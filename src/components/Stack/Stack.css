@@ -1,0 +1,8 @@
+.may-stack {
+  display: flex;
+  min-width: 0;
+}
+
+.may-stack--full {
+  width: 100%;
+}

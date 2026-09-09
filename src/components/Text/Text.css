@@ -1,0 +1,35 @@
+.may-text {
+  margin: 0;
+  line-height: var(--may-line-height-normal);
+}
+
+.may-text--xs { font-size: var(--may-font-size-xs); }
+.may-text--sm { font-size: var(--may-font-size-sm); }
+.may-text--md { font-size: var(--may-font-size-md); }
+.may-text--lg { font-size: var(--may-font-size-lg); }
+.may-text--xl { font-size: var(--may-font-size-xl); }
+
+.may-text--tone-default { color: var(--may-color-text); }
+.may-text--tone-muted { color: var(--may-color-text-muted); }
+.may-text--tone-subtle { color: var(--may-color-text-subtle); }
+.may-text--tone-brand { color: var(--may-color-brand-text); }
+.may-text--tone-success { color: var(--may-color-success-text); }
+.may-text--tone-warning { color: var(--may-color-warning-text); }
+.may-text--tone-danger { color: var(--may-color-danger-text); }
+.may-text--tone-inverted { color: var(--may-color-text-inverted); }
+
+.may-text--weight-normal { font-weight: var(--may-font-weight-normal); }
+.may-text--weight-medium { font-weight: var(--may-font-weight-medium); }
+.may-text--weight-semibold { font-weight: var(--may-font-weight-semibold); }
+.may-text--weight-bold { font-weight: var(--may-font-weight-bold); }
+
+.may-text--mono {
+  font-family: var(--may-font-mono);
+  font-size: 0.925em;
+}
+
+.may-text--clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

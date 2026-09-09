@@ -1,0 +1,83 @@
+.may-switch {
+  display: inline-flex;
+  align-items: start;
+  gap: var(--may-space-3);
+}
+
+.may-switch--label-start { flex-direction: row-reverse; justify-content: flex-end; }
+
+.may-switch__control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.may-switch__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.may-switch__track {
+  display: inline-flex;
+  align-items: center;
+  width: var(--may-switch-w);
+  height: var(--may-switch-h);
+  padding: 2px;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-border-strong);
+  transition: background-color var(--may-duration-normal) var(--may-ease-standard);
+}
+
+.may-switch__thumb {
+  width: calc(var(--may-switch-h) - 4px);
+  height: calc(var(--may-switch-h) - 4px);
+  border-radius: var(--may-radius-full);
+  background: var(--may-neutral-0);
+  box-shadow: var(--may-shadow-xs);
+  transition: transform var(--may-duration-normal) var(--may-ease-standard);
+}
+
+.may-switch__input:checked ~ .may-switch__track {
+  background: var(--may-color-brand);
+}
+
+.may-switch__input:checked ~ .may-switch__track .may-switch__thumb {
+  transform: translateX(calc(var(--may-switch-w) - var(--may-switch-h)));
+}
+
+.may-switch__input:focus-visible ~ .may-switch__track {
+  outline: var(--may-focus-ring-width) solid var(--may-color-focus-ring);
+  outline-offset: var(--may-focus-ring-offset);
+}
+
+.may-switch__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.may-switch__label {
+  color: var(--may-color-text);
+  cursor: pointer;
+  line-height: var(--may-line-height-snug);
+}
+
+.may-switch__description {
+  font-size: var(--may-font-size-sm);
+  color: var(--may-color-text-muted);
+  line-height: var(--may-line-height-snug);
+}
+
+.may-switch--disabled { opacity: 0.55; }
+.may-switch--disabled .may-switch__input,
+.may-switch--disabled .may-switch__label { cursor: not-allowed; }
+
+.may-switch--sm { --may-switch-w: 28px; --may-switch-h: 16px; font-size: var(--may-font-size-sm); }
+.may-switch--md { --may-switch-w: 36px; --may-switch-h: 20px; font-size: var(--may-font-size-md); }
+.may-switch--lg { --may-switch-w: 44px; --may-switch-h: 24px; font-size: var(--may-font-size-lg); }

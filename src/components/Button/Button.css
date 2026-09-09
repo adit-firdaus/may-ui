@@ -1,0 +1,185 @@
+/**
+ * Tone modifiers only set variables; variant modifiers only consume them.
+ * Adding a tone therefore never touches variant CSS, and vice versa.
+ */
+
+.may-button {
+  --may-btn-solid-fg: var(--may-color-on-brand);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--may-radius-md);
+  font-family: inherit;
+  font-weight: var(--may-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-standard),
+    border-color var(--may-duration-fast) var(--may-ease-standard),
+    color var(--may-duration-fast) var(--may-ease-standard);
+}
+
+.may-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-button--tone-brand {
+  --may-btn-solid-bg: var(--may-color-brand);
+  --may-btn-solid-bg-hover: var(--may-color-brand-hover);
+  --may-btn-solid-bg-active: var(--may-color-brand-active);
+  --may-btn-solid-fg: var(--may-color-on-brand);
+  --may-btn-subtle-bg: var(--may-color-brand-subtle);
+  --may-btn-subtle-bg-hover: var(--may-color-brand-subtle-hover);
+  --may-btn-border: var(--may-color-brand-border);
+  --may-btn-fg: var(--may-color-brand-text);
+}
+
+.may-button--tone-neutral {
+  --may-btn-solid-bg: var(--may-neutral-800);
+  --may-btn-solid-bg-hover: var(--may-neutral-900);
+  --may-btn-solid-bg-active: var(--may-neutral-950);
+  --may-btn-solid-fg: var(--may-neutral-0);
+  --may-btn-subtle-bg: var(--may-color-surface-hover);
+  --may-btn-subtle-bg-hover: var(--may-color-surface-active);
+  --may-btn-border: var(--may-color-border-strong);
+  --may-btn-fg: var(--may-color-text);
+}
+
+.may-button--tone-danger {
+  --may-btn-solid-bg: var(--may-color-danger);
+  --may-btn-solid-bg-hover: var(--may-color-danger-hover);
+  --may-btn-solid-bg-active: var(--may-color-danger-active);
+  --may-btn-solid-fg: var(--may-color-on-danger);
+  --may-btn-subtle-bg: var(--may-color-danger-subtle);
+  --may-btn-subtle-bg-hover: var(--may-color-danger-subtle);
+  --may-btn-border: var(--may-color-danger-border);
+  --may-btn-fg: var(--may-color-danger-text);
+}
+
+.may-button--tone-success {
+  --may-btn-solid-bg: var(--may-color-success);
+  --may-btn-solid-bg-hover: var(--may-green-600);
+  --may-btn-solid-bg-active: var(--may-green-700);
+  --may-btn-solid-fg: var(--may-neutral-0);
+  --may-btn-subtle-bg: var(--may-color-success-subtle);
+  --may-btn-subtle-bg-hover: var(--may-color-success-subtle);
+  --may-btn-border: var(--may-color-success-border);
+  --may-btn-fg: var(--may-color-success-text);
+}
+
+.may-button--tone-warning {
+  --may-btn-solid-bg: var(--may-color-warning);
+  --may-btn-solid-bg-hover: var(--may-amber-500);
+  --may-btn-solid-bg-active: var(--may-amber-600);
+  --may-btn-solid-fg: var(--may-neutral-950);
+  --may-btn-subtle-bg: var(--may-color-warning-subtle);
+  --may-btn-subtle-bg-hover: var(--may-color-warning-subtle);
+  --may-btn-border: var(--may-color-warning-border);
+  --may-btn-fg: var(--may-color-warning-text);
+}
+
+.may-button--tone-info {
+  --may-btn-solid-bg: var(--may-color-info);
+  --may-btn-solid-bg-hover: var(--may-blue-600);
+  --may-btn-solid-bg-active: var(--may-blue-700);
+  --may-btn-solid-fg: var(--may-neutral-0);
+  --may-btn-subtle-bg: var(--may-color-info-subtle);
+  --may-btn-subtle-bg-hover: var(--may-color-info-subtle);
+  --may-btn-border: var(--may-color-info-border);
+  --may-btn-fg: var(--may-color-info-text);
+}
+
+/* -------------------------------- variants -------------------------------- */
+
+.may-button--solid {
+  background: var(--may-btn-solid-bg);
+  color: var(--may-btn-solid-fg);
+}
+.may-button--solid:hover:not(:disabled) { background: var(--may-btn-solid-bg-hover); }
+.may-button--solid:active:not(:disabled) { background: var(--may-btn-solid-bg-active); }
+
+.may-button--soft {
+  background: var(--may-btn-subtle-bg);
+  color: var(--may-btn-fg);
+}
+.may-button--soft:hover:not(:disabled) { background: var(--may-btn-subtle-bg-hover); }
+
+.may-button--outline {
+  background: transparent;
+  border-color: var(--may-btn-border);
+  color: var(--may-btn-fg);
+}
+.may-button--outline:hover:not(:disabled) { background: var(--may-btn-subtle-bg); }
+
+.may-button--ghost {
+  background: transparent;
+  color: var(--may-btn-fg);
+}
+.may-button--ghost:hover:not(:disabled) { background: var(--may-btn-subtle-bg); }
+
+.may-button--link {
+  background: transparent;
+  color: var(--may-btn-fg);
+  padding: 0;
+  height: auto;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.may-button--link:hover:not(:disabled) { text-decoration-thickness: 2px; }
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-button--sm {
+  height: 28px;
+  padding-inline: var(--may-space-3);
+  font-size: var(--may-font-size-sm);
+  gap: var(--may-space-1);
+}
+
+.may-button--md {
+  height: 36px;
+  padding-inline: var(--may-space-4);
+  font-size: var(--may-font-size-md);
+}
+
+.may-button--lg {
+  height: 44px;
+  padding-inline: var(--may-space-5);
+  font-size: var(--may-font-size-lg);
+}
+
+.may-button--link.may-button--sm,
+.may-button--link.may-button--md,
+.may-button--link.may-button--lg {
+  padding-inline: 0;
+  height: auto;
+}
+
+.may-button--full {
+  width: 100%;
+}
+
+/* --------------------------------- loading -------------------------------- */
+
+.may-button__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.may-button__label {
+  display: inline-block;
+}
+
+.may-button--loading .may-button__label {
+  opacity: 0.7;
+}

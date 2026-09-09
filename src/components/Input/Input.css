@@ -1,0 +1,97 @@
+.may-input {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  background: var(--may-color-surface);
+  border: 1px solid var(--may-color-border-strong);
+  border-radius: var(--may-radius-md);
+  color: var(--may-color-text);
+  transition:
+    border-color var(--may-duration-fast) var(--may-ease-standard),
+    box-shadow var(--may-duration-fast) var(--may-ease-standard);
+  min-width: 0;
+}
+
+.may-input:hover:not(.may-input--disabled) {
+  border-color: var(--may-color-text-subtle);
+}
+
+.may-input:focus-within {
+  border-color: var(--may-color-brand);
+  box-shadow: 0 0 0 3px var(--may-color-brand-subtle);
+}
+
+.may-input--invalid {
+  border-color: var(--may-color-danger);
+}
+
+.may-input--invalid:focus-within {
+  border-color: var(--may-color-danger);
+  box-shadow: 0 0 0 3px var(--may-color-danger-subtle);
+}
+
+.may-input--disabled {
+  background: var(--may-color-surface-sunken);
+  color: var(--may-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.may-input--full {
+  display: flex;
+  width: 100%;
+}
+
+.may-input__control {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  padding: 0;
+}
+
+.may-input__control::placeholder {
+  color: var(--may-color-text-subtle);
+}
+
+.may-input__control:disabled {
+  cursor: not-allowed;
+}
+
+/* The wrapper owns the focus ring, so the inner input must not draw its own. */
+.may-input__control:focus-visible {
+  outline: none;
+}
+
+.may-input__affix {
+  display: inline-flex;
+  align-items: center;
+  color: var(--may-color-text-subtle);
+  flex-shrink: 0;
+}
+
+.may-input__affix svg {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+}
+
+.may-input--sm {
+  height: 28px;
+  padding-inline: var(--may-space-2);
+  font-size: var(--may-font-size-sm);
+}
+
+.may-input--md {
+  height: 36px;
+  padding-inline: var(--may-space-3);
+  font-size: var(--may-font-size-md);
+}
+
+.may-input--lg {
+  height: 44px;
+  padding-inline: var(--may-space-4);
+  font-size: var(--may-font-size-lg);
+}

@@ -1,0 +1,3 @@
+.may-root:not(.may-root--inline) {
+  min-height: 100%;
+}

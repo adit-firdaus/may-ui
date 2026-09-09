@@ -1,0 +1,344 @@
+/**
+ * May UI — design tokens.
+ *
+ * Two layers:
+ *   1. Primitives  (--may-<scale>-<step>)  raw values, rarely used directly
+ *   2. Semantic    (--may-color-<role>)    what you actually build with
+ *
+ * Restyle the whole system by overriding the semantic layer only.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- *
+   * 1. PRIMITIVES — color ramps
+   * ---------------------------------------------------------------- */
+
+  --may-neutral-0: #ffffff;
+  --may-neutral-50: #f8f9fb;
+  --may-neutral-100: #f1f3f7;
+  --may-neutral-200: #e4e7ee;
+  --may-neutral-300: #cfd4e0;
+  --may-neutral-400: #a2aabd;
+  --may-neutral-500: #737d96;
+  --may-neutral-600: #545e77;
+  --may-neutral-700: #3d4659;
+  --may-neutral-800: #272e3d;
+  --may-neutral-900: #171c27;
+  --may-neutral-950: #0d1017;
+
+  --may-brand-50: #f4f2ff;
+  --may-brand-100: #ebe7ff;
+  --may-brand-200: #d9d2ff;
+  --may-brand-300: #bcadff;
+  --may-brand-400: #9b7fff;
+  --may-brand-500: #7c4dff;
+  --may-brand-600: #6a2df0;
+  --may-brand-700: #5a1fd1;
+  --may-brand-800: #4a1caa;
+  --may-brand-900: #3e1a8a;
+  --may-brand-950: #250e5c;
+
+  --may-green-50: #eefbf3;
+  --may-green-100: #d5f5e2;
+  --may-green-200: #ade9c9;
+  --may-green-400: #47c684;
+  --may-green-500: #22a865;
+  --may-green-600: #158650;
+  --may-green-700: #136a42;
+  --may-green-900: #0b3f28;
+
+  --may-amber-50: #fff8eb;
+  --may-amber-100: #ffedc7;
+  --may-amber-200: #fdda8a;
+  --may-amber-400: #f5a524;
+  --may-amber-500: #e08704;
+  --may-amber-600: #b96603;
+  --may-amber-700: #944c08;
+  --may-amber-900: #5a2f0c;
+
+  --may-red-50: #fef3f2;
+  --may-red-100: #fee2e0;
+  --may-red-200: #fdc9c5;
+  --may-red-400: #f4655c;
+  --may-red-500: #e13b32;
+  --may-red-600: #be2921;
+  --may-red-700: #9c211b;
+  --may-red-900: #5c1512;
+
+  --may-blue-50: #eff6ff;
+  --may-blue-100: #dbeafe;
+  --may-blue-200: #bfdbfe;
+  --may-blue-400: #55a0f7;
+  --may-blue-500: #2a7fe8;
+  --may-blue-600: #1b63c4;
+  --may-blue-700: #1a4f9c;
+  --may-blue-900: #16305c;
+
+  /* ---------------------------------------------------------------- *
+   * 1. PRIMITIVES — space, radius, type, elevation, motion
+   * ---------------------------------------------------------------- */
+
+  --may-space-0: 0;
+  --may-space-1: 0.25rem;   /*  4px */
+  --may-space-2: 0.5rem;    /*  8px */
+  --may-space-3: 0.75rem;   /* 12px */
+  --may-space-4: 1rem;      /* 16px */
+  --may-space-5: 1.25rem;   /* 20px */
+  --may-space-6: 1.5rem;    /* 24px */
+  --may-space-8: 2rem;      /* 32px */
+  --may-space-10: 2.5rem;   /* 40px */
+  --may-space-12: 3rem;     /* 48px */
+  --may-space-16: 4rem;     /* 64px */
+  --may-space-20: 5rem;     /* 80px */
+  --may-space-24: 6rem;     /* 96px */
+
+  --may-radius-none: 0;
+  --may-radius-sm: 4px;
+  --may-radius-md: 8px;
+  --may-radius-lg: 12px;
+  --may-radius-xl: 16px;
+  --may-radius-2xl: 24px;
+  --may-radius-full: 9999px;
+
+  --may-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --may-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --may-font-size-xs: 0.75rem;    /* 12px */
+  --may-font-size-sm: 0.8125rem;  /* 13px */
+  --may-font-size-md: 0.875rem;   /* 14px */
+  --may-font-size-lg: 1rem;       /* 16px */
+  --may-font-size-xl: 1.25rem;    /* 20px */
+  --may-font-size-2xl: 1.5rem;    /* 24px */
+  --may-font-size-3xl: 1.875rem;  /* 30px */
+  --may-font-size-4xl: 2.25rem;   /* 36px */
+
+  --may-font-weight-normal: 400;
+  --may-font-weight-medium: 500;
+  --may-font-weight-semibold: 600;
+  --may-font-weight-bold: 700;
+
+  --may-line-height-tight: 1.2;
+  --may-line-height-snug: 1.4;
+  --may-line-height-normal: 1.55;
+  --may-line-height-relaxed: 1.75;
+
+  --may-letter-spacing-tight: -0.01em;
+  --may-letter-spacing-normal: 0;
+  --may-letter-spacing-wide: 0.04em;
+
+  --may-shadow-xs: 0 1px 2px rgba(13, 16, 23, 0.06);
+  --may-shadow-sm: 0 1px 3px rgba(13, 16, 23, 0.08), 0 1px 2px rgba(13, 16, 23, 0.04);
+  --may-shadow-md: 0 4px 12px rgba(13, 16, 23, 0.1), 0 2px 4px rgba(13, 16, 23, 0.05);
+  --may-shadow-lg: 0 12px 28px rgba(13, 16, 23, 0.13), 0 4px 8px rgba(13, 16, 23, 0.06);
+  --may-shadow-xl: 0 24px 56px rgba(13, 16, 23, 0.18);
+
+  --may-z-base: 1;
+  --may-z-dropdown: 1000;
+  --may-z-sticky: 1100;
+  --may-z-overlay: 1200;
+  --may-z-modal: 1300;
+  --may-z-popover: 1400;
+  --may-z-toast: 1500;
+  --may-z-tooltip: 1600;
+
+  --may-duration-fast: 120ms;
+  --may-duration-normal: 200ms;
+  --may-duration-slow: 320ms;
+  --may-ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --may-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --may-ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  --may-focus-ring-width: 2px;
+  --may-focus-ring-offset: 2px;
+
+  /* ---------------------------------------------------------------- *
+   * 2. SEMANTIC — light theme (the default)
+   * ---------------------------------------------------------------- */
+
+  --may-color-bg: var(--may-neutral-50);
+  --may-color-bg-subtle: var(--may-neutral-100);
+  --may-color-surface: var(--may-neutral-0);
+  --may-color-surface-raised: var(--may-neutral-0);
+  --may-color-surface-sunken: var(--may-neutral-100);
+  --may-color-surface-hover: var(--may-neutral-100);
+  --may-color-surface-active: var(--may-neutral-200);
+  --may-color-overlay: rgba(13, 16, 23, 0.45);
+
+  --may-color-text: var(--may-neutral-900);
+  --may-color-text-muted: var(--may-neutral-600);
+  --may-color-text-subtle: var(--may-neutral-500);
+  --may-color-text-disabled: var(--may-neutral-400);
+  --may-color-text-inverted: var(--may-neutral-0);
+
+  --may-color-border: var(--may-neutral-200);
+  --may-color-border-strong: var(--may-neutral-300);
+  --may-color-border-subtle: var(--may-neutral-100);
+
+  --may-color-brand: var(--may-brand-500);
+  --may-color-brand-hover: var(--may-brand-600);
+  --may-color-brand-active: var(--may-brand-700);
+  --may-color-brand-subtle: var(--may-brand-50);
+  --may-color-brand-subtle-hover: var(--may-brand-100);
+  --may-color-brand-border: var(--may-brand-200);
+  --may-color-brand-text: var(--may-brand-700);
+  --may-color-on-brand: var(--may-neutral-0);
+
+  --may-color-success: var(--may-green-500);
+  --may-color-success-subtle: var(--may-green-50);
+  --may-color-success-border: var(--may-green-200);
+  --may-color-success-text: var(--may-green-700);
+
+  --may-color-warning: var(--may-amber-400);
+  --may-color-warning-subtle: var(--may-amber-50);
+  --may-color-warning-border: var(--may-amber-200);
+  --may-color-warning-text: var(--may-amber-700);
+
+  --may-color-danger: var(--may-red-500);
+  --may-color-danger-hover: var(--may-red-600);
+  --may-color-danger-active: var(--may-red-700);
+  --may-color-danger-subtle: var(--may-red-50);
+  --may-color-danger-border: var(--may-red-200);
+  --may-color-danger-text: var(--may-red-700);
+  --may-color-on-danger: var(--may-neutral-0);
+
+  --may-color-info: var(--may-blue-500);
+  --may-color-info-subtle: var(--may-blue-50);
+  --may-color-info-border: var(--may-blue-200);
+  --may-color-info-text: var(--may-blue-700);
+
+  --may-color-focus-ring: var(--may-brand-400);
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. SEMANTIC — dark theme
+ * Applied by [data-may-theme="dark"], or automatically by the OS
+ * setting unless an explicit light theme is pinned.
+ * ------------------------------------------------------------------ */
+
+/* Explicit opt-in: <html data-may-theme="dark"> */
+[data-may-theme='dark'] {
+  --may-color-bg: var(--may-neutral-950);
+  --may-color-bg-subtle: var(--may-neutral-900);
+  --may-color-surface: var(--may-neutral-900);
+  --may-color-surface-raised: var(--may-neutral-800);
+  --may-color-surface-sunken: var(--may-neutral-950);
+  --may-color-surface-hover: var(--may-neutral-800);
+  --may-color-surface-active: var(--may-neutral-700);
+  --may-color-overlay: rgba(0, 0, 0, 0.65);
+
+  --may-color-text: var(--may-neutral-50);
+  --may-color-text-muted: var(--may-neutral-400);
+  --may-color-text-subtle: var(--may-neutral-500);
+  --may-color-text-disabled: var(--may-neutral-600);
+  --may-color-text-inverted: var(--may-neutral-950);
+
+  --may-color-border: var(--may-neutral-700);
+  --may-color-border-strong: var(--may-neutral-600);
+  --may-color-border-subtle: var(--may-neutral-800);
+
+  --may-color-brand: var(--may-brand-400);
+  --may-color-brand-hover: var(--may-brand-300);
+  --may-color-brand-active: var(--may-brand-200);
+  --may-color-brand-subtle: rgba(124, 77, 255, 0.16);
+  --may-color-brand-subtle-hover: rgba(124, 77, 255, 0.24);
+  --may-color-brand-border: rgba(124, 77, 255, 0.4);
+  --may-color-brand-text: var(--may-brand-300);
+  --may-color-on-brand: var(--may-neutral-950);
+
+  --may-color-success: var(--may-green-400);
+  --may-color-success-subtle: rgba(34, 168, 101, 0.16);
+  --may-color-success-border: rgba(34, 168, 101, 0.4);
+  --may-color-success-text: var(--may-green-200);
+
+  --may-color-warning: var(--may-amber-400);
+  --may-color-warning-subtle: rgba(245, 165, 36, 0.16);
+  --may-color-warning-border: rgba(245, 165, 36, 0.4);
+  --may-color-warning-text: var(--may-amber-200);
+
+  --may-color-danger: var(--may-red-400);
+  --may-color-danger-hover: var(--may-red-500);
+  --may-color-danger-active: var(--may-red-600);
+  --may-color-danger-subtle: rgba(225, 59, 50, 0.16);
+  --may-color-danger-border: rgba(225, 59, 50, 0.4);
+  --may-color-danger-text: var(--may-red-200);
+  --may-color-on-danger: var(--may-neutral-0);
+
+  --may-color-info: var(--may-blue-400);
+  --may-color-info-subtle: rgba(42, 127, 232, 0.16);
+  --may-color-info-border: rgba(42, 127, 232, 0.4);
+  --may-color-info-text: var(--may-blue-200);
+
+  --may-color-focus-ring: var(--may-brand-400);
+
+  --may-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --may-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --may-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --may-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.55), 0 4px 8px rgba(0, 0, 0, 0.35);
+  --may-shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.65);
+}
+
+/* Follow the OS setting, unless a light theme is explicitly pinned. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-may-theme='light']) {
+    --may-color-bg: var(--may-neutral-950);
+    --may-color-bg-subtle: var(--may-neutral-900);
+    --may-color-surface: var(--may-neutral-900);
+    --may-color-surface-raised: var(--may-neutral-800);
+    --may-color-surface-sunken: var(--may-neutral-950);
+    --may-color-surface-hover: var(--may-neutral-800);
+    --may-color-surface-active: var(--may-neutral-700);
+    --may-color-overlay: rgba(0, 0, 0, 0.65);
+  
+    --may-color-text: var(--may-neutral-50);
+    --may-color-text-muted: var(--may-neutral-400);
+    --may-color-text-subtle: var(--may-neutral-500);
+    --may-color-text-disabled: var(--may-neutral-600);
+    --may-color-text-inverted: var(--may-neutral-950);
+  
+    --may-color-border: var(--may-neutral-700);
+    --may-color-border-strong: var(--may-neutral-600);
+    --may-color-border-subtle: var(--may-neutral-800);
+  
+    --may-color-brand: var(--may-brand-400);
+    --may-color-brand-hover: var(--may-brand-300);
+    --may-color-brand-active: var(--may-brand-200);
+    --may-color-brand-subtle: rgba(124, 77, 255, 0.16);
+    --may-color-brand-subtle-hover: rgba(124, 77, 255, 0.24);
+    --may-color-brand-border: rgba(124, 77, 255, 0.4);
+    --may-color-brand-text: var(--may-brand-300);
+    --may-color-on-brand: var(--may-neutral-950);
+  
+    --may-color-success: var(--may-green-400);
+    --may-color-success-subtle: rgba(34, 168, 101, 0.16);
+    --may-color-success-border: rgba(34, 168, 101, 0.4);
+    --may-color-success-text: var(--may-green-200);
+  
+    --may-color-warning: var(--may-amber-400);
+    --may-color-warning-subtle: rgba(245, 165, 36, 0.16);
+    --may-color-warning-border: rgba(245, 165, 36, 0.4);
+    --may-color-warning-text: var(--may-amber-200);
+  
+    --may-color-danger: var(--may-red-400);
+    --may-color-danger-hover: var(--may-red-500);
+    --may-color-danger-active: var(--may-red-600);
+    --may-color-danger-subtle: rgba(225, 59, 50, 0.16);
+    --may-color-danger-border: rgba(225, 59, 50, 0.4);
+    --may-color-danger-text: var(--may-red-200);
+    --may-color-on-danger: var(--may-neutral-0);
+  
+    --may-color-info: var(--may-blue-400);
+    --may-color-info-subtle: rgba(42, 127, 232, 0.16);
+    --may-color-info-border: rgba(42, 127, 232, 0.4);
+    --may-color-info-text: var(--may-blue-200);
+  
+    --may-color-focus-ring: var(--may-brand-400);
+  
+    --may-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --may-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --may-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --may-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.55), 0 4px 8px rgba(0, 0, 0, 0.35);
+    --may-shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.65);
+  }
+}

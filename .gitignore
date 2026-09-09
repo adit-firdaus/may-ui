@@ -1,0 +1,13 @@
+node_modules/
+dist/
+storybook-static/
+*.log
+.DS_Store
+
+# design-sync
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.ds-sync/
+ds-bundle/

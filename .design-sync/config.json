@@ -1,0 +1,23 @@
+{
+  "projectId": "395ba6af-772e-4469-b2d6-7af4a0f3ebe6",
+  "shape": "storybook",
+  "storybookConfigDir": ".storybook",
+  "pkg": "mayui",
+  "globalName": "MayUI",
+  "entry": "dist/mayui.js",
+  "cssEntry": "dist/mayui.css",
+  "buildCmd": "npm run build",
+  "storybookStatic": ".design-sync/sb-reference",
+  "titleMap": {
+    "Designtokens": null
+  },
+  "overrides": {
+    "Pagination": {
+      "cardMode": "column"
+    },
+    "Tooltip": {
+      "cardMode": "column"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

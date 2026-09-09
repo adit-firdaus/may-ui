@@ -1,0 +1,18 @@
+.may-icon-button {
+  padding: 0;
+  aspect-ratio: 1;
+}
+
+.may-icon-button--sm { width: 28px; height: 28px; }
+.may-icon-button--md { width: 36px; height: 36px; }
+.may-icon-button--lg { width: 44px; height: 44px; }
+
+.may-icon-button--round {
+  border-radius: var(--may-radius-full);
+}
+
+.may-icon-button svg {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+}

@@ -1,0 +1,49 @@
+.may-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+}
+
+.may-progress__track {
+  flex: 1;
+  overflow: hidden;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-surface-active);
+}
+
+.may-progress__bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--may-progress-fill);
+  transition: width var(--may-duration-slow) var(--may-ease-out);
+}
+
+.may-progress--sm .may-progress__track { height: 4px; }
+.may-progress--md .may-progress__track { height: 8px; }
+.may-progress--lg .may-progress__track { height: 12px; }
+
+.may-progress__value {
+  font-size: var(--may-font-size-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text-muted);
+  min-width: 3ch;
+  text-align: end;
+}
+
+.may-progress__track--tone-brand { --may-progress-fill: var(--may-color-brand); }
+.may-progress__track--tone-neutral { --may-progress-fill: var(--may-color-text-muted); }
+.may-progress__track--tone-success { --may-progress-fill: var(--may-color-success); }
+.may-progress__track--tone-warning { --may-progress-fill: var(--may-color-warning); }
+.may-progress__track--tone-danger { --may-progress-fill: var(--may-color-danger); }
+.may-progress__track--tone-info { --may-progress-fill: var(--may-color-info); }
+
+.may-progress__track--indeterminate .may-progress__bar {
+  width: 40%;
+  animation: may-progress-slide 1.2s var(--may-ease-standard) infinite;
+}
+
+@keyframes may-progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
