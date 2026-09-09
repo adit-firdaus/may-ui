@@ -1,0 +1,141 @@
+.may-list-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Uppercase eyebrow above the card, as iOS Settings draws its section titles. */
+.may-list__header {
+  padding: var(--may-space-4) var(--may-space-4) var(--may-space-2);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--may-color-text-secondary);
+}
+
+.may-list__footer {
+  padding: var(--may-space-2) var(--may-space-4) var(--may-space-4);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+}
+
+.may-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--may-color-surface);
+}
+
+.may-list[data-variant='inset'] {
+  border-radius: var(--may-radius-card);
+  overflow: hidden;
+}
+
+/* -------------------------------- the row -------------------------------- */
+
+.may-list-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+  min-height: var(--may-control-h);
+  padding: var(--may-space-2) var(--may-space-4);
+  border: 0;
+  background: transparent;
+  color: var(--may-color-text);
+  font: inherit;
+  text-align: start;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+button.may-list-row { cursor: pointer; }
+button.may-list-row:disabled { cursor: not-allowed; opacity: 0.4; }
+
+/*
+ * The hairline is drawn by the row, inset from the leading edge so it starts
+ * under the label rather than at the card's edge — the detail that makes a
+ * grouped list read as iOS. Using a pseudo-element rather than border-bottom
+ * keeps it out of the box model, so row heights stay exact.
+ */
+.may-list-row + .may-list-row::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--may-space-4);
+  inset-inline-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+/* A row with a leading element indents the hairline past it, as iOS does. */
+.may-list-row:has(.may-list-row__leading) + .may-list-row::before {
+  inset-inline-start: calc(var(--may-space-4) * 2 + 29px);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-list-row + .may-list-row::before { height: var(--may-hairline); }
+}
+
+.may-list-row[data-pressed='true'] { background: var(--may-color-highlight-strong); }
+
+@media (hover: hover) and (pointer: fine) {
+  button.may-list-row:hover:not(:disabled) { background: var(--may-color-highlight); }
+}
+
+.may-list-row__leading {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.may-list-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.may-list-row__title {
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-list-row[data-destructive='true'] .may-list-row__title { color: var(--may-color-danger); }
+
+.may-list-row__subtitle {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-list-row__detail {
+  font-size: var(--may-text-body);
+  color: var(--may-color-text-secondary);
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.may-list-row__accessory { display: inline-flex; align-items: center; flex-shrink: 0; }
+
+.may-list-row__chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--may-color-text-tertiary);
+}

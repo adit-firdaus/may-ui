@@ -7,51 +7,47 @@ import './MayProvider.css'
 export type MayTheme = 'light' | 'dark' | 'system'
 
 export interface MayProviderProps {
-  /** Content rendered inside the themed root. */
   children?: ReactNode
-  /**
-   * Which theme to apply. `'system'` (default) follows the OS setting.
-   * @default 'system'
-   */
+  /** `'system'` (default) follows the OS setting. */
   theme?: MayTheme
-  /** Extra class names on the root element. */
-  className?: string
   /**
-   * Render the root as a plain `<div>` that fills its parent instead of
-   * stretching to the viewport height.
-   * @default false
+   * Accent colour. Defaults to Apple's systemBlue. Overriding this re-points
+   * both the tint (brand as text) and the primary fill.
    */
+  accent?: string
+  className?: string
+  /** Fill the parent rather than stretching to the viewport. */
   inline?: boolean
 }
 
-interface MayThemeContextValue {
+interface MayContextValue {
   theme: MayTheme
-  /** The theme actually in effect once `'system'` is resolved. */
   resolvedTheme: 'light' | 'dark'
   setTheme: (theme: MayTheme) => void
 }
 
-const MayThemeContext = createContext<MayThemeContextValue | null>(null)
+const MayContext = createContext<MayContextValue | null>(null)
 
-/** Read the current theme. Must be called inside a `<MayProvider>`. */
-export function useMayTheme(): MayThemeContextValue {
-  const ctx = useContext(MayThemeContext)
+/** Read and set the current theme. Must be called inside `<MayProvider>`. */
+export function useMayTheme(): MayContextValue {
+  const ctx = useContext(MayContext)
   if (!ctx) throw new Error('useMayTheme must be used inside <MayProvider>')
   return ctx
 }
 
-function prefersDark(): boolean {
-  if (typeof window === 'undefined' || !window.matchMedia) return false
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-}
+const prefersDark = () =>
+  typeof window !== 'undefined' &&
+  !!window.matchMedia &&
+  window.matchMedia('(prefers-color-scheme: dark)').matches
 
 /**
- * Root of every May UI tree. Supplies design tokens, the base typography
- * layer and theme state. Components render unstyled without it.
+ * Root of every May UI tree. Supplies the design tokens, the base layer and
+ * theme state. Components render unstyled without it.
  */
 export function MayProvider({
   children,
   theme = 'system',
+  accent,
   className,
   inline = false,
 }: MayProviderProps) {
@@ -68,19 +64,25 @@ export function MayProvider({
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  const value = useMemo<MayThemeContextValue>(() => {
+  const value = useMemo<MayContextValue>(() => {
     const resolved = current === 'system' ? (systemDark ? 'dark' : 'light') : current
     return { theme: current, resolvedTheme: resolved, setTheme: setCurrent }
   }, [current, systemDark])
 
   return (
-    <MayThemeContext.Provider value={value}>
+    <MayContext.Provider value={value}>
       <div
+        data-slot="root"
         className={cx('may-root', inline && 'may-root--inline', className)}
         data-may-theme={current === 'system' ? undefined : current}
+        style={
+          accent
+            ? ({ '--may-color-tint': accent, '--may-color-primary': accent } as React.CSSProperties)
+            : undefined
+        }
       >
         {children}
       </div>
-    </MayThemeContext.Provider>
+    </MayContext.Provider>
   )
 }

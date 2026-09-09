@@ -1,0 +1,69 @@
+/*
+ * The thumb is laid out once at 1px wide and positioned entirely with
+ * translate + scale, so selection changes never touch layout. Animating
+ * left/width instead would force a reflow on every frame of the slide.
+ */
+
+.may-segmented {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  padding: 2px;
+  border-radius: var(--may-radius-md);
+  background: var(--may-color-fill-tertiary);
+  isolation: isolate;
+}
+
+.may-segmented--full { display: flex; width: 100%; }
+
+.may-segmented__thumb {
+  position: absolute;
+  inset-block: 2px;
+  inset-inline-start: 0;
+  width: 1px;
+  z-index: 0;
+  transform-origin: 0 50%;
+  border-radius: calc(var(--may-radius-md) - 2px);
+  background: var(--may-color-surface);
+  box-shadow: var(--may-shadow-sm);
+  pointer-events: none;
+}
+
+.may-segmented__segment {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding-inline: var(--may-space-4);
+  border: 0;
+  border-radius: calc(var(--may-radius-md) - 2px);
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  font: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--may-duration-fast) var(--may-ease-out),
+    font-weight var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-segmented__segment[aria-selected='true'] {
+  color: var(--may-color-text);
+  font-weight: 600;
+}
+
+.may-segmented__segment:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* While dragging, the pointer owns the control — segment hover would fight it. */
+.may-segmented[data-dragging='true'] .may-segmented__segment { cursor: grabbing; }
+
+.may-segmented[data-size='sm'] { height: var(--may-control-h-sm); }
+.may-segmented[data-size='sm'] .may-segmented__segment { font-size: var(--may-text-footnote); }
+.may-segmented[data-size='md'] { height: var(--may-control-h-md); }
+.may-segmented[data-size='md'] .may-segmented__segment { font-size: var(--may-text-subheadline); }
+.may-segmented[data-size='lg'] { height: var(--may-control-h-lg); }
+.may-segmented[data-size='lg'] .may-segmented__segment { font-size: var(--may-text-body); }

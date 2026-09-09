@@ -1,83 +1,94 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Button } from './Button'
-import { Stack } from '../Stack/Stack'
 
 const meta = {
-  title: 'Actions/Button',
+  title: 'Catalog/Adaptive/Button',
   component: Button,
-  args: { children: 'Save changes' },
+  args: { children: 'Continue' },
   argTypes: {
-    variant: { control: 'select', options: ['solid', 'soft', 'outline', 'ghost', 'link'] },
-    tone: { control: 'select', options: ['brand', 'neutral', 'success', 'warning', 'danger', 'info'] },
-    size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
+    variant: { control: 'inline-radio', options: ['filled', 'tinted', 'gray', 'plain'] },
+    tone: { control: 'select', options: ['tint', 'neutral', 'success', 'warning', 'danger'] },
+    size: { control: 'inline-radio', options: ['xs', 'sm', 'md', 'lg'] },
   },
+  parameters: { layout: 'padded' },
 } satisfies Meta<typeof Button>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
+const Row = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ display: 'flex', gap: 'var(--may-space-3)', flexWrap: 'wrap', alignItems: 'center' }}>
+    {children}
+  </div>
+)
+
 export const Default: Story = {}
 
+/** There is no `outline` variant — nothing here is separated by a stroke. */
 export const Variants: Story = {
   render: (args) => (
-    <Stack direction="horizontal" gap={3} wrap>
-      <Button {...args} variant="solid">Solid</Button>
-      <Button {...args} variant="soft">Soft</Button>
-      <Button {...args} variant="outline">Outline</Button>
-      <Button {...args} variant="ghost">Ghost</Button>
-      <Button {...args} variant="link">Link</Button>
-    </Stack>
+    <Row>
+      <Button {...args} variant="filled">Filled</Button>
+      <Button {...args} variant="tinted">Tinted</Button>
+      <Button {...args} variant="gray">Gray</Button>
+      <Button {...args} variant="plain">Plain</Button>
+    </Row>
   ),
 }
 
 export const Tones: Story = {
-  render: (args) => (
-    <Stack gap={3}>
-      <Stack direction="horizontal" gap={3} wrap>
-        <Button {...args} tone="brand">Brand</Button>
-        <Button {...args} tone="neutral">Neutral</Button>
-        <Button {...args} tone="success">Success</Button>
-        <Button {...args} tone="warning">Warning</Button>
-        <Button {...args} tone="danger">Danger</Button>
-        <Button {...args} tone="info">Info</Button>
-      </Stack>
-      <Stack direction="horizontal" gap={3} wrap>
-        <Button {...args} variant="soft" tone="brand">Brand</Button>
-        <Button {...args} variant="soft" tone="neutral">Neutral</Button>
-        <Button {...args} variant="soft" tone="success">Success</Button>
-        <Button {...args} variant="soft" tone="warning">Warning</Button>
-        <Button {...args} variant="soft" tone="danger">Danger</Button>
-        <Button {...args} variant="soft" tone="info">Info</Button>
-      </Stack>
-    </Stack>
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--may-space-3)' }}>
+      <Row>
+        {(['tint', 'neutral', 'success', 'warning', 'danger'] as const).map((t) => (
+          <Button key={t} tone={t}>{t}</Button>
+        ))}
+      </Row>
+      <Row>
+        {(['tint', 'neutral', 'success', 'warning', 'danger'] as const).map((t) => (
+          <Button key={t} tone={t} variant="tinted">{t}</Button>
+        ))}
+      </Row>
+    </div>
   ),
 }
 
 export const Sizes: Story = {
-  render: (args) => (
-    <Stack direction="horizontal" gap={3}>
-      <Button {...args} size="sm">Small</Button>
-      <Button {...args} size="md">Medium</Button>
-      <Button {...args} size="lg">Large</Button>
-    </Stack>
+  render: () => (
+    <Row>
+      {(['xs', 'sm', 'md', 'lg'] as const).map((s) => (
+        <Button key={s} size={s}>{s}</Button>
+      ))}
+    </Row>
+  ),
+}
+
+/** Pills are for prominent standalone actions, the way iOS uses them. */
+export const Pills: Story = {
+  render: () => (
+    <Row>
+      <Button pill size="lg">Get Started</Button>
+      <Button pill size="lg" variant="tinted">Learn More</Button>
+      <Button pill size="lg" variant="gray">Not Now</Button>
+    </Row>
   ),
 }
 
 export const States: Story = {
-  render: (args) => (
-    <Stack direction="horizontal" gap={3} wrap>
-      <Button {...args}>Default</Button>
-      <Button {...args} loading>Saving</Button>
-      <Button {...args} disabled>Disabled</Button>
-      <Button {...args} fullWidth={false} leadingIcon={<PlusIcon />}>With icon</Button>
-    </Stack>
+  render: () => (
+    <Row>
+      <Button>Default</Button>
+      <Button loading>Saving</Button>
+      <Button disabled>Disabled</Button>
+      <Button leadingIcon={<PlusIcon />}>With icon</Button>
+    </Row>
   ),
 }
 
 function PlusIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden>
-      <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    <svg viewBox="0 0 16 16" aria-hidden>
+      <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }

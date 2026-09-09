@@ -1,0 +1,123 @@
+.may-sheet__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--may-z-sheet);
+  display: flex;
+  background: var(--may-color-scrim);
+  animation: may-fade-in var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-sheet__scrim[data-presentation='sheet'] { align-items: flex-end; }
+.may-sheet__scrim[data-presentation='dialog'] {
+  align-items: center;
+  justify-content: center;
+  padding: var(--may-space-6);
+}
+
+.may-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+  box-shadow: var(--may-shadow-xl);
+  overflow: hidden;
+}
+
+/* ----------------------------- phone: a sheet ---------------------------- */
+
+.may-sheet[data-presentation='sheet'] {
+  width: 100%;
+  border-start-start-radius: var(--may-radius-sheet);
+  border-start-end-radius: var(--may-radius-sheet);
+  padding-bottom: var(--may-inset-bottom);
+  /* iOS's own sheet presentation timing. */
+  animation: may-sheet-in var(--may-duration-sheet-in) var(--may-ease-sheet);
+  transition: transform var(--may-duration-settle) var(--may-spring-smooth);
+  touch-action: none;
+}
+
+.may-sheet[data-presentation='sheet'][data-size='sm'] { max-height: 40vh; }
+.may-sheet[data-presentation='sheet'][data-size='md'] { max-height: 60vh; }
+.may-sheet[data-presentation='sheet'][data-size='lg'] { max-height: 85vh; }
+.may-sheet[data-presentation='sheet'][data-size='full'] { height: 100dvh; max-height: none; }
+
+/* While the finger is down the sheet must track it exactly — any easing reads as lag. */
+.may-sheet[data-dragging='true'] { transition: none; }
+
+.may-sheet__grabber {
+  width: 36px;
+  height: 5px;
+  margin: var(--may-space-2) auto var(--may-space-1);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill);
+  flex-shrink: 0;
+}
+
+/* ---------------------------- desktop: a dialog --------------------------- */
+
+.may-sheet[data-presentation='dialog'] {
+  width: 100%;
+  border-radius: var(--may-radius-sheet);
+  max-height: calc(100vh - var(--may-space-16));
+  animation: may-dialog-in var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-sheet[data-presentation='dialog'][data-size='sm'] { max-width: 360px; }
+.may-sheet[data-presentation='dialog'][data-size='md'] { max-width: 480px; }
+.may-sheet[data-presentation='dialog'][data-size='lg'] { max-width: 680px; }
+.may-sheet[data-presentation='dialog'][data-size='full'] { max-width: 960px; }
+
+/* -------------------------------- contents ------------------------------- */
+
+.may-sheet__header {
+  padding: var(--may-space-5) var(--may-space-5) var(--may-space-3);
+  flex-shrink: 0;
+}
+
+.may-sheet__title {
+  margin: 0;
+  font-size: var(--may-text-title-3);
+  line-height: var(--may-text-title-3-leading);
+  letter-spacing: var(--may-text-title-3-tracking);
+  font-weight: var(--may-text-title-3-weight);
+}
+
+.may-sheet__description {
+  margin: var(--may-space-1) 0 0;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  color: var(--may-color-text-secondary);
+}
+
+.may-sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--may-space-5) var(--may-space-5);
+}
+
+.may-sheet__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--may-space-2);
+  padding: var(--may-space-4) var(--may-space-5);
+  flex-shrink: 0;
+}
+
+@keyframes may-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes may-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Overshoots very slightly, so a dialog arrives rather than simply appearing. */
+@keyframes may-dialog-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}

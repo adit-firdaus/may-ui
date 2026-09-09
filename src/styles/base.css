@@ -1,18 +1,30 @@
 /**
  * May UI — base layer.
- * Minimal, deliberately non-global: everything here is scoped to `.may-root`
- * (rendered by <MayProvider>) so dropping May UI into an existing app never
- * restyles that app's own markup.
+ *
+ * Everything here is scoped to `.may-root` (rendered by <MayProvider>), so
+ * dropping May UI into an existing app never restyles that app's own markup.
+ *
+ * This file is where "feels native" actually lives. Three things do most of
+ * that work, and all three are easy to skip:
+ *   1. chrome is unselectable, content is not
+ *   2. hover only exists for real pointers
+ *   3. a press is visible even when the tap is faster than the transition
  */
 
 .may-root {
   font-family: var(--may-font-sans);
-  font-size: var(--may-font-size-md);
-  line-height: var(--may-line-height-normal);
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
   color: var(--may-color-text);
   background-color: var(--may-color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* A tab bar should jump, the way a native one does. Smooth scrolling makes a
+   * tap look like it did nothing for the length of the animation. */
+  scroll-behavior: auto;
 }
 
 .may-root *,
@@ -21,15 +33,185 @@
   box-sizing: border-box;
 }
 
-/* Every interactive part of the system shares one focus treatment. */
-.may-focusable:focus-visible,
-.may-root :focus-visible {
-  outline: var(--may-focus-ring-width) solid var(--may-color-focus-ring);
-  outline-offset: var(--may-focus-ring-offset);
-  border-radius: var(--may-radius-sm);
+/* ------------------------------------------------------------------ *
+ * 1. Selection, callouts and drag
+ *
+ * App furniture is not a document. Controls, labels, rows and nav chrome
+ * must not be selectable, must not raise the long-press callout, and must
+ * not show the grey tap flash. Body copy stays selectable — that is the
+ * half most systems get wrong in the other direction.
+ * ------------------------------------------------------------------ */
+
+.may-root button,
+.may-root a,
+.may-root label,
+.may-root summary,
+.may-root [role='button'],
+.may-root [role='tab'],
+.may-root [role='option'],
+.may-root [role='menuitem'],
+.may-root [data-slot='list-row'],
+.may-root [data-slot='segmented'],
+.may-root [data-slot='nav-bar'],
+.may-root [data-slot='tab-bar'],
+.may-root [data-slot='toolbar'] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Removes the 300ms double-tap delay without disabling pinch zoom. */
+  touch-action: manipulation;
 }
 
-/* Visually hidden, still announced by screen readers. */
+.may-root p,
+.may-root [data-selectable],
+.may-root [data-slot='content'],
+.may-root [data-slot='body'] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Icons and images are furniture too — dragging one off a button is never intended. */
+.may-root img,
+.may-root svg {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.may-root input,
+.may-root textarea {
+  caret-color: var(--may-color-tint);
+  /* iOS zooms the viewport when a focused field is under 16px. */
+  font-size: max(16px, 1em);
+}
+
+.may-root ::selection {
+  background: color-mix(in srgb, var(--may-color-tint) 24%, transparent);
+  color: var(--may-color-text);
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. Hover only for real pointers
+ *
+ * Without this gate a tap leaves the hover state stuck until you tap
+ * something else — the single most common "this is a website" tell.
+ * Components put every :hover rule inside .may-hoverable.
+ * ------------------------------------------------------------------ */
+
+@media (hover: hover) and (pointer: fine) {
+  .may-hoverable:hover:not([disabled]):not([aria-disabled='true']) {
+    background-color: var(--may-color-highlight);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 3. Press feedback
+ *
+ * Asymmetric on purpose. Down is faster than the eye; up rides a spring
+ * that overshoots past its resting size and settles back. That overshoot
+ * is the bounce, and the asymmetry is what makes a 20ms tap still read as
+ * a press. `data-pressed` is held for a minimum window by usePressFeedback.
+ * ------------------------------------------------------------------ */
+
+.may-pressable {
+  transform: scale(1);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+  will-change: transform;
+}
+
+.may-pressable[data-pressed='true'] {
+  transform: scale(0.96);
+  transition: transform var(--may-duration-instant) var(--may-ease-out);
+}
+
+/* Non-uniform squish: slightly wider than tall, so it reads as pressing INTO
+ * the surface rather than shrinking uniformly. */
+.may-pressable[data-press-squish='true'][data-pressed='true'] {
+  transform: scale(0.97, 0.94);
+}
+
+/* ------------------------------------------------------------------ *
+ * Focus — keyboard only, never on tap
+ * ------------------------------------------------------------------ */
+
+.may-root :focus:not(:focus-visible) {
+  outline: none;
+}
+
+.may-root :focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* ------------------------------------------------------------------ *
+ * Scrolling
+ * ------------------------------------------------------------------ */
+
+.may-root [data-slot='scroll-area'] {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--may-scrollbar-thumb) transparent;
+}
+
+.may-root [data-slot='scroll-area']::-webkit-scrollbar {
+  width: var(--may-scrollbar-size);
+  height: var(--may-scrollbar-size);
+}
+
+.may-root [data-slot='scroll-area']::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.may-root [data-slot='scroll-area']::-webkit-scrollbar-thumb {
+  background: var(--may-scrollbar-thumb);
+  border-radius: var(--may-radius-full);
+  /* Inset the thumb without a wrapper element. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.may-root [data-slot='scroll-area']::-webkit-scrollbar-thumb:hover {
+  background: var(--may-scrollbar-thumb-hover);
+  background-clip: content-box;
+}
+
+/* ------------------------------------------------------------------ *
+ * Hairlines
+ *
+ * A separator is 1 physical pixel, not 1 CSS pixel. On a 2x display a 1px
+ * rule is twice as heavy as iOS draws it.
+ * ------------------------------------------------------------------ */
+
+.may-hairline {
+  background-color: var(--may-color-separator);
+  height: 1px;
+  flex-shrink: 0;
+}
+
+@media (min-resolution: 2dppx) {
+  .may-hairline {
+    height: var(--may-hairline);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Safe areas. The --may-inset-* indirection lets a WebView shell inject
+ * real insets where env() reports zero.
+ * ------------------------------------------------------------------ */
+
+.may-safe-top { padding-top: var(--may-inset-top); }
+.may-safe-bottom { padding-bottom: var(--may-inset-bottom); }
+.may-safe-x {
+  padding-left: var(--may-inset-left);
+  padding-right: var(--may-inset-right);
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilities
+ * ------------------------------------------------------------------ */
+
 .may-sr-only {
   position: absolute;
   width: 1px;
@@ -37,24 +219,32 @@
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
+
+/* ------------------------------------------------------------------ *
+ * Reduced motion
+ *
+ * Both reference projects set 0.01ms durations but leave
+ * animation-iteration-count alone, so infinite spinners keep looping at
+ * 0.01ms and strobe. Stopping the iteration is the part that matters.
+ * Durations collapse to 1ms rather than 0 so transitionend still fires.
+ * ------------------------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
   .may-root *,
   .may-root *::before,
   .may-root *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 1ms !important;
     scroll-behavior: auto !important;
   }
-}
 
-/* Shared overlay animation, used by Modal and Drawer. */
-@keyframes may-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  .may-pressable,
+  .may-pressable[data-pressed='true'] {
+    transform: none;
+  }
 }

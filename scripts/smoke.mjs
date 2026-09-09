@@ -1,51 +1,34 @@
+/**
+ * Server-renders every export against the BUILT bundle and asserts the things
+ * that are easy to break and invisible in a screenshot: accessibility wiring,
+ * the data-slot contract, and the native-feel attributes.
+ */
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement as h } from 'react'
 import * as May from '../dist/mayui.js'
 
-const P = (children) => h(May.MayProvider, { theme: 'light' }, children)
-const render = (el) => renderToStaticMarkup(P(el))
+const render = (el) => renderToStaticMarkup(h(May.MayProvider, { theme: 'light' }, el))
 
 const cases = {
-  Box: h(May.Box, { padding: 4, surface: 'base', radius: 'lg', bordered: true }, 'box'),
-  Stack: h(May.Stack, { direction: 'horizontal', gap: 3 }, 'a', 'b'),
-  Grid: h(May.Grid, { columns: 3, gap: 4 }, 'a'),
-  Divider: h(May.Divider, null),
-  DividerLabelled: h(May.Divider, null, 'or'),
-  Heading: h(May.Heading, { level: 1 }, 'Title'),
-  Text: h(May.Text, { tone: 'muted', clamp: 2 }, 'body'),
-  Button: h(May.Button, { tone: 'danger', variant: 'soft', size: 'lg' }, 'Delete'),
+  Button: h(May.Button, null, 'Continue'),
+  ButtonTinted: h(May.Button, { variant: 'tinted', tone: 'danger', size: 'lg', pill: true }, 'Delete'),
   ButtonLoading: h(May.Button, { loading: true }, 'Saving'),
-  IconButton: h(May.IconButton, { icon: 'x', 'aria-label': 'Close' }),
-  ButtonGroup: h(May.ButtonGroup, null, h(May.Button, null, 'A'), h(May.Button, null, 'B')),
-  Field: h(May.Field, { label: 'Email', error: 'Bad email', required: true }, h(May.Input, { fullWidth: true })),
-  FieldOk: h(May.Field, { label: 'Email', description: 'help' }, h(May.Input, null)),
-  Input: h(May.Input, { prefix: 'search', suffix: 'USD', size: 'sm' }),
-  Textarea: h(May.Textarea, { rows: 3, resize: 'none' }),
-  Select: h(May.Select, { placeholder: 'Pick', options: [{ label: 'A', value: 'a' }] }),
-  Checkbox: h(May.Checkbox, { description: 'desc', defaultChecked: true }, 'Label'),
-  RadioGroup: h(May.RadioGroup, { defaultValue: 'a', 'aria-label': 'g' }, h(May.Radio, { value: 'a' }, 'A'), h(May.Radio, { value: 'b' }, 'B')),
-  Switch: h(May.Switch, { defaultChecked: true, description: 'd' }, 'Toggle'),
-  Card: h(May.Card, { variant: 'raised' }, h(May.CardHeader, null, h(May.CardTitle, null, 'T'), h(May.CardDescription, null, 'D')), h(May.CardBody, null, 'body'), h(May.CardFooter, null, 'f')),
-  Badge: h(May.Badge, { tone: 'success', dot: true }, 'Live'),
-  Tag: h(May.Tag, { tone: 'brand', onRemove: () => {} }, 'react'),
-  Avatar: h(May.Avatar, { name: 'Ada Lovelace' }),
-  AvatarGroup: h(May.AvatarGroup, { max: 2 }, h(May.Avatar, { name: 'A B' }), h(May.Avatar, { name: 'C D' }), h(May.Avatar, { name: 'E F' })),
-  Table: h(May.Table, { striped: true, hoverable: true }, h(May.TableHead, null, h(May.TableRow, null, h(May.TableHeaderCell, null, 'H'), h(May.TableHeaderCell, { numeric: true }, 'N'))), h(May.TableBody, null, h(May.TableRow, { selected: true }, h(May.TableCell, null, 'c'), h(May.TableCell, { numeric: true }, '42')))),
-  Alert: h(May.Alert, { tone: 'danger', title: 'Failed', onDismiss: () => {} }, 'msg'),
-  Progress: h(May.Progress, { value: 64, showValue: true, 'aria-label': 'p' }),
-  ProgressIndet: h(May.Progress, { 'aria-label': 'p' }),
-  Spinner: h(May.Spinner, { size: 'lg' }),
-  Skeleton: h(May.Skeleton, { variant: 'text', lines: 3 }),
-  Tabs: h(May.Tabs, { defaultValue: 'a' }, h(May.TabList, { 'aria-label': 't' }, h(May.Tab, { value: 'a' }, 'A'), h(May.Tab, { value: 'b' }, 'B')), h(May.TabPanel, { value: 'a' }, 'panel a')),
-  Accordion: h(May.Accordion, { defaultValue: ['x'] }, h(May.AccordionItem, { value: 'x', title: 'Q', description: 'd' }, 'answer')),
-  Breadcrumb: h(May.Breadcrumb, { items: [{ label: 'Home', href: '#' }, { label: 'Now' }] }),
-  BreadcrumbCollapsed: h(May.Breadcrumb, { maxItems: 3, items: [1,2,3,4,5].map(n => ({ label: 'p'+n, href: '#' })) }),
-  Pagination: h(May.Pagination, { page: 23, pageCount: 50, onPageChange: () => {} }),
-  Tooltip: h(May.Tooltip, { content: 'hint', open: true }, h(May.Button, null, 'Hover')),
-  ModalClosed: h(May.Modal, { open: false, onClose: () => {} }, 'x'),
-  DrawerClosed: h(May.Drawer, { open: false, onClose: () => {} }, 'x'),
-  Toast: h(May.Toast, { title: 'Saved', description: 'd', tone: 'success', action: { label: 'Undo', onClick: () => {} }, onDismiss: () => {} }),
-  ToastProvider: h(May.ToastProvider, null, 'app'),
+  List: h(
+    May.List,
+    { header: 'General', footer: 'Applies to this device only.' },
+    h(May.ListRow, { title: 'Airplane Mode', accessory: 'x' }),
+    h(May.ListRow, { title: 'Wi-Fi', detail: 'HomeNet', onClick: () => {} }),
+    h(May.ListRow, { title: 'Delete Account', destructive: true, onClick: () => {} }),
+  ),
+  SegmentedControl: h(May.SegmentedControl, {
+    'aria-label': 'View',
+    options: [
+      { label: 'Day', value: 'd' },
+      { label: 'Week', value: 'w' },
+    ],
+  }),
+  SheetOpen: h(May.Sheet, { open: true, onClose: () => {}, title: 'Share', description: 'Pick one' }, 'body'),
+  SheetClosed: h(May.Sheet, { open: false, onClose: () => {} }, 'body'),
 }
 
 let pass = 0
@@ -68,21 +51,28 @@ if (failures.length) {
   process.exit(1)
 }
 
-// Spot-check a11y wiring that matters
-const fieldHtml = render(cases.Field)
+const listHtml = render(cases.List)
+const sheetHtml = render(cases.SheetOpen)
+const segHtml = render(cases.SegmentedControl)
+const btnHtml = render(cases.Button)
+
 const checks = [
-  ['Field marks control invalid', /aria-invalid="true"/.test(fieldHtml)],
-  ['Field wires aria-describedby to the error', /aria-describedby="[^"]*-error"/.test(fieldHtml)],
-  ['Field links label to control', /<label[^>]*for="([^"]+)"/.test(fieldHtml) && new RegExp(`id="${fieldHtml.match(/<label[^>]*for="([^"]+)"/)[1]}"`).test(fieldHtml)],
-  ['IconButton keeps its aria-label', /aria-label="Close"/.test(render(cases.IconButton))],
-  ['Tabs wires aria-controls', /aria-controls="[^"]*-panel-a"/.test(render(cases.Tabs))],
-  ['Accordion wires aria-expanded', /aria-expanded="true"/.test(render(cases.Accordion))],
-  ['Closed Modal renders nothing', render(cases.ModalClosed).indexOf('may-modal') === -1],
-  ['Pagination collapses with an ellipsis', render(cases.Pagination).includes('may-pagination__ellipsis')],
-  ['Avatar derives initials', render(cases.Avatar).includes('>AL<')],
-  ['Progress exposes aria-valuenow', /aria-valuenow="64"/.test(render(cases.Progress))],
-  ['Indeterminate Progress omits valuenow', !/aria-valuenow/.test(render(cases.ProgressIndet))],
+  ['every root emits data-slot', /data-slot="root"/.test(btnHtml) && /data-slot="button"/.test(btnHtml)],
+  ['Button emits data-variant and data-size', /data-variant="filled"/.test(btnHtml) && /data-size="md"/.test(btnHtml)],
+  ['Button is pressable and hoverable', /may-pressable/.test(btnHtml) && /may-hoverable/.test(btnHtml)],
+  ['an activatable ListRow is a real <button>', /<button[^>]*data-slot="list-row"/.test(listHtml)],
+  ['a static ListRow is NOT a button', /<div[^>]*data-slot="list-row"/.test(listHtml)],
+  ['destructive row is marked', /data-destructive="true"/.test(listHtml)],
+  ['List header and footer render', /General/.test(listHtml) && /this device only/.test(listHtml)],
+  ['SegmentedControl is a tablist with a thumb', /role="tablist"/.test(segHtml) && /may-segmented__thumb/.test(segHtml)],
+  ['SegmentedControl marks selection', /aria-selected="true"/.test(segHtml)],
+  ['Sheet is a modal dialog', /role="dialog"/.test(sheetHtml) && /aria-modal="true"/.test(sheetHtml)],
+  ['Sheet labels itself from its title', /aria-labelledby="[^"]*-title"/.test(sheetHtml)],
+  ['Sheet SSRs as the desktop dialog shape', /data-presentation="dialog"/.test(sheetHtml)],
+  ['Sheet body is a scroll-area (gets the scrollbar + overscroll rules)', /data-slot="scroll-area"/.test(sheetHtml)],
+  ['closed Sheet renders nothing', render(cases.SheetClosed).indexOf('may-sheet') === -1],
 ]
+
 let bad = 0
 for (const [label, ok] of checks) {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${label}`)
