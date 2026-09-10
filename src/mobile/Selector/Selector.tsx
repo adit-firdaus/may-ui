@@ -12,10 +12,10 @@ const PRESS_SCALE = 1.1
 
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export interface SelectorOption {
+export interface SelectorOption<T extends string = string> {
   /** Primary line. */
   label: ReactNode
-  value: string
+  value: T
   /** Second line under the label. `card` only — a chip has no room for one. */
   description?: ReactNode
   /** Leading glyph: an inline SVG, an emoji, an `IconTile`. */
@@ -29,8 +29,8 @@ export type SelectorSize = Exclude<MaySize, 'xs'>
 /** A fixed column count, or `'auto'` to let items wrap at their natural width. */
 export type SelectorColumns = number | 'auto'
 
-interface SelectorBaseProps {
-  options: SelectorOption[]
+interface SelectorBaseProps<T extends string = string> {
+  options: SelectorOption<T>[]
   /** @default 'card' */
   variant?: SelectorVariant
   /** @default 'md' */
@@ -47,19 +47,19 @@ interface SelectorBaseProps {
   'aria-label'?: string
 }
 
-interface SelectorSingleProps {
+interface SelectorSingleProps<T extends string = string> {
   /** @default false */
   multiple?: false
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string, option: SelectorOption) => void
+  value?: T
+  defaultValue?: T
+  onChange?: (value: T, option: SelectorOption<T>) => void
 }
 
-interface SelectorMultipleProps {
+interface SelectorMultipleProps<T extends string = string> {
   multiple: true
-  value?: string[]
-  defaultValue?: string[]
-  onChange?: (value: string[], option: SelectorOption) => void
+  value?: T[]
+  defaultValue?: T[]
+  onChange?: (value: T[], option: SelectorOption<T>) => void
 }
 
 /**
@@ -67,11 +67,11 @@ interface SelectorMultipleProps {
  * value a consumer receives is decided by the `multiple` flag they already
  * passed — no runtime `Array.isArray` at the call site, no `as string`.
  */
-export type SelectorProps =
-  | (SelectorBaseProps & SelectorSingleProps)
-  | (SelectorBaseProps & SelectorMultipleProps)
+export type SelectorProps<T extends string = string> =
+  | (SelectorBaseProps<T> & SelectorSingleProps<T>)
+  | (SelectorBaseProps<T> & SelectorMultipleProps<T>)
 
-const asList = (value: string | string[] | undefined): string[] =>
+const asList = <T extends string>(value: T | T[] | undefined): T[] =>
   value === undefined ? [] : Array.isArray(value) ? value : [value]
 
 /**
@@ -88,7 +88,7 @@ const asList = (value: string | string[] | undefined): string[] =>
  * leading edge and *widens the chip*, which is the motion iOS uses and the
  * reason a chip row feels physical rather than repainted.
  */
-export function Selector(props: SelectorProps) {
+export function Selector<T extends string = string>(props: SelectorProps<T>) {
   const {
     options,
     variant = 'card',
@@ -101,18 +101,20 @@ export function Selector(props: SelectorProps) {
   const columns = props.columns ?? (variant === 'chip' ? 'auto' : 2)
 
   const controlled = props.value !== undefined
-  const [internal, setInternal] = useState<string[]>(() => asList(props.defaultValue))
+  const [internal, setInternal] = useState<T[]>(() => asList(props.defaultValue))
   const selected = controlled ? asList(props.value) : internal
 
   const buttons = useRef<(HTMLButtonElement | null)[]>([])
 
-  const emit = (next: string[], option: SelectorOption) => {
+  const emit = (next: T[], option: SelectorOption<T>) => {
     if (!controlled) setInternal(next)
     if (props.multiple) props.onChange?.(next, option)
-    else props.onChange?.(next[0] ?? '', option)
+    // Single mode always emits a real option's value: `choose` returns early
+    // when nothing is selected, so `next[0]` is present by construction.
+    else if (next[0] !== undefined) props.onChange?.(next[0], option)
   }
 
-  const choose = (option: SelectorOption) => {
+  const choose = (option: SelectorOption<T>) => {
     if (disabled || option.disabled) return
 
     if (props.multiple) {

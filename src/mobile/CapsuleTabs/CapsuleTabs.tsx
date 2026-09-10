@@ -10,9 +10,9 @@ import './CapsuleTabs.css'
 /** A gentle puff — the chips sit close, so the pill stays inside its lane. */
 const PRESS_SCALE = 1.1
 
-export interface CapsuleTab {
+export interface CapsuleTab<T extends string = string> {
   /** Identity of the tab — what `onValueChange` reports. */
-  value: string
+  value: T
   label: ReactNode
   /** Leading glyph, sized to the label by CSS. */
   icon?: ReactNode
@@ -32,13 +32,13 @@ export type CapsuleTabsVariant = 'filled' | 'tinted' | 'surface'
 /** xs is deliberately absent: a chip that small stops being a touch target. */
 export type CapsuleTabsSize = Exclude<MaySize, 'xs'>
 
-export interface CapsuleTabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  items: CapsuleTab[]
+export interface CapsuleTabsProps<T extends string = string> extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  items: CapsuleTab<T>[]
   /** Controlled selection. */
-  value?: string
+  value?: T
   /** Uncontrolled initial selection. Falls back to the first tab. */
-  defaultValue?: string
-  onValueChange?: (value: string) => void
+  defaultValue?: T
+  onValueChange?: (value: T) => void
   /** @default 'filled' */
   variant?: CapsuleTabsVariant
   /** @default 'md' */
@@ -98,7 +98,7 @@ function revealChip(
  * a horizontal drag already belongs to the scroller, and a control that fights
  * its own scroll container for the same gesture loses both.
  */
-export function CapsuleTabs({
+export function CapsuleTabs<T extends string = string>({
   items = [],
   value,
   defaultValue,
@@ -108,14 +108,14 @@ export function CapsuleTabs({
   className,
   'aria-label': ariaLabel,
   ...rest
-}: CapsuleTabsProps) {
-  const [internal, setInternal] = useState(defaultValue ?? items[0]?.value ?? '')
+}: CapsuleTabsProps<T>) {
+  const [internal, setInternal] = useState<T | undefined>(defaultValue ?? items[0]?.value)
   const current = value ?? internal
   const reducedMotion = useReducedMotion()
 
   const scrollerRef = useRef<HTMLDivElement>(null)
   const firstPaint = useRef(true)
-  const lastValue = useRef<string | null>(null)
+  const lastValue = useRef<T | null | undefined>(null)
 
   const selectedIndex = Math.max(
     0,
@@ -154,7 +154,7 @@ export function CapsuleTabs({
     firstPaint.current = false
   }, [current, reducedMotion])
 
-  const select = (next: string) => {
+  const select = (next: T) => {
     if (value === undefined) setInternal(next)
     if (next !== current) onValueChange?.(next)
   }
@@ -235,10 +235,10 @@ export function CapsuleTabs({
   )
 }
 
-interface CapsuleTabChipProps {
-  item: CapsuleTab
+interface CapsuleTabChipProps<T extends string = string> {
+  item: CapsuleTab<T>
   selected: boolean
-  onSelect: (value: string) => void
+  onSelect: (value: T) => void
   chipRef: (node: HTMLButtonElement | null) => void
 }
 
@@ -248,7 +248,7 @@ interface CapsuleTabChipProps {
  * intercepts before a function component ever sees it — and `forwardRef` would
  * buy nothing, since nothing outside this file holds one of these.
  */
-function CapsuleTabChip({ item, selected, onSelect, chipRef }: CapsuleTabChipProps) {
+function CapsuleTabChip<T extends string = string>({ item, selected, onSelect, chipRef }: CapsuleTabChipProps<T>) {
   const { pressProps } = usePressFeedback(item.disabled)
 
   return (
