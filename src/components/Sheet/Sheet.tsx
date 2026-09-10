@@ -41,6 +41,14 @@ export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   size?: 'sm' | 'md' | 'lg' | 'full'
   /** Show the drag grabber on the phone presentation. @default true */
   grabber?: boolean
+  /**
+   * Which edge the sheet comes from. `'bottom'` (the default) is the phone
+   * sheet, and becomes a centred dialog at the desktop breakpoint. `'start'`
+   * and `'end'` are edge drawers — the standard desktop editor shape — and
+   * stay drawers at every width, so they do not reshape under you.
+   * @default 'bottom'
+   */
+  side?: 'bottom' | 'start' | 'end'
   /** Allow dragging the sheet down to dismiss it. @default true */
   dismissible?: boolean
   closeOnScrimClick?: boolean
@@ -74,6 +82,7 @@ export function Sheet({
   description,
   footer,
   footerLayout = 'end',
+  side = 'bottom',
   size = 'md',
   grabber = true,
   dismissible = true,
@@ -131,10 +140,12 @@ export function Sheet({
     }
   }, [open, onKeyDown])
 
-  /* Drag-to-dismiss. Phone presentation only — a centred dialog has no edge to drag from. */
+  /* Drag-to-dismiss. The phone sheet only — a centred dialog has no edge to
+   * drag from, and an edge drawer's axis is horizontal, so a downward drag
+   * would dismiss it in a direction it never travels. */
   useEffect(() => {
     const panel = panelRef.current
-    if (!open || !panel || isDesktop || !dismissible || reducedMotion) return
+    if (!open || !panel || presentation !== 'sheet' || !dismissible || reducedMotion) return
 
     let height = panel.offsetHeight
 
@@ -165,7 +176,12 @@ export function Sheet({
   // of blinking off the screen next to an entrance that rises.
   if (!mounted) return null
 
-  const presentation = isDesktop ? 'dialog' : 'sheet'
+  /*
+   * A drawer is a drawer at every width: reshaping an edge drawer into a
+   * centred dialog halfway across a breakpoint is exactly the surprise the
+   * adaptive story is meant to avoid. Only the default bottom sheet adapts.
+   */
+  const presentation = side !== 'bottom' ? 'drawer' : isDesktop ? 'dialog' : 'sheet'
 
   return (
     <div
@@ -173,6 +189,7 @@ export function Sheet({
       data-slot="scrim"
       data-state={open ? 'open' : 'closed'}
       data-presentation={presentation}
+      data-side={side}
       onMouseDown={(event) => {
         if (closeOnScrimClick && event.target === event.currentTarget) onClose()
       }}
@@ -187,6 +204,7 @@ export function Sheet({
         data-slot="sheet"
         data-state={open ? 'open' : 'closed'}
         data-presentation={presentation}
+        data-side={side}
         data-size={size}
         data-dragging={dragging ? 'true' : undefined}
         {...rest}
