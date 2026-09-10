@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
+import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import type { MayFooterLayout } from '../../types'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -87,6 +88,10 @@ export function Sheet({
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
   const [dragging, setDragging] = useState(false)
+
+  // Only while open: the measurement is cheap but the listeners are not free,
+  // and a closed sheet has no footer to keep above the keys.
+  useKeyboardInset(open)
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {

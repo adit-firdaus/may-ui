@@ -331,6 +331,13 @@ ${themed.split(String.fromCharCode(10)).map(l => l ? '  ' + l : l).join(String.f
   --may-inset-left: env(safe-area-inset-left, 0px);
   --may-inset-right: env(safe-area-inset-right, 0px);
 
+  /* How much of the layout viewport the on-screen keyboard is covering. Zero
+     until something measures it: Android resizes the layout viewport when the
+     keyboard opens, but iOS does NOT — it draws the keys over a viewport that
+     stays full height, so a sheet's footer ends up underneath them with no way
+     to reach it. useKeyboardInset writes the measured overlap here. */
+  --may-keyboard-inset: 0px;
+
   /* The room the floating bars occupy, for a scroller to pad itself with. Both
    * bars overlay their content rather than sitting in flow, so the space they
    * take is not something layout can work out on its own. Constants rather than

@@ -7,3 +7,4 @@ export type { MayPlatform, PlatformProviderProps } from './platform'
 // `linkComponent`, and a per-subtree override is speculative. The hook is
 // public so a consumer can build their own navigational component with it.
 export { useLinkComponent } from './link'
+export { useKeyboardInset } from './useKeyboardInset'
