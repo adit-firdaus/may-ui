@@ -31,7 +31,18 @@ export interface ActionSheetAction {
 export interface ActionSheetProps {
   open: boolean
   onClose: () => void
-  actions: ActionSheetAction[]
+  /**
+   * The rows. Named `items` to match every other list-taking component —
+   * Menu, Breadcrumb, Steps, TabBar, CapsuleTabs, CommandPalette, ContextMenu.
+   */
+  items?: ActionSheetAction[]
+  /**
+   * @deprecated Use `items`. `actions` meant two different things in one entry
+   * point — `ActionSheetAction[]` here and `ReactNode` on `Alert` — so the word
+   * could not be read without knowing which component you were looking at.
+   * Still honoured; `items` wins when both are passed.
+   */
+  actions?: ActionSheetAction[]
   title?: ReactNode
   description?: ReactNode
   /** Label of the phone shape's separate cancel group. @default 'Cancel' */
@@ -75,6 +86,7 @@ interface Placement {
 export function ActionSheet({
   open,
   onClose,
+  items,
   actions = [],
   title,
   description,
@@ -85,6 +97,8 @@ export function ActionSheet({
   const panelRef = useRef<HTMLDivElement>(null)
   const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
+  // `items` wins; `actions` is the deprecated spelling of the same list.
+  const list = items ?? actions
   const isDesktop = useIsDesktop()
   const [placement, setPlacement] = useState<Placement | null>(null)
   const reducedMotion = useReducedMotion()
@@ -193,7 +207,7 @@ export function ActionSheet({
       window.removeEventListener('resize', place)
       window.removeEventListener('scroll', onScroll, true)
     }
-  }, [open, menu, anchorRef, actions.length])
+  }, [open, menu, anchorRef, list.length])
 
   /*
    * Handled on the scrim rather than on `document`: an action sheet is very
@@ -291,7 +305,7 @@ export function ActionSheet({
               )}
             </div>
           )}
-          {actions.map((action, index) => (
+          {list.map((action, index) => (
             <ActionRow
               key={`${action.label}-${index}`}
               action={action}
