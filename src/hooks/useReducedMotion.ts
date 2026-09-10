@@ -2,15 +2,30 @@ import { useSyncExternalStore } from 'react'
 
 const QUERY = '(prefers-reduced-motion: reduce)'
 
+let list: MediaQueryList | null = null
+
+/**
+ * One MediaQueryList for the page.
+ *
+ * `getSnapshot` runs on every render of every consumer and again on every
+ * tearing check, and `matchMedia` parses the query and registers a fresh
+ * target with the document each time it is called. Resolved lazily rather than
+ * at module scope so nothing touches `window` during SSR.
+ */
+function media(): MediaQueryList | null {
+  if (list) return list
+  if (typeof window === 'undefined' || !window.matchMedia) return null
+  return (list = window.matchMedia(QUERY))
+}
+
 function subscribe(onChange: () => void): () => void {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {}
-  const mq = window.matchMedia(QUERY)
+  const mq = media()
+  if (!mq) return () => {}
   mq.addEventListener('change', onChange)
   return () => mq.removeEventListener('change', onChange)
 }
 
-const getSnapshot = () =>
-  typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(QUERY).matches
+const getSnapshot = () => media()?.matches ?? false
 
 /**
  * Whether the user has asked for reduced motion.

@@ -15,15 +15,35 @@ function query(): string {
   return `(min-width: ${token || '1024px'})`
 }
 
+let list: MediaQueryList | null = null
+
+/**
+ * One MediaQueryList for the page.
+ *
+ * `getSnapshot` runs on every render of every consumer and again on every
+ * tearing check. Doing it the long way meant a `getComputedStyle` on the
+ * document element *and* a fresh `matchMedia` per render, across every
+ * adaptive component on the page.
+ *
+ * The breakpoint is therefore resolved once, on first use. It is a build-time
+ * constant in practice — `--may-breakpoint-desktop` is emitted once by
+ * `gen-tokens.mjs`, on `:root`, and no theme redeclares it — and resolving
+ * lazily rather than at module scope keeps a late-loading stylesheet correct.
+ */
+function media(): MediaQueryList | null {
+  if (list) return list
+  if (typeof window === 'undefined' || !window.matchMedia) return null
+  return (list = window.matchMedia(query()))
+}
+
 function subscribe(onChange: () => void): () => void {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {}
-  const mq = window.matchMedia(query())
+  const mq = media()
+  if (!mq) return () => {}
   mq.addEventListener('change', onChange)
   return () => mq.removeEventListener('change', onChange)
 }
 
-const getSnapshot = () =>
-  typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(query()).matches
+const getSnapshot = () => media()?.matches ?? false
 
 /**
  * Server snapshot deliberately reports desktop rather than mobile: adaptive
