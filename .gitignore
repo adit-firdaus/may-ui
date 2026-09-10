@@ -4,6 +4,12 @@ storybook-static/
 *.log
 .DS_Store
 
+# local editor / agent config
+.claude/
+
+# npm's lockfile is the committed one; bun reads it fine
+bun.lock
+
 # design-sync
 .design-sync/sb-reference/
 .design-sync/learnings/

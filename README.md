@@ -13,7 +13,7 @@ and a token layer you can theme.
 ## Install
 
 ```bash
-npm install mayui
+npm install may-ui
 ```
 
 `react` and `react-dom` (18+) are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
@@ -26,8 +26,8 @@ Import the stylesheet once at the root, wrap your tree in `MayProvider`, and mou
 `MayHost` once for imperative surfaces:
 
 ```tsx
-import 'mayui/styles.css'
-import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from 'mayui'
+import 'may-ui/styles.css'
+import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from 'may-ui'
 
 export function App() {
   return (
@@ -52,16 +52,16 @@ Components render unstyled without it.
 
 | Import | What lives there |
 |---|---|
-| `mayui` | **Adaptive** components. One per concern, reshaping at the breakpoint. Start here. |
-| `mayui/desktop` | Shapes with no honest phone form |
-| `mayui/mobile` | Shapes with no desktop meaning |
+| `may-ui` | **Adaptive** components. One per concern, reshaping at the breakpoint. Start here. |
+| `may-ui/desktop` | Shapes with no honest phone form |
+| `may-ui/mobile` | Shapes with no desktop meaning |
 
 The adaptive components genuinely reshape rather than restyle: `Sheet` rises from the
 bottom with drag-to-dismiss on phones and presents as a centred dialog on desktop,
 `ActionSheet` becomes an anchored menu, `Table` collapses into grouped list rows. Reach
-into `mayui/desktop` only when you want more than the adaptive version carries.
+into `may-ui/desktop` only when you want more than the adaptive version carries.
 
-Consumers importing `mayui` never pull the desktop `DataTable` or the mobile gesture code.
+Consumers importing `may-ui` never pull the desktop `DataTable` or the mobile gesture code.
 
 ## Theming
 
@@ -159,7 +159,7 @@ on the compositor with no runtime JS:
 The same constants are readable from JS for gesture code:
 
 ```tsx
-import { motion } from 'mayui'
+import { motion } from 'may-ui'
 motion.duration.settle  // 340
 ```
 
@@ -187,7 +187,7 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 
 ## Components
 
-**Adaptive** (`mayui`)
+**Adaptive** (`may-ui`)
 
 | Group | Components |
 |---|---|
@@ -202,10 +202,10 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 | Overlays | `Sheet`, `Modal`, `AlertDialog`, `ActionSheet`, `Menu`, `Popover`, `Tooltip` |
 | Utility | `VisuallyHidden`, `cx`, `motion`, `initialsFrom`, `usePressFeedback`, `useReducedMotion` |
 
-**Desktop** (`mayui/desktop`) — `Sidebar`, `SidebarSection`, `SidebarItem`, `SidebarToggle`,
+**Desktop** (`may-ui/desktop`) — `Sidebar`, `SidebarSection`, `SidebarItem`, `SidebarToggle`,
 `NavTree`, `DataTable`, `CommandPalette`, `ContextMenu`, `SplitPane`
 
-**Mobile** (`mayui/mobile`) — `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`,
+**Mobile** (`may-ui/mobile`) — `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`,
 `SwipeAction`, `CapsuleTabs`, `Selector`, `Popup`, `FloatingBubble`
 
 ## Toasts
@@ -213,7 +213,7 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 Mount `MayHost` once, then call `toast` from anywhere — no hook, no provider:
 
 ```tsx
-import { toast, dismiss, dismissAll, setToastLimit } from 'mayui'
+import { toast, dismiss, dismissAll, setToastLimit } from 'may-ui'
 
 toast('Saved')
 toast.success('Deploy promoted')
@@ -225,14 +225,14 @@ live, and `setToastLimit(n)` caps how many stack at once.
 
 ## Example screens
 
-27 composed screens — full app shells, not isolated widgets — live under `mayui/examples`
+27 composed screens — full app shells, not isolated widgets — live under `may-ui/examples`
 and in the gallery app:
 
 ```bash
 npm run examples
 ```
 
-They are a separate entry, so importing `mayui` never pulls a demo screen into your bundle.
+They are a separate entry, so importing `may-ui` never pulls a demo screen into your bundle.
 
 ## Accessibility
 

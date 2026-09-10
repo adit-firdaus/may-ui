@@ -1,0 +1,30 @@
+# Publishes to npm when a GitHub Release is published. `prepublishOnly` rebuilds
+# dist as part of `npm publish`, so the tarball can never be stale.
+#
+# One-time setup: add an `NPM_TOKEN` repository secret (an npm automation token)
+# under Settings → Secrets and variables → Actions. Until it exists this job
+# fails at the publish step and nothing else is affected.
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run verify
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

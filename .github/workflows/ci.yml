@@ -1,0 +1,20 @@
+# Runs the full quality gate on every push and PR. `verify` is the same chain
+# the project uses locally: build + smoke + tokens + contract + size + coverage.
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run verify

@@ -1,9 +1,30 @@
 {
-  "name": "mayui",
+  "name": "may-ui",
   "version": "0.1.0",
   "description": "May UI — an Apple-native React design system: iOS design language, real spring motion, zero runtime dependencies.",
   "type": "module",
   "license": "MIT",
+  "author": "Adit Firdaus <aditfirdaus.dml@gmail.com>",
+  "homepage": "https://github.com/adit-firdaus/may-ui#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adit-firdaus/may-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adit-firdaus/may-ui/issues"
+  },
+  "keywords": [
+    "react",
+    "design-system",
+    "components",
+    "ui",
+    "ios",
+    "apple",
+    "tailwind-free"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": [
     "**/*.css"
   ],
@@ -38,6 +59,7 @@
     }
   },
   "scripts": {
+    "prepublishOnly": "npm run build",
     "gen:springs": "node scripts/gen-springs.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",
     "generate": "npm run gen:tokens && npm run gen:springs",
