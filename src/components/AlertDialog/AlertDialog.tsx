@@ -1,4 +1,4 @@
-import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
@@ -13,7 +13,13 @@ import './AlertDialog.css'
 /** Matches the exit animation in AlertDialog.css. */
 const EXIT_MS = 150
 
-export interface AlertDialogProps {
+/**
+ * Extends `HTMLAttributes` so a consumer can attach the things every other
+ * component already allows: `data-testid` for e2e, an `id`, extra `aria-*`,
+ * a `ref`. `title` is omitted because this component means a heading by it,
+ * not the HTML tooltip attribute.
+ */
+export interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   open: boolean
   /** The question, phrased as one. "Delete this album?" */
   title: ReactNode
@@ -57,6 +63,7 @@ export function AlertDialog({
   onCancel,
   children,
   className,
+  ...rest
 }: AlertDialogProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const confirmRef = useRef<HTMLButtonElement>(null)
@@ -170,6 +177,7 @@ export function AlertDialog({
         // Clears the flag once the shake finishes, so the next one can start it
         // again. The entry animation trips this too, harmlessly.
         onAnimationEnd={() => panelRef.current?.removeAttribute('data-nudge')}
+        {...rest}
         className={cx('may-alert-dialog', className)}
       >
         <div className="may-alert-dialog__content" data-slot="scroll-area">

@@ -1,4 +1,4 @@
-import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
@@ -14,7 +14,13 @@ import './Modal.css'
 /** Matches the exit animation in Modal.css. */
 const EXIT_MS = 150
 
-export interface ModalProps {
+/**
+ * Extends `HTMLAttributes` so a consumer can attach the things every other
+ * component already allows: `data-testid` for e2e, an `id`, extra `aria-*`,
+ * a `ref`. `title` is omitted because this component means a heading by it,
+ * not the HTML tooltip attribute.
+ */
+export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   open: boolean
   onClose: () => void
   children?: ReactNode
@@ -63,6 +69,7 @@ export function Modal({
   closeOnScrimClick = true,
   closeOnEscape = true,
   className,
+  ...rest
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const restoreTo = useRef<HTMLElement | null>(null)
@@ -171,6 +178,7 @@ export function Modal({
         data-size={size}
         data-presentation={isDesktop ? 'desktop' : 'compact'}
         data-closable={closeButton ? 'true' : undefined}
+        {...rest}
         className={cx('may-modal', className)}
       >
         {closeButton && (

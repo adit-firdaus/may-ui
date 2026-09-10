@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
@@ -13,7 +13,13 @@ import './Sheet.css'
 /** Matches the exit transition in Sheet.css. */
 const EXIT_MS = 150
 
-export interface SheetProps {
+/**
+ * Extends `HTMLAttributes` so a consumer can attach the things every other
+ * component already allows: `data-testid` for e2e, an `id`, extra `aria-*`,
+ * a `ref`. `title` is omitted because this component means a heading by it,
+ * not the HTML tooltip attribute.
+ */
+export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   open: boolean
   onClose: () => void
   children?: ReactNode
@@ -61,6 +67,7 @@ export function Sheet({
   dismissible = true,
   closeOnScrimClick = true,
   className,
+  ...rest
 }: SheetProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const restoreTo = useRef<HTMLElement | null>(null)
@@ -166,6 +173,7 @@ export function Sheet({
         data-presentation={presentation}
         data-size={size}
         data-dragging={dragging ? 'true' : undefined}
+        {...rest}
         className={cx('may-sheet', className)}
       >
         {grabber && !isDesktop && dismissible && (
