@@ -1,5 +1,5 @@
 {
-  "name": "may-ui",
+  "name": "@adit_firdaus/may-ui",
   "version": "0.1.0",
   "description": "May UI — an Apple-native React design system: iOS design language, real spring motion, zero runtime dependencies.",
   "type": "module",

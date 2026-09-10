@@ -14,7 +14,7 @@ export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/may-ui/' : '/',
   plugins: [react()],
   resolve: {
-    alias: { 'may-ui': resolve(__dirname, '../src') },
+    alias: { '@adit_firdaus/may-ui': resolve(__dirname, '../src') },
   },
   server: {
     port: 5173,

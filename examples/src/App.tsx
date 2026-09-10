@@ -12,9 +12,9 @@ import {
   ListRow,
   Toolbar,
   useIsDesktop,
-} from 'may-ui'
-import { Sidebar, SidebarSection, SidebarItem } from 'may-ui/desktop'
-import { DeviceFrame, SCREENS, type ExampleScreen } from 'may-ui/examples'
+} from '@adit_firdaus/may-ui'
+import { Sidebar, SidebarSection, SidebarItem } from '@adit_firdaus/may-ui/desktop'
+import { DeviceFrame, SCREENS, type ExampleScreen } from '@adit_firdaus/may-ui/examples'
 
 const GROUPS = [
   { key: 'phone', title: 'Phone' },

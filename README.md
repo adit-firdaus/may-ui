@@ -13,7 +13,7 @@ and a token layer you can theme.
 ## Install
 
 ```bash
-npm install may-ui
+npm install @adit_firdaus/may-ui
 ```
 
 `react` and `react-dom` (18+) are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
@@ -26,8 +26,8 @@ Import the stylesheet once at the root, wrap your tree in `MayProvider`, and mou
 `MayHost` once for imperative surfaces:
 
 ```tsx
-import 'may-ui/styles.css'
-import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from 'may-ui'
+import '@adit_firdaus/may-ui/styles.css'
+import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from '@adit_firdaus/may-ui'
 
 export function App() {
   return (
@@ -52,16 +52,16 @@ Components render unstyled without it.
 
 | Import | What lives there |
 |---|---|
-| `may-ui` | **Adaptive** components. One per concern, reshaping at the breakpoint. Start here. |
-| `may-ui/desktop` | Shapes with no honest phone form |
-| `may-ui/mobile` | Shapes with no desktop meaning |
+| `@adit_firdaus/may-ui` | **Adaptive** components. One per concern, reshaping at the breakpoint. Start here. |
+| `@adit_firdaus/may-ui/desktop` | Shapes with no honest phone form |
+| `@adit_firdaus/may-ui/mobile` | Shapes with no desktop meaning |
 
 The adaptive components genuinely reshape rather than restyle: `Sheet` rises from the
 bottom with drag-to-dismiss on phones and presents as a centred dialog on desktop,
 `ActionSheet` becomes an anchored menu, `Table` collapses into grouped list rows. Reach
-into `may-ui/desktop` only when you want more than the adaptive version carries.
+into `@adit_firdaus/may-ui/desktop` only when you want more than the adaptive version carries.
 
-Consumers importing `may-ui` never pull the desktop `DataTable` or the mobile gesture code.
+Consumers importing `@adit_firdaus/may-ui` never pull the desktop `DataTable` or the mobile gesture code.
 
 ## Theming
 
@@ -159,7 +159,7 @@ on the compositor with no runtime JS:
 The same constants are readable from JS for gesture code:
 
 ```tsx
-import { motion } from 'may-ui'
+import { motion } from '@adit_firdaus/may-ui'
 motion.duration.settle  // 340
 ```
 
@@ -187,7 +187,7 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 
 ## Components
 
-**Adaptive** (`may-ui`)
+**Adaptive** (`@adit_firdaus/may-ui`)
 
 | Group | Components |
 |---|---|
@@ -202,10 +202,10 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 | Overlays | `Sheet`, `Modal`, `AlertDialog`, `ActionSheet`, `Menu`, `Popover`, `Tooltip` |
 | Utility | `VisuallyHidden`, `cx`, `motion`, `initialsFrom`, `usePressFeedback`, `useReducedMotion` |
 
-**Desktop** (`may-ui/desktop`) — `Sidebar`, `SidebarSection`, `SidebarItem`, `SidebarToggle`,
+**Desktop** (`@adit_firdaus/may-ui/desktop`) — `Sidebar`, `SidebarSection`, `SidebarItem`, `SidebarToggle`,
 `NavTree`, `DataTable`, `CommandPalette`, `ContextMenu`, `SplitPane`
 
-**Mobile** (`may-ui/mobile`) — `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`,
+**Mobile** (`@adit_firdaus/may-ui/mobile`) — `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`,
 `SwipeAction`, `CapsuleTabs`, `Selector`, `Popup`, `FloatingBubble`
 
 ## Toasts
@@ -213,7 +213,7 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 Mount `MayHost` once, then call `toast` from anywhere — no hook, no provider:
 
 ```tsx
-import { toast, dismiss, dismissAll, setToastLimit } from 'may-ui'
+import { toast, dismiss, dismissAll, setToastLimit } from '@adit_firdaus/may-ui'
 
 toast('Saved')
 toast.success('Deploy promoted')
@@ -225,14 +225,14 @@ live, and `setToastLimit(n)` caps how many stack at once.
 
 ## Example screens
 
-27 composed screens — full app shells, not isolated widgets — live under `may-ui/examples`
+27 composed screens — full app shells, not isolated widgets — live under `@adit_firdaus/may-ui/examples`
 and in the gallery app:
 
 ```bash
 npm run examples
 ```
 
-They are a separate entry, so importing `may-ui` never pulls a demo screen into your bundle.
+They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a demo screen into your bundle.
 
 ## Accessibility
 
