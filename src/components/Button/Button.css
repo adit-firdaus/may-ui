@@ -153,7 +153,21 @@
   display: block;
 }
 
-.may-button__label { display: inline-block; }
+/*
+ * A centred ROW, not an inline-block. May's own API puts a glyph in
+ * `leadingIcon`, but the convention every shadcn/Chakra/MUI codebase arrives
+ * with is `<Button><Icon />Label</Button>` — both children land in this one
+ * span. Any reset that makes `svg` a block (Tailwind's preflight does exactly
+ * that, and it is on almost every consumer) then broke the line, putting the
+ * glyph above the text and spilling it past the pill. Costs nothing when the
+ * label is text alone.
+ */
+.may-button__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-2);
+}
 
 .may-button__spinner {
   width: 1.05em;
