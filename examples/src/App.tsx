@@ -16,6 +16,9 @@ import {
 import { Sidebar, SidebarSection, SidebarItem } from '@adit_firdaus/may-ui/desktop'
 import { DeviceFrame, SCREENS, type ExampleScreen } from '@adit_firdaus/may-ui/examples'
 
+/** Injected by Vite from the library's package.json. See vite.config.ts. */
+declare const __MAY_VERSION__: string
+
 const GROUPS = [
   { key: 'phone', title: 'Phone' },
   { key: 'desktop', title: 'Desktop' },
@@ -81,7 +84,7 @@ export function App() {
               <Stack gap={1} style={{ padding: 'var(--may-space-2)' }}>
                 <Text variant="headline">May UI</Text>
                 <Text variant="caption-1" tone="secondary">
-                  {SCREENS.length} examples
+                  v{__MAY_VERSION__} · {SCREENS.length} examples
                 </Text>
               </Stack>
             }
@@ -193,6 +196,12 @@ export function App() {
                 )
               })}
             <div style={{ padding: '0 var(--may-space-4)' }}>{themeSwitch}</div>
+            {/* The sidebar never renders on a phone, so the version lives here
+              * too — otherwise it would be invisible on the device most likely
+              * to be asking which build it is looking at. */}
+            <Text variant="caption-1" tone="secondary" style={{ padding: '0 var(--may-space-4)' }}>
+              May UI v{__MAY_VERSION__}
+            </Text>
           </Stack>
         </Sheet>
       </div>

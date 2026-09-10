@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -7,7 +8,16 @@ import react from '@vitejs/plugin-react'
  * reflects the working tree — editing a component updates the gallery on the
  * next HMR tick rather than after a rebuild.
  */
+/*
+ * The version the gallery is built from, read from the library's own
+ * package.json so the deployed site can never claim a version it is not.
+ */
+const { version } = JSON.parse(
+  readFileSync(resolve(__dirname, '../package.json'), 'utf8'),
+) as { version: string }
+
 export default defineConfig(({ command }) => ({
+  define: { __MAY_VERSION__: JSON.stringify(version) },
   root: __dirname,
   // The gallery is deployed to GitHub Pages under the repo path. Only the
   // production build takes the sub-path; the dev server stays at '/'.
