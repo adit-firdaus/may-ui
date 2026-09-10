@@ -1,11 +1,21 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import { forwardRef } from 'react'
+import { forwardRef, isValidElement } from 'react'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
 import './Fab.css'
 
 export interface FabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
+  /**
+   * Render this control's presentation onto its child instead of a `<button>`,
+   * so a router `<Link>` can wear it without losing the anchor. The child's own
+   * props win; `className` is merged. `type`/`disabled` are not forwarded —
+   * neither is valid on an `<a>` — and a disabled child gets `aria-disabled`.
+   * @default false
+   */
+  asChild?: boolean
+
   /**
    * The glyph, and it stays a ReactNode — a consumer's slot, never a fixed
    * icon. Either shape is sized to the control by CSS: a bare `<svg>` with no
@@ -49,6 +59,7 @@ export const Fab = forwardRef<HTMLButtonElement, FabProps>(function Fab(
   {
     icon,
     children,
+    asChild = false,
     tone = 'tint',
     size = 'md',
     fixed = false,
@@ -63,7 +74,52 @@ export const Fab = forwardRef<HTMLButtonElement, FabProps>(function Fab(
 ) {
   const isDisabled = disabled || loading
   const { pressProps } = usePressFeedback(isDisabled)
-  const extended = children != null
+  /*
+   * Extended means "carries a label". Under `asChild` the label is the child's
+   * own children, not `children` — which is the element itself and so always
+   * present. Reading it from the wrong place would draw every Fab-as-link in
+   * the extended shape, including icon-only ones.
+   */
+  const label = asChild && isValidElement(children)
+    ? (children.props as { children?: ReactNode }).children
+    : children
+  const extended = label != null
+
+  const presentation = {
+    'data-slot': 'fab',
+    'data-tone': tone,
+    'data-size': size,
+    'data-position': position,
+    className: cx(
+      'may-fab',
+      'may-pressable',
+      'may-hoverable',
+      extended && 'may-fab--extended',
+      fixed && 'may-fab--fixed',
+      className,
+    ),
+  }
+
+  const glyph = loading ? (
+    <span className="may-fab__spinner" aria-hidden />
+  ) : (
+    <span className="may-fab__glyph" aria-hidden>
+      {icon}
+    </span>
+  )
+
+  if (asChild) {
+    return renderAsChild(
+      children,
+      { ...rest, ...pressProps, ref, ...presentation, 'aria-busy': loading || undefined, 'aria-disabled': isDisabled || undefined },
+      (label) => (
+        <>
+          {glyph}
+          {label != null && <span className="may-fab__label">{label}</span>}
+        </>
+      ),
+    )
+  }
 
   return (
     <button
@@ -73,26 +129,9 @@ export const Fab = forwardRef<HTMLButtonElement, FabProps>(function Fab(
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      data-slot="fab"
-      data-tone={tone}
-      data-size={size}
-      data-position={position}
-      className={cx(
-        'may-fab',
-        'may-pressable',
-        'may-hoverable',
-        extended && 'may-fab--extended',
-        fixed && 'may-fab--fixed',
-        className,
-      )}
+      {...presentation}
     >
-      {loading ? (
-        <span className="may-fab__spinner" aria-hidden />
-      ) : (
-        <span className="may-fab__glyph" aria-hidden>
-          {icon}
-        </span>
-      )}
+      {glyph}
       {extended && <span className="may-fab__label">{children}</span>}
     </button>
   )

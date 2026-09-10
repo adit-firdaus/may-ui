@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
 import './Button.css'
@@ -17,6 +18,15 @@ export type ButtonVariant = 'filled' | 'tinted' | 'gray' | 'plain'
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
   children?: ReactNode
+  /**
+   * Render this button's presentation onto its child instead of a `<button>` —
+   * the way to make a router `<Link>` look like a button without losing the
+   * anchor. The child's own props win; `className` is merged. `type` and
+   * `disabled` are not forwarded, because neither is valid on an `<a>`:
+   * a disabled child gets `aria-disabled` instead.
+   * @default false
+   */
+  asChild?: boolean
   /** @default 'filled' */
   variant?: ButtonVariant
   /** @default 'tint' */
@@ -42,6 +52,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     children,
+    asChild = false,
     variant = 'filled',
     tone = 'tint',
     size = 'md',
@@ -60,6 +71,55 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const isDisabled = disabled || loading
   const { pressProps } = usePressFeedback(isDisabled)
 
+  const inner = (content: ReactNode) => (
+    <>
+      {loading && <span className="may-button__spinner" aria-hidden />}
+      {leadingIcon && !loading && (
+        <span className="may-button__icon" aria-hidden>
+          {leadingIcon}
+        </span>
+      )}
+      {content != null && <span className="may-button__label">{content}</span>}
+      {trailingIcon && (
+        <span className="may-button__icon" aria-hidden>
+          {trailingIcon}
+        </span>
+      )}
+    </>
+  )
+
+  const presentation = {
+    'data-slot': 'button',
+    'data-variant': variant,
+    'data-tone': tone,
+    'data-size': size,
+    'data-press-squish': 'true',
+    className: cx(
+      'may-button',
+      'may-pressable',
+      'may-hoverable',
+      pill && 'may-button--pill',
+      fullWidth && 'may-button--full',
+      className,
+    ),
+  }
+
+  if (asChild) {
+    return renderAsChild(
+      children,
+      {
+        ...rest,
+        ...pressProps,
+        ref,
+        ...presentation,
+        'aria-busy': loading || undefined,
+        // `disabled` is not a thing on an anchor; announce it instead.
+        'aria-disabled': isDisabled || undefined,
+      },
+      inner,
+    )
+  }
+
   return (
     <button
       {...rest}
@@ -68,32 +128,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      data-slot="button"
-      data-variant={variant}
-      data-tone={tone}
-      data-size={size}
-      data-press-squish="true"
-      className={cx(
-        'may-button',
-        'may-pressable',
-        'may-hoverable',
-        pill && 'may-button--pill',
-        fullWidth && 'may-button--full',
-        className,
-      )}
+      {...presentation}
     >
-      {loading && <span className="may-button__spinner" aria-hidden />}
-      {leadingIcon && !loading && (
-        <span className="may-button__icon" aria-hidden>
-          {leadingIcon}
-        </span>
-      )}
-      {children != null && <span className="may-button__label">{children}</span>}
-      {trailingIcon && (
-        <span className="may-button__icon" aria-hidden>
-          {trailingIcon}
-        </span>
-      )}
+      {inner(children)}
     </button>
   )
 })

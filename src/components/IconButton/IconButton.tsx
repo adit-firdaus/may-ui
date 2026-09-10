@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
 import type { ButtonVariant } from '../Button/Button'
@@ -15,6 +16,15 @@ import '../Button/Button.css'
 import './IconButton.css'
 
 export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
+  /**
+   * Render this control's presentation onto its child instead of a `<button>`,
+   * so a router `<Link>` can wear it without losing the anchor. The child's own
+   * props win; `className` is merged. `type`/`disabled` are not forwarded —
+   * neither is valid on an `<a>` — and a disabled child gets `aria-disabled`.
+   * @default false
+   */
+  asChild?: boolean
+
   /**
    * The glyph, and it stays a ReactNode — a consumer's slot, never a fixed
    * icon. Either shape is sized to the control by CSS: a bare `<svg>` with no
@@ -55,6 +65,7 @@ export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
   {
     children,
+    asChild = false,
     variant = 'plain',
     tone = 'tint',
     size = 'md',
@@ -70,6 +81,32 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
   const isDisabled = disabled || loading
   const { pressProps } = usePressFeedback(isDisabled)
 
+  const inner = (glyph: ReactNode) =>
+    loading ? (
+      <span className="may-button__spinner" aria-hidden />
+    ) : (
+      <span className="may-icon-button__glyph" aria-hidden>
+        {glyph}
+      </span>
+    )
+
+  const presentation = {
+    'data-slot': 'icon-button',
+    'data-variant': variant,
+    'data-tone': tone,
+    'data-size': size,
+    'data-round': round ? 'true' : undefined,
+    className: cx('may-button', 'may-icon-button', 'may-pressable', 'may-hoverable', className),
+  }
+
+  if (asChild) {
+    return renderAsChild(
+      children,
+      { ...rest, ...pressProps, ref, ...presentation, 'aria-busy': loading || undefined, 'aria-disabled': isDisabled || undefined },
+      inner,
+    )
+  }
+
   return (
     <button
       {...rest}
@@ -78,26 +115,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      data-slot="icon-button"
-      data-variant={variant}
-      data-tone={tone}
-      data-size={size}
-      data-round={round ? 'true' : undefined}
-      className={cx(
-        'may-button',
-        'may-icon-button',
-        'may-pressable',
-        'may-hoverable',
-        className,
-      )}
+      {...presentation}
     >
-      {loading ? (
-        <span className="may-button__spinner" aria-hidden />
-      ) : (
-        <span className="may-icon-button__glyph" aria-hidden>
-          {children}
-        </span>
-      )}
+      {inner(children)}
     </button>
   )
 })
