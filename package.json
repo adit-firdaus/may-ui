@@ -61,6 +61,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
+    "prepare": "npm run build",
     "gen:springs": "node scripts/gen-springs.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",
     "generate": "npm run gen:tokens && npm run gen:springs",

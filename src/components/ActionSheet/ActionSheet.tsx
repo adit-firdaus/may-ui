@@ -75,7 +75,7 @@ interface Placement {
 export function ActionSheet({
   open,
   onClose,
-  actions,
+  actions = [],
   title,
   description,
   cancelLabel = 'Cancel',

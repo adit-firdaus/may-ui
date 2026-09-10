@@ -60,7 +60,7 @@ export interface MenuProps {
  */
 export function Menu({
   trigger,
-  items,
+  items = [],
   placement = 'bottom-start',
   offset = 6,
   open: openProp,

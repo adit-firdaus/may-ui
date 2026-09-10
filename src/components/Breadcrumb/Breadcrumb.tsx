@@ -128,7 +128,7 @@ function EllipsisCrumb({ hidden, onExpand }: { hidden: number; onExpand: () => v
  * whole trail snapping to a new width.
  */
 export function Breadcrumb({
-  items,
+  items = [],
   maxItems,
   itemsBeforeCollapse = 1,
   itemsAfterCollapse = 2,

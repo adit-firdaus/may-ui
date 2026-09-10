@@ -133,7 +133,7 @@ function Step({ item, index, status, last, clickable, markerRef, onSelect }: Ste
  * carries a halo rather than a ring.
  */
 export function Steps({
-  items,
+  items = [],
   current,
   orientation = 'horizontal',
   clickable = false,

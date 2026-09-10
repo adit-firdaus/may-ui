@@ -75,7 +75,7 @@ const POP_FROM = 0.78
  * not as vibrancy.
  */
 export function TabBar({
-  items,
+  items = [],
   value,
   defaultValue,
   onValueChange,

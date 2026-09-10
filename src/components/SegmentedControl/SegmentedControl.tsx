@@ -52,7 +52,7 @@ export interface SegmentedControlProps {
  * the selection, the keyboard, and the track fill that squeezes under the press.
  */
 export function SegmentedControl({
-  options,
+  options = [],
   value,
   defaultValue,
   onValueChange,

@@ -99,7 +99,7 @@ function revealChip(
  * its own scroll container for the same gesture loses both.
  */
 export function CapsuleTabs({
-  items,
+  items = [],
   value,
   defaultValue,
   onValueChange,
