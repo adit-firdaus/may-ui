@@ -22,19 +22,24 @@ const PRESS_SCALE = 1.16
 const SETTLE_EASING = 'var(--may-ease-sheet)'
 const SETTLE_MS = 340
 
-export interface SegmentedOption {
+export interface SegmentedOption<T extends string = string> {
   label: string
-  value: string
+  value: T
   disabled?: boolean
 }
 
-export interface SegmentedControlProps {
-  options: SegmentedOption[]
+/**
+ * Generic over the option value, so a union survives the round trip: with
+ * `options` typed `'id' | 'en'`, `onValueChange` hands back `'id' | 'en'`
+ * rather than `string`, and the cast every typed call site needed disappears.
+ */
+export interface SegmentedControlProps<T extends string = string> {
+  options: SegmentedOption<T>[]
   /** Controlled value. */
-  value?: string
+  value?: T
   /** Uncontrolled initial value. */
-  defaultValue?: string
-  onValueChange?: (value: string) => void
+  defaultValue?: T
+  onValueChange?: (value: T) => void
   /** @default 'md' */
   size?: Exclude<MaySize, 'xs'>
   fullWidth?: boolean
@@ -51,7 +56,7 @@ export interface SegmentedControlProps {
  * overdrag, select-on-release — lives in `useSlidingThumb`; this component owns
  * the selection, the keyboard, and the track fill that squeezes under the press.
  */
-export function SegmentedControl({
+export function SegmentedControl<T extends string = string>({
   options = [],
   value,
   defaultValue,
@@ -60,8 +65,8 @@ export function SegmentedControl({
   fullWidth = false,
   className,
   ...rest
-}: SegmentedControlProps) {
-  const [internal, setInternal] = useState(defaultValue ?? options[0]?.value ?? '')
+}: SegmentedControlProps<T>) {
+  const [internal, setInternal] = useState<T | undefined>(defaultValue ?? options[0]?.value)
   const current = value ?? internal
 
   const selectedIndex = Math.max(
@@ -69,7 +74,7 @@ export function SegmentedControl({
     options.findIndex((o) => o.value === current),
   )
 
-  const commit = (next: string) => {
+  const commit = (next: T) => {
     if (next === current) return
     if (value === undefined) setInternal(next)
     onValueChange?.(next)

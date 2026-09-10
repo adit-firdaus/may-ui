@@ -12,9 +12,9 @@ import './TabBar.css'
 /** A whisper of a puff — the glyph's own pop carries most of the press. */
 const PRESS_SCALE = 1.06
 
-export interface TabBarItem {
+export interface TabBarItem<T extends string = string> {
   /** Identity of the tab — what `onValueChange` reports. */
-  value: string
+  value: T
   label: ReactNode
   /** Outline glyph, drawn while the tab is not selected. */
   icon: ReactNode
@@ -33,13 +33,13 @@ export interface TabBarItem {
   disabled?: boolean
 }
 
-export interface TabBarProps extends Omit<HTMLAttributes<HTMLElement>, 'onChange'> {
-  items: TabBarItem[]
+export interface TabBarProps<T extends string = string> extends Omit<HTMLAttributes<HTMLElement>, 'onChange'> {
+  items: TabBarItem<T>[]
   /** Controlled selection. */
-  value?: string
+  value?: T
   /** Uncontrolled initial selection. Falls back to the first item. */
-  defaultValue?: string
-  onValueChange?: (value: string) => void
+  defaultValue?: T
+  onValueChange?: (value: T) => void
   /** Float the bar above the bottom edge of the viewport. @default true */
   fixed?: boolean
   /** Keep the labels under the glyphs. Off is iOS's compact landscape bar. @default true */
@@ -74,7 +74,7 @@ const POP_FROM = 0.78
  * hairline. A translucent bar with nothing behind it to blur reads as a bug,
  * not as vibrancy.
  */
-export function TabBar({
+export function TabBar<T extends string = string>({
   items = [],
   value,
   defaultValue,
@@ -86,12 +86,12 @@ export function TabBar({
   className,
   'aria-label': ariaLabel = 'Tabs',
   ...rest
-}: TabBarProps) {
-  const [internal, setInternal] = useState(defaultValue ?? items[0]?.value ?? '')
+}: TabBarProps<T>) {
+  const [internal, setInternal] = useState<T | undefined>(defaultValue ?? items[0]?.value)
   const current = value ?? internal
   const reducedMotion = useReducedMotion()
 
-  const select = (next: string) => {
+  const select = (next: T) => {
     if (value === undefined) setInternal(next)
     if (next !== current) onValueChange?.(next)
   }
@@ -146,27 +146,27 @@ export function TabBar({
   )
 }
 
-interface TabBarItemViewProps {
-  item: TabBarItem
+interface TabBarItemViewProps<T extends string = string> {
+  item: TabBarItem<T>
   selected: boolean
   labels: boolean
   reducedMotion: boolean
   itemRef: (node: HTMLElement | null) => void
-  onSelect: (value: string) => void
+  onSelect: (value: T) => void
 }
 
 /**
  * One item. Split out because the press hook cannot be called from inside a
  * `map`, and because the glyph pop needs a ref of its own.
  */
-function TabBarItemView({
+function TabBarItemView<T extends string = string>({
   item,
   selected,
   labels,
   reducedMotion,
   itemRef,
   onSelect,
-}: TabBarItemViewProps) {
+}: TabBarItemViewProps<T>) {
   const glyphRef = useRef<HTMLSpanElement>(null)
   const { pressProps } = usePressFeedback(item.disabled)
 
