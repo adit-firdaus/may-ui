@@ -17,3 +17,8 @@ export type MayTextStyle =
   | 'footnote'
   | 'caption-1'
   | 'caption-2'
+
+/**
+ * How an overlay's footer lays its actions out. See `Sheet`/`Modal`.
+ */
+export type MayFooterLayout = 'end' | 'stack' | 'fill'

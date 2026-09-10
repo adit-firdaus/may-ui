@@ -196,3 +196,26 @@
   from { transform: translateY(var(--may-space-2)) scale(0.9); }
   to { transform: translateY(0) scale(1); }
 }
+
+/*
+ * Footer layouts. Declared last so an explicit `footerLayout` beats the
+ * presentation-driven default, which it ties with on specificity.
+ *
+ * `stack` is a column of full-width actions, primary first: a single child in
+ * an `end` footer gets sized to its content and pinned to the corner, which on
+ * a phone reads as a small pill floating in the bottom-right of a full-width
+ * surface rather than as the sheet's primary action.
+ */
+.may-modal__footer[data-footer='stack'] {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.may-modal__footer[data-footer='fill'] {
+  justify-content: stretch;
+}
+
+.may-modal__footer[data-footer='fill'] > * {
+  flex: 1 1 0;
+}

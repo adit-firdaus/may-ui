@@ -2,6 +2,7 @@ import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as
 import { useEffect, useRef } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
+import type { MayFooterLayout } from '../../types'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -28,6 +29,15 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   description?: ReactNode
   /** Action row. On a phone its children stack full-width; on desktop they sit inline. */
   footer?: ReactNode
+  /**
+   * How the footer lays its actions out. `'end'` (the default) is today's
+   * behaviour: content-sized, pinned to the trailing edge. `'stack'` is the
+   * native phone shape — a column of full-width actions, primary first, which
+   * is what a single "Save" almost always wants instead of a small pill in the
+   * corner. `'fill'` keeps one row and shares the width equally.
+   * @default 'end'
+   */
+  footerLayout?: MayFooterLayout
   /** @default 'md' */
   size?: 'sm' | 'md' | 'lg' | 'full'
   /** Render the close chip in the top-trailing corner. @default true */
@@ -63,6 +73,7 @@ export function Modal({
   title,
   description,
   footer,
+  footerLayout = 'end',
   size = 'md',
   closeButton = true,
   closeLabel = 'Close',
@@ -219,7 +230,11 @@ export function Modal({
           </div>
         )}
 
-        {footer && <footer className="may-modal__footer">{footer}</footer>}
+        {footer && (
+          <footer className="may-modal__footer" data-footer={footerLayout}>
+            {footer}
+          </footer>
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
+import type { MayFooterLayout } from '../../types'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
@@ -26,6 +27,15 @@ export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   title?: ReactNode
   description?: ReactNode
   footer?: ReactNode
+  /**
+   * How the footer lays its actions out. `'end'` (the default) is today's
+   * behaviour: content-sized, pinned to the trailing edge. `'stack'` is the
+   * native phone shape — a column of full-width actions, primary first, which
+   * is what a single "Save" almost always wants instead of a small pill in the
+   * corner. `'fill'` keeps one row and shares the width equally.
+   * @default 'end'
+   */
+  footerLayout?: MayFooterLayout
   /** @default 'md' */
   size?: 'sm' | 'md' | 'lg' | 'full'
   /** Show the drag grabber on the phone presentation. @default true */
@@ -62,6 +72,7 @@ export function Sheet({
   title,
   description,
   footer,
+  footerLayout = 'end',
   size = 'md',
   grabber = true,
   dismissible = true,
@@ -198,7 +209,11 @@ export function Sheet({
             {children}
           </div>
         )}
-        {footer && <footer className="may-sheet__footer">{footer}</footer>}
+        {footer && (
+          <footer className="may-sheet__footer" data-footer={footerLayout}>
+            {footer}
+          </footer>
+        )}
       </div>
     </div>
   )
