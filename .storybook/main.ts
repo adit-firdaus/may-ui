@@ -20,10 +20,23 @@ const config: StorybookConfig = {
    */
   viteFinal: async (config, { configType }) => ({
     ...config,
-    // Deployed to GitHub Pages under the repo path, beside the examples gallery
-    // at the site root. Only the production build takes the sub-path; dev stays
-    // at '/'.
-    base: configType === 'PRODUCTION' ? '/may-ui/storybook/' : config.base,
+    /*
+     * Deployed to GitHub Pages under the repo path, beside the examples gallery
+     * at the site root. Only the production build takes the sub-path; dev stays
+     * at '/'.
+     *
+     * `STORYBOOK_BASE` overrides it because a production build is not always a
+     * Pages build: design-sync builds this storybook into a LOCAL reference
+     * directory and loads it off the filesystem, where an absolute
+     * `/may-ui/storybook/` asset URL resolves to nothing — the story JS never
+     * loads and every story renders empty, which reads as a broken design
+     * system rather than a broken path. That sync passes `STORYBOOK_BASE=./`.
+     * Unset, behaviour is exactly as before, so the Pages workflow is untouched.
+     */
+    base:
+      configType === 'PRODUCTION'
+        ? (process.env.STORYBOOK_BASE ?? '/may-ui/storybook/')
+        : config.base,
     /*
      * Storybook inherits the root vite.config, which carries vite-plugin-dts for
      * the LIBRARY build. Storybook needs no type declarations, and the plugin's
