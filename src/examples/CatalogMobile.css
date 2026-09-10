@@ -1,0 +1,110 @@
+/*
+ * The mobile family catalog.
+ *
+ * Only three kinds of rule live here, and each one is load-bearing rather than
+ * decorative:
+ *
+ *   1. `__frame` is a phone in miniature. `transform: translateZ(0)` makes it
+ *      the containing block for `position: fixed` descendants, which is the
+ *      only reason a fixed TabBar, a sticky NavBar's scroll parent and a
+ *      Popup's scrim resolve against this tile instead of escaping to the
+ *      browser window. The `--may-inset-*` overrides go with it: env() reports
+ *      0 in a desktop browser, so without them the bars would show none of the
+ *      safe-area behaviour they exist to demonstrate.
+ *
+ *   2. `__untransformed` is the deliberate absence of (1). FloatingBubble is
+ *      `position: fixed` against the viewport by design, so this box has no
+ *      transform, no `contain` and no `overflow` — any of the three would
+ *      capture the bubble and misreport where it actually parks.
+ *
+ *   3. Everything else is tile chrome: the stage the component sits on and the
+ *      caption under it.
+ *
+ * Lengths are rem, never px, so the whole page scales with the type ramp.
+ */
+
+.may-catalog-mobile__entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-3);
+}
+
+/* The component itself, on the page colour it would sit on in a real app. */
+.may-catalog-mobile__stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-3);
+  min-width: 0;
+}
+
+.may-catalog-mobile__caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-1);
+}
+
+/* --------------------------------- frames --------------------------------- */
+
+.may-catalog-mobile__frame {
+  position: relative;
+  /* See note 1 at the top of this file — this line is the whole mechanism. */
+  transform: translateZ(0);
+  contain: layout paint;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* A phone's proportions, cropped to the part of the screen worth judging. */
+  height: 21rem;
+  overflow: hidden;
+  border-radius: var(--may-radius-sheet);
+  background: var(--may-color-bg);
+  box-shadow: var(--may-shadow-sm);
+
+  /* Real insets: the notch and the home indicator, in rem. */
+  --may-inset-top: 2.75rem;
+  --may-inset-bottom: 2.125rem;
+  --may-inset-left: 0rem;
+  --may-inset-right: 0rem;
+}
+
+/* The frame's own scroller — what a sticky NavBar sticks to. */
+.may-catalog-mobile__frame-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ---------------------------------- strips -------------------------------- */
+
+/*
+ * The in-flow components need no containing block, only the page colour under
+ * them: a SearchBar or a row of capsules is judged against the surface it
+ * actually rides on.
+ */
+.may-catalog-mobile__strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-3);
+  padding: var(--may-space-3);
+  border-radius: var(--may-radius-sheet);
+  background: var(--may-color-bg);
+}
+
+/* PullToRefresh owns its scroller, so the strip only bounds and clips it. */
+.may-catalog-mobile__scroller {
+  height: 14rem;
+  overflow: hidden;
+  border-radius: var(--may-radius-sheet);
+  background: var(--may-color-bg);
+}
+
+/*
+ * See note 2 — no transform, no contain, no overflow. Deliberately.
+ */
+.may-catalog-mobile__untransformed {
+  height: 15rem;
+  padding: var(--may-space-3);
+  border-radius: var(--may-radius-sheet);
+  background: var(--may-color-bg);
+}

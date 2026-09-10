@@ -10,13 +10,16 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      // Three entries: the adaptive default plus the two dedicated families.
-      // Consumers importing only `mayui` never pull the desktop DataTable or
-      // the mobile gesture code into their bundle.
+      // Four entries: the adaptive default, the two dedicated families, and the
+      // example screens. Consumers importing only `mayui` never pull the desktop
+      // DataTable, the mobile gesture code, or a demo screen into their bundle.
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         desktop: resolve(__dirname, 'src/desktop.ts'),
         mobile: resolve(__dirname, 'src/mobile.ts'),
+        // The example screens. A fourth entry rather than part of the main one,
+        // so importing 'mayui' never pulls a demo screen into a consumer's bundle.
+        examples: resolve(__dirname, 'src/examples/index.ts'),
       },
       name: 'MayUI',
       formats: ['es', 'cjs'],

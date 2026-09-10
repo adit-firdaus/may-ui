@@ -1,0 +1,76 @@
+/*
+ * PhotosScreen — the photo tile.
+ *
+ * A tile is a control, so it carries the system's press feel and none of the
+ * user agent's: no stroke, no padding, no grey tap flash. The image plate is a
+ * separate layer from the button so selection can inset the picture while the
+ * hit target stays exactly one grid cell — the same move Photos makes, and the
+ * reason a selected tile never leaves a gap in the wall.
+ */
+
+.may-photo-tile {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.may-photo-tile__plate {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transition:
+    transform var(--may-duration-settle) var(--may-spring-snappy),
+    border-radius var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+/* Selected: the picture shrinks inside its cell and rounds off. */
+.may-photo-tile[aria-pressed='true'] .may-photo-tile__plate {
+  transform: scale(0.86);
+  border-radius: var(--may-radius-md);
+}
+
+/* Pointer only — on touch this would stay lit after the tap. */
+@media (hover: hover) and (pointer: fine) {
+  .may-photo-tile:hover .may-photo-tile__plate {
+    filter: brightness(1.1);
+  }
+}
+
+/* Overlays sit on the button, not the plate, so they hold still as it scales. */
+.may-photo-tile__badge {
+  position: absolute;
+  inset-block-start: var(--may-space-1);
+  inset-inline-end: var(--may-space-1);
+}
+
+.may-photo-tile__duration {
+  position: absolute;
+  inset-block-end: var(--may-space-1);
+  inset-inline-end: var(--may-space-2);
+  color: var(--may-on-color);
+}
+
+.may-photo-tile__check {
+  position: absolute;
+  inset-block-end: var(--may-space-1);
+  inset-inline-start: var(--may-space-1);
+  inline-size: var(--may-space-5);
+  block-size: var(--may-space-5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-primary);
+  color: var(--may-color-on-primary);
+}
+
+.may-photo-tile__check > svg {
+  inline-size: var(--may-space-4);
+  block-size: var(--may-space-4);
+}

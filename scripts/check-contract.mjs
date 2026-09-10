@@ -73,6 +73,23 @@ const checks = [
     ),
   ],
   [
+    'scoped dark re-resolves the SEMANTIC aliases, not just the primitives',
+    // A custom property that says `var(--primitive)` is substituted where it is
+    // DECLARED. Declaring the aliases only on :root made them resolve against
+    // the light primitives, so `<div data-may-theme="dark">` changed the
+    // primitives beneath an already-resolved alias and rendered light. The
+    // earlier version of this test checked that dark redefined the primitives —
+    // which it did — and missed that nothing downstream re-resolved.
+    (() => {
+      const block = css.match(/\[data-may-theme=["']?dark["']?\]\s*\{([^}]*)\}/)?.[1] ?? ''
+      return (
+        /--may-color-bg\s*:/.test(block) &&
+        /--may-color-text\s*:/.test(block) &&
+        /--may-shadow-lg\s*:/.test(block)
+      )
+    })(),
+  ],
+  [
     'reduced motion stops iteration, not just duration',
     /animation-iteration-count:\s*1\s*!important/.test(css),
   ],

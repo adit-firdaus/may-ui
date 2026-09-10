@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { cx } from '../../utils/cx'
+import { PlatformProvider, type MayPlatform } from '../../hooks/platform'
 import '../../styles/index.css'
 import './MayProvider.css'
 
@@ -18,6 +19,13 @@ export interface MayProviderProps {
   className?: string
   /** Fill the parent rather than stretching to the viewport. */
   inline?: boolean
+  /**
+   * Pin what the adaptive components consider the platform, instead of
+   * measuring the viewport. Useful inside a simulated device or a preview
+   * pane, where the window's width says nothing about the shape being shown.
+   * @default 'auto'
+   */
+  platform?: MayPlatform
 }
 
 interface MayContextValue {
@@ -50,6 +58,7 @@ export function MayProvider({
   accent,
   className,
   inline = false,
+  platform = 'auto',
 }: MayProviderProps) {
   const [current, setCurrent] = useState<MayTheme>(theme)
   const [systemDark, setSystemDark] = useState(prefersDark)
@@ -71,6 +80,7 @@ export function MayProvider({
 
   return (
     <MayContext.Provider value={value}>
+      <PlatformProvider platform={platform}>
       <div
         data-slot="root"
         className={cx('may-root', inline && 'may-root--inline', className)}
@@ -83,6 +93,7 @@ export function MayProvider({
       >
         {children}
       </div>
+      </PlatformProvider>
     </MayContext.Provider>
   )
 }

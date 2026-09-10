@@ -1,0 +1,187 @@
+/*
+ * The catalogue's own chrome — never the exhibits.
+ *
+ * Everything a specimen draws comes from the library. What lives here is the
+ * museum around it: the masthead, the section rules, the cell that holds one
+ * component, and the monospaced caption that names it. Two neutral swatches
+ * are the only "content" this file invents, because the layout primitives
+ * (Stack, Grid) need something inert to arrange — anything from the library
+ * would put a second copy of a component on a page whose entire promise is
+ * that each one appears exactly once.
+ */
+
+.cat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--may-space-8) var(--may-space-6) var(--may-space-16);
+}
+
+.cat-inner {
+  max-width: 68rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-12);
+}
+
+/* ------------------------------- masthead ------------------------------- */
+
+.cat-masthead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-2);
+}
+
+.cat-title {
+  margin: 0;
+  color: var(--may-color-text);
+  font-size: var(--may-text-large-title);
+  line-height: var(--may-text-large-title-leading);
+  letter-spacing: var(--may-text-large-title-tracking);
+  font-weight: var(--may-text-large-title-weight);
+}
+
+.cat-lede {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--may-color-text-secondary);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+
+/* ------------------------------- sections ------------------------------- */
+
+.cat-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-6);
+}
+
+.cat-section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+}
+
+.cat-section-title {
+  margin: 0;
+  color: var(--may-color-text);
+  font-size: var(--may-text-title-3);
+  line-height: var(--may-text-title-3-leading);
+  letter-spacing: var(--may-text-title-3-tracking);
+  font-weight: var(--may-text-title-3-weight);
+}
+
+/* A hairline, not a border: this system draws separators as filled rules. */
+.cat-section-rule {
+  flex: 1;
+  height: var(--may-hairline);
+  background: var(--may-color-separator);
+}
+
+.cat-section-count {
+  color: var(--may-color-text-tertiary);
+  font-family: var(--may-font-mono);
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------- grid --------------------------------- */
+
+/*
+ * auto-fill rather than auto-fit, so a section holding three specimens keeps
+ * three-column cells instead of stretching them across the page — the widths
+ * have to stay comparable for the family to be judged side by side.
+ */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: var(--may-space-8) var(--may-space-5);
+  align-items: start;
+}
+
+.cat-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-3);
+  min-width: 0;
+}
+
+/* Bars, tables and horizontal steppers are not specimens at 19rem. */
+.cat-cell--wide {
+  grid-column: 1 / -1;
+}
+
+/*
+ * Stretch by default. Nearly every specimen here is a block that owns its
+ * container's width — a List, a Card, a Progress bar — and letting them hug
+ * their content instead would show each one at a width it never ships at.
+ */
+.cat-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--may-space-4);
+  min-height: var(--may-space-12);
+  min-width: 0;
+}
+
+/* The small things — a Button, a Badge, an Avatar — read as a row instead. */
+.cat-stage--row {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--may-space-4);
+}
+
+/* -------------------------------- caption -------------------------------- */
+
+.cat-caption {
+  margin: 0;
+  color: var(--may-color-text-secondary);
+  font-family: var(--may-font-mono);
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  letter-spacing: var(--may-text-caption-1-tracking);
+}
+
+/* The note drops out of the mono face so the name stays the thing you scan. */
+.cat-caption-note {
+  color: var(--may-color-text-tertiary);
+  font-family: var(--may-font-sans);
+}
+
+/* --------------------------------- filler -------------------------------- */
+
+.cat-swatch {
+  display: block;
+  block-size: var(--may-space-10);
+  inline-size: var(--may-space-12);
+  border-radius: var(--may-radius-sm);
+  background: var(--may-color-fill-tertiary);
+}
+
+/* Inside Grid the column decides the width; only the height is ours. */
+.cat-swatch--grid {
+  inline-size: auto;
+}
+
+.cat-prose {
+  margin: 0;
+  color: var(--may-color-text-secondary);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+}
+
+/* The two components with nothing to show: say so rather than show a blank. */
+.cat-ghost {
+  margin: 0;
+  color: var(--may-color-text-tertiary);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  font-style: italic;
+}

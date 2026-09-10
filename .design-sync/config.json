@@ -14,7 +14,8 @@
   "readmeHeader": ".design-sync/conventions.md",
   "extraEntries": [
     "./dist/desktop.js",
-    "./dist/mobile.js"
+    "./dist/mobile.js",
+    "./dist/examples.js"
   ],
   "overrides": {
     "AlertDialog": {

@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from 'react'
+import type { HTMLAttributes, MutableRefObject, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { cx } from '../../utils/cx'
@@ -37,6 +37,15 @@ export interface PullToRefreshProps extends Omit<HTMLAttributes<HTMLDivElement>,
   disabled?: boolean
   /** Announced while the refresh runs. @default 'Refreshing' */
   label?: string
+  /**
+   * Receives the scroller this component owns.
+   *
+   * NavBar and NavigationBar drive their large-title collapse from a scroll
+   * container's ref, and this component's scroller is internal — so without
+   * this a bar could never collapse above a pull-to-refresh list, which is
+   * exactly the shape a Mail inbox wants.
+   */
+  scrollRef?: MutableRefObject<HTMLDivElement | null>
 }
 
 /**
@@ -59,11 +68,21 @@ export function PullToRefresh({
   max = 140,
   disabled = false,
   label = 'Refreshing',
+  scrollRef: externalScrollRef,
   className,
   ...rest
 }: PullToRefreshProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  /* Mirror the scroller onto the caller's ref so a bar can observe it. */
+  useEffect(() => {
+    if (!externalScrollRef) return
+    externalScrollRef.current = scrollRef.current
+    return () => {
+      externalScrollRef.current = null
+    }
+  }, [externalScrollRef])
   const [status, setStatus] = useState<PullStatus>('idle')
 
   /*

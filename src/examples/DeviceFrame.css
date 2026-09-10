@@ -1,0 +1,82 @@
+.may-device {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--may-space-3);
+  margin: 0;
+}
+
+.may-device__body {
+  position: relative;
+  border-radius: 44px;
+  padding: 12px;
+  background: var(--may-gray-3);
+  box-shadow: var(--may-shadow-xl);
+  flex-shrink: 0;
+}
+
+[data-may-theme='dark'] .may-device__body { background: var(--may-gray-4); }
+
+/*
+ * The screen is the containing block for fixed-position descendants — see the
+ * component's header comment. `contain: layout paint` also stops a Sheet's
+ * scrim from painting over the frame's own bezel.
+ */
+.may-device__screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--may-color-bg);
+  transform: translateZ(0);
+  contain: layout paint;
+  isolation: isolate;
+
+  /* Real insets, since env() reports 0 outside a device. */
+  --may-inset-top: 44px;
+  --may-inset-bottom: 34px;
+  --may-inset-left: 0px;
+  --may-inset-right: 0px;
+}
+
+.may-device--phone .may-device__screen { width: 390px; height: 720px; }
+.may-device--phone-large .may-device__screen { width: 430px; height: 800px; }
+.may-device--tablet .may-device__screen {
+  width: 820px;
+  height: 700px;
+  --may-inset-top: 24px;
+  --may-inset-bottom: 20px;
+}
+
+/* The Dynamic Island silhouette. Purely cosmetic, and hidden from AT. */
+.may-device__notch {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 118px;
+  height: 32px;
+  border-radius: var(--may-radius-full);
+  background: #000;
+  pointer-events: none;
+}
+
+.may-device--tablet .may-device__notch { display: none; }
+
+.may-device__indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  border-radius: var(--may-radius-full);
+  background: var(--may-label);
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.may-device__label {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+}

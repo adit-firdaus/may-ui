@@ -1,0 +1,27 @@
+/*
+ * Two rules the inline-style path cannot express, and nothing else.
+ *
+ * A selected row in a list-detail split is not a hover and not a press — it is
+ * a persistent state that has to survive both. `aria-current` is what already
+ * announces it, so the paint hangs off the same attribute rather than off a
+ * second class that could drift out of step with it.
+ */
+
+.may-inbox__row[aria-current='true'] {
+  background: var(--may-color-highlight-strong);
+}
+
+/*
+ * The tint bar on the leading edge. `.may-list-row` is already positioned, and
+ * its ::before is spoken for by the hairline between rows, so this rides
+ * ::after. Drawing it here rather than as a border keeps every row the same
+ * height whether it is selected or not.
+ */
+.may-inbox__row[aria-current='true']::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--may-space-1);
+  background: var(--may-color-tint);
+}

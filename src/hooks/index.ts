@@ -1,3 +1,5 @@
 export { useReducedMotion } from './useReducedMotion'
 export { useIsDesktop } from './useIsDesktop'
 export { usePressFeedback } from './usePressFeedback'
+export { PlatformProvider, usePlatform } from './platform'
+export type { MayPlatform, PlatformProviderProps } from './platform'

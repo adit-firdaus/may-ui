@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { usePlatform } from './platform'
 
 /**
  * Reads the breakpoint from the token layer, so JS and CSS can never disagree
@@ -33,5 +34,12 @@ const getSnapshot = () =>
 const getServerSnapshot = () => true
 
 export function useIsDesktop(): boolean {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  const measured = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  // A pinned platform wins over the viewport. Hooks cannot be called
+  // conditionally, so the media query still runs — it is a subscription, not
+  // work, and pinning is the uncommon case.
+  const platform = usePlatform()
+  if (platform === 'phone') return false
+  if (platform === 'desktop') return true
+  return measured
 }

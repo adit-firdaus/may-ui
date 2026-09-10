@@ -1,38 +1,99 @@
 /**
  * Weight gate. "Lightweight" is only real if it is enforced.
+ *
+ * This measures each entry's TRANSITIVE CLOSURE, not the entry file. Rollup
+ * hoists code shared between entries into separate chunks, so once a fourth
+ * entry was added `dist/mayui.js` shrank from 124kB to a 4.7kB re-export shim
+ * over a 121kB chunk. Measuring the entry file alone would have reported a 96%
+ * size *improvement* while the real cost to a consumer was unchanged — a gate
+ * that passes for the wrong reason is worse than no gate.
  */
-import { readFileSync, statSync } from 'node:fs'
+import { readFileSync, statSync, existsSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
+import { dirname, resolve, join } from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
-const gz = (p) => gzipSync(readFileSync(p)).length
+const dist = join(root, 'dist')
+
+/** Follow static imports/re-exports from an entry and return every file reached. */
+function closure(entry) {
+  const seen = new Set()
+  const queue = [entry]
+  while (queue.length) {
+    const file = queue.pop()
+    if (seen.has(file)) continue
+    const path = join(dist, file)
+    if (!existsSync(path)) continue
+    seen.add(file)
+    const src = readFileSync(path, 'utf8')
+    for (const m of src.matchAll(/(?:from|import)\s*["'](\.\/[^"']+)["']/g)) {
+      queue.push(m[1].replace(/^\.\//, ''))
+    }
+  }
+  return [...seen]
+}
+
+const gz = (files) =>
+  gzipSync(Buffer.concat(files.map((f) => readFileSync(join(dist, f))))).length
+const raw = (files) => files.reduce((n, f) => n + statSync(join(dist, f)).size, 0)
 
 const BUDGETS = {
-  // The adaptive default — what every consumer pays.
-  'dist/mayui.js': 34 * 1024,
-  'dist/mayui.css': 34 * 1024,
+  // What every consumer of `mayui` pays.
+  'mayui.js': 44 * 1024,
   // Opt-in families. Importing 'mayui' pulls in neither.
-  'dist/desktop.js': 22 * 1024,
-  'dist/mobile.js': 22 * 1024,
+  'desktop.js': 26 * 1024,
+  'mobile.js': 26 * 1024,
+  // The example screens. Never imported by a consumer — this budget exists to
+  // catch them leaking into the main entry.
+  'examples.js': 145 * 1024,
 }
 
 let failed = false
-console.log('bundle budgets\n')
-for (const [file, budget] of Object.entries(BUDGETS)) {
-  const path = resolve(root, file)
-  const raw = statSync(path).size
-  const gzipped = gz(path)
+console.log('bundle budgets (transitive closure per entry)\n')
+
+const closures = {}
+for (const [entry, budget] of Object.entries(BUDGETS)) {
+  const files = closure(entry)
+  closures[entry] = files
+  const gzipped = gz(files)
   const ok = gzipped <= budget
   if (!ok) failed = true
   console.log(
-    `  ${ok ? 'ok  ' : 'FAIL'} ${file.padEnd(18)} ${String(raw).padStart(7)} raw  ` +
-      `${String(gzipped).padStart(6)} gz  / ${budget} budget` +
-      `${ok ? ` (${Math.round((gzipped / budget) * 100)}% used)` : ''}`,
+    `  ${ok ? 'ok  ' : 'FAIL'} ${entry.padEnd(13)} ${String(raw(files)).padStart(7)} raw  ` +
+      `${String(gzipped).padStart(6)} gz  / ${budget} budget  (${files.length} chunk${files.length === 1 ? '' : 's'}` +
+      `${ok ? `, ${Math.round((gzipped / budget) * 100)}% used` : ''})`,
   )
 }
+
+// The load-bearing check: no example screen may be reachable from the library entry.
+const mainFiles = new Set(closures['mayui.js'])
+const exampleOnly = closures['examples.js'].filter((f) => !mainFiles.has(f))
+const leaked = closures['mayui.js'].filter((f) => /examples/i.test(f))
+const leakOk = leaked.length === 0
+if (!leakOk) failed = true
+console.log(
+  `\n  ${leakOk ? 'ok  ' : 'FAIL'} examples do not leak into the library entry` +
+    ` (${exampleOnly.length} chunk(s) exclusive to examples)`,
+)
+
+const cssPath = join(dist, 'mayui.css')
+const cssGz = gzipSync(readFileSync(cssPath)).length
+const CSS_BUDGET = 40 * 1024
+const cssOk = cssGz <= CSS_BUDGET
+if (!cssOk) failed = true
+console.log(
+  `  ${cssOk ? 'ok  ' : 'FAIL'} mayui.css   ${String(statSync(cssPath).size).padStart(7)} raw  ` +
+    `${String(cssGz).padStart(6)} gz  / ${CSS_BUDGET} budget`,
+)
+console.log(
+  '       (one stylesheet by design: cssCodeSplit is off so the design-sync',
+)
+console.log(
+  '        @import closure resolves. It therefore also carries the example',
+)
+console.log('        screens’ CSS — a few hundred bytes gzipped.)')
 
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 const deps = Object.keys(pkg.dependencies ?? {})

@@ -68,6 +68,65 @@
   --may-shadow-a5: 0.12;
   --may-shadow-a6: 0.16;
   --may-shadow-a7: 0.2;
+
+  /* ---------------------------------------------------------------- *
+   * Semantic colour and elevation — the tier components consume.
+   *
+   * Declared in EVERY theme scope on purpose. These are aliases, and an alias
+   * is substituted where it is declared: if they lived only on :root they
+   * would resolve against the light primitives and a scoped dark subtree
+   * would inherit light values while its own primitives sat unused.
+   * ---------------------------------------------------------------- */
+
+  --may-color-bg: var(--may-bg-grouped);
+  --may-color-surface: var(--may-bg-elevated);
+  --may-color-surface-nested: var(--may-bg-nested);
+
+  --may-color-text: var(--may-label);
+  --may-color-text-secondary: var(--may-label-secondary);
+  --may-color-text-tertiary: var(--may-label-tertiary);
+  --may-color-text-quaternary: var(--may-label-quaternary);
+
+  --may-color-fill: var(--may-fill-primary);
+  --may-color-fill-secondary: var(--may-fill-secondary);
+  --may-color-fill-tertiary: var(--may-fill-tertiary);
+  --may-color-fill-quaternary: var(--may-fill-quaternary);
+
+  --may-color-separator: var(--may-separator);
+  --may-color-separator-opaque: var(--may-separator-opaque);
+
+  /* Brand as text vs brand as fill — see the header note. */
+  --may-color-tint: var(--may-blue);
+  --may-color-primary: var(--may-blue);
+  --may-color-on-primary: var(--may-on-color);
+
+  /* Destructive, likewise split. */
+  --may-color-danger: var(--may-red);
+  --may-color-destructive: var(--may-red);
+  --may-color-on-destructive: var(--may-on-color);
+
+  --may-color-success: var(--may-green);
+  --may-color-warning: var(--may-orange);
+  --may-color-info: var(--may-blue);
+
+  /* One highlight rule for every selectable row in the system. */
+  --may-color-highlight: var(--may-fill-quaternary);
+  --may-color-highlight-strong: var(--may-fill-tertiary);
+
+  --may-color-scrim: var(--may-scrim);
+  --may-color-ring: var(--may-color-tint);
+
+  /* Elevation. No hairline rings: surfaces separate by value, and only
+   * genuinely floating layers cast a shadow at all. The dark scope redefines
+   * every alpha, so these must re-resolve with it. */
+  --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));
+  --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+  --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+  --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));
+  --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));
+  --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));
+  --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));
+  --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));
 }
 
 /* Explicit opt-in. */
@@ -125,6 +184,65 @@
   --may-shadow-a5: 0.48;
   --may-shadow-a6: 0.56;
   --may-shadow-a7: 0.64;
+
+  /* ---------------------------------------------------------------- *
+   * Semantic colour and elevation — the tier components consume.
+   *
+   * Declared in EVERY theme scope on purpose. These are aliases, and an alias
+   * is substituted where it is declared: if they lived only on :root they
+   * would resolve against the light primitives and a scoped dark subtree
+   * would inherit light values while its own primitives sat unused.
+   * ---------------------------------------------------------------- */
+
+  --may-color-bg: var(--may-bg-grouped);
+  --may-color-surface: var(--may-bg-elevated);
+  --may-color-surface-nested: var(--may-bg-nested);
+
+  --may-color-text: var(--may-label);
+  --may-color-text-secondary: var(--may-label-secondary);
+  --may-color-text-tertiary: var(--may-label-tertiary);
+  --may-color-text-quaternary: var(--may-label-quaternary);
+
+  --may-color-fill: var(--may-fill-primary);
+  --may-color-fill-secondary: var(--may-fill-secondary);
+  --may-color-fill-tertiary: var(--may-fill-tertiary);
+  --may-color-fill-quaternary: var(--may-fill-quaternary);
+
+  --may-color-separator: var(--may-separator);
+  --may-color-separator-opaque: var(--may-separator-opaque);
+
+  /* Brand as text vs brand as fill — see the header note. */
+  --may-color-tint: var(--may-blue);
+  --may-color-primary: var(--may-blue);
+  --may-color-on-primary: var(--may-on-color);
+
+  /* Destructive, likewise split. */
+  --may-color-danger: var(--may-red);
+  --may-color-destructive: var(--may-red);
+  --may-color-on-destructive: var(--may-on-color);
+
+  --may-color-success: var(--may-green);
+  --may-color-warning: var(--may-orange);
+  --may-color-info: var(--may-blue);
+
+  /* One highlight rule for every selectable row in the system. */
+  --may-color-highlight: var(--may-fill-quaternary);
+  --may-color-highlight-strong: var(--may-fill-tertiary);
+
+  --may-color-scrim: var(--may-scrim);
+  --may-color-ring: var(--may-color-tint);
+
+  /* Elevation. No hairline rings: surfaces separate by value, and only
+   * genuinely floating layers cast a shadow at all. The dark scope redefines
+   * every alpha, so these must re-resolve with it. */
+  --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));
+  --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+  --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+  --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));
+  --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));
+  --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));
+  --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));
+  --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));
 }
 
 /* The OS setting, unless a light theme is pinned. */
@@ -183,52 +301,69 @@
     --may-shadow-a5: 0.48;
     --may-shadow-a6: 0.56;
     --may-shadow-a7: 0.64;
+
+    /* ---------------------------------------------------------------- *
+     * Semantic colour and elevation — the tier components consume.
+     *
+     * Declared in EVERY theme scope on purpose. These are aliases, and an alias
+     * is substituted where it is declared: if they lived only on :root they
+     * would resolve against the light primitives and a scoped dark subtree
+     * would inherit light values while its own primitives sat unused.
+     * ---------------------------------------------------------------- */
+
+    --may-color-bg: var(--may-bg-grouped);
+    --may-color-surface: var(--may-bg-elevated);
+    --may-color-surface-nested: var(--may-bg-nested);
+
+    --may-color-text: var(--may-label);
+    --may-color-text-secondary: var(--may-label-secondary);
+    --may-color-text-tertiary: var(--may-label-tertiary);
+    --may-color-text-quaternary: var(--may-label-quaternary);
+
+    --may-color-fill: var(--may-fill-primary);
+    --may-color-fill-secondary: var(--may-fill-secondary);
+    --may-color-fill-tertiary: var(--may-fill-tertiary);
+    --may-color-fill-quaternary: var(--may-fill-quaternary);
+
+    --may-color-separator: var(--may-separator);
+    --may-color-separator-opaque: var(--may-separator-opaque);
+
+    /* Brand as text vs brand as fill — see the header note. */
+    --may-color-tint: var(--may-blue);
+    --may-color-primary: var(--may-blue);
+    --may-color-on-primary: var(--may-on-color);
+
+    /* Destructive, likewise split. */
+    --may-color-danger: var(--may-red);
+    --may-color-destructive: var(--may-red);
+    --may-color-on-destructive: var(--may-on-color);
+
+    --may-color-success: var(--may-green);
+    --may-color-warning: var(--may-orange);
+    --may-color-info: var(--may-blue);
+
+    /* One highlight rule for every selectable row in the system. */
+    --may-color-highlight: var(--may-fill-quaternary);
+    --may-color-highlight-strong: var(--may-fill-tertiary);
+
+    --may-color-scrim: var(--may-scrim);
+    --may-color-ring: var(--may-color-tint);
+
+    /* Elevation. No hairline rings: surfaces separate by value, and only
+     * genuinely floating layers cast a shadow at all. The dark scope redefines
+     * every alpha, so these must re-resolve with it. */
+    --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));
+    --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+    --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+    --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));
+    --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));
+    --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));
+    --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));
+    --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));
   }
 }
 
 :root {
-  /* ---------------------------------------------------------------- *
-   * Semantic colour — the tier components consume
-   * ---------------------------------------------------------------- */
-
-  --may-color-bg: var(--may-bg-grouped);
-  --may-color-surface: var(--may-bg-elevated);
-  --may-color-surface-nested: var(--may-bg-nested);
-
-  --may-color-text: var(--may-label);
-  --may-color-text-secondary: var(--may-label-secondary);
-  --may-color-text-tertiary: var(--may-label-tertiary);
-  --may-color-text-quaternary: var(--may-label-quaternary);
-
-  --may-color-fill: var(--may-fill-primary);
-  --may-color-fill-secondary: var(--may-fill-secondary);
-  --may-color-fill-tertiary: var(--may-fill-tertiary);
-  --may-color-fill-quaternary: var(--may-fill-quaternary);
-
-  --may-color-separator: var(--may-separator);
-  --may-color-separator-opaque: var(--may-separator-opaque);
-
-  /* Brand as text vs brand as fill — see the header note. */
-  --may-color-tint: var(--may-blue);
-  --may-color-primary: var(--may-blue);
-  --may-color-on-primary: var(--may-on-color);
-
-  /* Destructive, likewise split. */
-  --may-color-danger: var(--may-red);
-  --may-color-destructive: var(--may-red);
-  --may-color-on-destructive: var(--may-on-color);
-
-  --may-color-success: var(--may-green);
-  --may-color-warning: var(--may-orange);
-  --may-color-info: var(--may-blue);
-
-  /* One highlight rule for every selectable row in the system. */
-  --may-color-highlight: var(--may-fill-quaternary);
-  --may-color-highlight-strong: var(--may-fill-tertiary);
-
-  --may-color-scrim: var(--may-scrim);
-  --may-color-ring: var(--may-color-tint);
-
   /* ---------------------------------------------------------------- *
    * Control height is a single knob; every rung is a proportion of it
    * ---------------------------------------------------------------- */
@@ -335,20 +470,6 @@
   --may-text-large-title-weight: 700;
 
   /* ---------------------------------------------------------------- *
-   * Elevation. No hairline rings: surfaces separate by value, and only
-   * genuinely floating layers cast a shadow at all.
-   * ---------------------------------------------------------------- */
-
-  --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));
-  --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
-  --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
-  --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));
-  --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));
-  --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));
-  --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));
-  --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));
-
-  /* ---------------------------------------------------------------- *
    * Layering, layout, chrome
    * ---------------------------------------------------------------- */
 
@@ -367,6 +488,12 @@
 
   --may-hairline: 0.5px;
   --may-scrollbar-size: 8px;
+  /* Width of a list row's leading element. The hairline between two rows is
+   * inset past it, the way iOS starts a separator under the label rather than
+   * at the card edge. Defaults to a small IconTile; override per list when the
+   * leading element is an Avatar or a Checkbox instead. */
+  --may-list-leading-w: 29px;
+
   --may-tabbar-h: 3.25rem;
   --may-navbar-h: 2.75rem;
 

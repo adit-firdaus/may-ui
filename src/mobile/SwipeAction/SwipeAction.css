@@ -52,6 +52,17 @@
   background: var(--may-color-separator);
 }
 
+/*
+ * Mirror List's leading-indent rule. A ListRow with a `leading` element starts
+ * its separator under the label, not at the card edge — and the same row must
+ * not change shape just because it became swipeable. List's own selector
+ * (`.may-list-row:has(…) + .may-list-row`) cannot see across the two wrapper
+ * elements, so the rule is restated here against the same variable.
+ */
+.may-swipe:has(.may-list-row__leading) + .may-swipe .may-swipe__content::before {
+  inset-inline-start: calc(var(--may-space-4) * 2 + var(--may-list-leading-w, 29px));
+}
+
 @media (min-resolution: 2dppx) {
   .may-swipe + .may-swipe .may-swipe__content::before {
     height: var(--may-hairline);

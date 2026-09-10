@@ -73,7 +73,11 @@ button.may-list-row:disabled { cursor: not-allowed; opacity: 0.4; }
 
 /* A row with a leading element indents the hairline past it, as iOS does. */
 .may-list-row:has(.may-list-row__leading) + .may-list-row::before {
-  inset-inline-start: calc(var(--may-space-4) * 2 + 29px);
+  /* Width of the leading element. A variable rather than a literal so a row
+   * led by an Avatar or a Checkbox can correct its own separator:
+   *   <List style={{ '--may-list-leading-w': '36px' }}>
+   */
+  inset-inline-start: calc(var(--may-space-4) * 2 + var(--may-list-leading-w, 29px));
 }
 
 @media (min-resolution: 2dppx) {

@@ -248,3 +248,38 @@
     transform: none;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * UA control chrome
+ *
+ * A bare interactive element — most often `<Box as="button">`, which is the
+ * idiomatic way to make a custom surface activatable — inherits the browser's
+ * own button styling, including a border. That is the one thing this system
+ * says a control never has, so the reset belongs here rather than in each
+ * component. Components set their own background, padding and radius, so
+ * neutralising the UA layer takes nothing away from them.
+ * ------------------------------------------------------------------ */
+
+.may-root button,
+.may-root [type='button'],
+.may-root [type='submit'],
+.may-root [type='reset'] {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+}
+
+/*
+ * Sizing floor for a raw <svg> a SCREEN puts in its own markup — a glyph in a
+ * table cell, say. Every component sizes the icons in its own slots, but an
+ * unclassed, unsized svg outside those slots would otherwise fall back to the
+ * browser's 300x150 replaced-element default. Scoped to svgs with neither a
+ * class nor explicit dimensions so it can never override a component's rule.
+ */
+.may-root svg:not([width]):not([height]):not([class]) {
+  width: 1em;
+  height: 1em;
+}
