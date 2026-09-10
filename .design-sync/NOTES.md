@@ -47,6 +47,32 @@ what is here now — do not use it as a reference for anything.
 
 ## Findings
 
+### `[GENERAL]` The reference storybook needs `STORYBOOK_BASE=./`
+
+**Build the reference with `STORYBOOK_BASE=./` or every story fails.**
+
+```bash
+STORYBOOK_BASE=./ npx storybook build -c .storybook \
+  -o "$(git rev-parse --show-toplevel)/.design-sync/sb-reference"
+```
+
+`.storybook/main.ts` sets `base: '/may-ui/storybook/'` for any PRODUCTION build,
+which is right for the GitHub Pages deploy and fatal for a local reference:
+`compare.mjs` serves `sb-reference/` over HTTP with that directory as the server
+root, so every asset URL resolved to `/may-ui/storybook/assets/…` → 404, the
+story JS never loaded, and all 365 stories came back `sb-error`. The build still
+exits 0 and `iframe.html` is still ~17 kB, so nothing upstream of the compare
+stage notices.
+
+Fixed at the source rather than by patching the built output: `main.ts` now reads
+`process.env.STORYBOOK_BASE` and falls back to the Pages path, so the Pages
+workflow is unchanged (it sets no such variable) and the sync passes `./`.
+
+Introduced by the Pages work (`ce962de` / `f16ef47`), which landed *after* the
+previous sync — which is why no earlier note warned about it. If a future sync
+ever sees a roster-wide `sb-error`, check the asset URLs in
+`.design-sync/sb-reference/iframe.html` first: they must be relative (`./assets/…`).
+
 ### `[GENERAL]` The compare harness cannot see viewport-fixed overlays
 
 **The most important thing in this file.** `compare.mjs` screenshots the storybook side
@@ -65,6 +91,27 @@ AlertDialog, Popover, Menu, Popup, Toast, Tooltip, CommandPalette, ContextMenu �
 **not verified by the compare oracle**. Most of those components are also
 interaction-gated, so both panels legitimately show only a trigger and grade `match`
 without exercising the overlay at all.
+
+A SECOND mechanism reaches the same place, found on the 2026-09-11 sync: a
+component whose panel opens on an **interaction** is equally invisible, even
+when nothing is viewport-fixed. `ContextMenu` opens on right-click, which the
+oracle never performs, so all four of its stories show only the closed trigger
+on BOTH sides and grade `match` — that verdict is real but narrow, and is not
+evidence that the popup (panel, separators, destructive-item styling) arrived
+intact. Read every overlay `match` in this system that way.
+
+A THIRD flavour, and the one most easily misread: a **click-to-open** surface
+where BOTH panels are equally untriggered. `MayHost`, `Menu` and `Modal` all
+capture with only their trigger row rendered, on both sides, pixel-identical.
+That is NOT the blank-reference gap (which shows one side blank against real
+content on the other) and needs no override — but it means the verdict covers
+the trigger, never the panel.
+
+**Consequence for a change made on 2026-09-11:** `MenuItem.checked` (a tinted
+checkmark in the leading slot, with `menuitemcheckbox` semantics) has NO story
+that opens the menu, so no story exercises it and this oracle cannot see it. If
+that state matters, add a story that renders the menu open — the gap is in the
+stories, not in the component.
 
 What *does* cover them: `package-validate.mjs`'s render check (73/73 previews render
 cleanly, and that renders the real preview html including open overlays), and
@@ -92,6 +139,24 @@ and content sits at a different x-offset on essentially every pair. On dense com
 it also shifts available content width by ~16px, which can move where text wraps. The
 rubric classes this as ignorable; it is not a padding bug.
 
+Worked example (2026-09-11): `Grid` → `Auto Fill` wraps "Recently Deleted" onto two
+lines in the preview and one in storybook, because auto-fill tracks resolve against
+the wider band (868px vs the 900px capture). Do not chase that as a token or CSS
+delta.
+
+Second worked example, and the sneakiest form: on `Slider` the framing offset reads
+as the THUMB having drifted along its track. It has not — measure the *relative*
+fill (thumb position as a fraction of track width), which is identical on both
+sides (64.0% on Brightness). Judging a slider, a progress bar or any positioned
+indicator by absolute x is judging the framing, not the component.
+
+### `[GENERAL]` NavBar → Long Title has a pre-existing glyph artifact
+
+`NavBar` → `Long Title` renders overlapping glyphs in the title. Verified on the
+raw pair (2026-09-11): byte-for-byte identical on BOTH panels, so it is a
+renderer quirk in the story itself, not a sync regression. Don't chase it as a
+preview defect; if it's worth fixing, it's worth fixing in the story.
+
 ### `[GENERAL]` Animated stories capture at an arbitrary phase
 
 Spinner arcs and marquee offsets can differ between panels with no content difference
@@ -113,12 +178,23 @@ every icon is inline SVG.
 
 ## Re-sync risks
 
+*Current as of the 2026-09-11 sync (73 components, 333 stories, all `match`).*
+
+- **The stylesheet now ships inside `@layer may-ui`** (library commit `f6340c4`, shipped
+  as 0.2.0). Unlayered CSS beats every layered rule whatever its specificity, which is
+  the point for npm consumers — a Tailwind utility should win on a May component — but it
+  changes the cascade *inside Claude Design too*: any unlayered CSS the app itself injects
+  now outranks May's component rules. **The local render check cannot see this**, because
+  it renders previews in a clean page with no competing reset. It is only observable in
+  the rendered cards. If components ever look unstyled in the project while
+  `package-validate.mjs` is green, this is the first thing to check — and the fix belongs
+  in how `styles.css` is emitted for the sync, NOT in the library.
 - **Overlay open states are unverified by the compare oracle** (see the harness gap
-  above). This is the single biggest coverage gap in this sync. If an overlay's styling
-  regresses, the sheets will still read `match`.
-- **101 of 332 story verdicts are `sibling-trusted`** — the component's primary story was
-  image-judged and its siblings inherited that verdict under the §4 sampling rule. They
-  were captured but not individually eyeballed.
+  above, now documented in all three flavours). Still the single biggest coverage gap.
+  If an overlay's styling regresses, the sheets will still read `match`.
+- **18 of 333 story verdicts are `sibling-trusted`** — down from 101 of 332 last sync;
+  315 stories were individually image-judged this time. The trusted ones were captured
+  but not individually eyeballed.
 - **`Table` grades only its desktop shape.** It is adaptive and collapses into grouped
   list rows below the breakpoint, but the capture viewport is desktop-width, so the
   mobile reshape is never photographed. Same for every other adaptive component's phone

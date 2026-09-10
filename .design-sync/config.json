@@ -50,6 +50,15 @@
     "TabBar": {
       "cardMode": "single",
       "primaryStory": "Default"
+    },
+    "Badge": {
+      "cardMode": "column"
+    },
+    "Pagination": {
+      "cardMode": "column"
+    },
+    "DataTable": {
+      "cardMode": "column"
     }
   }
 }
