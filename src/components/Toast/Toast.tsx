@@ -180,11 +180,51 @@ const withTone =
   (title: ReactNode, options: ToastOptions = {}): string =>
     enqueue(title, { ...options, tone })
 
+/** Copy for a stage of `toast.promise`, or a function of the settled value. */
+export type ToastCopy<T> = ReactNode | ((value: T) => ReactNode)
+
+export interface ToastPromiseCopy<T> {
+  loading: ReactNode
+  success: ToastCopy<T>
+  error: ToastCopy<unknown>
+}
+
 export interface ToastFn {
   (title: ReactNode, options?: ToastOptions): string
   success: (title: ReactNode, options?: ToastOptions) => string
   warning: (title: ReactNode, options?: ToastOptions) => string
   danger: (title: ReactNode, options?: ToastOptions) => string
+  /**
+   * Show `loading`, then replace it in place with the outcome.
+   *
+   * Built from the two primitives above — `duration: 0` holds the toast open,
+   * and re-toasting the same `id` swaps its content without the row leaving
+   * and returning. Returns `{ unwrap }` rather than the promise itself so a
+   * fire-and-forget caller cannot produce an unhandled rejection; call
+   * `unwrap()` when you do want to await or catch it.
+   */
+  promise: <T>(input: Promise<T>, copy: ToastPromiseCopy<T>) => { unwrap: () => Promise<T> }
+}
+
+const resolveCopy = <T,>(copy: ToastCopy<T>, value: T): ReactNode =>
+  typeof copy === 'function' ? (copy as (v: T) => ReactNode)(value) : copy
+
+function promise<T>(input: Promise<T>, copy: ToastPromiseCopy<T>): { unwrap: () => Promise<T> } {
+  const id = enqueue(copy.loading, { duration: 0 })
+  const settled = input.then(
+    (value) => {
+      withTone('success')(resolveCopy(copy.success, value), { id })
+      return value
+    },
+    (error: unknown) => {
+      withTone('danger')(resolveCopy(copy.error, error), { id })
+      throw error
+    },
+  )
+  // The caller may never look at this promise. Without a terminal handler here
+  // every fire-and-forget use would surface as an unhandled rejection.
+  settled.catch(() => {})
+  return { unwrap: () => settled }
 }
 
 /**
@@ -198,6 +238,7 @@ export const toast: ToastFn = Object.assign(enqueue, {
   success: withTone('success'),
   warning: withTone('warning'),
   danger: withTone('danger'),
+  promise,
 })
 
 /**
