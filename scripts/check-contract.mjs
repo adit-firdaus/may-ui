@@ -38,6 +38,65 @@ function stripHoverGuards(source) {
 
 const unguarded = stripHoverGuards(css)
 
+/**
+ * Every rule in the sheet, as [selector, body]. Good enough for a contract
+ * check: the built CSS is machine-generated, so there is no exotic nesting to
+ * trip over.
+ */
+function rules(source) {
+  const out = []
+  let depth = 0
+  let buf = ''
+  let sel = ''
+  for (const ch of source) {
+    if (ch === '{') {
+      if (depth === 0) {
+        sel = buf.trim()
+        buf = ''
+      } else buf += ch
+      depth++
+    } else if (ch === '}') {
+      depth--
+      if (depth === 0) {
+        out.push([sel, buf])
+        buf = ''
+      } else buf += ch
+    } else buf += ch
+  }
+  return out
+}
+
+/** The class-like half of specificity: classes, attributes and pseudo-classes. */
+function weight(selector) {
+  const bare = selector.replace(/:where\([^)]*\)/g, '')
+  return (
+    (bare.match(/\.[\w-]+/g) ?? []).length +
+    (bare.match(/\[[^\]]+\]/g) ?? []).length +
+    (bare.match(/:(?!:)(?!where)[\w-]+/g) ?? []).length
+  )
+}
+
+/**
+ * A rule that paints — sets `color` or `background` — but names no component
+ * of its own is a RESET. It has to lose to every component rule, and at equal
+ * specificity it does not: a tie breaks on source order, and base.css is
+ * imported last. That is exactly how `.may-root [type='button']` (0,2,0) came
+ * to tie `.may-button[data-variant='filled']` and strip the background off
+ * every May control that renders `type="button"` — the selected segment and
+ * the current page drew black-on-blue, unreadable against their own thumb.
+ *
+ * Pseudo-elements are exempt: `::selection` and the scrollbar parts are not
+ * the component's own box, so they cannot collide with its rules.
+ */
+const overreachingResets = rules(css)
+  .filter(([sel, body]) => sel && !sel.startsWith('@') && /(^|;|\s)(color|background|background-color)\s*:/.test(body))
+  .flatMap(([sel]) => sel.split(',').map((one) => one.trim()))
+  .filter((sel) => sel && !sel.includes('::'))
+  // A component rule names its own class; `may-root` is the scope, not a component.
+  .filter((sel) => !/\.may-(?!root\b)[\w-]+/.test(sel))
+  .filter((sel) => weight(sel) > 1)
+
+
 const checks = [
   [
     'no backdrop-filter anywhere — surfaces separate by value, not translucency',
@@ -124,6 +183,11 @@ const checks = [
   [
     'a linear() fallback exists for older browsers',
     /@supports not \(animation-timing-function: linear/.test(css),
+  ],
+  [
+    'element resets cannot out-specify the components they paint over',
+    overreachingResets.length === 0 ||
+      (console.log(`\n       offending selector(s): ${overreachingResets.join(', ')}`), false),
   ],
 ]
 

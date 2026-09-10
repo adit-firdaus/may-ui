@@ -295,12 +295,20 @@
  * says a control never has, so the reset belongs here rather than in each
  * component. Components set their own background, padding and radius, so
  * neutralising the UA layer takes nothing away from them.
+ *
+ * Wrapped in `:where()`, which contributes NO specificity, and that is the
+ * whole point: `.may-root [type='button']` scores (0,2,0) and so TIED with
+ * `.may-button[data-variant='filled']`. Ties break on source order, base.css
+ * is imported last, and the reset therefore won — every May control that
+ * renders `type="button"` lost its own background and colour. The selected
+ * segment and the current page drew black-on-blue, unreadable against their
+ * own thumb. At zero specificity the stated intent above is finally true.
+ *
+ * Not `:not([class*='may-'])`: `:not()` takes the specificity of its argument,
+ * which would raise the reset to (0,3,0) and make it strictly worse.
  * ------------------------------------------------------------------ */
 
-.may-root button,
-.may-root [type='button'],
-.may-root [type='submit'],
-.may-root [type='reset'] {
+:where(.may-root) :where(button, [type='button'], [type='submit'], [type='reset']) {
   appearance: none;
   -webkit-appearance: none;
   border: 0;
