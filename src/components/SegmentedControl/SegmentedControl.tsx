@@ -75,7 +75,7 @@ export function SegmentedControl({
     onValueChange?.(next)
   }
 
-  const { trackRef, thumbRef, registerItem, dragging, onPointerDown } = useSlidingThumb<
+  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
     HTMLDivElement,
     HTMLButtonElement
   >({
@@ -111,7 +111,6 @@ export function SegmentedControl({
       role="tablist"
       data-slot="segmented"
       data-size={size}
-      data-dragging={dragging ? 'true' : undefined}
       className={cx('may-segmented', fullWidth && 'may-segmented--full', className)}
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}

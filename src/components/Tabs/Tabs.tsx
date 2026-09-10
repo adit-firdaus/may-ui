@@ -173,6 +173,8 @@ export function TabList({
   /** The fallback we have already asked for, so a controlled parent that
    * ignores it cannot spin us in a render loop. */
   const requested = useRef<string | null>(null)
+  /** Last border-radius written to the pill. See `positionIndicator`. */
+  const lastEnds = useRef('')
 
   const positionIndicator = useCallback(
     (animate: boolean) => {
@@ -184,21 +186,33 @@ export function TabList({
         thumb.style.opacity = '0'
         return
       }
-      thumb.style.opacity = ''
+      // Only clear it when it is set: assigning to an already-absent property
+      // still dirties the inline style, and the measurement below would then
+      // be a forced recalc. This effect runs on every render.
+      if (thumb.style.opacity) thumb.style.opacity = ''
+
+      // Every measurement first, then every write.
       const geometry = geometryFor(track, active, axis)
+      const radius =
+        variant === 'pill' && geometry.width > 0
+          ? (axis === 'block' ? thumb.offsetWidth : thumb.offsetHeight) / 2
+          : 0
 
       /*
        * A pill is a capsule, and a capsule laid out at 1px and stretched carries
        * its radius stretched too — a full radius would shear across half of it.
        * Dividing the along-axis half-radius by the scale cancels that exactly,
        * at every width; the underline is a square bar and wants none of it.
+       *
+       * Guarded, because a border-radius change repaints the thumb's layer
+       * rather than merely re-compositing it.
        */
-      if (variant === 'pill' && geometry.width > 0) {
-        const radius = (axis === 'block' ? thumb.offsetWidth : thumb.offsetHeight) / 2
-        if (radius > 0) {
-          const shrunk = `${radius / geometry.width}px`
-          thumb.style.borderRadius =
-            axis === 'block' ? `${radius}px / ${shrunk}` : `${shrunk} / ${radius}px`
+      if (radius > 0) {
+        const shrunk = `${radius / geometry.width}px`
+        const ends = axis === 'block' ? `${radius}px / ${shrunk}` : `${shrunk} / ${radius}px`
+        if (ends !== lastEnds.current) {
+          lastEnds.current = ends
+          thumb.style.borderRadius = ends
         }
       }
 

@@ -48,8 +48,11 @@ export function geometryFor(
   track: HTMLElement,
   segment: HTMLElement,
   axis: ThumbAxis = 'inline',
+  /** The track's rect when the caller has already measured it. Reading it a
+   *  second time for the same placement is a wasted layout query. */
+  trackRect?: DOMRect,
 ): ThumbGeometry {
-  const t = track.getBoundingClientRect()
+  const t = trackRect ?? track.getBoundingClientRect()
   const s = segment.getBoundingClientRect()
   return axis === 'block'
     ? { x: s.top - t.top, width: s.height }
@@ -120,7 +123,7 @@ export function applyThumb(
   const cross = pressed ? 1 + (pressScale - 1) * 1.1 : 1
 
   const d = reducedMotion ? 1 : settleMs
-  thumb.style.transition = instant
+  const transition = instant
     ? 'transform 0s'
     : following
       ? `transform ${reducedMotion ? 1 : FOLLOW_MS}ms linear, ` +
@@ -137,15 +140,40 @@ export function applyThumb(
   const centred = x - (width * (along - 1)) / 2
   const offset = centred + overdrag
 
-  // Individual properties left by an earlier version would win over the
-  // shorthand, so they are cleared rather than trusted.
-  thumb.style.translate = ''
-  thumb.style.scale = ''
-  thumb.style.transform =
+  const transform =
     axis === 'block'
       ? `translateY(${offset}px) scaleY(${width * along}) scaleX(${cross})`
       : `translateX(${offset}px) scaleX(${width * along}) scaleY(${cross})`
+
+  /*
+   * Write only what actually changed. A style write is not free even when the
+   * value is identical — re-stating `transition` mid-transition disturbs it,
+   * and a follow re-composes the same string on every frame. The shorthand
+   * cannot be read back to compare (a `var()` in any longhand serialises the
+   * shorthand as empty), so the last write is remembered here instead.
+   */
+  let last = written.get(thumb)
+  if (!last) {
+    // Individual properties left by an earlier version would win over the
+    // shorthand. Clearing them on the first write is enough: nothing else
+    // sets them afterwards.
+    thumb.style.translate = ''
+    thumb.style.scale = ''
+    last = { transition: '', transform: '' }
+    written.set(thumb, last)
+  }
+  if (last.transition !== transition) {
+    last.transition = transition
+    thumb.style.transition = transition
+  }
+  if (last.transform !== transform) {
+    last.transform = transform
+    thumb.style.transform = transform
+  }
 }
+
+/** The last transition/transform written to each thumb. See `applyThumb`. */
+const written = new WeakMap<HTMLElement, { transition: string; transform: string }>()
 
 /**
  * Which segment a pointer at `client` (clientX on the inline axis, clientY on
