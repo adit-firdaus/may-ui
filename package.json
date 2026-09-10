@@ -29,7 +29,8 @@
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.map"
   ],
   "main": "./dist/mayui.cjs",
   "module": "./dist/mayui.js",
