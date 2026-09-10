@@ -41,6 +41,36 @@ bundle — each family is a separate entry.
 `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`, `SwipeAction`, `CapsuleTabs`,
 `Selector`, `Popup`, `FloatingBubble`
 
+## Table: select-all, sortable headers, bespoke cells
+
+`Table` is prop-driven, but the props are not limited to strings — `header` is a
+`ReactNode` and `render` returns one, which is enough for the three things
+people usually reach for a compound API to get:
+
+```tsx
+<Table
+  rowKey="id"
+  data={rows}
+  selectedKeys={selected}
+  columns={[
+    // select-all in the header, a checkbox per row in the cell
+    { key: 'sel',
+      header: <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all" />,
+      render: (row) => <Checkbox checked={selected.includes(row.id)} onCheckedChange={() => toggle(row.id)} aria-label={`Select ${row.name}`} /> },
+    // a sortable header is a button in the header node
+    { key: 'name', primary: true,
+      header: <Button variant="plain" size="sm" onClick={sortByName}>Name ↑</Button> },
+    // a bespoke cell
+    { key: 'size', header: 'Size', numeric: true, render: (row) => <code>{row.size} MB</code> },
+  ]}
+/>
+```
+
+Keeping one model rather than adding a compound layer beside it is deliberate:
+the collapsed phone shape re-labels every cell with its column header, so it
+needs the column metadata that `columns` carries. A `<TableCell>` written by
+hand has none, and would either lose the adaptive shape or have to rebuild it.
+
 ## Toasts and imperative surfaces
 
 Toasts, and dialogs opened from code, render through the single `MayHost` you
