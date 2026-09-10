@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoPerson } from 'react-icons/io5'
 import { Input } from './Input'
 import { Field } from '../Field/Field'
 
@@ -19,13 +20,6 @@ const Column = ({ children }: { children: React.ReactNode }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--may-space-4)', maxWidth: 420 }}>
     {children}
   </div>
-)
-
-const PersonIcon = () => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <circle cx="8" cy="5" r="3" fill="currentColor" />
-    <path d="M2.5 14a5.5 5.5 0 0111 0z" fill="currentColor" />
-  </svg>
 )
 
 /** A fill, not a box. Focus is a sprung ring drawn with box-shadow — there is no stroke anywhere in the control. */
@@ -51,7 +45,7 @@ export const Sizes: Story = {
 export const PrefixAndSuffix: Story = {
   render: () => (
     <Column>
-      <Input fullWidth prefix={<PersonIcon />} placeholder="Search contacts" />
+      <Input fullWidth prefix={<IoPerson aria-hidden />} placeholder="Search contacts" />
       <Input fullWidth prefix="$" suffix="USD" inputMode="decimal" placeholder="0.00" />
       <Input fullWidth suffix="@icloud.com" placeholder="craig" />
     </Column>

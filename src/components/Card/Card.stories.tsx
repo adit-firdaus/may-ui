@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoChevronForward } from 'react-icons/io5'
 import { Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle } from './Card'
 import { Button } from '../Button'
 import { List, ListRow } from '../List'
@@ -132,15 +133,9 @@ export const FullBleed: Story = {
 
 function Chevron() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden style={{ color: 'var(--may-color-text-tertiary)' }}>
-      <path
-        d="M6 3.5L10.5 8L6 12.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <IoChevronForward
+      aria-hidden
+      style={{ color: 'var(--may-color-text-tertiary)', width: 14, height: 14 }}
+    />
   )
 }

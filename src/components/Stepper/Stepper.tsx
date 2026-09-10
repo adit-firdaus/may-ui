@@ -2,6 +2,7 @@ import type { HTMLAttributes } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { IoAdd, IoRemove } from 'react-icons/io5'
 import type { MaySize } from '../../types'
 import './Stepper.css'
 
@@ -120,15 +121,11 @@ function StepperHalf({
         if (event.detail === 0 && !inert) onActivate()
       }}
     >
-      <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-        <path
-          d={action === 'increment' ? 'M8 3.25v9.5M3.25 8h9.5' : 'M3.25 8h9.5'}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-        />
-      </svg>
+      {action === 'increment' ? (
+        <IoAdd aria-hidden focusable="false" />
+      ) : (
+        <IoRemove aria-hidden focusable="false" />
+      )}
     </button>
   )
 }

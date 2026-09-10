@@ -1,35 +1,32 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import type { ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoArrowRedoOutline,
+  IoArrowUndoOutline,
+  IoCopyOutline,
+  IoFlagOutline,
+  IoOpenOutline,
+  IoPricetagOutline,
+  IoShareOutline,
+  IoTimeOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { ContextMenu } from './ContextMenu'
 import type { ContextMenuEntry, ContextMenuProps } from './ContextMenu'
 import { List, ListRow } from '../../components/List/List'
 import { Avatar } from '../../components/Avatar/Avatar'
 import { Text } from '../../components/Text/Text'
 
-const glyph = (path: string): ReactNode => (
-  <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-    <path
-      d={path}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
 const ICON = {
-  open: glyph('M4 5h6l2 2h8v12H4V5Z'),
-  reply: glyph('M9 8 4 12l5 4m-5-4h9a7 7 0 0 1 7 7v1'),
-  forward: glyph('M15 8l5 4-5 4m5-4h-9a7 7 0 0 0-7 7v1'),
-  flag: glyph('M6 21V4h11l-2 4 2 4H6'),
-  copy: glyph('M9 9h10v10H9V9Zm-4 6V5h10'),
-  share: glyph('M12 16V4m0 0L8 8m4-4 4 4M5 14v5h14v-5'),
-  tag: glyph('M4 4h7l9 9-7 7-9-9V4Zm3.5 3.5h.01'),
-  trash: glyph('M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13'),
-  clock: glyph('M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14v5l3.5 2'),
+  open: <IoOpenOutline aria-hidden />,
+  reply: <IoArrowUndoOutline aria-hidden />,
+  forward: <IoArrowRedoOutline aria-hidden />,
+  flag: <IoFlagOutline aria-hidden />,
+  copy: <IoCopyOutline aria-hidden />,
+  share: <IoShareOutline aria-hidden />,
+  tag: <IoPricetagOutline aria-hidden />,
+  trash: <IoTrashOutline aria-hidden />,
+  clock: <IoTimeOutline aria-hidden />,
 }
 
 const mailMenu: ContextMenuEntry[] = [

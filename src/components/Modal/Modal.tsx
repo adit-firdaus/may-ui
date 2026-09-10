@@ -1,5 +1,6 @@
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
+import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
@@ -164,15 +165,7 @@ export function Modal({
             {/* xmark — the chip behind it is smaller than the button, so the
                 glyph stays iOS-sized while the tap target stays a full 44pt. */}
             <span className="may-modal__close-chip" aria-hidden>
-              <svg viewBox="0 0 16 16" focusable="false">
-                <path
-                  d="M4.75 4.75L11.25 11.25M11.25 4.75L4.75 11.25"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.9"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <IoClose focusable="false" />
             </span>
           </button>
         )}

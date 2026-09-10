@@ -1,5 +1,16 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
+import {
+  IoAdd,
+  IoCalendar,
+  IoCreateOutline,
+  IoEllipsisHorizontal,
+  IoFileTrayOutline,
+  IoFolderOutline,
+  IoShareOutline,
+  IoStarOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { Accordion, AccordionItem } from '../components/Accordion'
 import { ActionSheet } from '../components/ActionSheet'
 import type { ActionSheetAction } from '../components/ActionSheet'
@@ -766,90 +777,38 @@ function Cell({
 
 /* --------------------------------- glyphs -------------------------------- */
 
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.7,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
 function ShareGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 3.5v12M8.5 7 12 3.5 15.5 7" {...stroke} />
-      <path d="M6.5 11H5.2A1.2 1.2 0 0 0 4 12.2v7.1A1.2 1.2 0 0 0 5.2 20.5h13.6a1.2 1.2 0 0 0 1.2-1.2v-7.1a1.2 1.2 0 0 0-1.2-1.2h-1.3" {...stroke} />
-    </svg>
-  )
+  return <IoShareOutline aria-hidden />
 }
 
 function PlusGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 5.5v13M5.5 12h13" {...stroke} />
-    </svg>
-  )
+  return <IoAdd aria-hidden />
 }
 
 function ComposeGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M19.2 4.8a2.1 2.1 0 0 1 0 3L10 17l-3.6 1 1-3.6 9.2-9.2a2.1 2.1 0 0 1 2.6-.4z" {...stroke} />
-      <path d="M5 20.2h14" {...stroke} />
-    </svg>
-  )
+  return <IoCreateOutline aria-hidden />
 }
 
 function FolderGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M3.5 7.4c0-.9.7-1.6 1.6-1.6h3.6l2 2.2h8.2c.9 0 1.6.7 1.6 1.6v7.6c0 .9-.7 1.6-1.6 1.6H5.1a1.6 1.6 0 0 1-1.6-1.6z" {...stroke} />
-    </svg>
-  )
+  return <IoFolderOutline aria-hidden />
 }
 
 function TrashGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M5.5 6.8h13M9.6 6.8V5.2c0-.7.5-1.2 1.2-1.2h2.4c.7 0 1.2.5 1.2 1.2v1.6" {...stroke} />
-      <path d="M7.2 6.8l.8 12c0 .7.6 1.2 1.2 1.2h5.6c.6 0 1.2-.5 1.2-1.2l.8-12" {...stroke} />
-      <path d="M10.4 10.2v6.4M13.6 10.2v6.4" {...stroke} />
-    </svg>
-  )
+  return <IoTrashOutline aria-hidden />
 }
 
 function EllipsisGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <circle cx="6" cy="12" r="1.6" fill="currentColor" />
-      <circle cx="12" cy="12" r="1.6" fill="currentColor" />
-      <circle cx="18" cy="12" r="1.6" fill="currentColor" />
-    </svg>
-  )
+  return <IoEllipsisHorizontal aria-hidden />
 }
 
 function CalendarGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <rect x="3.8" y="5.4" width="16.4" height="14.4" rx="3" {...stroke} />
-      <path d="M3.8 10h16.4M8.4 3.6v3.4M15.6 3.6v3.4" {...stroke} />
-    </svg>
-  )
+  return <IoCalendar aria-hidden />
 }
 
 function StarGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 3.8l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.9l5.8-.8z" {...stroke} />
-    </svg>
-  )
+  return <IoStarOutline aria-hidden />
 }
 
 function TrayGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M3.6 13.8l2.6-7.4A2 2 0 0 1 8.1 5h7.8a2 2 0 0 1 1.9 1.4l2.6 7.4" {...stroke} />
-      <path d="M3.6 13.8h4.2l1.2 2.4h6l1.2-2.4h4.2v3.6a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2z" {...stroke} />
-    </svg>
-  )
+  return <IoFileTrayOutline aria-hidden />
 }

@@ -202,7 +202,7 @@
   color: var(--may-color-text-secondary);
 }
 
-.may-command__icon > svg:not([width]) {
+.may-command__icon > svg {
   width: 1em;
   height: 1em;
   display: block;

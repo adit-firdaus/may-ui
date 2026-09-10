@@ -1,6 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import type { ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoArchiveOutline,
+  IoArrowUndoOutline,
+  IoCloudOutline,
+  IoCreateOutline,
+  IoFlagOutline,
+  IoMailOutline,
+  IoMoonOutline,
+  IoPersonOutline,
+  IoSearchOutline,
+  IoSettingsOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { CommandPalette } from './CommandPalette'
 import type { CommandGroup, CommandItem, CommandPaletteProps } from './CommandPalette'
 import { Button } from '../../components/Button/Button'
@@ -9,31 +21,18 @@ import { List, ListRow } from '../../components/List/List'
 
 /* SF-Symbol-flavoured glyphs. Stroked, never filled, so they sit at the same
  * weight as the row's own text. */
-const glyph = (path: string): ReactNode => (
-  <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-    <path
-      d={path}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
 const ICON = {
-  compose: glyph('M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z'),
-  mailbox: glyph('M3 7h18v12H3V7Zm0 0 9 6 9-6'),
-  search: glyph('M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14Zm5 12 4 4'),
-  flag: glyph('M6 21V4h11l-2 4 2 4H6'),
-  archive: glyph('M3 6h18v4H3V6Zm2 4v10h14V10M9 14h6'),
-  trash: glyph('M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13'),
-  reply: glyph('M9 8 4 12l5 4m-5-4h9a7 7 0 0 1 7 7v1'),
-  person: glyph('M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-8 8a8 8 0 0 1 16 0'),
-  gear: glyph('M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm9-3-2 .6-.6 1.5 1 1.8-2 2-1.8-1-1.5.6L12 21l-.6-2-1.5-.6-1.8 1-2-2 1-1.8L6.5 14 4.5 12l2-.6.6-1.5-1-1.8 2-2 1.8 1 1.5-.6L12 4l.6 2 1.5.6 1.8-1 2 2-1 1.8.6 1.5 2 .6Z'),
-  moon: glyph('M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z'),
-  cloud: glyph('M6.5 18.5A4.5 4.5 0 0 1 7 9.6a5.5 5.5 0 0 1 10.6 1.5 3.7 3.7 0 0 1-.6 7.4H6.5Z'),
+  compose: <IoCreateOutline aria-hidden />,
+  mailbox: <IoMailOutline aria-hidden />,
+  search: <IoSearchOutline aria-hidden />,
+  flag: <IoFlagOutline aria-hidden />,
+  archive: <IoArchiveOutline aria-hidden />,
+  trash: <IoTrashOutline aria-hidden />,
+  reply: <IoArrowUndoOutline aria-hidden />,
+  person: <IoPersonOutline aria-hidden />,
+  gear: <IoSettingsOutline aria-hidden />,
+  moon: <IoMoonOutline aria-hidden />,
+  cloud: <IoCloudOutline aria-hidden />,
 }
 
 const mailCommands: CommandGroup[] = [

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoCloudOutline, IoDocumentOutline, IoFolderOutline } from 'react-icons/io5'
 import { NavTree } from './NavTree'
 import type { NavTreeNode } from './NavTree'
 import { Button } from '../../components/Button'
@@ -14,54 +15,44 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const Glyph = ({ d }: { d: string }) => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const folder = 'M1.5 4.5A1 1 0 0 1 2.5 3.5h3l1.5 1.5h5.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1z'
-const doc = 'M3.5 1.5h5L12.5 5.5v9h-9zM8.5 1.5v4h4'
-const cloud = 'M4.5 12.5a3 3 0 0 1-.3-6 4 4 0 0 1 7.7.6 2.7 2.7 0 0 1-.4 5.4z'
-
 /** The Files app's own hierarchy, near enough to be recognisable. */
 const files: NavTreeNode[] = [
   {
     id: 'icloud',
     label: 'iCloud Drive',
-    icon: <Glyph d={cloud} />,
+    icon: <IoCloudOutline aria-hidden />,
     children: [
       {
         id: 'documents',
         label: 'Documents',
-        icon: <Glyph d={folder} />,
+        icon: <IoFolderOutline aria-hidden />,
         children: [
           {
             id: 'projects',
             label: 'Projects',
-            icon: <Glyph d={folder} />,
+            icon: <IoFolderOutline aria-hidden />,
             children: [
-              { id: 'may-ui', label: 'May UI.sketch', icon: <Glyph d={doc} /> },
-              { id: 'tokens', label: 'Tokens.json', icon: <Glyph d={doc} /> },
+              { id: 'may-ui', label: 'May UI.sketch', icon: <IoDocumentOutline aria-hidden /> },
+              { id: 'tokens', label: 'Tokens.json', icon: <IoDocumentOutline aria-hidden /> },
             ],
           },
-          { id: 'invoices', label: 'Invoices', icon: <Glyph d={folder} />, badge: 4 },
+          { id: 'invoices', label: 'Invoices', icon: <IoFolderOutline aria-hidden />, badge: 4 },
         ],
       },
-      { id: 'desktop', label: 'Desktop', icon: <Glyph d={folder} /> },
-      { id: 'shortcuts', label: 'Shortcuts', icon: <Glyph d={folder} />, disabled: true },
+      { id: 'desktop', label: 'Desktop', icon: <IoFolderOutline aria-hidden /> },
+      { id: 'shortcuts', label: 'Shortcuts', icon: <IoFolderOutline aria-hidden />, disabled: true },
     ],
   },
   {
     id: 'mac',
     label: 'On My Mac',
-    icon: <Glyph d={folder} />,
+    icon: <IoFolderOutline aria-hidden />,
     children: [
-      { id: 'downloads', label: 'Downloads', icon: <Glyph d={folder} />, badge: 12 },
-      { id: 'screenshots', label: 'Screenshots', icon: <Glyph d={folder} /> },
+      { id: 'downloads', label: 'Downloads', icon: <IoFolderOutline aria-hidden />, badge: 12 },
+      { id: 'screenshots', label: 'Screenshots', icon: <IoFolderOutline aria-hidden /> },
     ],
   },
-  { id: 'shared', label: 'Shared', icon: <Glyph d={folder} /> },
+  { id: 'shared', label: 'Shared', icon: <IoFolderOutline aria-hidden /> },
 ]
 
 /**
@@ -115,23 +106,23 @@ export const Deep: Story = {
       {
         id: 'l1',
         label: 'Library',
-        icon: <Glyph d={folder} />,
+        icon: <IoFolderOutline aria-hidden />,
         children: [
           {
             id: 'l2',
             label: 'Application Support',
-            icon: <Glyph d={folder} />,
+            icon: <IoFolderOutline aria-hidden />,
             children: [
               {
                 id: 'l3',
                 label: 'com.mayui.app',
-                icon: <Glyph d={folder} />,
+                icon: <IoFolderOutline aria-hidden />,
                 children: [
                   {
                     id: 'l4',
                     label: 'Caches',
-                    icon: <Glyph d={folder} />,
-                    children: [{ id: 'l5', label: 'metadata.plist', icon: <Glyph d={doc} /> }],
+                    icon: <IoFolderOutline aria-hidden />,
+                    children: [{ id: 'l5', label: 'metadata.plist', icon: <IoDocumentOutline aria-hidden /> }],
                   },
                 ],
               },

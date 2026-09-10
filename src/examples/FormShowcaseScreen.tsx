@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { IoGlobe, IoMail, IoPricetag, IoSpeedometer } from 'react-icons/io5'
 import { Box } from '../components/Box'
 import { Button } from '../components/Button'
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '../components/Card'
@@ -411,45 +412,17 @@ function StateCell({ caption, children }: { caption: string; children: ReactNode
 /* -------------------------------- glyph set -------------------------------- */
 
 function TagGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M3.6 11.2V4.8a1.2 1.2 0 011.2-1.2h6.4c.3 0 .6.1.9.4l8 8a1.2 1.2 0 010 1.7l-6.4 6.4a1.2 1.2 0 01-1.7 0l-8-8a1.2 1.2 0 01-.4-.9zm4.3-4.6a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoPricetag aria-hidden />
 }
 
 function GlobeGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 2.6a9.4 9.4 0 100 18.8 9.4 9.4 0 000-18.8zm0 1.8c1.2 0 2.5 2 2.9 5H9.1c.4-3 1.7-5 2.9-5zM4.6 11.2h2.7c.1-1.9.4-3.6 1-4.9a7.7 7.7 0 00-3.7 4.9zm0 1.6a7.7 7.7 0 003.7 4.9c-.6-1.3-.9-3-1-4.9H4.6zm4.5 0h5.8c-.4 3-1.7 5-2.9 5s-2.5-2-2.9-5zm7.4 0h2.9a7.7 7.7 0 01-3.9 4.9c.6-1.3.9-3 1-4.9zm0-1.6c-.1-1.9-.4-3.6-1-4.9a7.7 7.7 0 013.9 4.9h-2.9z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoGlobe aria-hidden />
 }
 
 function GaugeGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 4a9 9 0 00-7.8 13.5 1 1 0 001.7-1A7 7 0 1119 17.6a1 1 0 001.7 1A9 9 0 0012 4zm4.3 4.3l-4 3.5a1.6 1.6 0 101.5 1.4l3.5-4a.6.6 0 00-.9-.9z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoSpeedometer aria-hidden />
 }
 
 function MailGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M4.4 5.4h15.2a1.4 1.4 0 011.4 1.4v10.4a1.4 1.4 0 01-1.4 1.4H4.4A1.4 1.4 0 013 17.2V6.8a1.4 1.4 0 011.4-1.4zm.9 2L12 12.2l6.7-4.8z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoMail aria-hidden />
 }

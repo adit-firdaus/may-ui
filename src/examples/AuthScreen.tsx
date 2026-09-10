@@ -1,4 +1,11 @@
 import { useState } from 'react'
+import {
+  IoEyeOffOutline,
+  IoEyeOutline,
+  IoLogoApple,
+  IoLogoGoogle,
+  IoSparkles,
+} from 'react-icons/io5'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Checkbox } from '../components/Checkbox'
@@ -212,53 +219,21 @@ function SignInCard({ headingLevel = 1, emailValue, passwordError }: SignInCardP
 
 /** The app mark: a four-point spark, symmetric about the tile's centre. */
 function SparkIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
-      <path d="M12 2c.9 6.4 3.6 9.1 10 10-6.4.9-9.1 3.6-10 10-.9-6.4-3.6-9.1-10-10 6.4-.9 9.1-3.6 10-10Z" />
-    </svg>
-  )
+  return <IoSparkles aria-hidden />
 }
 
 function EyeIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M1.9 10S4.9 4.75 10 4.75 18.1 10 18.1 10 15.1 15.25 10 15.25 1.9 10 1.9 10Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <circle cx="10" cy="10" r="2.4" stroke="currentColor" strokeWidth="1.6" />
-    </svg>
-  )
+  return <IoEyeOutline aria-hidden />
 }
 
 function EyeOffIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M7.6 5.25A7.6 7.6 0 0 1 10 4.75c5.1 0 8.1 5.25 8.1 5.25a15 15 0 0 1-2.6 3.2M4.7 6.6A14.6 14.6 0 0 0 1.9 10S4.9 15.25 10 15.25c1 0 1.9-.2 2.7-.5M8.4 8.5a2.4 2.4 0 0 0 3.3 3.3M3 3l14 14"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
+  return <IoEyeOffOutline aria-hidden />
 }
 
 function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
-      <path d="M17.6 12.7c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.1 2.5-1.8 3-.5 7.5 1.2 10 .9 1.2 1.9 2.6 3.2 2.5 1.3 0 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.2-1.2 3.1-2.4 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-3.8ZM15 5.4c.7-.9 1.2-2.1 1.1-3.4-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.2 1.1.1 2.3-.6 3-1.4Z" />
-    </svg>
-  )
+  return <IoLogoApple aria-hidden />
 }
 
 function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
-      <path d="M21.4 11.1H12v3h5.4c-.24 1.4-1.7 4.1-5.4 4.1a6 6 0 0 1 0-12c1.85 0 3.08.8 3.79 1.47l2.58-2.49A9.1 9.1 0 0 0 12 2.8a9.2 9.2 0 1 0 0 18.4c5.3 0 8.8-3.73 8.8-8.98 0-.6-.06-1.06-.14-1.52Z" />
-    </svg>
-  )
+  return <IoLogoGoogle aria-hidden />
 }

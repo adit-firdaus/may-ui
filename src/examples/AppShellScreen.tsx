@@ -1,5 +1,17 @@
-import type { CSSProperties } from 'react'
 import { useState } from 'react'
+import {
+  IoAttachOutline,
+  IoCalendarOutline,
+  IoCloudOutline,
+  IoCreateOutline,
+  IoDocumentOutline,
+  IoEllipsisHorizontal,
+  IoFileTrayOutline,
+  IoFlagOutline,
+  IoFolderOutline,
+  IoMailOutline,
+  IoSendOutline,
+} from 'react-icons/io5'
 import { Sidebar, SidebarItem, SidebarSection, SidebarToggle } from '../desktop/Sidebar'
 import { Avatar } from '../components/Avatar'
 import { Badge } from '../components/Badge'
@@ -10,47 +22,6 @@ import { Table } from '../components/Table'
 import type { TableColumn } from '../components/Table'
 import { Text } from '../components/Text'
 import { Tooltip } from '../components/Tooltip'
-
-/* ------------------------------------------------------------------ *
- * Glyphs
- *
- * Drawn on the same 16px grid the Sidebar's own chevrons use, so a
- * mailbox icon and the section disclosure beside it share one optical
- * weight. Stroked rather than filled: a filled glyph at 24px reads a
- * full step heavier than the label next to it.
- *
- * Sizing is left to whoever slots it — every component that takes an
- * icon (Sidebar, IconButton, Breadcrumb, Menu) sizes `svg:not([width])`
- * itself. `style` is only for the one place a glyph sits loose in a
- * table cell with no slot to inherit from.
- * ------------------------------------------------------------------ */
-
-const Glyph = ({ d, style }: { d: string; style?: CSSProperties }) => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false" style={style}>
-    <path
-      d={d}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const icons = {
-  inbox: 'M1.5 8.5h3l1 2h5l1-2h3M2 4.5h12v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z',
-  send: 'M14 2L7 9m7-7l-4.5 12-2.2-5.3L2 6.5z',
-  draft: 'M4 2.5h5l3 3v8H4zM9 2.5v3h3',
-  flag: 'M4 14V2.5h8l-1.6 3L12 8.5H4',
-  unread: 'M2 4.5h12v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zM2.4 5l5.6 4.2L13.6 5',
-  clip: 'M10.5 4.5l-5 5a1.8 1.8 0 0 0 2.5 2.5l5.5-5.5a3.2 3.2 0 0 0-4.5-4.5L3 7.5',
-  today: 'M2.5 4.5h11v9h-11zM2.5 7h11M5.5 2.5v3M10.5 2.5v3',
-  folder: 'M2 4.5h4l1.2 1.5H14v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z',
-  cloud: 'M4.5 12.5a3 3 0 0 1-.3-6 4 4 0 0 1 7.7.6 2.7 2.7 0 0 1-.4 5.4z',
-  compose: 'M13.5 8v4.5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1H8M11 2.2l2.8 2.8-5 5-3.3.5.5-3.3z',
-  more: 'M4 8h.01M8 8h.01M12 8h.01',
-}
 
 /* ------------------------------------------------------------------ *
  * Data
@@ -193,8 +164,8 @@ const messageColumns: TableColumn<Message>[] = [
             color: 'var(--may-color-text-secondary)',
           }}
         >
-          <Glyph
-            d={icons.clip}
+          <IoAttachOutline
+            aria-hidden
             style={{
               width: 'var(--may-space-4)',
               height: 'var(--may-space-4)',
@@ -299,7 +270,7 @@ export function AppShellScreen() {
       >
         <SidebarSection title="Favourites">
           <SidebarItem
-            icon={<Glyph d={icons.inbox} />}
+            icon={<IoFileTrayOutline aria-hidden />}
             badge={unread}
             active={mailbox === 'inbox'}
             onClick={() => setMailbox('inbox')}
@@ -307,14 +278,14 @@ export function AppShellScreen() {
             Inbox
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.send} />}
+            icon={<IoSendOutline aria-hidden />}
             active={mailbox === 'sent'}
             onClick={() => setMailbox('sent')}
           >
             Sent
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.draft} />}
+            icon={<IoDocumentOutline aria-hidden />}
             badge={2}
             active={mailbox === 'drafts'}
             onClick={() => setMailbox('drafts')}
@@ -322,7 +293,7 @@ export function AppShellScreen() {
             Drafts
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.flag} />}
+            icon={<IoFlagOutline aria-hidden />}
             active={mailbox === 'flagged'}
             onClick={() => setMailbox('flagged')}
           >
@@ -336,7 +307,7 @@ export function AppShellScreen() {
          * this state when the rail reopens. */}
         <SidebarSection title="Smart Mailboxes" collapsible>
           <SidebarItem
-            icon={<Glyph d={icons.unread} />}
+            icon={<IoMailOutline aria-hidden />}
             badge={unread}
             active={mailbox === 'unread'}
             onClick={() => setMailbox('unread')}
@@ -344,14 +315,14 @@ export function AppShellScreen() {
             Unread
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.clip} />}
+            icon={<IoAttachOutline aria-hidden />}
             active={mailbox === 'attachments'}
             onClick={() => setMailbox('attachments')}
           >
             Attachments
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.today} />}
+            icon={<IoCalendarOutline aria-hidden />}
             badge={4}
             active={mailbox === 'today'}
             onClick={() => setMailbox('today')}
@@ -362,21 +333,21 @@ export function AppShellScreen() {
 
         <SidebarSection title="iCloud" collapsible defaultOpen={false}>
           <SidebarItem
-            icon={<Glyph d={icons.folder} />}
+            icon={<IoFolderOutline aria-hidden />}
             active={mailbox === 'receipts'}
             onClick={() => setMailbox('receipts')}
           >
             Receipts
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.folder} />}
+            icon={<IoFolderOutline aria-hidden />}
             active={mailbox === 'travel'}
             onClick={() => setMailbox('travel')}
           >
             Travel
           </SidebarItem>
           <SidebarItem
-            icon={<Glyph d={icons.folder} />}
+            icon={<IoFolderOutline aria-hidden />}
             active={mailbox === 'archive'}
             onClick={() => setMailbox('archive')}
           >
@@ -417,7 +388,7 @@ export function AppShellScreen() {
             items={[
               {
                 label: 'iCloud',
-                icon: <Glyph d={icons.cloud} />,
+                icon: <IoCloudOutline aria-hidden />,
                 onClick: () => setMailbox('archive'),
               },
               { label: 'Favourites', onClick: () => setMailbox('inbox') },
@@ -431,7 +402,7 @@ export function AppShellScreen() {
             </Text>
             <Tooltip label="New Message ⌘N">
               <IconButton aria-label="New Message">
-                <Glyph d={icons.compose} />
+                <IoCreateOutline aria-hidden />
               </IconButton>
             </Tooltip>
             {/* Shortcuts are the real ones Mail uses, because a menu that
@@ -441,7 +412,7 @@ export function AppShellScreen() {
               placement="bottom-end"
               trigger={
                 <IconButton aria-label="View options" tone="neutral">
-                  <Glyph d={icons.more} />
+                  <IoEllipsisHorizontal aria-hidden />
                 </IconButton>
               }
               items={[

@@ -1,4 +1,12 @@
 import { useState } from 'react'
+import {
+  IoCheckmark,
+  IoCopyOutline,
+  IoFolderOutline,
+  IoHeartOutline,
+  IoShareOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { ActionSheet } from '../components/ActionSheet'
 import { Badge } from '../components/Badge'
 import { Grid } from '../components/Grid'
@@ -174,7 +182,7 @@ export function PhotosScreen() {
                 )}
                 {isSelected && (
                   <span className="may-photo-tile__check" aria-hidden>
-                    <CheckIcon />
+                    <IoCheckmark aria-hidden />
                   </span>
                 )}
               </button>
@@ -203,7 +211,7 @@ export function PhotosScreen() {
           disabled={count === 0}
           onClick={() => setShareOpen(true)}
         >
-          <ShareIcon />
+          <IoShareOutline aria-hidden />
         </IconButton>
 
         <Text variant="subheadline" weight="semibold" tone={count === 0 ? 'tertiary' : 'default'}>
@@ -216,7 +224,7 @@ export function PhotosScreen() {
             disabled={count === 0}
             onClick={() => toast(`Added ${count} ${noun.toLowerCase()} to Favourites`)}
           >
-            <HeartIcon />
+            <IoHeartOutline aria-hidden />
           </IconButton>
           <IconButton
             aria-label="Delete"
@@ -227,7 +235,7 @@ export function PhotosScreen() {
               toast(`${count} ${noun} deleted`, { tone: 'danger' })
             }}
           >
-            <TrashIcon />
+            <IoTrashOutline aria-hidden />
           </IconButton>
         </Stack>
       </Toolbar>
@@ -245,11 +253,11 @@ export function PhotosScreen() {
         description="Shared items keep their edits and location."
         actions={[
           { label: 'AirDrop', icon: <AirDropIcon />, onSelect: () => toast('Sent to Marco’s iPhone', { tone: 'success' }) },
-          { label: 'Copy', icon: <CopyIcon />, onSelect: () => toast(`${count} ${noun} copied`) },
-          { label: 'Save to Files', icon: <FolderIcon />, onSelect: () => toast('Saved to iCloud Drive') },
+          { label: 'Copy', icon: <IoCopyOutline aria-hidden />, onSelect: () => toast(`${count} ${noun} copied`) },
+          { label: 'Save to Files', icon: <IoFolderOutline aria-hidden />, onSelect: () => toast('Saved to iCloud Drive') },
           {
             label: `Delete ${count} ${noun}`,
-            icon: <TrashIcon />,
+            icon: <IoTrashOutline aria-hidden />,
             destructive: true,
             onSelect: () => {
               setSelected([])
@@ -267,98 +275,19 @@ export function PhotosScreen() {
 }
 
 /* ------------------------------- glyph set -------------------------------- */
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M5.5 12.6l4.2 4.2 8.8-9.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-/** square.and.arrow.up */
-function ShareIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <g fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3.2v11.4" />
-        <path d="M8.2 6.8L12 3l3.8 3.8" />
-        <path d="M7.4 10.4H6a2 2 0 00-2 2v6.4a2 2 0 002 2h12a2 2 0 002-2v-6.4a2 2 0 00-2-2h-1.4" />
-      </g>
-    </svg>
-  )
-}
-
-function HeartIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 20.4S3.4 15.2 3.4 9.4A4.8 4.8 0 0112 6.8a4.8 4.8 0 018.6 2.6c0 5.8-8.6 11-8.6 11z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <g fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4.4 6.6h15.2" />
-        <path d="M9.4 6.6V4.8a1.4 1.4 0 011.4-1.4h2.4a1.4 1.4 0 011.4 1.4v1.8" />
-        <path d="M6.4 6.6l.9 12.2a1.8 1.8 0 001.8 1.6h5.8a1.8 1.8 0 001.8-1.6l.9-12.2" />
-        <path d="M10.4 10.4v6.4M13.6 10.4v6.4" />
-      </g>
-    </svg>
-  )
-}
+/* AirDrop only: Ionicons has no AirDrop mark, and the nearest arcs in the set
+ * are Wi-Fi, which means reception rather than a transfer. */
 
 /** The AirDrop radar: an arc stack over a droplet. */
 function AirDropIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden>
-      <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+      <g fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
         <path d="M6.4 14.6a7.9 7.9 0 0111.2 0" />
         <path d="M9.1 17.3a4.1 4.1 0 015.8 0" />
         <path d="M3.7 11.9a11.7 11.7 0 0116.6 0" />
       </g>
       <circle cx="12" cy="19.9" r="1.6" fill="currentColor" />
-    </svg>
-  )
-}
-
-/** doc.on.doc */
-function CopyIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
-        <rect x="8.4" y="8.4" width="11.2" height="12.2" rx="2.4" />
-        <path d="M15.6 5.8V5.4a2 2 0 00-2-2H6.4a2 2 0 00-2 2v9.2a2 2 0 002 2h.4" />
-      </g>
-    </svg>
-  )
-}
-
-function FolderIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M3.4 7.2a2 2 0 012-2h3.4l2 2h7.8a2 2 0 012 2v8.6a2 2 0 01-2 2H5.4a2 2 0 01-2-2z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
     </svg>
   )
 }

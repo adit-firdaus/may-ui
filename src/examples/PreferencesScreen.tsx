@@ -1,6 +1,19 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 
+import {
+  IoCalendar,
+  IoCheckmark,
+  IoContrastOutline,
+  IoFlash,
+  IoMail,
+  IoMegaphone,
+  IoNotificationsOutline,
+  IoOptionsOutline,
+  IoPerson,
+  IoSettingsOutline,
+  IoShieldOutline,
+} from 'react-icons/io5'
 import { Box } from '../components/Box'
 import { Button } from '../components/Button'
 import { Checkbox } from '../components/Checkbox'
@@ -20,32 +33,20 @@ import { Text } from '../components/Text'
 
 /* -------------------------------- glyph set -------------------------------- */
 
-const tabGlyph = (d: string): ReactNode => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const tileGlyph = (d: string): ReactNode => (
-  <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
 const TAB_ICON = {
-  general: tabGlyph('M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM8 1.5l1 1.7 1.9-.4.4 1.9 1.7 1-1 1.7 1 1.7-1.7 1-.4 1.9-1.9-.4-1 1.7-1-1.7-1.9.4-.4-1.9-1.7-1 1-1.7-1-1.7 1.7-1 .4-1.9 1.9.4z'),
-  appearance: tabGlyph('M8 14A6 6 0 1 0 8 2v12z'),
-  notifications: tabGlyph('M4 6.5a4 4 0 0 1 8 0c0 3 1 4 1 4H3s1-1 1-4zM6.5 13.5h3'),
-  privacy: tabGlyph('M8 1.8l5 2v4c0 3.2-2.1 5.6-5 6.4-2.9-.8-5-3.2-5-6.4v-4z'),
-  advanced: tabGlyph('M2 4.5h12M2 8h12M2 11.5h12M6 3v3M10.5 6.5v3M4.5 10v3'),
+  general: <IoSettingsOutline aria-hidden />,
+  appearance: <IoContrastOutline aria-hidden />,
+  notifications: <IoNotificationsOutline aria-hidden />,
+  privacy: <IoShieldOutline aria-hidden />,
+  advanced: <IoOptionsOutline aria-hidden />,
 }
 
 const TILE = {
-  mail: tileGlyph('M3 7h18v12H3V7Zm0 0 9 6 9-6'),
-  person: tileGlyph('M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-8 8a8 8 0 0 1 16 0'),
-  calendar: tileGlyph('M4 6h16v14H4zM4 10h16M8 3v4m8-4v4'),
-  bolt: tileGlyph('M13 3 6 13h5l-1 8 7-10h-5z'),
-  megaphone: tileGlyph('M4 10v4h3l7 4V6l-7 4H4Zm14-1a4 4 0 0 1 0 6'),
+  mail: <IoMail aria-hidden />,
+  person: <IoPerson aria-hidden />,
+  calendar: <IoCalendar aria-hidden />,
+  bolt: <IoFlash aria-hidden />,
+  megaphone: <IoMegaphone aria-hidden />,
 }
 
 /* --------------------------------- options --------------------------------- */
@@ -113,21 +114,10 @@ function TrafficLight({ colour }: { colour: string }) {
 
 function Check() {
   return (
-    <svg
-      viewBox="0 0 16 16"
+    <IoCheckmark
       aria-hidden
-      focusable="false"
       style={{ width: 'var(--may-space-3)', height: 'var(--may-space-3)' }}
-    >
-      <path
-        d="M3 8.6 6.4 12 13 4.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    />
   )
 }
 

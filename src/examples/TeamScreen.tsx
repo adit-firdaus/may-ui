@@ -1,4 +1,10 @@
 import { useMemo, useState } from 'react'
+import {
+  IoEllipsisHorizontal,
+  IoPersonAddOutline,
+  IoPersonOutline,
+  IoPersonRemoveOutline,
+} from 'react-icons/io5'
 import { DataTable } from '../desktop/DataTable'
 import type { DataTableColumn } from '../desktop/DataTable'
 import { Avatar, AvatarGroup } from '../components/Avatar'
@@ -258,7 +264,7 @@ export function TeamScreen() {
           placement="bottom-end"
           trigger={
             <IconButton aria-label={`Actions for ${row.name}`} size="sm" tone="neutral">
-              <EllipsisIcon />
+              <IoEllipsisHorizontal aria-hidden />
             </IconButton>
           }
           items={rowActions(row)}
@@ -318,7 +324,7 @@ export function TeamScreen() {
             {/* Tooltip describes; the button's own label names. Both are needed —
                 a tooltip never appears on touch. */}
             <Tooltip label="Invite by email — ⇧⌘I">
-              <Button leadingIcon={<PersonPlusIcon />} onClick={() => setInviting(true)}>
+              <Button leadingIcon={<IoPersonAddOutline aria-hidden />} onClick={() => setInviting(true)}>
                 Invite member
               </Button>
             </Tooltip>
@@ -393,7 +399,7 @@ export function TeamScreen() {
 
 function rowActions(member: Member): MenuItem[] {
   return [
-    { label: 'View profile', icon: <PersonIcon />, onSelect: () => {} },
+    { label: 'View profile', icon: <IoPersonOutline aria-hidden />, onSelect: () => {} },
     { label: 'Change role…', shortcut: '⌘E', onSelect: () => {} },
     {
       label: 'Resend invitation',
@@ -408,7 +414,7 @@ function rowActions(member: Member): MenuItem[] {
     },
     {
       label: 'Remove from team',
-      icon: <PersonMinusIcon />,
+      icon: <IoPersonRemoveOutline aria-hidden />,
       shortcut: '⌘⌫',
       destructive: true,
       separator: true,
@@ -422,58 +428,4 @@ function rowActions(member: Member): MenuItem[] {
         }),
     },
   ]
-}
-
-/* --------------------------------- glyph set -------------------------------- */
-
-function EllipsisIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden focusable="false">
-      <circle cx="4.5" cy="10" r="1.6" />
-      <circle cx="10" cy="10" r="1.6" />
-      <circle cx="15.5" cy="10" r="1.6" />
-    </svg>
-  )
-}
-
-function PersonIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M10 10a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5ZM3.75 16.5c.6-2.7 3.1-4.25 6.25-4.25s5.65 1.55 6.25 4.25"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function PersonPlusIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M8 9.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2.5 16.25c.55-2.5 2.8-3.9 5.5-3.9M14.5 10.5v5M12 13h5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function PersonMinusIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M8 9.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2.5 16.25c.55-2.5 2.8-3.9 5.5-3.9M12 13h5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
 }

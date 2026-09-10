@@ -6,6 +6,7 @@ import type {
   RefObject,
 } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { IoCheckmark, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { Kbd } from '../../components/Kbd/Kbd'
@@ -242,16 +243,7 @@ function MenuItem({
       >
         <span className="may-menu__lead" aria-hidden>
           {item.checked ? (
-            <svg viewBox="0 0 16 16" className="may-menu__check" focusable="false">
-              <path
-                d="M3 8.6L6.4 12L13 4.6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <IoCheckmark className="may-menu__check" focusable="false" />
           ) : (
             item.icon
           )}
@@ -267,16 +259,7 @@ function MenuItem({
           </span>
         )}
         {hasSubmenu && (
-          <svg className="may-menu__chevron" viewBox="0 0 16 16" aria-hidden focusable="false">
-            <path
-              d="M6 3.5L10.5 8L6 12.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <IoChevronForward className="may-menu__chevron" aria-hidden focusable="false" />
         )}
       </button>
 

@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { useRef, useState } from 'react'
+import { IoAdd, IoBag, IoBus, IoCafe, IoCash, IoScanOutline, IoSparkles } from 'react-icons/io5'
 import { Box } from '../components/Box'
 import { Button } from '../components/Button'
 import { IconButton } from '../components/IconButton'
@@ -294,80 +295,31 @@ const TRANSACTIONS: Transaction[] = [
 /* -------------------------------- glyph set -------------------------------- */
 
 function ScanIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M4 4h5v2.2H6.2V9H4zm11 0h5v5h-2.2V6.2H15zM4 15h2.2v2.8H9V20H4zm13.8 0H20v5h-5v-2.2h2.8zM4 10.9h16v2.2H4z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoScanOutline aria-hidden />
 }
 
 function PlusIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 4.4a1.1 1.1 0 011.1 1.1v5.4h5.4a1.1 1.1 0 010 2.2h-5.4v5.4a1.1 1.1 0 01-2.2 0v-5.4H5.5a1.1 1.1 0 010-2.2h5.4V5.5A1.1 1.1 0 0112 4.4z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoAdd aria-hidden />
 }
 
 function CupIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M5.4 5h11.2v3h1.6a2.9 2.9 0 010 5.8h-1.8a5.6 5.6 0 01-11 0zm11.2 5.2v1.4h1.6a.7.7 0 000-1.4zM4.6 19.4h12.8v1.6H4.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCafe aria-hidden />
 }
 
 function CashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M3.4 6.4h17.2a1 1 0 011 1v9.2a1 1 0 01-1 1H3.4a1 1 0 01-1-1V7.4a1 1 0 011-1zM12 9.2a2.8 2.8 0 100 5.6 2.8 2.8 0 000-5.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCash aria-hidden />
 }
 
 function TransitIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M8 2.6h8a3.4 3.4 0 013.4 3.4v9.2a3.4 3.4 0 01-3.4 3.4l1.6 2.2h-2.4l-1.2-2.2H10l-1.2 2.2H6.4L8 18.6A3.4 3.4 0 014.6 15.2V6A3.4 3.4 0 018 2.6zm-1.2 4v4.2h10.4V6.6zm1.6 6.4a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8zm7.2 0a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoBus aria-hidden />
 }
 
 function BagIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M8.4 7V6a3.6 3.6 0 017.2 0v1h3.2l.8 12.4a1.6 1.6 0 01-1.6 1.6H6a1.6 1.6 0 01-1.6-1.6L5.2 7zm2.2 0h2.8V6a1.4 1.4 0 00-2.8 0z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoBag aria-hidden />
 }
 
 function SparkleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 2.6l1.9 5.5 5.5 1.9-5.5 1.9L12 17.4l-1.9-5.5-5.5-1.9 5.5-1.9zM18.6 15l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoSparkles aria-hidden />
 }
 
 function FuelIcon() {

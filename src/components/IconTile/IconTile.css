@@ -33,8 +33,11 @@
 .may-icon-tile[data-size='lg'] { --may-tile-size: calc(var(--may-control-h) * 1.375); }
 
 /* The glyph is a fixed fraction of the tile, the way SF Symbols are specced
- * inside an app icon's grid. An explicitly sized svg opts out. */
-.may-icon-tile > svg:not([width]) {
+ * inside an app icon's grid. An explicitly sized svg opts out.
+ * react-icons renders width/height="1em" as ATTRIBUTES rather than leaving them
+ * unset, so that form is matched too — only a px size is a real opt-out. */
+.may-icon-tile > svg,
+.may-icon-tile > svg[width='1em'] {
   width: calc(var(--may-tile-size) * 0.6);
   height: calc(var(--may-tile-size) * 0.6);
   display: block;

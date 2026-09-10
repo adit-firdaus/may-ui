@@ -26,7 +26,7 @@
 }
 
 /* An icon with no explicit size fills the glyph slot; one with a size keeps it. */
-.may-empty__glyph > svg:not([width]) {
+.may-empty__glyph > svg {
   width: 1em;
   height: 1em;
   display: block;

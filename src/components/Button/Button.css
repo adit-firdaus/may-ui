@@ -141,7 +141,14 @@
 }
 
 /* Default icon size that an explicit size on the icon overrides. */
-.may-button__icon > svg:not([width]) {
+/*
+ * Sized in em so the glyph scales with the control. No :not([width]) guard:
+ * react-icons always emits width/height ATTRIBUTES, which would make such a
+ * guard never match — and a CSS width beats an SVG presentation attribute
+ * anyway. A caller wanting a fixed size passes an inline style, which wins
+ * over this rule.
+ */
+.may-button__icon > svg {
   width: 1.15em;
   height: 1.15em;
   display: block;

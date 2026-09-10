@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useMemo, useState } from 'react'
+import { IoCloudOutline } from 'react-icons/io5'
 import { DataTable } from './DataTable'
 import type { DataTableColumn, DataTableProps } from './DataTable'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
@@ -278,18 +279,7 @@ export const Empty: Story = {
         <EmptyState
           title="No Backups"
           description="Backups of the devices signed in to this Apple Account appear here."
-          glyph={
-            <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden>
-              <path
-                d="M6.5 17.5A4.5 4.5 0 0 1 7 8.6a5.5 5.5 0 0 1 10.6 1.5 3.7 3.7 0 0 1-.6 7.4H6.5Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          }
+          glyph={<IoCloudOutline aria-hidden />}
         />
       }
       noResultsState={

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoAdd } from 'react-icons/io5'
 import { Button } from './Button'
 
 const meta = {
@@ -80,15 +81,7 @@ export const States: Story = {
       <Button>Default</Button>
       <Button loading>Saving</Button>
       <Button disabled>Disabled</Button>
-      <Button leadingIcon={<PlusIcon />}>With icon</Button>
+      <Button leadingIcon={<IoAdd aria-hidden />}>With icon</Button>
     </Row>
   ),
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden>
-      <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  )
 }

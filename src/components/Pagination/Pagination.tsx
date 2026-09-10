@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
+import { IoChevronBack, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize } from '../../types'
@@ -67,21 +68,6 @@ function slotsFor(page: number, pageCount: number, siblingCount: number): Slot[]
   return [1, ...middle, pageCount]
 }
 
-function Chevron({ back }: { back?: boolean }) {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path
-        d={back ? 'M10 3.5L5.5 8L10 12.5' : 'M6 3.5L10.5 8L6 12.5'}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 interface KeyProps {
   children: ReactNode
   label: string
@@ -146,7 +132,7 @@ export function Pagination({
         onClick={() => go(current - 1)}
         className="may-pagination__arrow"
       >
-        <Chevron back />
+        <IoChevronBack aria-hidden focusable="false" />
       </PagerKey>
     </li>
   )
@@ -200,7 +186,7 @@ export function Pagination({
             onClick={() => go(current + 1)}
             className="may-pagination__arrow"
           >
-            <Chevron />
+            <IoChevronForward aria-hidden focusable="false" />
           </PagerKey>
         </li>
       </ul>

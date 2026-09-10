@@ -1,4 +1,14 @@
+import type { ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoBag,
+  IoBarChartOutline,
+  IoFlash,
+  IoFunnelOutline,
+  IoGlobeOutline,
+  IoPeople,
+  IoTime,
+} from 'react-icons/io5'
 import { Box } from '../components/Box'
 import { Button } from '../components/Button'
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '../components/Card'
@@ -34,34 +44,18 @@ interface Tile {
   /** True when going DOWN is the good news — crashes, refunds, latency. */
   invert?: boolean
   gradient: 'blue' | 'green' | 'orange' | 'purple'
-  glyph: string
+  glyph: ReactNode
 }
 
 const glyphs = {
-  people: 'M8 8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM2.5 13.5a5.5 5.5 0 0 1 11 0',
-  bag: 'M4 5.5h8l.8 8H3.2zM6 5.5V4a2 2 0 0 1 4 0v1.5',
-  clock: 'M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12zM8 4.8V8l2.2 1.6',
-  bolt: 'M9 2L4.5 9H8l-1 5 4.5-7H8z',
-  chart: 'M2.5 13.5h11M4.5 11V7M7.5 11V4M10.5 11V8.5M13 11V6',
-  globe: 'M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12zM2.4 6.2h11.2M2.4 9.8h11.2M8 2c3 3.6 3 8.4 0 12M8 2c-3 3.6-3 8.4 0 12',
-  filter: 'M2.5 4h11l-4.2 4.8V13L6.7 11.6V8.8z',
+  people: <IoPeople aria-hidden />,
+  bag: <IoBag aria-hidden />,
+  clock: <IoTime aria-hidden />,
+  bolt: <IoFlash aria-hidden />,
+  chart: <IoBarChartOutline aria-hidden />,
+  globe: <IoGlobeOutline aria-hidden />,
+  filter: <IoFunnelOutline aria-hidden />,
 }
-
-/* Unsized on purpose: IconTile and Button both size `svg:not([width])`
- * themselves, so one glyph serves a 44px app-icon tile and a small
- * button's leading slot without either being told a pixel. */
-const Glyph = ({ d }: { d: string }) => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path
-      d={d}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
 
 const tiles: Record<Range, Tile[]> = {
   '7d': [
@@ -267,7 +261,7 @@ export function AnalyticsDashboardScreen() {
                   <Button
                     variant="gray"
                     size="sm"
-                    leadingIcon={<Glyph d={glyphs.filter} />}
+                    leadingIcon={glyphs.filter}
                   >
                     Filters
                   </Button>
@@ -325,7 +319,7 @@ export function AnalyticsDashboardScreen() {
                 invertDelta={tile.invert}
                 trailing={
                   <IconTile gradient={tile.gradient} size="md">
-                    <Glyph d={tile.glyph} />
+                    {tile.glyph}
                   </IconTile>
                 }
               />

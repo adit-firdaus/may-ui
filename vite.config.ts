@@ -35,7 +35,10 @@ export default defineConfig({
             : `${entryName}.cjs`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      // react-icons is external so the consumer's bundler tree-shakes it per
+      // icon against their own copy. Inlining it would ship every glyph we use
+      // AND duplicate whatever they already import.
+      external: [/^react$/, 'react-dom', 'react/jsx-runtime', /^react-icons/],
       output: {
         assetFileNames: 'mayui.css',
         globals: { react: 'React', 'react-dom': 'ReactDOM' },

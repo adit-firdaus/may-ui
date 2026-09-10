@@ -58,7 +58,14 @@
   color: var(--may-alert-accent);
 }
 
-.may-alert__icon > svg:not([width]) {
+/*
+ * Sized in em so the glyph tracks the alert's text rather than a fixed pixel
+ * box. This covers both the built-in tone glyph and a consumer's own icon; an
+ * author rule outranks the width/height ATTRIBUTES react-icons stamps on every
+ * icon, so neither needs special-casing. To keep a specific size, pass an
+ * inline style — that outranks this rule in turn.
+ */
+.may-alert__icon > svg {
   width: 1.25em;
   height: 1.25em;
   display: block;

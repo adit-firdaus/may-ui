@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoInformationCircleOutline } from 'react-icons/io5'
 import { Popover } from './Popover'
 import type { PopoverPlacement } from './Popover'
 import { Button } from '../Button'
@@ -7,17 +8,7 @@ import { IconButton } from '../IconButton'
 import { List, ListRow } from '../List'
 import { Switch } from '../Switch'
 
-const InfoIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.7" />
-    <path
-      d="M10 9v5M10 6.2v.6"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-    />
-  </svg>
-)
+const InfoIcon = () => <IoInformationCircleOutline aria-hidden />
 
 const meta = {
   title: 'Catalog/Adaptive/Popover',

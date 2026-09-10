@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoCheckmark, IoCloudOfflineOutline, IoTrashOutline } from 'react-icons/io5'
 import { useState } from 'react'
 import { Toast } from './Toast'
 import { Button } from '../Button'
@@ -75,14 +76,14 @@ export const IconsAndActions: Story = {
     <div style={column}>
       <Toast
         tone="success"
-        icon={<CheckIcon />}
+        icon={<IoCheckmark aria-hidden />}
         title="Message sent"
         duration={0}
         onDismiss={() => {}}
       />
       <Toast
         tone="tint"
-        icon={<TrashIcon />}
+        icon={<IoTrashOutline aria-hidden />}
         title="Conversation deleted"
         description="Moved to Recently Deleted."
         action={{ label: 'Undo', onClick: () => {} }}
@@ -91,7 +92,7 @@ export const IconsAndActions: Story = {
       />
       <Toast
         tone="danger"
-        icon={<CloudIcon />}
+        icon={<IoCloudOfflineOutline aria-hidden />}
         title="Backup failed"
         action={{ label: 'Retry', onClick: () => {} }}
         closeButton={false}
@@ -139,48 +140,4 @@ export const Dismissing: Story = {
       </div>
     )
   },
-}
-
-/* --------------------------------- glyphs --------------------------------- */
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path
-        d="M5 12.5L10 17.5L19 7"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path
-        d="M4 7h16M9.5 7V5h5v2M6.5 7l1 12h9l1-12M10 10.5v5M14 10.5v5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function CloudIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path
-        d="M7.5 18a4 4 0 010-8 5.5 5.5 0 0110.6 1.4A3.6 3.6 0 0117.5 18H7.5z"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinejoin="round"
-      />
-      <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-    </svg>
-  )
 }

@@ -2,6 +2,7 @@ import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
 import { useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { IoCheckmark } from 'react-icons/io5'
 import type { MaySize } from '../../types'
 import './Selector.css'
 
@@ -266,16 +267,8 @@ function SelectorItem({
           on selection cannot animate in, and in a card it would reflow the
           grid the instant it did. CSS reveals it. */}
       <span className="may-selector__check" aria-hidden>
-        <svg viewBox="0 0 16 16" focusable="false">
-          <path
-            d="M3.5 8.4l3.1 3.1L12.5 5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        {/* The wrapping span is already aria-hidden. */}
+        <IoCheckmark focusable="false" />
       </span>
     </button>
   )

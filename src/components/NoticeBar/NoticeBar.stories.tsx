@@ -1,4 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import {
+  IoCheckmarkCircleOutline,
+  IoEllipse,
+  IoFlashOutline,
+  IoLinkOutline,
+} from 'react-icons/io5'
 import { useState } from 'react'
 import { NoticeBar } from './NoticeBar'
 import { Button } from '../Button/Button'
@@ -43,7 +49,7 @@ const Screen = ({ children }: { children: React.ReactNode }) => (
 export const Default: Story = {
   render: (args) => (
     <Screen>
-      <NoticeBar {...args} icon={<LinkIcon />} />
+      <NoticeBar {...args} icon={<IoLinkOutline aria-hidden />} />
     </Screen>
   ),
 }
@@ -51,16 +57,16 @@ export const Default: Story = {
 export const Tones: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--may-space-3)', maxWidth: 420 }}>
-      <NoticeBar tone="tint" icon={<LinkIcon />}>
+      <NoticeBar tone="tint" icon={<IoLinkOutline aria-hidden />}>
         Personal Hotspot: 1 Connection
       </NoticeBar>
-      <NoticeBar tone="danger" icon={<RecordIcon />}>
+      <NoticeBar tone="danger" icon={<IoEllipse aria-hidden />}>
         Screen Recording
       </NoticeBar>
-      <NoticeBar tone="success" icon={<CheckIcon />}>
+      <NoticeBar tone="success" icon={<IoCheckmarkCircleOutline aria-hidden />}>
         Location Shared with Find My
       </NoticeBar>
-      <NoticeBar tone="warning" icon={<BoltIcon />}>
+      <NoticeBar tone="warning" icon={<IoFlashOutline aria-hidden />}>
         Low Power Mode is on
       </NoticeBar>
       <NoticeBar tone="neutral">Do Not Disturb until 8:00 AM</NoticeBar>
@@ -72,7 +78,7 @@ export const Tones: Story = {
 export const Marquee: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--may-space-3)', maxWidth: 420 }}>
-      <NoticeBar tone="warning" marquee icon={<BoltIcon />}>
+      <NoticeBar tone="warning" marquee icon={<IoFlashOutline aria-hidden />}>
         Flash Flood Warning in effect for this area until 9:00 PM. Avoid low-lying roads and
         move to higher ground if advised by local officials.
       </NoticeBar>
@@ -92,7 +98,7 @@ export const WithAction: Story = {
     <Screen>
       <NoticeBar
         tone="danger"
-        icon={<RecordIcon />}
+        icon={<IoEllipse aria-hidden />}
         action={
           <Button size="xs" variant="plain">
             Stop
@@ -119,7 +125,7 @@ function DismissDemo() {
         {open && (
           <NoticeBar
             tone="warning"
-            icon={<BoltIcon />}
+            icon={<IoFlashOutline aria-hidden />}
             marquee
             onClose={() => setOpen(false)}
             closeLabel="Dismiss battery notice"
@@ -140,49 +146,5 @@ function DismissDemo() {
         </Button>
       )}
     </div>
-  )
-}
-
-/* --------------------------- SF-Symbol-ish glyphs --------------------------- */
-
-const strokeProps = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.7,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-}
-
-function LinkIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M8.4 11.6a3 3 0 0 0 4.3 0l2.4-2.4a3 3 0 0 0-4.3-4.3l-1 1" {...strokeProps} />
-      <path d="M11.6 8.4a3 3 0 0 0-4.3 0l-2.4 2.4a3 3 0 0 0 4.3 4.3l1-1" {...strokeProps} />
-    </svg>
-  )
-}
-
-function RecordIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <circle cx="10" cy="10" r="4.6" fill="currentColor" />
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <circle cx="10" cy="10" r="8" {...strokeProps} />
-      <path d="M6.4 10.3l2.5 2.5 4.8-5.4" {...strokeProps} />
-    </svg>
-  )
-}
-
-function BoltIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M11.2 2.6L4.8 11h4.1l-1.1 6.4 6.4-8.4h-4.1z" {...strokeProps} />
-    </svg>
   )
 }

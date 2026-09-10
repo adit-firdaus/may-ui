@@ -95,7 +95,7 @@
   color: var(--may-toast-accent);
 }
 
-.may-toast__icon > svg:not([width]) {
+.may-toast__icon > svg {
   width: 55%;
   height: 55%;
   display: block;

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoArchive, IoEllipsisHorizontal, IoFlag, IoMail, IoPin, IoTrash } from 'react-icons/io5'
 import { SwipeAction } from './SwipeAction'
 import { List, ListRow } from '../../components/List'
 
@@ -15,52 +16,17 @@ type Story = StoryObj<typeof meta>
 
 /* ------------------------------- glyphs ---------------------------------- */
 
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.8,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
+const ArchiveIcon = () => <IoArchive aria-hidden />
 
-const ArchiveIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path d="M3 6.5h14M4.5 6.5V16h11V6.5M3 6.5 4.6 4h10.8L17 6.5M8 10h4" {...stroke} />
-  </svg>
-)
+const FlagIcon = () => <IoFlag aria-hidden />
 
-const FlagIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path d="M5 17V3.5m0 0h9l-2 3 2 3H5" {...stroke} />
-  </svg>
-)
+const MoreIcon = () => <IoEllipsisHorizontal aria-hidden />
 
-const MoreIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="4.5" cy="10" r="1.4" fill="currentColor" />
-    <circle cx="10" cy="10" r="1.4" fill="currentColor" />
-    <circle cx="15.5" cy="10" r="1.4" fill="currentColor" />
-  </svg>
-)
+const MailIcon = () => <IoMail aria-hidden />
 
-const MailIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <rect x="2.5" y="4.5" width="15" height="11" rx="2.5" {...stroke} />
-    <path d="m3.5 6 6.5 4.5L16.5 6" {...stroke} />
-  </svg>
-)
+const TrashIcon = () => <IoTrash aria-hidden />
 
-const TrashIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path d="M4 6h12M8 6V4h4v2M6 6l.8 10h6.4L15 6M8.5 9v4M11.5 9v4" {...stroke} />
-  </svg>
-)
-
-const PinIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path d="M10 12.5V17M6.5 3h7l-1 5 2.5 2v1.5h-11V10L6.5 8z" {...stroke} />
-  </svg>
-)
+const PinIcon = () => <IoPin aria-hidden />
 
 /* -------------------------------- stories -------------------------------- */
 

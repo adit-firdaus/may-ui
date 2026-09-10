@@ -7,6 +7,7 @@ import type {
   KeyboardEvent,
 } from 'react'
 import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { IoCloseCircle, IoSearch } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize } from '../../types'
@@ -213,16 +214,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
     >
       <div className="may-search-bar__field">
         <span className="may-search-bar__lead" aria-hidden>
-          <svg className="may-search-bar__glyph" viewBox="0 0 16 16" focusable="false">
-            <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.75" />
-            <path
-              d="M10.6 10.6L14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IoSearch className="may-search-bar__glyph" focusable="false" />
           <span className="may-search-bar__placeholder">{placeholder}</span>
         </span>
 
@@ -265,14 +257,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
             onClick={clear}
             className="may-search-bar__clear may-pressable may-hoverable"
           >
-            <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                fill="currentColor"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-              />
-            </svg>
+            <IoCloseCircle aria-hidden focusable="false" />
           </button>
         </span>
       </div>

@@ -239,7 +239,7 @@
 }
 
 /* Tracks the label's size unless the caller sizes the glyph itself. */
-.may-tabs__tab-icon > svg:not([width]) {
+.may-tabs__tab-icon > svg {
   width: 1.15em;
   height: 1.15em;
   display: block;

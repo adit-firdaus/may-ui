@@ -1,5 +1,6 @@
 import type { CSSProperties, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
+import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
@@ -288,18 +289,7 @@ function Row({ node, level }: { node: NavTreeNode; level: number }) {
         {/* Always rendered, even on a leaf: it is the column the labels align
          * to, and a leaf that borrows its width sits under its siblings. */}
         <span className="may-navtree__twisty" aria-hidden>
-          {branchy && (
-            <svg viewBox="0 0 16 16" focusable="false">
-              <path
-                d="M6 3.5L10.5 8L6 12.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
+          {branchy && <IoChevronForward focusable="false" />}
         </span>
         {node.icon && (
           <span className="may-navtree__icon" aria-hidden>

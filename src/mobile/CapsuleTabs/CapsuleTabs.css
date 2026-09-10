@@ -163,7 +163,7 @@
 }
 
 /* Tracks the label's size unless the caller sizes the glyph itself. */
-.may-capsule-tabs__icon > svg:not([width]) {
+.may-capsule-tabs__icon > svg {
   width: 1.15em;
   height: 1.15em;
   display: block;

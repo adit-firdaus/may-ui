@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoCheckmark, IoCreateOutline } from 'react-icons/io5'
 import { VisuallyHidden } from './VisuallyHidden'
 
 const meta = {
@@ -33,22 +34,11 @@ export const IconButtonLabels: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: 'var(--may-space-3)' }}>
       <button type="button" style={iconButton}>
-        <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden focusable="false">
-          <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
+        <IoCreateOutline aria-hidden style={{ width: 18, height: 18 }} />
         <VisuallyHidden>Compose message</VisuallyHidden>
       </button>
       <button type="button" style={iconButton}>
-        <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden focusable="false">
-          <path
-            d="M3 8.5l3.5 3.5L13 5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <IoCheckmark aria-hidden style={{ width: 18, height: 18 }} />
         <VisuallyHidden>Mark as read</VisuallyHidden>
       </button>
     </div>

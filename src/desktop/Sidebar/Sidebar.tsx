@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, PointerEvent, ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
@@ -207,16 +208,7 @@ export function SidebarSection({
             className="may-sidebar-section__header may-hoverable"
           >
             <span className="may-sidebar-section__title">{title}</span>
-            <svg className="may-sidebar-section__chevron" viewBox="0 0 16 16" aria-hidden focusable="false">
-              <path
-                d="M6 3.5L10.5 8L6 12.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <IoChevronForward className="may-sidebar-section__chevron" aria-hidden focusable="false" />
           </button>
         ) : (
           <div className="may-sidebar-section__header">
@@ -380,7 +372,7 @@ export function SidebarToggle({ label, className, onClick, ...rest }: SidebarTog
           d="M9.5 3.5L5 8l4.5 4.5M13.5 3.5L9 8l4.5 4.5"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="1"
           strokeLinecap="round"
           strokeLinejoin="round"
         />

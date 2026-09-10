@@ -1,5 +1,6 @@
 import type { AnimationEvent, CSSProperties, HTMLAttributes, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -163,15 +164,7 @@ export function NoticeBar({
           aria-label={closeLabel}
           className="may-notice__close may-pressable may-hoverable"
         >
-          <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-            <path
-              d="M4.5 4.5l7 7M11.5 4.5l-7 7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IoClose aria-hidden focusable="false" />
         </button>
       )}
     </div>

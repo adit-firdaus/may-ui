@@ -151,7 +151,7 @@
   color: inherit;
 }
 
-.may-navtree__icon > svg:not([width]) {
+.may-navtree__icon > svg {
   width: 1.2em;
   height: 1.2em;
   display: block;

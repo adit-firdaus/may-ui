@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoLocation, IoPerson } from 'react-icons/io5'
 import { Tag } from './Tag'
 import { Button } from '../Button/Button'
 
@@ -119,22 +120,9 @@ export const Sizes: Story = {
 }
 
 function PersonIcon() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden>
-      <circle cx="8" cy="5" r="2.6" fill="currentColor" />
-      <path d="M2.8 14c0-2.9 2.3-4.6 5.2-4.6s5.2 1.7 5.2 4.6" fill="currentColor" />
-    </svg>
-  )
+  return <IoPerson aria-hidden />
 }
 
 function PinIcon() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden>
-      <path
-        d="M8 1.8c2.3 0 4.2 1.9 4.2 4.2 0 3-4.2 8-4.2 8S3.8 9 3.8 6c0-2.3 1.9-4.2 4.2-4.2z"
-        fill="currentColor"
-      />
-      <circle cx="8" cy="6" r="1.5" fill="var(--may-color-surface)" />
-    </svg>
-  )
+  return <IoLocation aria-hidden />
 }

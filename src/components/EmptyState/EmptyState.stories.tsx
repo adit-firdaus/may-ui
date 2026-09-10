@@ -1,4 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import {
+  IoDownloadOutline,
+  IoMailOutline,
+  IoRadioOutline,
+  IoSearchOutline,
+} from 'react-icons/io5'
 import { EmptyState } from './EmptyState'
 import { Button } from '../Button'
 import { Card } from '../Card'
@@ -24,7 +30,7 @@ export const Default: Story = {
   render: (args) => (
     <EmptyState
       {...args}
-      glyph={<MailIcon />}
+      glyph={<IoMailOutline aria-hidden />}
       title="No Mail"
       description="You have read everything in this mailbox. New messages will appear here."
     />
@@ -35,7 +41,7 @@ export const Default: Story = {
 export const WithAction: Story = {
   render: () => (
     <EmptyState
-      glyph={<AirDropIcon />}
+      glyph={<IoRadioOutline aria-hidden />}
       title="No People Nearby"
       description="AirDrop finds people who have their iPhone or Mac unlocked and nearby."
       action={
@@ -56,7 +62,7 @@ export const Sizes: Story = {
         <Card key={size} variant="grouped" padding="none">
           <EmptyState
             size={size}
-            glyph={<SearchIcon />}
+            glyph={<IoSearchOutline aria-hidden />}
             title="No Results"
             description={`Nothing matched “tokyo” in this mailbox. (size: ${size})`}
           />
@@ -73,7 +79,7 @@ export const InACard: Story = {
       <Card padding="none">
         <EmptyState
           size="sm"
-          glyph={<DownloadIcon />}
+          glyph={<IoDownloadOutline aria-hidden />}
           title="No Downloads"
           description="Files you download will appear here."
           action={<Button size="sm" variant="tinted">Browse Files</Button>}
@@ -81,43 +87,4 @@ export const InACard: Story = {
       </Card>
     </div>
   ),
-}
-
-/* --- glyphs: plain strokes, sized by the slot rather than by themselves --- */
-
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <rect x="2.5" y="5" width="19" height="14" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M3.5 7.5l8.5 6 8.5-6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function AirDropIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <circle cx="12" cy="12" r="9.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 13.5a5 5 0 018 0M9.75 16.5a2.75 2.75 0 014.5 0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="12" cy="8" r="1.25" fill="currentColor" />
-    </svg>
-  )
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M16 16l4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function DownloadIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M12 4v11m0 0l-4-4m4 4l4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M4.5 17.5v1a2 2 0 002 2h11a2 2 0 002-2v-1" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
 }

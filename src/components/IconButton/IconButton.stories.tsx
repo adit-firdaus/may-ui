@@ -1,10 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import {
+  IoAdd,
+  IoArrowUndo,
+  IoClose,
+  IoCreate,
+  IoEllipsisHorizontal,
+  IoFolder,
+  IoShareOutline,
+  IoTrash,
+} from 'react-icons/io5'
 import { IconButton } from './IconButton'
 
 const meta = {
   title: 'Catalog/Adaptive/IconButton',
   component: IconButton,
-  args: { 'aria-label': 'Share', children: <ShareIcon /> },
+  args: { 'aria-label': 'Share', children: <IoShareOutline aria-hidden focusable="false" /> },
   argTypes: {
     variant: { control: 'inline-radio', options: ['filled', 'tinted', 'gray', 'plain'] },
     tone: { control: 'select', options: ['tint', 'neutral', 'success', 'warning', 'danger'] },
@@ -41,16 +51,16 @@ export const Round: Story = {
   render: () => (
     <Row>
       <IconButton aria-label="Close" round variant="gray" tone="neutral">
-        <CloseIcon />
+        <IoClose aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="More" round variant="gray" tone="neutral">
-        <EllipsisIcon />
+        <IoEllipsisHorizontal aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="Add contact" round variant="filled">
-        <PlusIcon />
+        <IoAdd aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="Delete message" round variant="tinted" tone="danger">
-        <TrashIcon />
+        <IoTrash aria-hidden focusable="false" />
       </IconButton>
     </Row>
   ),
@@ -81,16 +91,16 @@ export const MailActions: Story = {
       }}
     >
       <IconButton aria-label="Move to folder">
-        <FolderIcon />
+        <IoFolder aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="Delete message" tone="danger">
-        <TrashIcon />
+        <IoTrash aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="Reply">
-        <ReplyIcon />
+        <IoArrowUndo aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="New message">
-        <ComposeIcon />
+        <IoCreate aria-hidden focusable="false" />
       </IconButton>
       <IconButton aria-label="Sending" loading />
     </div>
@@ -107,81 +117,3 @@ export const States: Story = {
   ),
 }
 
-/* ------------------------------- glyphs ---------------------------------- */
-
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.6,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
-function ShareIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5" {...stroke} />
-      <path d="M4.5 11v5.5h11V11" {...stroke} />
-    </svg>
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M6 6l8 8M14 6l-8 8" {...stroke} strokeWidth={1.9} />
-    </svg>
-  )
-}
-
-function EllipsisIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <circle cx="5" cy="10" r="1.4" fill="currentColor" />
-      <circle cx="10" cy="10" r="1.4" fill="currentColor" />
-      <circle cx="15" cy="10" r="1.4" fill="currentColor" />
-    </svg>
-  )
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M10 4.5v11M4.5 10h11" {...stroke} strokeWidth={1.9} />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M4 6h12M8 6V4.5h4V6M6 6l.8 10h6.4L14 6" {...stroke} />
-    </svg>
-  )
-}
-
-function FolderIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M3 6.5A1.5 1.5 0 014.5 5h3l1.5 2h6.5A1.5 1.5 0 0117 8.5v6A1.5 1.5 0 0115.5 16h-11A1.5 1.5 0 013 14.5z" {...stroke} />
-    </svg>
-  )
-}
-
-function ReplyIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M8 5L3.5 9.5 8 14" {...stroke} />
-      <path d="M3.5 9.5H12a4.5 4.5 0 014.5 4.5v1" {...stroke} />
-    </svg>
-  )
-}
-
-function ComposeIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M16.5 5.5l-2-2-8 8-.8 2.8 2.8-.8z" {...stroke} />
-      <path d="M4 16.5h12" {...stroke} />
-    </svg>
-  )
-}

@@ -1,4 +1,13 @@
 import { useState } from 'react'
+import {
+  IoArchiveOutline,
+  IoCreateOutline,
+  IoFilterOutline,
+  IoFlagOutline,
+  IoMailOutline,
+  IoTimeOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { EmptyState } from '../components/EmptyState'
@@ -56,21 +65,21 @@ export function MailInboxScreen() {
         {
           label: message.unread ? 'Read' : 'Unread',
           tone: 'tint',
-          icon: <EnvelopeIcon />,
+          icon: <IoMailOutline aria-hidden />,
           onSelect: () => setRead(message.id, message.unread),
         },
-        { label: 'Remind', tone: 'neutral', icon: <ClockIcon />, onSelect: () => {} },
+        { label: 'Remind', tone: 'neutral', icon: <IoTimeOutline aria-hidden />, onSelect: () => {} },
       ]}
       trailing={[
         /* First = primary = the one a full swipe fires. */
-        { label: 'Archive', tone: 'tint', icon: <ArchiveIcon />, onSelect: () => remove(message.id) },
+        { label: 'Archive', tone: 'tint', icon: <IoArchiveOutline aria-hidden />, onSelect: () => remove(message.id) },
         {
           label: flagged.includes(message.id) ? 'Unflag' : 'Flag',
           tone: 'warning',
-          icon: <FlagIcon />,
+          icon: <IoFlagOutline aria-hidden />,
           onSelect: () => toggleFlag(message.id),
         },
-        { label: 'Trash', tone: 'danger', icon: <TrashIcon />, onSelect: () => remove(message.id) },
+        { label: 'Trash', tone: 'danger', icon: <IoTrashOutline aria-hidden />, onSelect: () => remove(message.id) },
       ]}
     >
       <ListRow
@@ -164,7 +173,7 @@ export function MailInboxScreen() {
           )}
           {messages.length === 0 && (
             <EmptyState
-              glyph={<EnvelopeIcon />}
+              glyph={<IoMailOutline aria-hidden />}
               title="No Mail"
               description="Everything has been archived. Pull down to check for new messages."
             />
@@ -174,7 +183,7 @@ export function MailInboxScreen() {
 
       <Toolbar placement="bottom" separator safeArea>
         <IconButton aria-label="Filter by unread" onClick={() => setUpdated(`Filtered · ${unread} unread`)}>
-          <FilterIcon />
+          <IoFilterOutline aria-hidden />
         </IconButton>
         <ToolbarSpacer />
         <Text variant="caption-1" tone="secondary" as="span">
@@ -194,7 +203,7 @@ export function MailInboxScreen() {
           zIndex: 'var(--may-z-nav)',
         }}
       >
-        <Fab icon={<ComposeIcon />} aria-label="New Message" />
+        <Fab icon={<IoCreateOutline aria-hidden />} aria-label="New Message" />
       </div>
     </div>
   )
@@ -278,73 +287,4 @@ const NEW_MAIL: Message = {
   at: 'now',
   unread: true,
   group: 'today',
-}
-
-/* ------------------------------- glyph set -------------------------------- */
-
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.8,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
-function EnvelopeIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <rect x="2.5" y="4.5" width="15" height="11" rx="2.5" {...stroke} />
-      <path d="m3.6 6 6.4 4.6L16.4 6" {...stroke} />
-    </svg>
-  )
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <circle cx="10" cy="10" r="7.2" {...stroke} />
-      <path d="M10 5.6V10l3 1.9" {...stroke} />
-    </svg>
-  )
-}
-
-function ArchiveIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M3 6.5h14M4.5 6.5V16h11V6.5M3 6.5 4.6 4h10.8L17 6.5M8 10h4" {...stroke} />
-    </svg>
-  )
-}
-
-function FlagIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M5 17V3.5m0 0h9l-2 3 2 3H5" {...stroke} />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M4 6h12M8 6V4h4v2M6 6l.8 10h6.4L15 6M8.5 9v4M11.5 9v4" {...stroke} />
-    </svg>
-  )
-}
-
-function FilterIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M3.5 5.5h13M6 10h8M8.5 14.5h3" {...stroke} />
-    </svg>
-  )
-}
-
-function ComposeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M4.5 19.5h15M6 16.4l9.1-9.1 2.6 2.6-9.1 9.1H6z" {...stroke} />
-      <path d="m16.2 6.2 1.6-1.6a1.4 1.4 0 0 1 2 0l.6.6a1.4 1.4 0 0 1 0 2l-1.6 1.6" {...stroke} />
-    </svg>
-  )
 }

@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoAdd, IoCreate } from 'react-icons/io5'
 import { Fab } from './Fab'
 import { List, ListRow } from '../List'
 
 const meta = {
   title: 'Catalog/Adaptive/Fab',
   component: Fab,
-  args: { 'aria-label': 'New note', icon: <ComposeIcon /> },
+  args: { 'aria-label': 'New note', icon: <IoCreate aria-hidden focusable="false" /> },
   argTypes: {
     tone: { control: 'select', options: ['tint', 'neutral', 'success', 'warning', 'danger'] },
     size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
@@ -32,7 +33,7 @@ export const Extended: Story = {
     <Row>
       <Fab {...args} />
       <Fab {...args}>New Note</Fab>
-      <Fab {...args} icon={<PlusIcon />} aria-label="Add reminder" tone="danger">
+      <Fab {...args} icon={<IoAdd aria-hidden focusable="false" />} aria-label="Add reminder" tone="danger">
         Remind Me
       </Fab>
     </Row>
@@ -108,29 +109,3 @@ export const States: Story = {
   ),
 }
 
-/* ------------------------------- glyphs ---------------------------------- */
-
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.6,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
-function ComposeIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M16.5 5.5l-2-2-8 8-.8 2.8 2.8-.8z" {...stroke} />
-      <path d="M4 16.5h12" {...stroke} />
-    </svg>
-  )
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M10 4.5v11M4.5 10h11" {...stroke} strokeWidth={1.9} />
-    </svg>
-  )
-}

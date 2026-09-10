@@ -1,5 +1,24 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoArchiveOutline,
+  IoBrowsersOutline,
+  IoBrushOutline,
+  IoCodeOutline,
+  IoCreateOutline,
+  IoDocumentOutline,
+  IoDocumentTextOutline,
+  IoEyeOutline,
+  IoFileTrayOutline,
+  IoFolderOutline,
+  IoInformationCircleOutline,
+  IoMoonOutline,
+  IoPaperPlaneOutline,
+  IoPencilOutline,
+  IoSettingsOutline,
+  IoStarOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 
 import { Button } from '../components/Button'
 import { Heading } from '../components/Heading'
@@ -19,50 +38,46 @@ import { SplitPane } from '../desktop/SplitPane'
 
 /* -------------------------------- glyph set --------------------------------
  *
- * Two grids, because two scales of chrome. Window furniture — sidebar rows,
- * tree rows — is drawn on 16, the grid those components size their own
- * chevrons on. Menu and palette rows are drawn on 24, where a stroke reads at
- * the weight of the label beside it. Stroked, never filled: a filled glyph
- * sits a full step heavier than the text it sits next to.
+ * Ionicons, outline throughout. Window furniture — sidebar rows, tree rows —
+ * and menu and palette rows all sit beside a label, and a filled glyph sits a
+ * full step heavier than the text next to it. No sizes anywhere: each
+ * component's own stylesheet sizes the glyph it is handed.
+ *
+ * The exception is ⌘, which Ionicons does not carry. It stays hand-drawn on
+ * the 24 grid rather than being swapped for an icon that means something else.
  * -------------------------------------------------------------------------- */
 
-const rail = (d: string): ReactNode => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
+const glyph = (d: string): ReactNode => (
+  <svg viewBox="0 0 24 24" aria-hidden focusable="false">
     <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
-const glyph = (d: string): ReactNode => (
-  <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
 const RAIL = {
-  inbox: rail('M1.5 8.5h3l1 2h5l1-2h3M2 4.5h12v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z'),
-  star: rail('M8 2l1.8 3.7 4.2.6-3 3 .7 4.1L8 11.5l-3.7 1.9.7-4.1-3-3 4.2-.6z'),
-  sent: rail('M14 2L7 9m7-7l-4.5 12-2.2-5.3L2 6.5z'),
-  draft: rail('M4 2.5h5l3 3v8H4zM9 2.5v3h3'),
-  archive: rail('M2.5 2.5h11v3h-11zM3.5 5.5v8h9v-8M6.5 8.5h3'),
-  folder: rail('M1.5 4.5A1 1 0 0 1 2.5 3.5h3L7 5h6.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z'),
-  code: rail('M6 4L2.5 8 6 12M10 4l3.5 4L10 12'),
-  gear: rail('M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-2-1.3.4-.4 1 .7 1.2-1.4 1.4-1.2-.7-1 .4L9 13.6H7l-.4-1.3-1-.4-1.2.7-1.4-1.4.7-1.2-.4-1L2 8.6V7l1.3-.4.4-1-.7-1.2 1.4-1.4 1.2.7 1-.4L7 2h2l.4 1.3 1 .4 1.2-.7 1.4 1.4-.7 1.2.4 1L14 7z'),
+  inbox: <IoFileTrayOutline aria-hidden />,
+  star: <IoStarOutline aria-hidden />,
+  sent: <IoPaperPlaneOutline aria-hidden />,
+  draft: <IoDocumentOutline aria-hidden />,
+  archive: <IoArchiveOutline aria-hidden />,
+  folder: <IoFolderOutline aria-hidden />,
+  code: <IoCodeOutline aria-hidden />,
+  gear: <IoSettingsOutline aria-hidden />,
 }
 
 const ICON = {
-  compose: glyph('M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z'),
-  window: glyph('M3 5h18v14H3zM3 9h18'),
-  inbox: glyph('M3 13h5l1.5 3h5L16 13h5M4 5h16l1 8v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5Z'),
-  drafts: glyph('M5 3h9l5 5v13H5zM14 3v5h5M8.5 13h7m-7 3.5h4'),
-  gear: glyph('M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm9-3-2 .6-.6 1.5 1 1.8-2 2-1.8-1-1.5.6L12 21l-.6-2-1.5-.6-1.8 1-2-2 1-1.8L6.5 14 4.5 12l2-.6.6-1.5-1-1.8 2-2 1.8 1 1.5-.6L12 4l.6 2 1.5.6 1.8-1 2 2-1 1.8.6 1.5 2 .6Z'),
-  moon: glyph('M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z'),
-  archive: glyph('M3 4h18v4H3zM5 8v12h14V8M10 12h4'),
-  trash: glyph('M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13'),
+  compose: <IoCreateOutline aria-hidden />,
+  window: <IoBrowsersOutline aria-hidden />,
+  inbox: <IoFileTrayOutline aria-hidden />,
+  drafts: <IoDocumentTextOutline aria-hidden />,
+  gear: <IoSettingsOutline aria-hidden />,
+  moon: <IoMoonOutline aria-hidden />,
+  archive: <IoArchiveOutline aria-hidden />,
+  trash: <IoTrashOutline aria-hidden />,
   command: glyph('M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3Z'),
-  design: glyph('M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z'),
-  info: glyph('M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 11v5m0-8h.01'),
-  eye: glyph('M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Zm9.5 2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z'),
-  rename: glyph('M4 20h16M6 16l9.5-9.5a2.1 2.1 0 0 0-3-3L3 13v3h3Z'),
+  design: <IoBrushOutline aria-hidden />,
+  info: <IoInformationCircleOutline aria-hidden />,
+  eye: <IoEyeOutline aria-hidden />,
+  rename: <IoPencilOutline aria-hidden />,
 }
 
 /* ------------------------------- sidebar data ------------------------------ */

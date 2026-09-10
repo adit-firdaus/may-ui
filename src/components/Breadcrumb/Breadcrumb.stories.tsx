@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoFolderOutline } from 'react-icons/io5'
 import { Breadcrumb } from './Breadcrumb'
 
 const meta = {
@@ -17,20 +18,6 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
-
-function FolderIcon() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path
-        d="M1.75 4.25A1.25 1.25 0 0 1 3 3h3l1.5 1.75h5.5A1.25 1.25 0 0 1 14.25 6v6A1.25 1.25 0 0 1 13 13.25H3A1.25 1.25 0 0 1 1.75 12z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
 
 /** The last crumb is where you are: not a link, not pressable, marked `aria-current`. */
 export const Default: Story = {}
@@ -58,9 +45,9 @@ export const Collapsed: Story = {
 export const WithIcons: Story = {
   args: {
     items: [
-      { label: 'iCloud Drive', icon: <FolderIcon />, href: '#' },
-      { label: 'Shared', icon: <FolderIcon />, href: '#' },
-      { label: 'Q3 Launch', icon: <FolderIcon /> },
+      { label: 'iCloud Drive', icon: <IoFolderOutline aria-hidden />, href: '#' },
+      { label: 'Shared', icon: <IoFolderOutline aria-hidden />, href: '#' },
+      { label: 'Q3 Launch', icon: <IoFolderOutline aria-hidden /> },
     ],
   },
 }

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ReactNode } from 'react'
 import { useRef } from 'react'
+import { IoArrowUndoOutline, IoCreateOutline, IoFolderOutline } from 'react-icons/io5'
 import { NavBar } from './NavBar'
 import { Button } from '../../components/Button'
 import { IconButton } from '../../components/IconButton'
@@ -203,39 +204,14 @@ function Body() {
 
 /* --------------------------------- glyphs --------------------------------- */
 
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.6,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
 function FolderIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path
-        d="M3 6.5A1.5 1.5 0 014.5 5h3l1.5 2h6.5A1.5 1.5 0 0117 8.5v6A1.5 1.5 0 0115.5 16h-11A1.5 1.5 0 013 14.5z"
-        {...stroke}
-      />
-    </svg>
-  )
+  return <IoFolderOutline aria-hidden />
 }
 
 function ReplyIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M8 5L3.5 9.5 8 14" {...stroke} />
-      <path d="M3.5 9.5H12a4.5 4.5 0 014.5 4.5v1" {...stroke} />
-    </svg>
-  )
+  return <IoArrowUndoOutline aria-hidden />
 }
 
 function ComposeIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden>
-      <path d="M16.5 5.5l-2-2-8 8-.8 2.8 2.8-.8z" {...stroke} />
-      <path d="M4 16.5h12" {...stroke} />
-    </svg>
-  )
+  return <IoCreateOutline aria-hidden />
 }

@@ -1,5 +1,6 @@
 import type { CSSProperties, HTMLAttributes, MouseEvent, ReactNode } from 'react'
 import { Fragment, isValidElement } from 'react'
+import { IoCheckmark } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
@@ -304,21 +305,11 @@ export function Table<T>({
                     // it survives being read aloud in a way a colour does not.
                     accessory={
                       isSelected ? (
-                        <svg
+                        <IoCheckmark
                           className="may-table__check"
-                          viewBox="0 0 16 16"
                           role="img"
                           aria-label="Selected"
-                        >
-                          <path
-                            d="M3 8.6L6.4 12L13 4.6"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
+                        />
                       ) : undefined
                     }
                     onClick={onRowClick ? () => onRowClick(row, index) : undefined}

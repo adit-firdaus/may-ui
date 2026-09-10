@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
+import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import './List.css'
@@ -98,16 +99,7 @@ export function ListRow({
       {detail && <span className="may-list-row__detail">{detail}</span>}
       {accessory && <span className="may-list-row__accessory">{accessory}</span>}
       {showChevron && (
-        <svg className="may-list-row__chevron" viewBox="0 0 16 16" aria-hidden focusable="false">
-          <path
-            d="M6 3.5L10.5 8L6 12.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <IoChevronForward className="may-list-row__chevron" aria-hidden focusable="false" />
       )}
     </>
   )

@@ -237,7 +237,7 @@
   flex-shrink: 0;
 }
 
-.may-action-sheet__icon > svg:not([width]) {
+.may-action-sheet__icon > svg {
   width: 1.1em;
   height: 1.1em;
   display: block;

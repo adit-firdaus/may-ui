@@ -1,4 +1,20 @@
 import { useState } from 'react'
+import {
+  IoChatboxEllipses,
+  IoChevronDown,
+  IoEllipsisHorizontal,
+  IoHeart,
+  IoHeartOutline,
+  IoList,
+  IoPause,
+  IoPlay,
+  IoPlaySkipBack,
+  IoPlaySkipForward,
+  IoRepeat,
+  IoShuffle,
+  IoVolumeHigh,
+  IoVolumeLow,
+} from 'react-icons/io5'
 import { Box } from '../components/Box'
 import { IconButton } from '../components/IconButton'
 import { Slider } from '../components/Slider'
@@ -55,7 +71,7 @@ export function NowPlayingScreen() {
       {/* Dismiss / source / more — the chrome that sits over the artwork. */}
       <Stack direction="row" align="center" justify="between">
         <IconButton aria-label="Minimise player" size="sm" tone="neutral">
-          <ChevronDownIcon />
+          <IoChevronDown aria-hidden />
         </IconButton>
         <Stack gap={0} align="center">
           <Text variant="caption-2" tone="tertiary" weight="semibold" style={{ letterSpacing: '0.08em' }}>
@@ -66,7 +82,7 @@ export function NowPlayingScreen() {
           </Text>
         </Stack>
         <IconButton aria-label="More options" size="sm" tone="neutral">
-          <EllipsisIcon />
+          <IoEllipsisHorizontal aria-hidden />
         </IconButton>
       </Stack>
 
@@ -164,7 +180,7 @@ export function NowPlayingScreen() {
           tone={loved ? 'danger' : 'neutral'}
           onClick={() => setLoved((v) => !v)}
         >
-          <HeartIcon filled={loved} />
+          {loved ? <IoHeart aria-hidden /> : <IoHeartOutline aria-hidden />}
         </IconButton>
       </Stack>
 
@@ -201,7 +217,7 @@ export function NowPlayingScreen() {
           tone={shuffle ? 'tint' : 'neutral'}
           onClick={() => setShuffle((v) => !v)}
         >
-          <ShuffleIcon />
+          <IoShuffle aria-hidden />
         </IconButton>
         <IconButton
           aria-label="Previous track"
@@ -210,7 +226,7 @@ export function NowPlayingScreen() {
           style={{ fontSize: 'var(--may-text-title-3)' }}
           onClick={() => setElapsed(0)}
         >
-          <BackwardIcon />
+          <IoPlaySkipBack aria-hidden />
         </IconButton>
         <IconButton
           aria-label={playing ? 'Pause' : 'Play'}
@@ -221,7 +237,7 @@ export function NowPlayingScreen() {
           style={{ fontSize: 'var(--may-text-title-1)' }}
           onClick={() => setPlaying((v) => !v)}
         >
-          {playing ? <PauseIcon /> : <PlayIcon />}
+          {playing ? <IoPause aria-hidden /> : <IoPlay aria-hidden />}
         </IconButton>
         <IconButton
           aria-label="Next track"
@@ -230,7 +246,7 @@ export function NowPlayingScreen() {
           style={{ fontSize: 'var(--may-text-title-3)' }}
           onClick={() => setElapsed(DURATION)}
         >
-          <ForwardIcon />
+          <IoPlaySkipForward aria-hidden />
         </IconButton>
         <IconButton
           aria-label={`Repeat: ${repeat}`}
@@ -238,7 +254,7 @@ export function NowPlayingScreen() {
           tone={repeat === 'off' ? 'neutral' : 'tint'}
           onClick={() => setRepeat((mode) => NEXT_REPEAT[mode])}
         >
-          {repeat === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
+          {repeat === 'one' ? <RepeatOneIcon /> : <IoRepeat aria-hidden />}
         </IconButton>
       </Stack>
 
@@ -249,20 +265,20 @@ export function NowPlayingScreen() {
         onValueChange={setVolume}
         tone="neutral"
         formatValue={(v) => `${v}%`}
-        leading={<SpeakerLowIcon />}
-        trailing={<SpeakerHighIcon />}
+        leading={<IoVolumeLow aria-hidden />}
+        trailing={<IoVolumeHigh aria-hidden />}
       />
 
       {/* Lyrics, output and queue — the three destinations Music keeps here. */}
       <Stack direction="row" align="center" justify="center" gap={16}>
         <IconButton aria-label="Lyrics" tone="neutral">
-          <LyricsIcon />
+          <IoChatboxEllipses aria-hidden />
         </IconButton>
         <IconButton aria-label="AirPlay: Living Room" tone="tint">
           <AirPlayIcon />
         </IconButton>
         <IconButton aria-label="Playing next" tone="neutral">
-          <QueueIcon />
+          <IoList aria-hidden />
         </IconButton>
       </Stack>
     </div>
@@ -270,86 +286,8 @@ export function NowPlayingScreen() {
 }
 
 /* ------------------------------- glyph set -------------------------------- */
-/* Drawn at 24 rather than imported: an example that pulls an icon package
- * teaches the package instead of the composition. */
-
-function ChevronDownIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M5.5 9.5L12 16l6.5-6.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function EllipsisIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <circle cx="5" cy="12" r="1.8" />
-      <circle cx="12" cy="12" r="1.8" />
-      <circle cx="19" cy="12" r="1.8" />
-    </svg>
-  )
-}
-
-function HeartIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 20.4S3.4 15.2 3.4 9.4A4.8 4.8 0 0112 6.8a4.8 4.8 0 018.6 2.6c0 5.8-8.6 11-8.6 11z"
-        fill={filled ? 'currentColor' : 'none'}
-        stroke="currentColor"
-        strokeWidth={filled ? 0 : 1.8}
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function ShuffleIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 7h3.1c1.7 0 2.7 1.1 3.7 2.6l3.2 4.8c1 1.5 2 2.6 3.7 2.6H21" />
-      <path d="M3 17h3.1c1.7 0 2.7-1.1 3.7-2.6" />
-      <path d="M14.1 9.6c1-1.5 2-2.6 3.7-2.6H21" />
-      <path d="M18.4 4.4L21 7l-2.6 2.6" />
-      <path d="M18.4 14.4L21 17l-2.6 2.6" />
-    </svg>
-  )
-}
-
-function RepeatIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 10.5V9a3 3 0 013-3h9" />
-      <path d="M15.4 3.4L18.6 6l-3.2 2.6" />
-      <path d="M18 13.5V15a3 3 0 01-3 3H6" />
-      <path d="M8.6 15.4L5.4 18l3.2 2.6" />
-    </svg>
-  )
-}
+/* What is left is what Ionicons does not carry: the set has `repeat` but no
+ * repeat-one, and no AirPlay mark at all. Everything else here is an Ionicon. */
 
 function RepeatOneIcon() {
   return (
@@ -357,7 +295,7 @@ function RepeatOneIcon() {
       <g
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.9"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -366,85 +304,7 @@ function RepeatOneIcon() {
         <path d="M18 13.5V15a3 3 0 01-3 3H6" />
         <path d="M8.6 15.4L5.4 18l3.2 2.6" />
       </g>
-      <path d="M11.4 9.8h1.3v4.6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function BackwardIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M12.4 6.6v10.8L4.6 12z" />
-      <path d="M20.2 6.6v10.8L12.4 12z" />
-    </svg>
-  )
-}
-
-function ForwardIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M3.8 6.6v10.8L11.6 12z" />
-      <path d="M11.6 6.6v10.8L19.4 12z" />
-    </svg>
-  )
-}
-
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M7.6 5.2v13.6L19 12z" />
-    </svg>
-  )
-}
-
-function PauseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <rect x="7" y="5" width="3.6" height="14" rx="1.3" />
-      <rect x="13.4" y="5" width="3.6" height="14" rx="1.3" />
-    </svg>
-  )
-}
-
-function SpeakerLowIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M4 9.4h3.3L11.6 5.8v12.4L7.3 14.6H4z" fill="currentColor" />
-      <path
-        d="M14.6 9.7a3.3 3.3 0 010 4.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
-function SpeakerHighIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M3 9.4h3.3L10.6 5.8v12.4L6.3 14.6H3z" fill="currentColor" />
-      <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-        <path d="M13.6 9.7a3.3 3.3 0 010 4.6" />
-        <path d="M16.4 7.2a6.8 6.8 0 010 9.6" />
-        <path d="M19.2 4.7a10.3 10.3 0 010 14.6" />
-      </g>
-    </svg>
-  )
-}
-
-function LyricsIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M5 4h14a2 2 0 012 2v8.4a2 2 0 01-2 2h-6.6L8 20.4v-4H5a2 2 0 01-2-2V6a2 2 0 012-2z"
-        fill="currentColor"
-      />
-      <g fill="none" stroke="var(--may-color-bg)" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M7.4 8.4h9.2" />
-        <path d="M7.4 12h6" />
-      </g>
+      <path d="M11.4 9.8h1.3v4.6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -456,23 +316,10 @@ function AirPlayIcon() {
         d="M6.4 16H4.6A2.6 2.6 0 012 13.4V6.2a2.6 2.6 0 012.6-2.6h14.8A2.6 2.6 0 0122 6.2v7.2a2.6 2.6 0 01-2.6 2.6h-1.8"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.9"
+        strokeWidth="1.5"
         strokeLinecap="round"
       />
       <path d="M12 13.6l5.2 6.8H6.8z" fill="currentColor" />
-    </svg>
-  )
-}
-
-function QueueIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <circle cx="4.2" cy="6.5" r="1.6" />
-      <circle cx="4.2" cy="12" r="1.6" />
-      <circle cx="4.2" cy="17.5" r="1.6" />
-      <rect x="8.4" y="5.4" width="12.4" height="2.2" rx="1.1" />
-      <rect x="8.4" y="10.9" width="12.4" height="2.2" rx="1.1" />
-      <rect x="8.4" y="16.4" width="12.4" height="2.2" rx="1.1" />
     </svg>
   )
 }

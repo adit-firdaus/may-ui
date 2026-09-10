@@ -104,7 +104,7 @@ button.may-breadcrumb__crumb::after {
   color: var(--may-color-text-tertiary);
 }
 
-.may-breadcrumb__icon > svg:not([width]) {
+.may-breadcrumb__icon > svg {
   width: 1.1em;
   height: 1.1em;
   display: block;
@@ -144,7 +144,9 @@ button.may-breadcrumb__crumb::after {
   color: var(--may-color-text-quaternary);
 }
 
-.may-breadcrumb__separator > svg:not([width]) {
+/* Smaller than the crumb text: a separator is punctuation, not a word. To pin
+ * a separator at a fixed size, pass an inline style — it outranks this. */
+.may-breadcrumb__separator > svg {
   width: 0.85em;
   height: 0.85em;
   display: block;

@@ -1,63 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import {
+  IoArrowUndoOutline,
+  IoEllipsisHorizontal,
+  IoFlagOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { useState } from 'react'
 import { Menu } from './Menu'
 import type { MenuItem } from './Menu'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 
-const EllipsisIcon = () => (
-  <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden focusable="false">
-    <circle cx="4.5" cy="10" r="1.6" />
-    <circle cx="10" cy="10" r="1.6" />
-    <circle cx="15.5" cy="10" r="1.6" />
-  </svg>
-)
-
-const ReplyIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-    <path
-      d="M8 5L3.5 9.5 8 14M4 9.5h7.5a5 5 0 0 1 5 5"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const FlagIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-    <path
-      d="M5 17V4.2c3-1.6 6-.4 9 0v7.6c-3-1.4-6-2.6-9 0Z"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const TrashIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-    <path
-      d="M3.5 5.5h13M8 3.5h4M6 5.5V16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5.5"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
 const mailActions: MenuItem[] = [
-  { label: 'Reply', icon: <ReplyIcon />, shortcut: '⌘R', onSelect: () => {} },
+  { label: 'Reply', icon: <IoArrowUndoOutline aria-hidden />, shortcut: '⌘R', onSelect: () => {} },
   { label: 'Reply All', shortcut: '⇧⌘R', onSelect: () => {} },
   { label: 'Forward', shortcut: '⇧⌘F', onSelect: () => {} },
-  { label: 'Flag', icon: <FlagIcon />, separator: true, onSelect: () => {} },
+  { label: 'Flag', icon: <IoFlagOutline aria-hidden />, separator: true, onSelect: () => {} },
   { label: 'Mark as Unread', shortcut: '⇧⌘U', onSelect: () => {} },
   { label: 'Mute Thread', onSelect: () => {} },
   {
     label: 'Delete',
-    icon: <TrashIcon />,
+    icon: <IoTrashOutline aria-hidden />,
     shortcut: '⌘⌫',
     destructive: true,
     separator: true,
@@ -71,7 +34,7 @@ const meta = {
   args: {
     trigger: (
       <IconButton aria-label="More actions" variant="gray" round>
-        <EllipsisIcon />
+        <IoEllipsisHorizontal aria-hidden />
       </IconButton>
     ),
     items: mailActions,

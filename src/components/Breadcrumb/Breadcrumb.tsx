@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -46,21 +47,6 @@ const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : us
 interface Entry {
   item: BreadcrumbItem | null
   index: number
-}
-
-function Chevron() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path
-        d="M6 3.5L10.5 8L6 12.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
 }
 
 /**
@@ -215,7 +201,7 @@ export function Breadcrumb({
               )}
               {!last && (
                 <span className="may-breadcrumb__separator" aria-hidden>
-                  {separator ?? <Chevron />}
+                  {separator ?? <IoChevronForward aria-hidden focusable="false" />}
                 </span>
               )}
             </li>

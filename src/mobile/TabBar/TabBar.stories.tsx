@@ -1,6 +1,27 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoAlbums,
+  IoAlbumsOutline,
+  IoFlag,
+  IoFlagOutline,
+  IoGameController,
+  IoGameControllerOutline,
+  IoHeart,
+  IoHeartOutline,
+  IoImages,
+  IoImagesOutline,
+  IoMail,
+  IoMailOutline,
+  IoPeople,
+  IoPeopleOutline,
+  IoSearchOutline,
+  IoStar,
+  IoStarOutline,
+  IoToday,
+  IoTodayOutline,
+} from 'react-icons/io5'
 import { TabBar } from './TabBar'
 import { List, ListRow } from '../../components/List'
 
@@ -219,67 +240,31 @@ type Glyph = { filled?: boolean }
 const paint = (filled?: boolean) => (filled ? { fill: 'currentColor', stroke: 'none' } : outline)
 
 function LibraryIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <rect x="3.5" y="5.5" width="17" height="13" rx="3" {...paint(filled)} />
-      <path d="M3.5 15l4-4 3.5 3.5L14.5 11l6 6" {...outline} stroke={filled ? 'none' : 'currentColor'} />
-    </svg>
-  )
+  return filled ? <IoImages aria-hidden /> : <IoImagesOutline aria-hidden />
 }
 
 function HeartIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 19.5c-.6 0-7.5-4.3-7.5-9.2A4.3 4.3 0 0112 8.2a4.3 4.3 0 017.5 2.1c0 4.9-6.9 9.2-7.5 9.2z"
-        {...paint(filled)}
-      />
-    </svg>
-  )
+  return filled ? <IoHeart aria-hidden /> : <IoHeartOutline aria-hidden />
 }
 
 function AlbumsIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <rect x="3.5" y="7.5" width="8" height="8" rx="2" {...paint(filled)} />
-      <rect x="12.5" y="7.5" width="8" height="8" rx="2" {...paint(filled)} />
-    </svg>
-  )
+  return filled ? <IoAlbums aria-hidden /> : <IoAlbumsOutline aria-hidden />
 }
 
 function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <circle cx="11" cy="11" r="6" {...outline} />
-      <path d="M15.5 15.5L20 20" {...outline} />
-    </svg>
-  )
+  return <IoSearchOutline aria-hidden />
 }
 
 function InboxIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <rect x="3.5" y="6" width="17" height="12" rx="3" {...paint(filled)} />
-      <path d="M4 8.5l8 5 8-5" {...outline} stroke={filled ? 'var(--may-color-surface)' : 'currentColor'} />
-    </svg>
-  )
+  return filled ? <IoMail aria-hidden /> : <IoMailOutline aria-hidden />
 }
 
 function StarIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M12 4.5l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 10.2l5.4-.8z" {...paint(filled)} />
-    </svg>
-  )
+  return filled ? <IoStar aria-hidden /> : <IoStarOutline aria-hidden />
 }
 
 function FlagIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M6 20V5" {...outline} />
-      <path d="M6 5.5h11l-2.5 4 2.5 4H6z" {...paint(filled)} />
-    </svg>
-  )
+  return filled ? <IoFlag aria-hidden /> : <IoFlagOutline aria-hidden />
 }
 
 function RingsIcon({ filled }: Glyph) {
@@ -292,27 +277,13 @@ function RingsIcon({ filled }: Glyph) {
 }
 
 function PeopleIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <circle cx="12" cy="8.5" r="3.5" {...paint(filled)} />
-      <path d="M5 19c1.4-3 4-4.5 7-4.5s5.6 1.5 7 4.5" {...outline} />
-    </svg>
-  )
+  return filled ? <IoPeople aria-hidden /> : <IoPeopleOutline aria-hidden />
 }
 
 function TodayIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <rect x="4" y="5.5" width="16" height="14" rx="3" {...paint(filled)} />
-      <path d="M8 3.5v3M16 3.5v3" {...outline} />
-    </svg>
-  )
+  return filled ? <IoToday aria-hidden /> : <IoTodayOutline aria-hidden />
 }
 
 function GamesIcon({ filled }: Glyph) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M7.5 8.5h9a4 4 0 013.9 4.9l-.5 2.1a2.6 2.6 0 01-4.7.9L14 15h-4l-1.2 1.4a2.6 2.6 0 01-4.7-.9l-.5-2.1a4 4 0 013.9-4.9z" {...paint(filled)} />
-    </svg>
-  )
+  return filled ? <IoGameController aria-hidden /> : <IoGameControllerOutline aria-hidden />
 }

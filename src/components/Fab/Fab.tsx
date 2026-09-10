@@ -6,7 +6,12 @@ import type { MaySize, MayTone } from '../../types'
 import './Fab.css'
 
 export interface FabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
-  /** The glyph. A bare `<svg>` is scaled to the control by CSS. */
+  /**
+   * The glyph, and it stays a ReactNode — a consumer's slot, never a fixed
+   * icon. Either shape is sized to the control by CSS: a bare `<svg>` with no
+   * width attribute, or an Ionicon from `react-icons/io5` at its default size
+   * (`width="1em"`). Both land on 1.35em. Pass `size` to opt out.
+   */
   icon: ReactNode
   /** An optional label, which extends the circle into a pill. */
   children?: ReactNode

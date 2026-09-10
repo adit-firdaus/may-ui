@@ -1,5 +1,6 @@
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { IoSearch } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
@@ -527,16 +528,7 @@ export function CommandPalette({
         className={cx('may-command', className)}
       >
         <div className="may-command__field">
-          <svg className="may-command__search" viewBox="0 0 16 16" aria-hidden focusable="false">
-            <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-            <path
-              d="M10.6 10.6L14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IoSearch className="may-command__search" aria-hidden focusable="false" />
           <input
             ref={inputRef}
             type="text"

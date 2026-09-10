@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoSunny, IoSunnyOutline, IoVolumeHigh, IoVolumeLow } from 'react-icons/io5'
 import { List, ListRow } from '../List'
 import { Slider } from './Slider'
 
@@ -13,39 +14,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** iOS's brightness slider: a small sun at one end, a large one at the other. */
-const SunIcon = ({ rays }: { rays: boolean }) => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="10" cy="10" r={rays ? 4 : 5.5} fill="currentColor" />
-    {rays &&
-      [0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-        <rect
-          key={angle}
-          x="9.25"
-          y="0.5"
-          width="1.5"
-          height="3"
-          rx="0.75"
-          fill="currentColor"
-          transform={`rotate(${angle} 10 10)`}
-        />
-      ))}
-  </svg>
-)
+const SunIcon = ({ rays }: { rays: boolean }) =>
+  rays ? <IoSunny aria-hidden /> : <IoSunnyOutline aria-hidden />
 
-const SpeakerIcon = ({ loud }: { loud: boolean }) => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path d="M9 3.5 5.2 7H3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2.2L9 16.5z" fill="currentColor" />
-    {loud && (
-      <path
-        d="M12.5 6.5a5 5 0 0 1 0 7M15 4a8.5 8.5 0 0 1 0 12"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    )}
-  </svg>
-)
+const SpeakerIcon = ({ loud }: { loud: boolean }) =>
+  loud ? <IoVolumeHigh aria-hidden /> : <IoVolumeLow aria-hidden />
 
 /**
  * The thumb is dragged, and the rail can be pressed anywhere to jump to that

@@ -1,5 +1,12 @@
 import type { AnimationEvent, HTMLAttributes, ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoAlertCircleOutline,
+  IoCheckmarkCircleOutline,
+  IoClose,
+  IoInformationCircleOutline,
+  IoWarningOutline,
+} from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MayTone } from '../../types'
@@ -101,15 +108,7 @@ export function Alert({
           aria-label={dismissLabel}
           className="may-alert__dismiss may-pressable may-hoverable"
         >
-          <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-            <path
-              d="M4.5 4.5l7 7M11.5 4.5l-7 7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IoClose aria-hidden focusable="false" />
         </button>
       )}
     </div>
@@ -117,56 +116,26 @@ export function Alert({
 }
 
 /**
- * SF-Symbol-shaped glyphs, drawn as strokes rather than filled shapes so they
- * take the tone from `currentColor` and stay legible on a wash of it.
+ * Ionicons' SF-Symbol-shaped glyphs, in their OUTLINE cut rather than the solid
+ * one: the alert already sits on a wash of its own tone, and a filled triangle
+ * on an 18% orange wash is one flat orange shape. The outline keeps its
+ * interior readable, and `currentColor` still carries the tone.
+ *
+ * The glyph takes `may-alert__glyph` because react-icons always emits
+ * `width`/`height` attributes — the class is what `.may-alert__icon`'s sizing
+ * rule matches on, so the glyph keeps scaling with the alert's text.
  */
 function toneGlyph(tone: MayTone): ReactNode {
-  const stroke = {
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.6,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-  }
+  const glyphProps = {
+    className: 'may-alert__glyph',
+    'aria-hidden': true,
+    focusable: 'false',
+  } as const
 
-  if (tone === 'success') {
-    return (
-      <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-        <circle cx="10" cy="10" r="8.2" {...stroke} />
-        <path d="M6.4 10.3l2.5 2.5 4.8-5.4" {...stroke} />
-      </svg>
-    )
-  }
-
-  if (tone === 'warning') {
-    return (
-      <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-        <path
-          d="M10.9 3.4l7 12.1a1 1 0 0 1-.9 1.5H3a1 1 0 0 1-.9-1.5l7-12.1a1 1 0 0 1 1.8 0Z"
-          {...stroke}
-        />
-        <path d="M10 7.8v3.9" {...stroke} />
-        <circle cx="10" cy="14.2" r="0.95" fill="currentColor" />
-      </svg>
-    )
-  }
-
-  if (tone === 'danger') {
-    return (
-      <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-        <circle cx="10" cy="10" r="8.2" {...stroke} />
-        <path d="M10 5.9v5.1" {...stroke} />
-        <circle cx="10" cy="13.9" r="0.95" fill="currentColor" />
-      </svg>
-    )
-  }
+  if (tone === 'success') return <IoCheckmarkCircleOutline {...glyphProps} />
+  if (tone === 'warning') return <IoWarningOutline {...glyphProps} />
+  if (tone === 'danger') return <IoAlertCircleOutline {...glyphProps} />
 
   // tint and neutral share the information glyph.
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <circle cx="10" cy="10" r="8.2" {...stroke} />
-      <path d="M10 9.1v5" {...stroke} />
-      <circle cx="10" cy="6.2" r="0.95" fill="currentColor" />
-    </svg>
-  )
+  return <IoInformationCircleOutline {...glyphProps} />
 }

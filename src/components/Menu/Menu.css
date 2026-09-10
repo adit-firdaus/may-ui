@@ -90,7 +90,7 @@
 .may-menu__item[data-destructive='true'] .may-menu__icon { color: inherit; }
 
 /* Default glyph size that an explicit size on the icon overrides. */
-.may-menu__icon > svg:not([width]) {
+.may-menu__icon > svg {
   width: 1.15em;
   height: 1.15em;
   display: block;

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoBagHandleOutline } from 'react-icons/io5'
 import { Table } from './Table'
 import type { TableColumn, TableProps } from './Table'
 import { EmptyState } from '../EmptyState/EmptyState'
@@ -191,18 +192,7 @@ export const Empty: Story = {
         <EmptyState
           title="No Purchases"
           description="Purchases made with this Apple Account appear here."
-          glyph={
-            <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden>
-              <path
-                d="M4 7h16l-1.4 12.1a2 2 0 0 1-2 1.9H7.4a2 2 0 0 1-2-1.9L4 7Zm4 0a4 4 0 1 1 8 0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          }
+          glyph={<IoBagHandleOutline aria-hidden />}
         />
       }
     />

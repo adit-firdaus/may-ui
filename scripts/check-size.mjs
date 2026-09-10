@@ -97,11 +97,19 @@ console.log('        screens’ CSS — a few hundred bytes gzipped.)')
 
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 const deps = Object.keys(pkg.dependencies ?? {})
-const depsOk = deps.length === 0
+/*
+ * react-icons is the one sanctioned runtime dependency: the icon set is a
+ * deliberate design decision, and it is externalised in the build so the
+ * consumer's bundler tree-shakes it per icon. Anything else appearing here is
+ * an accident and should fail.
+ */
+const ALLOWED_DEPS = new Set(['react-icons'])
+const depsOk = deps.every((d) => ALLOWED_DEPS.has(d))
 if (!depsOk) failed = true
 console.log(
   `\n  ${depsOk ? 'ok  ' : 'FAIL'} runtime dependencies: ${deps.length === 0 ? 'none' : deps.join(', ')}`,
 )
-console.log('       (easing-utils is a devDependency — compiled in at build time)')
+console.log('       (react-icons is external and tree-shaken per icon by the consumer;')
+console.log('        easing-utils is a devDependency, compiled in at build time)')
 
 process.exit(failed ? 1 : 0)

@@ -134,7 +134,7 @@
 }
 
 /* Fills the glyph box unless the caller sizes the artwork itself. */
-.may-tab-bar__icon > svg:not([width]) {
+.may-tab-bar__icon > svg {
   width: 100%;
   height: 100%;
   display: block;

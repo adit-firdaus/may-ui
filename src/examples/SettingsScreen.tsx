@@ -1,4 +1,15 @@
 import { useRef, useState } from 'react'
+import {
+  IoAirplane,
+  IoBluetooth,
+  IoCellular,
+  IoHourglass,
+  IoRadio,
+  IoSettings,
+  IoSunny,
+  IoVolumeHigh,
+  IoWifi,
+} from 'react-icons/io5'
 import { AlertDialog } from '../components/AlertDialog'
 import { Avatar } from '../components/Avatar'
 import { IconTile } from '../components/IconTile'
@@ -99,7 +110,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="orange">
-                  <AirplaneIcon />
+                  <IoAirplane aria-hidden />
                 </IconTile>
               }
               title="Airplane Mode"
@@ -116,7 +127,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="blue">
-                  <WifiIcon />
+                  <IoWifi aria-hidden />
                 </IconTile>
               }
               title="Wi-Fi"
@@ -126,7 +137,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="blue">
-                  <BluetoothIcon />
+                  <IoBluetooth aria-hidden />
                 </IconTile>
               }
               title="Bluetooth"
@@ -136,7 +147,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="green">
-                  <CellularIcon />
+                  <IoCellular aria-hidden />
                 </IconTile>
               }
               title="Cellular"
@@ -146,7 +157,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="green">
-                  <HotspotIcon />
+                  <IoRadio aria-hidden />
                 </IconTile>
               }
               title="Personal Hotspot"
@@ -160,7 +171,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="gray">
-                  <GearIcon />
+                  <IoSettings aria-hidden />
                 </IconTile>
               }
               title="General"
@@ -170,7 +181,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="blue">
-                  <BrightnessIcon />
+                  <IoSunny aria-hidden />
                 </IconTile>
               }
               title="Display & Brightness"
@@ -180,7 +191,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="pink">
-                  <SpeakerIcon />
+                  <IoVolumeHigh aria-hidden />
                 </IconTile>
               }
               title="Sounds & Haptics"
@@ -189,7 +200,7 @@ export function SettingsScreen() {
             <ListRow
               leading={
                 <IconTile gradient="indigo">
-                  <HourglassIcon />
+                  <IoHourglass aria-hidden />
                 </IconTile>
               }
               title="Screen Time"
@@ -225,98 +236,5 @@ export function SettingsScreen() {
         onCancel={() => setConfirming(false)}
       />
     </div>
-  )
-}
-
-/* ------------------------------- glyph set -------------------------------- */
-
-/* One stroke recipe for the whole set, so the tiles read as a single family
- * rather than as eight icons that happened to land in the same list. */
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.7,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
-function AirplaneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 3c.9 0 1.4.8 1.4 1.8v4.4l6.6 3.9v1.9l-6.6-2v3.9l2.2 1.6v1.4L12 19.6l-3.6 1.3v-1.4l2.2-1.6V14l-6.6 2v-1.9l6.6-3.9V4.8C10.6 3.8 11.1 3 12 3z" fill="currentColor" />
-    </svg>
-  )
-}
-
-function WifiIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M3.5 9.2a13 13 0 0 1 17 0M6.6 12.6a8.4 8.4 0 0 1 10.8 0M9.7 16a3.8 3.8 0 0 1 4.6 0" {...stroke} />
-      <circle cx="12" cy="19" r="1.3" fill="currentColor" />
-    </svg>
-  )
-}
-
-function BluetoothIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M8 7.5 16 16.5 12 20V4l4 3.5L8 16.5" {...stroke} />
-    </svg>
-  )
-}
-
-function CellularIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <rect x="3" y="15" width="3" height="5" rx="1" fill="currentColor" />
-      <rect x="8" y="11.5" width="3" height="8.5" rx="1" fill="currentColor" />
-      <rect x="13" y="8" width="3" height="12" rx="1" fill="currentColor" />
-      <rect x="18" y="4.5" width="3" height="15.5" rx="1" fill="currentColor" />
-    </svg>
-  )
-}
-
-function HotspotIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <circle cx="12" cy="12" r="2.4" fill="currentColor" />
-      <path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" {...stroke} />
-    </svg>
-  )
-}
-
-function GearIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z" {...stroke} />
-      <path d="M12 2.8l1.5 2.1 2.5-.6.6 2.5 2.1 1.5-1.3 2.2 1.3 2.2-2.1 1.5-.6 2.5-2.5-.6L12 21.2l-1.5-2.1-2.5.6-.6-2.5-2.1-1.5 1.3-2.2-1.3-2.2 2.1-1.5.6-2.5 2.5.6z" {...stroke} />
-    </svg>
-  )
-}
-
-function BrightnessIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <circle cx="12" cy="12" r="4" fill="currentColor" />
-      <path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M18.6 5.4l-1.8 1.8M7.2 16.8l-1.8 1.8" {...stroke} />
-    </svg>
-  )
-}
-
-function SpeakerIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M11.5 4.4 6.8 8.4H3.6v7.2h3.2l4.7 4V4.4z" fill="currentColor" />
-      <path d="M15.4 9a4.2 4.2 0 0 1 0 6M18.2 6.2a8 8 0 0 1 0 11.6" {...stroke} />
-    </svg>
-  )
-}
-
-function HourglassIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <circle cx="12" cy="12" r="8.6" {...stroke} />
-      <path d="M12 6.8V12l3.4 2.2" {...stroke} />
-    </svg>
   )
 }

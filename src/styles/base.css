@@ -27,6 +27,22 @@
   scroll-behavior: auto;
 }
 
+/*
+ * A scoped theme — `<div data-may-theme="dark">` inside a light page — re-declares
+ * every token beneath it, and that is enough for anything which resolves a token
+ * itself. It is NOT enough for `color`, because color is inherited: `.may-root`
+ * already resolved it against the OUTER theme, and an inherited computed value
+ * does not re-resolve just because the tokens under it changed. Everything that
+ * leans on inheritance — every icon, every bare button — would keep the outer
+ * theme's colour, which on a dark-pinned surface means black on black.
+ *
+ * Background needs no counterpart: it does not inherit, so an element wanting the
+ * scoped surface paints it and resolves in its own scope.
+ */
+[data-may-theme] {
+  color: var(--may-color-text);
+}
+
 .may-root *,
 .may-root *::before,
 .may-root *::after {

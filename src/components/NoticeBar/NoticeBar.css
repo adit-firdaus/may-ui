@@ -65,7 +65,7 @@
   flex-shrink: 0;
 }
 
-.may-notice__icon > svg:not([width]) {
+.may-notice__icon > svg {
   width: 1.15em;
   height: 1.15em;
   display: block;

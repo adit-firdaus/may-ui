@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { IoAdd, IoChevronDown, IoEllipsisHorizontal, IoPeopleOutline } from 'react-icons/io5'
 import { DataTable } from '../desktop/DataTable'
 import type { DataTableColumn } from '../desktop/DataTable'
 import { Avatar } from '../components/Avatar'
@@ -64,26 +65,6 @@ const STATUS_TONE = {
   Invited: 'tint',
   Suspended: 'danger',
 } as const
-
-const glyphs = {
-  plus: 'M8 3.5v9M3.5 8h9',
-  more: 'M4 8h.01M8 8h.01M12 8h.01',
-  chevron: 'M4 6.5L8 10.5l4-4',
-  people: 'M8 8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM2.5 13.5a5.5 5.5 0 0 1 11 0',
-}
-
-const Glyph = ({ d }: { d: string }) => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path
-      d={d}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
 
 /* ------------------------------------------------------------------ *
  * Screen
@@ -183,7 +164,7 @@ export function DataTableAdminScreen() {
             placement="bottom-end"
             trigger={
               <IconButton aria-label={`Actions for ${row.name}`} tone="neutral" size="sm">
-                <Glyph d={glyphs.more} />
+                <IoEllipsisHorizontal aria-hidden />
               </IconButton>
             }
             items={[
@@ -258,7 +239,7 @@ export function DataTableAdminScreen() {
               aria-label="Bulk actions"
               placement="bottom-end"
               trigger={
-                <Button variant="gray" trailingIcon={<Glyph d={glyphs.chevron} />}>
+                <Button variant="gray" trailingIcon={<IoChevronDown aria-hidden />}>
                   {count > 0 ? `${count} Selected` : 'Bulk Actions'}
                 </Button>
               }
@@ -275,7 +256,7 @@ export function DataTableAdminScreen() {
               ]}
             />
 
-            <Button variant="filled" leadingIcon={<Glyph d={glyphs.plus} />}>
+            <Button variant="filled" leadingIcon={<IoAdd aria-hidden />}>
               Invite
             </Button>
           </Stack>
@@ -300,7 +281,7 @@ export function DataTableAdminScreen() {
             defaultSort={[{ key: 'lastActive', direction: 'asc' }]}
             emptyState={
               <EmptyState
-                glyph={<Glyph d={glyphs.people} />}
+                glyph={<IoPeopleOutline aria-hidden />}
                 title="No one matches that search"
                 description={`No one in Mercury, Inc. matches “${query.trim()}”. Try a name, an email address, or a role.`}
                 action={

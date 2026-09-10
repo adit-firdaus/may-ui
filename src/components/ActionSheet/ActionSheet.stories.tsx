@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { IoCopyOutline, IoShareOutline, IoTrashOutline } from 'react-icons/io5'
 import { useRef, useState } from 'react'
 import { ActionSheet } from './ActionSheet'
 import { Button } from '../Button'
@@ -12,45 +13,6 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
-
-const Share = () => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path
-      d="M8 10.5V2m0 0L5.25 4.75M8 2l2.75 2.75M3.5 8.5v4a1 1 0 001 1h7a1 1 0 001-1v-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const Trash = () => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path
-      d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.1a1 1 0 001 .9h3.8a1 1 0 001-.9l.6-8.1"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const Duplicate = () => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path
-      d="M5.5 5.5V3.5a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-2M3.5 5.5h6a1 1 0 011 1v6a1 1 0 01-1 1h-6a1 1 0 01-1-1v-6a1 1 0 011-1z"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
 
 /**
  * The same actions in two genuinely different shapes. Below the desktop
@@ -77,12 +39,12 @@ export const Adaptive: Story = {
           title="IMG_4021.HEIC"
           description="Taken 14 June at Vík í Mýrdal"
           actions={[
-            { label: 'Share…', icon: <Share />, onSelect: () => setLast('Share') },
-            { label: 'Duplicate', icon: <Duplicate />, onSelect: () => setLast('Duplicate') },
+            { label: 'Share…', icon: <IoShareOutline aria-hidden />, onSelect: () => setLast('Share') },
+            { label: 'Duplicate', icon: <IoCopyOutline aria-hidden />, onSelect: () => setLast('Duplicate') },
             { label: 'Add to Album', onSelect: () => setLast('Add to Album') },
             {
               label: 'Delete Photo',
-              icon: <Trash />,
+              icon: <IoTrashOutline aria-hidden />,
               destructive: true,
               onSelect: () => setLast('Delete Photo'),
             },

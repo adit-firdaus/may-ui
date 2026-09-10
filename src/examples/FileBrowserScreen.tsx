@@ -1,5 +1,26 @@
 import type { MouseEvent, ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoAppsOutline,
+  IoArchive,
+  IoBrush,
+  IoCloudOutline,
+  IoCodeSlash,
+  IoDocument,
+  IoEasel,
+  IoFolder,
+  IoFolderOutline,
+  IoGlobeOutline,
+  IoImage,
+  IoInformationCircleOutline,
+  IoOpenOutline,
+  IoPencilOutline,
+  IoPricetagOutline,
+  IoServerOutline,
+  IoStatsChart,
+  IoTrashOutline,
+  IoVideocam,
+} from 'react-icons/io5'
 
 import { Breadcrumb } from '../components/Breadcrumb'
 import type { BreadcrumbItem } from '../components/Breadcrumb'
@@ -21,47 +42,33 @@ import { SplitPane } from '../desktop/SplitPane'
 
 /* -------------------------------- glyph set -------------------------------- */
 
-/** Sidebar glyphs sit on the 16px grid the rest of the chrome uses. */
-const chrome = (d: string): ReactNode => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-/** File-kind glyphs ride inside an IconTile, so they are drawn at 24. */
-const kindGlyph = (d: string): ReactNode => (
-  <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
 const CHROME = {
-  cloud: chrome('M4.5 12.5a3 3 0 0 1-.3-6 4 4 0 0 1 7.7.6 2.7 2.7 0 0 1-.4 5.4z'),
-  folder: chrome('M1.5 4.5A1 1 0 0 1 2.5 3.5h3l1.5 1.5h5.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1z'),
-  drive: chrome('M2 3.5h12v9H2zM4.5 10h.01M4.5 6h7'),
-  globe: chrome('M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12zM2.4 6.5h11.2M2.4 9.5h11.2M8 2c-3 3.4-3 8.6 0 12 3-3.4 3-8.6 0-12z'),
-  tag: chrome('M2.5 2.5h5l6 6-5 5-6-6zM5 5h.01'),
+  cloud: <IoCloudOutline aria-hidden />,
+  folder: <IoFolderOutline aria-hidden />,
+  drive: <IoServerOutline aria-hidden />,
+  globe: <IoGlobeOutline aria-hidden />,
+  tag: <IoPricetagOutline aria-hidden />,
 }
 
 const KIND = {
-  folder: kindGlyph('M3 6.5A1.5 1.5 0 0 1 4.5 5h4L11 7.5h8.5A1.5 1.5 0 0 1 21 9v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z'),
-  doc: kindGlyph('M6 3h7l5 5v13H6zM13 3v5h5'),
-  design: kindGlyph('M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z'),
-  image: kindGlyph('M4 5h16v14H4zM6 17l4.5-5 3 3.5 2.5-2.5 4 4M15.5 9h.01'),
-  code: kindGlyph('M6 3h12v18H6zM10.5 11 9 13l1.5 2m3-4L15 13l-1.5 2'),
-  sheet: kindGlyph('M5 19V9m5 10V5m5 14v-7m5 7V8'),
-  deck: kindGlyph('M4 5h16v9H4zM12 14v5m-3 0h6'),
-  movie: kindGlyph('M3 6h18v12H3zM10 9.5l5 2.5-5 2.5z'),
-  archive: kindGlyph('M5 3h14v18H5zM12 3v2m0 2v2m0 2v2m0 2v3'),
+  folder: <IoFolder aria-hidden />,
+  doc: <IoDocument aria-hidden />,
+  design: <IoBrush aria-hidden />,
+  image: <IoImage aria-hidden />,
+  code: <IoCodeSlash aria-hidden />,
+  sheet: <IoStatsChart aria-hidden />,
+  deck: <IoEasel aria-hidden />,
+  movie: <IoVideocam aria-hidden />,
+  archive: <IoArchive aria-hidden />,
 }
 
 /** Menu glyphs are their own set: a command is an action, not a file kind. */
 const MENU = {
-  open: kindGlyph('M9 5H5v14h14v-4M14 4h6v6M20 4l-8 8'),
-  apps: kindGlyph('M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'),
-  info: kindGlyph('M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 11.5v5M12 8h.01'),
-  pencil: kindGlyph('M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z'),
-  trash: kindGlyph('M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13'),
+  open: <IoOpenOutline aria-hidden />,
+  apps: <IoAppsOutline aria-hidden />,
+  info: <IoInformationCircleOutline aria-hidden />,
+  pencil: <IoPencilOutline aria-hidden />,
+  trash: <IoTrashOutline aria-hidden />,
 }
 
 /* ---------------------------------- data ----------------------------------- */

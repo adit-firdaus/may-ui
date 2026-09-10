@@ -1,5 +1,24 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import {
+  IoAlbums,
+  IoAlbumsOutline,
+  IoBriefcase,
+  IoCar,
+  IoEllipsisHorizontal,
+  IoFlag,
+  IoGrid,
+  IoGridOutline,
+  IoHeart,
+  IoHeartOutline,
+  IoLinkOutline,
+  IoMail,
+  IoMoon,
+  IoPerson,
+  IoRadioButtonOn,
+  IoSearchOutline,
+  IoTime,
+} from 'react-icons/io5'
 import { Badge } from '../components/Badge'
 import { Box } from '../components/Box'
 import { Button } from '../components/Button'
@@ -453,133 +472,33 @@ const MAIL: Message[] = [
 
 /* ---------------------------------- icons ---------------------------------- */
 
-const EllipsisIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="4.5" cy="10" r="1.5" fill="currentColor" />
-    <circle cx="10" cy="10" r="1.5" fill="currentColor" />
-    <circle cx="15.5" cy="10" r="1.5" fill="currentColor" />
-  </svg>
-)
+const EllipsisIcon = () => <IoEllipsisHorizontal aria-hidden />
 
-const MagnifierIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="9" cy="9" r="5.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
-    <path d="M12.9 12.9 17 17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-  </svg>
-)
+const MagnifierIcon = () => <IoSearchOutline aria-hidden />
 
-const HeartIcon = ({ filled = false }: { filled?: boolean }) => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path
-      d="M10 16.2 4.4 11a3.6 3.6 0 0 1 5.6-4.4A3.6 3.6 0 0 1 15.6 11z"
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+const HeartIcon = ({ filled = false }: { filled?: boolean }) =>
+  filled ? <IoHeart aria-hidden /> : <IoHeartOutline aria-hidden />
 
-const GridIcon = ({ filled = false }: { filled?: boolean }) => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <g fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
-      <rect x="3.2" y="3.2" width="5.6" height="5.6" rx="1.6" />
-      <rect x="11.2" y="3.2" width="5.6" height="5.6" rx="1.6" />
-      <rect x="3.2" y="11.2" width="5.6" height="5.6" rx="1.6" />
-      <rect x="11.2" y="11.2" width="5.6" height="5.6" rx="1.6" />
-    </g>
-  </svg>
-)
+const GridIcon = ({ filled = false }: { filled?: boolean }) =>
+  filled ? <IoGrid aria-hidden /> : <IoGridOutline aria-hidden />
 
-const LibraryIcon = ({ filled = false }: { filled?: boolean }) => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <g fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
-      <rect x="3" y="4" width="3.4" height="12" rx="1.2" />
-      <rect x="8.3" y="4" width="3.4" height="12" rx="1.2" />
-      <rect x="13.6" y="5.6" width="3.4" height="10.4" rx="1.2" />
-    </g>
-  </svg>
-)
+const LibraryIcon = ({ filled = false }: { filled?: boolean }) =>
+  filled ? <IoAlbums aria-hidden /> : <IoAlbumsOutline aria-hidden />
 
-const LinkIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-      <path d="M8.4 11.6a3.4 3.4 0 0 0 4.8 0l2.4-2.4a3.4 3.4 0 0 0-4.8-4.8l-1 1" />
-      <path d="M11.6 8.4a3.4 3.4 0 0 0-4.8 0l-2.4 2.4a3.4 3.4 0 0 0 4.8 4.8l1-1" />
-    </g>
-  </svg>
-)
+const LinkIcon = () => <IoLinkOutline aria-hidden />
 
-const EnvelopeIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
-      <rect x="2.6" y="4.8" width="14.8" height="10.4" rx="2.4" />
-      <path d="m3.6 6.4 6.4 4.6 6.4-4.6" />
-    </g>
-  </svg>
-)
+const EnvelopeIcon = () => <IoMail aria-hidden />
 
-const FlagIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path
-      d="M5 3.4v13.2"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      fill="none"
-    />
-    <path d="M6.4 4.2h8.4l-1.8 3 1.8 3H6.4z" fill="currentColor" />
-  </svg>
-)
+const FlagIcon = () => <IoFlag aria-hidden />
 
-const ClockIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="10" cy="10" r="6.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
-    <path d="M10 6.2V10l2.6 1.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-  </svg>
-)
+const ClockIcon = () => <IoTime aria-hidden />
 
-const PersonIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="10" cy="7" r="3.1" fill="currentColor" />
-    <path d="M3.9 16.6a6.1 6.1 0 0 1 12.2 0z" fill="currentColor" />
-  </svg>
-)
+const PersonIcon = () => <IoPerson aria-hidden />
 
-const BriefcaseIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
-      <rect x="2.8" y="6.4" width="14.4" height="9.4" rx="2.2" />
-      <path d="M7.4 6.2V5.1c0-.8.6-1.4 1.4-1.4h2.4c.8 0 1.4.6 1.4 1.4v1.1" />
-    </g>
-  </svg>
-)
+const BriefcaseIcon = () => <IoBriefcase aria-hidden />
 
-const MoonIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path
-      d="M15.8 12.4A6.6 6.6 0 0 1 7.6 4.2a6.6 6.6 0 1 0 8.2 8.2"
-      fill="currentColor"
-    />
-  </svg>
-)
+const MoonIcon = () => <IoMoon aria-hidden />
 
-const CarIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path
-      d="M4 13.4v1.4a.9.9 0 0 1-.9.9h-.4a.9.9 0 0 1-.9-.9v-4l1.7-4.2A2 2 0 0 1 5.4 5.4h9.2a2 2 0 0 1 1.9 1.2L18.2 11v4a.9.9 0 0 1-.9.9h-.4a.9.9 0 0 1-.9-.9v-1.4z"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
-    <path d="M3.4 10.6h13.2" stroke="currentColor" strokeWidth="1.5" fill="none" />
-  </svg>
-)
+const CarIcon = () => <IoCar aria-hidden />
 
-const RingIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-    <circle cx="10" cy="10" r="2.6" fill="currentColor" />
-  </svg>
-)
+const RingIcon = () => <IoRadioButtonOn aria-hidden />

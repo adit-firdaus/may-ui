@@ -15,7 +15,12 @@ import '../Button/Button.css'
 import './IconButton.css'
 
 export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
-  /** The glyph. A bare `<svg>` is scaled to the control by CSS. */
+  /**
+   * The glyph, and it stays a ReactNode — a consumer's slot, never a fixed
+   * icon. Either shape is sized to the control by CSS: a bare `<svg>` with no
+   * width attribute, or an Ionicon from `react-icons/io5` at its default size
+   * (`width="1em"`). Both land on 1.25em. Pass `size` to opt out.
+   */
   children?: ReactNode
   /**
    * Required, not optional. An icon-only control carries no text node, so

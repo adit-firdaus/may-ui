@@ -1,5 +1,20 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
+import {
+  IoArrowUndoOutline,
+  IoCalendar,
+  IoCamera,
+  IoChevronDown,
+  IoCopyOutline,
+  IoFlagOutline,
+  IoImagesOutline,
+  IoLink,
+  IoMail,
+  IoNotifications,
+  IoShare,
+  IoStarOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { ActionSheet } from '../components/ActionSheet'
 import { AlertDialog } from '../components/AlertDialog'
 import { Button } from '../components/Button'
@@ -464,117 +479,54 @@ function Trigger({
 
 /* -------------------------------- glyph set -------------------------------- */
 
-const stroke = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.7,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-} as const
-
 function ShareGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 3.5v11M12 3.5L8.5 7M12 3.5L15.5 7M5.5 12.5v6a1.5 1.5 0 001.5 1.5h10a1.5 1.5 0 001.5-1.5v-6" {...stroke} />
-    </svg>
-  )
+  return <IoShare aria-hidden />
 }
 
 function AlbumGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M4 7.5A1.5 1.5 0 015.5 6h13A1.5 1.5 0 0120 7.5v9a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 16.5z" {...stroke} />
-      <path d="M4 15l4-3.5 3 2.5 3.5-3 5.5 4.5" {...stroke} />
-    </svg>
-  )
+  return <IoImagesOutline aria-hidden />
 }
 
 function PhotoGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M4 8.5A1.5 1.5 0 015.5 7h2l1.2-2h6.6L16.5 7h2A1.5 1.5 0 0120 8.5v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 16.5z" {...stroke} />
-      <circle cx="12" cy="12.5" r="3.2" {...stroke} />
-    </svg>
-  )
+  return <IoCamera aria-hidden />
 }
 
 function TrashGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M4.5 6.5h15M9.5 4.5h5M7 6.5V19a1.5 1.5 0 001.5 1.5h7A1.5 1.5 0 0017 19V6.5M10.5 10v6.5M13.5 10v6.5" {...stroke} />
-    </svg>
-  )
+  return <IoTrashOutline aria-hidden />
 }
 
 function CalendarGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M4.5 8A1.5 1.5 0 016 6.5h12A1.5 1.5 0 0119.5 8v10a1.5 1.5 0 01-1.5 1.5H6A1.5 1.5 0 014.5 18zM4.5 10.5h15M8.5 4.5v4M15.5 4.5v4" {...stroke} />
-    </svg>
-  )
+  return <IoCalendar aria-hidden />
 }
 
 function MailGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M4 8a1.5 1.5 0 011.5-1.5h13A1.5 1.5 0 0120 8v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 16z" {...stroke} />
-      <path d="M4.6 7.6l7.4 5.2 7.4-5.2" {...stroke} />
-    </svg>
-  )
+  return <IoMail aria-hidden />
 }
 
 function ReplyGlyph() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M8 5L3.5 9.5 8 14M4 9.5h7.5a5 5 0 015 5" {...stroke} />
-    </svg>
-  )
+  return <IoArrowUndoOutline aria-hidden />
 }
 
 function FlagGlyph() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M5 17V4.2c3-1.6 6-.4 9 0v7.6c-3-1.4-6-2.6-9 0Z" {...stroke} />
-    </svg>
-  )
+  return <IoFlagOutline aria-hidden />
 }
 
 function CopyGlyph() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M5.5 5.5V3.2A1.2 1.2 0 016.7 2h6.1A1.2 1.2 0 0114 3.2v6.1a1.2 1.2 0 01-1.2 1.2h-2.3M3.2 5.5h6.1a1.2 1.2 0 011.2 1.2v6.1A1.2 1.2 0 019.3 14H3.2A1.2 1.2 0 012 12.8V6.7a1.2 1.2 0 011.2-1.2z" {...stroke} />
-    </svg>
-  )
+  return <IoCopyOutline aria-hidden />
 }
 
 function StarGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 4.5l2.35 4.76 5.25.77-3.8 3.7.9 5.23L12 16.5l-4.7 2.46.9-5.23-3.8-3.7 5.25-.77z" {...stroke} />
-    </svg>
-  )
+  return <IoStarOutline aria-hidden />
 }
 
 function BellGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M12 4.5a5 5 0 015 5v3.2l1.5 2.8H5.5L7 12.7V9.5a5 5 0 015-5zM10 18.5a2 2 0 004 0" {...stroke} />
-    </svg>
-  )
+  return <IoNotifications aria-hidden />
 }
 
 function LinkGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M10 13.8a3.4 3.4 0 004.9.35l2.6-2.6a3.4 3.4 0 00-4.8-4.8l-1.3 1.3M14 10.2a3.4 3.4 0 00-4.9-.35l-2.6 2.6a3.4 3.4 0 004.8 4.8l1.3-1.3" {...stroke} />
-    </svg>
-  )
+  return <IoLink aria-hidden />
 }
 
 function ChevronDownGlyph() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path d="M4 6.25L8 10l4-3.75" {...stroke} />
-    </svg>
-  )
+  return <IoChevronDown aria-hidden />
 }

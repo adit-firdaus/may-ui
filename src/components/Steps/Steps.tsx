@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
+import { IoAlert, IoCheckmark } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize } from '../../types'
@@ -50,36 +51,6 @@ const STATUS_LABEL: Record<StepStatus, string> = {
   error: 'Failed',
 }
 
-function Check() {
-  return (
-    <svg className="may-steps__check" viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path
-        d="M4 8.4L6.7 11.2L12 5.4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function Bang() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path
-        d="M8 4V9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <circle cx="8" cy="11.6" r="1.1" fill="currentColor" />
-    </svg>
-  )
-}
-
 interface StepProps {
   item: StepItem
   index: number
@@ -98,7 +69,13 @@ function Step({ item, index, status, last, clickable, onSelect }: StepProps) {
   const marker = (
     <span className="may-steps__marker" aria-hidden>
       {item.icon ??
-        (status === 'complete' ? <Check /> : status === 'error' ? <Bang /> : index + 1)}
+        (status === 'complete' ? (
+          <IoCheckmark className="may-steps__check" aria-hidden focusable="false" />
+        ) : status === 'error' ? (
+          <IoAlert aria-hidden focusable="false" />
+        ) : (
+          index + 1
+        ))}
     </span>
   )
 

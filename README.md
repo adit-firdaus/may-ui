@@ -1,12 +1,14 @@
 # May UI
 
-A custom React design system built on CSS-variable design tokens.
+Apple's design language as a React library — iOS 26 / macOS shapes, real spring physics,
+and a token layer you can theme.
 
-- **33 components** — layout, typography, forms, data display, navigation, overlays
-- **Token-first** — every colour, space, radius and shadow is a `--may-*` custom property
-- **Light and dark** — follows the OS setting by default, overridable per subtree
-- **No runtime CSS-in-JS** — plain compiled CSS, zero styling dependencies
-- **Typed** — a single bundled `index.d.ts` with JSDoc on every prop
+- **74 components** across three families — adaptive, desktop-only, mobile-only
+- **No borders** — surfaces separate by value, translucent fill and hairline separators
+- **Real springs** — damped-oscillator curves sampled into CSS `linear()`, no runtime JS
+- **Token-first** — every colour, space, radius, shadow and duration is a `--may-*` property
+- **Light and dark** — follows the OS by default, pinnable per subtree
+- **Typed** — bundled `.d.ts` per entry, JSDoc on every prop
 
 ## Install
 
@@ -14,23 +16,27 @@ A custom React design system built on CSS-variable design tokens.
 npm install mayui
 ```
 
-`react` and `react-dom` (18+) are peer dependencies.
+`react` and `react-dom` (18+) are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
+is a dependency — May UI draws its glyphs from Ionicons (`react-icons/io5`), and it stays
+external so your bundler tree-shakes it per icon.
 
 ## Use
 
-Import the stylesheet once at the root of your app, then wrap your tree in `MayProvider`:
+Import the stylesheet once at the root, wrap your tree in `MayProvider`, and mount
+`MayHost` once for imperative surfaces:
 
 ```tsx
 import 'mayui/styles.css'
-import { MayProvider, Button, Card, CardTitle, Stack, Text } from 'mayui'
+import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from 'mayui'
 
 export function App() {
   return (
     <MayProvider theme="system">
+      <MayHost />
       <Stack gap={4}>
         <Card>
           <CardTitle>Production deploy</CardTitle>
-          <Text tone="muted">All 14 health checks passed.</Text>
+          <Text tone="secondary">All 14 health checks passed.</Text>
           <Button>Promote</Button>
         </Card>
       </Stack>
@@ -39,12 +45,25 @@ export function App() {
 }
 ```
 
-`MayProvider` supplies the tokens, the base typography layer and theme state. Components render
-unstyled without it.
+`MayProvider` renders the `.may-root` element carrying every token and the base layer.
+Components render unstyled without it.
+
+## Three entry points
+
+| Import | What lives there |
+|---|---|
+| `mayui` | **Adaptive** components. One per concern, reshaping at the breakpoint. Start here. |
+| `mayui/desktop` | Shapes with no honest phone form |
+| `mayui/mobile` | Shapes with no desktop meaning |
+
+The adaptive components genuinely reshape rather than restyle: `Sheet` rises from the
+bottom with drag-to-dismiss on phones and presents as a centred dialog on desktop,
+`ActionSheet` becomes an anchored menu, `Table` collapses into grouped list rows. Reach
+into `mayui/desktop` only when you want more than the adaptive version carries.
+
+Consumers importing `mayui` never pull the desktop `DataTable` or the mobile gesture code.
 
 ## Theming
-
-Themes resolve in three ways:
 
 | `theme` prop | Behaviour |
 |---|---|
@@ -52,161 +71,211 @@ Themes resolve in three ways:
 | `'light'` | pinned light |
 | `'dark'` | pinned dark |
 
-Read or change the theme from anywhere inside the provider:
-
 ```tsx
 const { theme, resolvedTheme, setTheme } = useMayTheme()
 ```
 
-Providers nest, so a single region can be pinned dark inside an otherwise light page.
+Providers nest, so a region can be pinned dark inside an otherwise light page — the
+semantic aliases are re-declared in every theme scope, so a scoped `data-may-theme`
+re-resolves them rather than leaving them stuck at the outer theme's values.
+
+`accent` on the provider re-points the tint.
+
+## Icons
+
+Glyphs come from Ionicons, which is drawn to Apple's own icon grid:
+
+```tsx
+import { IoSettingsOutline, IoAdd } from 'react-icons/io5'
+
+<Button leadingIcon={<IoSettingsOutline />}>Settings</Button>
+<IconButton aria-label="Add"><IoAdd /></IconButton>
+```
+
+**Do not pass `size`, `width` or `height`.** Each component sizes the glyph to its own slot
+in CSS, so one icon is correct in a Button, a Fab and a list row without being told.
+react-icons emits `width="1em"` as an *attribute*, which a stylesheet rule always beats.
+For a genuine one-off, `style={{ width: 20, height: 20 }}` wins over everything.
+
+Use filled icons (`IoStar`) on tab bars, selected states and coloured `IconTile`s; outline
+(`IoStarOutline`) for toolbars, nav actions and list rows.
 
 ## Styling your own markup
 
-There are **no utility classes**. Style layout glue in one of two ways, in this order of preference:
+There are **no utility classes**, and the `may-*` class names are internal. Two ways, in
+this order:
 
-1. **`Box`, `Stack` and `Grid`** — token-bound layout primitives. Reach for these first.
+**Layout primitives first** — `Box`, `Stack`, `Grid`, `Separator` take token-bound props:
 
-   ```tsx
-   <Stack direction="horizontal" gap={3} align="center">
-     <Box surface="base" padding={4} radius="lg" bordered>…</Box>
-   </Stack>
-   ```
+```tsx
+<Stack direction="horizontal" gap={3} align="center" justify="between">
+  <Box surface="base" padding={4} radius="card">…</Box>
+</Stack>
+```
 
-   `gap` and `padding` take steps on the 4px scale: `0 1 2 3 4 5 6 8 10 12 16 20 24`.
+`gap` / `padding` take steps on the 4px scale: `0 1 2 3 4 5 6 8 10 12 16 20 24`.
 
-2. **`var(--may-*)` in your own CSS**, for anything the primitives don't cover. Never hard-code a
-   colour, radius or shadow — every one of them is a token.
-
-   ```css
-   .my-panel {
-     background: var(--may-color-surface);
-     border: 1px solid var(--may-color-border);
-     border-radius: var(--may-radius-lg);
-     padding: var(--may-space-5);
-   }
-   ```
-
-## The token layers
-
-`src/styles/tokens.css` has two layers:
-
-- **Primitives** — raw ramps and scales: `--may-brand-500`, `--may-space-4`, `--may-radius-lg`,
-  `--may-shadow-md`, `--may-font-size-lg`. Rarely referenced directly.
-- **Semantic** — roles you actually build with: `--may-color-surface`, `--may-color-text-muted`,
-  `--may-color-border`, `--may-color-brand`, `--may-color-danger-subtle`.
-
-Rebrand the system by overriding the **semantic** layer only:
+**Then `var(--may-*)` in your own CSS:**
 
 ```css
-:root {
-  --may-color-brand: #0f766e;
-  --may-color-brand-hover: #0d5f59;
-  --may-color-brand-subtle: #ecfdf5;
-  --may-color-brand-text: #115e59;
+.my-panel {
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+  border-radius: var(--may-radius-card);
+  padding: var(--may-space-4);
+  box-shadow: var(--may-shadow-sm);
 }
 ```
 
+To separate two surfaces, **never reach for a border** — use a background-value change, a
+soft shadow, or `<Separator />` (a true 0.5px device-pixel rule).
+
+## The token layers
+
+Primitives are raw values (`--may-blue`, `--may-gray-6`); semantic aliases point at them
+(`--may-color-text: var(--may-label)`). Style against the **semantic** layer so themes work.
+
+Surfaces `--may-color-bg` `--may-color-surface` `--may-color-surface-nested` · text
+`--may-color-text` `--may-color-text-secondary` `--may-color-text-tertiary` · fills
+`--may-color-fill` through `--may-color-fill-quaternary` · lines `--may-color-separator` ·
+status `--may-color-success` `--may-color-warning` `--may-color-danger` `--may-color-info`.
+
+Apple's system palette is available raw: `--may-blue` `--may-green` `--may-indigo`
+`--may-orange` `--may-pink` `--may-purple` `--may-red` `--may-teal` `--may-yellow`
+`--may-mint` `--may-cyan`.
+
+`--may-color-tint` and `--may-color-primary` are **not** the same token: tint is
+brand-as-text (a link, a selected tab label), primary is brand-as-fill (a filled button).
+Collapsing them is what makes a ported Apple palette look wrong.
+
+## Motion
+
+Springs are real damped oscillators sampled at build time into CSS `linear()` — they run
+on the compositor with no runtime JS:
+
+`--may-spring-snappy` · `--may-spring-smooth` · `--may-spring-bouncy` (overshoots) ·
+`--may-spring-playful`. Durations: `--may-duration-instant|fast|settle`.
+
+The same constants are readable from JS for gesture code:
+
+```tsx
+import { motion } from 'mayui'
+motion.duration.settle  // 340
+```
+
+Everything collapses under `prefers-reduced-motion`.
+
 ## Shared vocabulary
 
-Two prop vocabularies repeat across the system, so learning them once covers most components:
-
-- **`tone`** — `brand` · `neutral` · `success` · `warning` · `danger` · `info`
+- **`tone`** — `tint` · `neutral` · `success` · `warning` · `danger`
 - **`size`** — `sm` · `md` · `lg`
-
-`Button`, `IconButton`, `Badge`, `Tag`, `Alert`, `Progress` and `Toast` all take `tone`.
-Every interactive control takes `size`.
 
 ## Forms
 
-Wrap every control in a `Field`. It owns the label, help text, error message, required marker and
-the `aria-describedby` wiring — the control picks all of that up from context:
+Wrap every control in a `Field`. It owns the label, help text, error message, required
+marker and the `aria-describedby` wiring; the control picks all of it up from context:
 
 ```tsx
-<Field label="Email address" description="Used for billing receipts." required>
-  <Input type="email" fullWidth />
-</Field>
-
-<Field label="Email address" error="Enter a valid email address.">
-  <Input type="email" fullWidth />
+<Field label="Email" help="We'll only use this to sign you in." error={error}>
+  <Input type="email" value={value} onChange={onChange} />
 </Field>
 ```
 
-Passing `error` marks the control invalid; you never set `invalid` by hand.
+To wire a control of your own into that machinery, read the context directly:
+`useFieldControl()` returns the `id`, `aria-describedby` and invalid state to spread onto
+your input; `useFieldContext()` exposes the whole field state for custom layouts.
 
 ## Components
 
+**Adaptive** (`mayui`)
+
 | Group | Components |
 |---|---|
-| Foundation | `MayProvider`, `useMayTheme` |
-| Layout | `Box`, `Stack`, `Grid`, `Divider` |
-| Typography | `Heading`, `Text` |
-| Actions | `Button`, `IconButton`, `ButtonGroup` |
-| Forms | `Field`, `Input`, `Textarea`, `Select`, `Checkbox`, `Radio`, `RadioGroup`, `Switch` |
-| Data display | `Card`, `Badge`, `Tag`, `Avatar`, `AvatarGroup`, `Table`, `Alert`, `Progress`, `Spinner`, `Skeleton` |
-| Navigation | `Tabs`, `Accordion`, `Breadcrumb`, `Pagination` |
-| Overlays | `Tooltip`, `Modal`, `Drawer`, `Toast`, `ToastProvider`, `useToast` |
+| Foundation | `MayProvider`, `MayHost`, `useMayTheme`, `PlatformProvider`, `usePlatform`, `useIsDesktop` |
+| Layout | `Box`, `Stack`, `Grid`, `Separator`, `SafeArea`, `ScrollArea` |
+| Typography | `Heading`, `Text`, `Label`, `Kbd` |
+| Actions | `Button`, `IconButton`, `ButtonGroup`, `Fab`, `Toolbar`, `ToolbarSpacer` |
+| Forms | `Field`, `Input`, `Textarea`, `Select`, `Checkbox`, `Radio`, `RadioGroup`, `Switch`, `Slider`, `Stepper`, `SearchField`, `SegmentedControl` |
+| Data display | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardBody`, `CardFooter`, `Badge`, `Tag`, `Avatar`, `AvatarGroup`, `IconTile`, `Table`, `List`, `ListRow`, `Descriptions`, `DescriptionItem`, `Statistic`, `EmptyState` |
+| Feedback | `Alert`, `NoticeBar`, `Progress`, `CircularProgress`, `Spinner`, `Skeleton`, `Toast`, `toast`, `useToast` |
+| Navigation | `Tabs`, `TabList`, `Tab`, `TabPanel`, `NavigationBar`, `Breadcrumb`, `Pagination`, `Steps`, `Accordion`, `AccordionItem`, `Collapsible` |
+| Overlays | `Sheet`, `Modal`, `AlertDialog`, `ActionSheet`, `Menu`, `Popover`, `Tooltip` |
+| Utility | `VisuallyHidden`, `cx`, `motion`, `initialsFrom`, `usePressFeedback`, `useReducedMotion` |
+
+**Desktop** (`mayui/desktop`) — `Sidebar`, `SidebarSection`, `SidebarItem`, `SidebarToggle`,
+`NavTree`, `DataTable`, `CommandPalette`, `ContextMenu`, `SplitPane`
+
+**Mobile** (`mayui/mobile`) — `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`,
+`SwipeAction`, `CapsuleTabs`, `Selector`, `Popup`, `FloatingBubble`
 
 ## Toasts
 
-Mount `ToastProvider` once near the root, then call `useToast()` anywhere beneath it:
+Mount `MayHost` once, then call `toast` from anywhere — no hook, no provider:
 
 ```tsx
-<MayProvider>
-  <ToastProvider position="bottom-right">
-    <App />
-  </ToastProvider>
-</MayProvider>
+import { toast, dismiss, dismissAll, setToastLimit } from 'mayui'
+
+toast('Saved')
+toast.success('Deploy promoted')
+toast.error('Health check failed')
 ```
 
-```tsx
-const { toast, dismiss, dismissAll } = useToast()
+`dismiss(id)` closes one toast, `dismissAll()` clears the queue, `useToast()` reads it
+live, and `setToastLimit(n)` caps how many stack at once.
 
-toast({ title: 'Saved', description: 'Your changes are live.', tone: 'success' })
-toast({ title: 'Build failed', tone: 'danger', duration: 0 })  // sticky
-toast({ title: 'Archived', action: { label: 'Undo', onClick: restore } })
+## Example screens
+
+27 composed screens — full app shells, not isolated widgets — live under `mayui/examples`
+and in the gallery app:
+
+```bash
+npm run examples
 ```
+
+They are a separate entry, so importing `mayui` never pulls a demo screen into your bundle.
 
 ## Accessibility
 
-Built in, not bolted on:
-
-- One focus treatment across the system, via `:focus-visible` and `--may-color-focus-ring`
-- `Modal` and `Drawer` trap focus, lock body scroll, and restore focus on close
-- `Tabs` implements arrow-key roving focus; `Accordion` wires `aria-expanded`/`aria-controls`
 - `IconButton` requires an `aria-label` at the type level
-- `Field` generates and wires every `id` and `aria-describedby`
-- All animation is disabled under `prefers-reduced-motion: reduce`
+- Focus rings are never removed, only restyled, and appear on `:focus-visible`
+- Overlays trap focus, restore it on close, and close on `Escape`
+- Hover styling is gated behind `@media (hover: hover) and (pointer: fine)`, so touch
+  devices never get stuck hover
+- Everything collapses under `prefers-reduced-motion`, including animation iteration
 
 ## Development
 
 ```bash
-npm install
-npm run storybook       # component workshop at :6006
-npm run build           # typecheck, then build dist/
-npm run verify          # typecheck + build + render smoke test + token audit
-npm run typecheck
-npm run build-storybook
+npm run dev          # Vite playground
+npm run storybook    # component workshop
+npm run examples     # the example-screen gallery
+npm run build        # library build (four entries) + types
+npm run verify       # typecheck, smoke, tokens, contract, size, coverage
 ```
 
-Build output:
+`npm run generate` regenerates `src/styles/tokens.css` and `src/styles/motion.css` from
+`scripts/gen-tokens.mjs` and `scripts/gen-springs.mjs`. **Never edit those two CSS files
+by hand** — they are build output.
 
-| File | Contents |
-|---|---|
-| `dist/mayui.js` / `dist/mayui.cjs` | ESM and CJS bundles |
-| `dist/mayui.css` | every component's styles plus the token layer |
-| `dist/index.d.ts` | one bundled declaration file |
+### The gates
 
-`npm run smoke` server-renders every component against the built bundle and asserts the
-accessibility wiring; `npm run check:tokens` fails if the stylesheet reads a `--may-*` variable
-that nothing declares.
+`npm run verify` enforces the design contract rather than trusting it: no `backdrop-filter`,
+no visible strokes, every `:hover` behind a pointer query, chrome unselectable and body copy
+selectable, dark re-resolving the full semantic alias set, hairlines at true device pixels,
+the tint/primary split intact, and springs that are real `linear()` samples. It also holds
+bundle budgets per entry and fails if any exported component appears in no example.
 
 ## Adding a component
 
 1. `src/components/<Name>/` with `<Name>.tsx`, `<Name>.css`, `<Name>.stories.tsx`, `index.ts`
+   (or `src/desktop/` / `src/mobile/` for a dedicated family)
 2. Import the CSS from the `.tsx` so the bundler picks it up
 3. Class names are `may-<component>` with `__element` and `--modifier` (BEM)
 4. Style from tokens only — no literal colours, spacings, radii or shadows
-5. Re-export from `src/index.ts`
+5. Draw glyphs with `react-icons/io5`, and size them in CSS against `.may-<component>__icon > svg`
+   — never with a `:not([width])` guard, which react-icons defeats
+6. Re-export from the matching entry, and use it in at least one example screen or
+   `check:coverage` will fail
 
 The tone pattern is worth copying: tone modifiers **set** CSS variables and variant modifiers
 **consume** them, so a new tone never touches variant CSS and vice versa. See `Button.css`.

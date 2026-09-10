@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useEffect, useRef } from 'react'
+import { IoTrashOutline } from 'react-icons/io5'
 import { MayHost } from './MayHost'
 import { dismissAll, toast, useToast } from '../Toast/Toast'
 import type { ToastPosition } from '../Toast/Toast'
@@ -180,15 +181,5 @@ export const ProgressAndActions: Story = {
 }
 
 function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path
-        d="M4 7h16M9.5 7V5h5v2M6.5 7l1 12h9l1-12M10 10.5v5M14 10.5v5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
+  return <IoTrashOutline aria-hidden />
 }

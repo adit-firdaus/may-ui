@@ -1,4 +1,13 @@
 import { useRef } from 'react'
+import {
+  IoFootsteps,
+  IoHeart,
+  IoLocation,
+  IoMoon,
+  IoPersonOutline,
+  IoSunny,
+  IoWalk,
+} from 'react-icons/io5'
 import { Box } from '../components/Box'
 import { Card, CardHeader, CardTitle, CardDescription } from '../components/Card'
 import { Grid } from '../components/Grid'
@@ -378,47 +387,19 @@ function RingStat({ tone, value, max, centre, label, detail }: RingStatProps) {
 /* ------------------------------- glyph set --------------------------------- */
 
 function PersonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 12a4.2 4.2 0 100-8.4A4.2 4.2 0 0012 12zm0 1.9c-3.9 0-7 2.2-7 4.9 0 1 .8 1.6 2 1.6h10c1.2 0 2-.6 2-1.6 0-2.7-3.1-4.9-7-4.9z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoPersonOutline aria-hidden />
 }
 
 function HeartIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 20.4S3.4 15.2 3.4 9.4A4.8 4.8 0 0112 6.8a4.8 4.8 0 018.6 2.6c0 5.8-8.6 11-8.6 11z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoHeart aria-hidden />
 }
 
 function ShoeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M3 16.4c0-1.2.6-2 .6-3.4l1-4.2 3.6 1.6c1.4.6 2.3 2 3.9 2.9l6.5 2.5c1.4.6 2.4 1 2.4 2.2v1.4H3.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoFootsteps aria-hidden />
 }
 
 function MapPinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 2.6a6.6 6.6 0 00-6.6 6.6c0 4.8 5.5 11 6.6 12.2 1.1-1.2 6.6-7.4 6.6-12.2A6.6 6.6 0 0012 2.6zm0 9.1a2.6 2.6 0 110-5.2 2.6 2.6 0 010 5.2z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoLocation aria-hidden />
 }
 
 function StairsIcon() {
@@ -433,31 +414,13 @@ function StairsIcon() {
 }
 
 function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" fill="currentColor" />
-    </svg>
-  )
+  return <IoMoon aria-hidden />
 }
 
 function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 7.6a4.4 4.4 0 100 8.8 4.4 4.4 0 000-8.8zm0-5.4a1 1 0 011 1v1.6a1 1 0 11-2 0V3.2a1 1 0 011-1zm0 16.6a1 1 0 011 1v1.6a1 1 0 11-2 0v-1.6a1 1 0 011-1zM2.2 12a1 1 0 011-1h1.6a1 1 0 110 2H3.2a1 1 0 01-1-1zm16.6 0a1 1 0 011-1h1.6a1 1 0 110 2h-1.6a1 1 0 01-1-1zM5.1 5.1a1 1 0 011.4 0l1.1 1.1a1 1 0 11-1.4 1.4L5.1 6.5a1 1 0 010-1.4zm11 11a1 1 0 011.4 0l1.1 1.1a1 1 0 11-1.4 1.4l-1.1-1.1a1 1 0 010-1.4zm2.5-11a1 1 0 010 1.4l-1.1 1.1a1 1 0 11-1.4-1.4l1.1-1.1a1 1 0 011.4 0zm-11 11a1 1 0 010 1.4l-1.1 1.1a1 1 0 01-1.4-1.4l1.1-1.1a1 1 0 011.4 0z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoSunny aria-hidden />
 }
 
 function WalkIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M13.6 4.4a1.9 1.9 0 11-3.8 0 1.9 1.9 0 013.8 0zM9.4 7.9l-2.6 1.6a1.1 1.1 0 00-.5.9v2.9a1.1 1.1 0 002.2 0v-2.2l1.5-.9-.9 3.9 3 2.6.7 4.1a1.2 1.2 0 002.3-.4l-.7-4.4a1.6 1.6 0 00-.5-.9l-2.1-1.9 1-3.5 1.4 2a1.2 1.2 0 00.9.5l2.2.2a1.1 1.1 0 00.2-2.2l-1.7-.2-2.3-3.3a2.3 2.3 0 00-2.9-.7zM8.4 16.2l-1.6 3.4a1.2 1.2 0 002.1 1l1.6-3.2z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoWalk aria-hidden />
 }

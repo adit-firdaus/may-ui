@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
+import { IoCaretUp } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import './Statistic.css'
 
@@ -79,14 +80,7 @@ export function Statistic({
             data-direction={direction}
             data-sentiment={sentiment}
           >
-            <svg
-              className="may-statistic__arrow"
-              viewBox="0 0 12 12"
-              aria-hidden
-              focusable="false"
-            >
-              <path d="M6 2.2L10 7.4H2z" fill="currentColor" />
-            </svg>
+            <IoCaretUp className="may-statistic__arrow" aria-hidden focusable="false" />
             {/* The arrow is decoration; the direction still has to be spoken. */}
             <span className="may-sr-only">
               {direction === 'up' ? 'Up ' : direction === 'down' ? 'Down ' : 'Unchanged, '}

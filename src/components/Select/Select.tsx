@@ -3,6 +3,7 @@ import { forwardRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
+import { IoChevronDown } from 'react-icons/io5'
 import type { MaySize } from '../../types'
 import './Select.css'
 
@@ -130,17 +131,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         ))}
         {children}
       </select>
-      {/* chevron.up.chevron.down — iOS's own glyph for "this opens a menu". */}
-      <svg className="may-select__chevron" viewBox="0 0 16 16" aria-hidden focusable="false">
-        <path
-          d="M4.75 6.25L8 3L11.25 6.25M4.75 9.75L8 13L11.25 9.75"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      {/* The chevron that says "this opens a menu". Ionicons ships no stacked
+          chevron.up.chevron.down, so the downward one carries the affordance. */}
+      <IoChevronDown className="may-select__chevron" aria-hidden focusable="false" />
     </div>
   )
 })

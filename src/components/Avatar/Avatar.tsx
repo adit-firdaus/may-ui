@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, isValidElement, useEffect, useState } from 'react'
+import { IoPerson } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import type { MaySize } from '../../types'
 import './Avatar.css'
@@ -122,7 +123,7 @@ export function Avatar({
         </span>
       ) : (
         <span className="may-avatar__glyph" aria-hidden>
-          {fallback ?? <PersonGlyph />}
+          {fallback ?? <IoPerson aria-hidden focusable="false" />}
         </span>
       )}
     </span>
@@ -181,14 +182,5 @@ export function AvatarGroup({
         </span>
       )}
     </div>
-  )
-}
-
-function PersonGlyph() {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden focusable="false">
-      <circle cx="16" cy="12" r="5.4" fill="currentColor" />
-      <path d="M5.6 29c0-6 4.7-9.4 10.4-9.4S26.4 23 26.4 29z" fill="currentColor" />
-    </svg>
   )
 }

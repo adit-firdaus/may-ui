@@ -1,5 +1,16 @@
 import type { ReactNode } from 'react'
 import { useRef, useState } from 'react'
+import {
+  IoAtCircleOutline,
+  IoChatbubble,
+  IoCheckmarkCircleOutline,
+  IoHome,
+  IoImage,
+  IoKey,
+  IoMail,
+  IoMoon,
+  IoShield,
+} from 'react-icons/io5'
 import { NavigationBar } from '../components/NavigationBar'
 import { NoticeBar } from '../components/NoticeBar'
 import { Button } from '../components/Button'
@@ -310,95 +321,38 @@ export function NotificationsScreen() {
 /* ------------------------------- glyph set -------------------------------- */
 
 function MessageGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 3.4c-5 0-9 3.3-9 7.4 0 2.4 1.4 4.5 3.5 5.8-.2 1.2-.8 2.4-1.8 3.4 1.9-.2 3.6-.9 4.9-2 .8.2 1.6.3 2.4.3 5 0 9-3.3 9-7.5s-4-7.4-9-7.4z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoChatbubble aria-hidden />
 }
 
 function MailGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M3 7.2c0-1.3 1-2.2 2.3-2.2h13.4c1.3 0 2.3.9 2.3 2.2v9.6c0 1.3-1 2.2-2.3 2.2H5.3C4 19 3 18.1 3 16.8zM5.4 7l6.6 5.2L18.6 7z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoMail aria-hidden />
 }
 
 function ShieldGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 2.6l7 2.6v6.2c0 4.2-2.9 8-7 10.2-4.1-2.2-7-6-7-10.2V5.2zM11 8v5.4h2V8zm0 7v2h2v-2z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoShield aria-hidden />
 }
 
 function KeyGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M14.6 3.6a5.8 5.8 0 00-5.4 7.9L3 17.7V21h3.3l1.1-1.1v-1.8h1.8l1.4-1.4v-1.8h1.8l1.1-1.1a5.8 5.8 0 10.1-10.2zm2.1 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoKey aria-hidden />
 }
 
 function HouseGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M12 3l9 7.6-1.3 1.6-1-.8V21H5.3v-9.6l-1 .8L3 10.6zm-1.4 10v6h2.8v-6z" fill="currentColor" />
-    </svg>
-  )
+  return <IoHome aria-hidden />
 }
 
 function PhotosGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M4 6.4c0-1.3 1-2.2 2.3-2.2h11.4c1.3 0 2.3.9 2.3 2.2v11.2c0 1.3-1 2.2-2.3 2.2H6.3C5 19.8 4 18.9 4 17.6zm2.2 10.4h11.6l-3.6-5-2.8 3.6-1.9-2.2zM8.4 9.6a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoImage aria-hidden />
 }
 
 /** The Focus glyph: the crescent Do Not Disturb has used since iOS 6. */
 function MoonGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" fill="currentColor" />
-    </svg>
-  )
+  return <IoMoon aria-hidden />
 }
 
 function AtGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 2.5a9.5 9.5 0 100 19v-2a7.5 7.5 0 117.5-7.5V13a1.5 1.5 0 01-3 0V7.5h-2v.9A4.5 4.5 0 1012 16.5a4.5 4.5 0 003.3-1.4 3.5 3.5 0 006.2-2.1V12A9.5 9.5 0 0012 2.5zm0 12a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoAtCircleOutline aria-hidden />
 }
 
 function CheckGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zm4.9 6.9l-6 7.3-3.7-3.4 1.4-1.5 2.1 2 4.6-5.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCheckmarkCircleOutline aria-hidden />
 }

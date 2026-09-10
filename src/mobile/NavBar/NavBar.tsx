@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode, RefObject } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { IoChevronBack } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -171,16 +172,7 @@ function BackButton({ onBack, href, label, ariaLabel }: BackButtonProps) {
 
   const content = (
     <>
-      <svg className="may-nav-bar__chevron" viewBox="0 0 16 16" aria-hidden focusable="false">
-        <path
-          d="M10 3.5L5.5 8L10 12.5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <IoChevronBack className="may-nav-bar__chevron" aria-hidden focusable="false" />
       {label != null && <span className="may-nav-bar__back-label">{label}</span>}
     </>
   )

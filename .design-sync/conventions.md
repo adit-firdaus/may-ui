@@ -12,6 +12,8 @@ spacing, no type scale. `MayHost` is the single mount point for imperative surfa
 (toasts); mount it once, near the root.
 
 ```jsx
+import { IoWifi, IoCellular } from react-icons/io5
+
 <MayProvider theme="system">   {/* "system" | "light" | "dark" */}
   <MayHost />
   <YourApp />
@@ -85,7 +87,36 @@ surface — links, plain buttons, an active tab label. `--may-color-primary` is 
 as a **fill** carrying white text. Same hue, different jobs; using the fill token for
 text is the classic tell that an Apple palette was ported rather than designed.
 
-### 4. Typography is Apple's named styles
+### 4. Icons come from Ionicons — do not hand-draw SVG
+
+Every glyph in May UI is an [Ionicons](https://ionic.io/ionicons) component from
+`react-icons/io5`, and yours should be too. Ionicons is drawn to Apple's own icon grid,
+so it is the closest freely-licensed match to SF Symbols — a hand-drawn `<path>` will
+read as foreign next to it no matter how carefully it is drawn.
+
+```jsx
+import { IoSettingsOutline, IoAdd, IoStar } from 'react-icons/io5'
+
+<Button leadingIcon={<IoSettingsOutline />}>Settings</Button>
+<IconButton aria-label="Add"><IoAdd /></IconButton>
+<Tag icon={<IoStar />}>Starred</Tag>
+```
+
+**Never pass `size`, `width` or `height`.** Each component sizes the glyph to its own
+slot in CSS, so the same icon is correct in a Button, a Fab and a list row without being
+told. react-icons emits `width="1em"` as an *attribute*, which a stylesheet rule always
+beats — that is what makes this work. If one call site genuinely needs a fixed size,
+pass `style={{ width: 20, height: 20 }}`; an inline style outranks the component rule.
+Reach for that rarely.
+
+**Filled or outline, the way iOS does it:** filled (`IoHeart`, `IoStar`) for tab bars,
+selected states, and anything sitting on a coloured `IconTile` or swipe action; outline
+(`IoHeartOutline`) for toolbars, nav bar actions and list rows. Outline is the common case.
+
+`react-icons` is a real dependency of May UI, but it is left external and tree-shaken per
+icon — you pay only for the glyphs you import.
+
+### 5. Typography is Apple's named styles
 
 `Text` takes `variant`: `large-title`, `title-1`, `title-2`, `title-3`, `headline`,
 `body`, `callout`, `subheadline`, `footnote`, `caption-1`, `caption-2`. Each token
@@ -93,7 +124,7 @@ carries size, line-height, tracking **and** weight together, because in iOS thos
 move as one. `body` and `headline` are the same size — they differ only in weight and
 tracking. Never set a raw `font-size`.
 
-### 5. Motion — real springs, already built
+### 6. Motion — real springs, already built
 
 Transitions use generated spring curves: `--may-spring-snappy`, `--may-spring-smooth`,
 `--may-spring-bouncy`, `--may-spring-playful`, plus `--may-ease-back`,
@@ -106,7 +137,7 @@ Durations: `--may-duration-instant`, `-fast`, `-settle`, `-sheet-in`, `-sheet-ou
 
 This system is meant to feel alive. Prefer a spring over a linear ease.
 
-### 6. Native feel — three rules to preserve
+### 7. Native feel — three rules to preserve
 
 These are what separate a native-feeling app from a web page, and they are easy to undo:
 
@@ -117,7 +148,7 @@ These are what separate a native-feeling app from a web page, and they are easy 
 3. **Press feedback is asymmetric** — fast down, spring back up. Interactive components
    already carry `may-pressable`; reuse the component rather than rebuilding the feel.
 
-### 7. Forms: wrap every control in `Field`
+### 8. Forms: wrap every control in `Field`
 
 `Field` owns the label, help text, error, required marker and all `id`/`aria-describedby`
 wiring. Passing `error` marks the control invalid — never set `invalid` yourself.
@@ -128,15 +159,17 @@ wiring. Passing `error` marks the control invalid — never set `invalid` yourse
 </Field>
 ```
 
-### 8. Where the truth lives
+### 9. Where the truth lives
 
 `_ds/<folder>/styles.css` and the `_ds_bundle.css` it imports hold every token
 definition and component rule. Each component's `.prompt.md` and `.d.ts` under
 `components/<group>/<Name>/` are the authoritative prop contracts.
 
-### 9. An idiomatic screen
+### 10. An idiomatic screen
 
 ```jsx
+import { IoWifi, IoCellular } from 'react-icons/io5'
+
 <MayProvider theme="system">
   <MayHost />
   <NavigationBar title="Settings" largeTitle />
@@ -146,8 +179,8 @@ definition and component rule. Each component's `.prompt.md` and `.d.ts` under
       options={[{ label: 'All', value: 'all' }, { label: 'Mine', value: 'mine' }]}
     />
     <List header="Network" footer="Applies to this device only.">
-      <ListRow leading={<IconTile gradient="blue" />} title="Wi-Fi" detail="HomeNet" onClick={open} />
-      <ListRow leading={<IconTile gradient="green" />} title="Cellular" accessory={<Switch />} />
+      <ListRow leading={<IconTile gradient="blue"><IoWifi /></IconTile>} title="Wi-Fi" detail="HomeNet" onClick={open} />
+      <ListRow leading={<IconTile gradient="green"><IoCellular /></IconTile>} title="Cellular" accessory={<Switch />} />
       <ListRow title="Reset" destructive onClick={reset} />
     </List>
     <Button pill size="lg" fullWidth>Continue</Button>

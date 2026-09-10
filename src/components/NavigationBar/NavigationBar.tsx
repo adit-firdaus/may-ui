@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode, RefObject } from 'react'
 import { useEffect, useRef } from 'react'
+import { IoChevronBack } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 // A value import: the back button IS a Button, so its stylesheet has to travel
 // with this one. A type-only import is erased at compile time and the bundler
@@ -34,21 +35,6 @@ export interface NavigationBarProps extends Omit<HTMLAttributes<HTMLElement>, 't
   sticky?: boolean
   /** Pad past the notch and the landscape rounded corners. @default true */
   safeArea?: boolean
-}
-
-function BackChevron() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-      <path
-        d="M10 3L5 8L10 13"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
 }
 
 /**
@@ -146,7 +132,9 @@ export function NavigationBar({
       // draw it under the minimum with nothing to make the difference up.
       size="md"
       onClick={onBack}
-      leadingIcon={<BackChevron />}
+      leadingIcon={
+        <IoChevronBack className="may-nav-bar__back-chevron" aria-hidden focusable="false" />
+      }
       className="may-nav-bar__back"
     >
       {backLabel}

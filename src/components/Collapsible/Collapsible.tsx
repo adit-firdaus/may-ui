@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { useCallback, useState } from 'react'
+import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
@@ -90,21 +91,7 @@ export function Collapsible({
       >
         <span className="may-collapsible__label">{trigger}</span>
         {chevron && (
-          <svg
-            className="may-collapsible__chevron"
-            viewBox="0 0 16 16"
-            aria-hidden
-            focusable="false"
-          >
-            <path
-              d="M6 3.5L10.5 8L6 12.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <IoChevronForward className="may-collapsible__chevron" aria-hidden focusable="false" />
         )}
       </button>
 

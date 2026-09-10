@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import { IoAt, IoCheckmarkCircleOutline, IoCloud, IoDocumentText } from 'react-icons/io5'
 import { Steps } from '../components/Steps'
 import type { StepItem } from '../components/Steps'
 import { Field } from '../components/Field'
@@ -279,14 +280,7 @@ function Reason({ gradient, glyph, title, body }: ReasonProps) {
 /* ------------------------------- glyph set -------------------------------- */
 
 function AtGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 2.5a9.5 9.5 0 100 19v-2a7.5 7.5 0 117.5-7.5V13a1.5 1.5 0 01-3 0V7.5h-2v.9A4.5 4.5 0 1012 16.5a4.5 4.5 0 003.3-1.4 3.5 3.5 0 006.2-2.1V12A9.5 9.5 0 0012 2.5zm0 12a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoAt aria-hidden />
 }
 
 /** The Face ID mark: bracketed corners around a schematic face. */
@@ -302,34 +296,13 @@ function FaceIdGlyph() {
 }
 
 function CheckSealGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 1.8l2.3 1.8 2.9-.3 1 2.7 2.6 1.3-.7 2.8L21.9 12l-1.8 2.3.3 2.9-2.7 1-1.3 2.6-2.8-.7L12 21.9l-2.3-1.8-2.9.3-1-2.7-2.6-1.3.7-2.8L2.1 12l1.8-2.3-.3-2.9 2.7-1L7.6 3.2l2.8.7zm4.6 6.9l-5.9 7.2-3.6-3.4 1.4-1.5 2 1.9 4.5-5.5z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCheckmarkCircleOutline aria-hidden />
 }
 
 function CloudGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M7 19.4a4.4 4.4 0 01-.5-8.8 5.9 5.9 0 0111.2-1.5A4.2 4.2 0 0117.6 19.4z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCloud aria-hidden />
 }
 
 function DocumentGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M6 3.6C6 2.7 6.7 2 7.6 2H14l4.4 4.4v14c0 .9-.7 1.6-1.6 1.6H7.6c-.9 0-1.6-.7-1.6-1.6zM13.6 3.4v3.6h3.6zM8.6 11v1.6h6.8V11zm0 3.6v1.6h6.8v-1.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoDocumentText aria-hidden />
 }

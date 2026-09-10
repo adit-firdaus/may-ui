@@ -1,14 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
+import { IoAccessibility, IoCall, IoChatbubble } from 'react-icons/io5'
 import { FloatingBubble } from './FloatingBubble'
 import { List, ListRow } from '../../components/List'
 
-const RingIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-    <circle cx="10" cy="10" r="2.6" fill="currentColor" />
-  </svg>
-)
+const RingIcon = () => <IoAccessibility aria-hidden />
 
 const meta = {
   title: 'Catalog/Mobile/FloatingBubble',
@@ -26,23 +22,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const PhoneIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path
-      d="M6.2 3.5 8 6.4 6.6 8.1a9 9 0 0 0 5.3 5.3l1.7-1.4 2.9 1.8v2.3c0 .8-.7 1.4-1.5 1.3C8.4 16.7 3.3 11.6 2.4 5c-.1-.8.5-1.5 1.3-1.5z"
-      fill="currentColor"
-    />
-  </svg>
-)
+const PhoneIcon = () => <IoCall aria-hidden />
 
-const MessageIcon = () => (
-  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-    <path
-      d="M10 3.2c4.1 0 7.3 2.6 7.3 5.9 0 3.2-3.2 5.8-7.3 5.8-.7 0-1.4-.1-2-.2l-3.5 1.8.9-2.8c-1.6-1.1-2.7-2.7-2.7-4.6 0-3.3 3.2-5.9 7.3-5.9"
-      fill="currentColor"
-    />
-  </svg>
-)
+const MessageIcon = () => <IoChatbubble aria-hidden />
 
 /**
  * AssistiveTouch. Drag it anywhere — it resists past the safe area rather than

@@ -1,4 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import {
+  IoFlame,
+  IoFlash,
+  IoFootsteps,
+  IoHeart,
+  IoMoon,
+} from 'react-icons/io5'
 import { useState } from 'react'
 import { Statistic } from './Statistic'
 import { IconTile } from '../IconTile/IconTile'
@@ -47,7 +54,7 @@ export const Dashboard: Story = {
         direction="up"
         trailing={
           <IconTile gradient="red" size="md">
-            <FlameIcon />
+            <IoFlame aria-hidden />
           </IconTile>
         }
       />
@@ -59,7 +66,7 @@ export const Dashboard: Story = {
         direction="down"
         trailing={
           <IconTile gradient="orange" size="md">
-            <ShoeIcon />
+            <IoFootsteps aria-hidden />
           </IconTile>
         }
       />
@@ -73,7 +80,7 @@ export const Dashboard: Story = {
         invertDelta
         trailing={
           <IconTile gradient="pink" size="md">
-            <HeartIcon />
+            <IoHeart aria-hidden />
           </IconTile>
         }
       />
@@ -85,7 +92,7 @@ export const Dashboard: Story = {
         direction="flat"
         trailing={
           <IconTile gradient="indigo" size="md">
-            <MoonIcon />
+            <IoMoon aria-hidden />
           </IconTile>
         }
       />
@@ -126,7 +133,7 @@ function TurnDemo() {
         direction={up ? 'up' : 'down'}
         trailing={
           <IconTile gradient="green" size="md">
-            <BoltIcon />
+            <IoFlash aria-hidden />
           </IconTile>
         }
       />
@@ -145,55 +152,4 @@ export const Sizes: Story = {
       ))}
     </div>
   ),
-}
-
-/* ------------------------------- glyph set -------------------------------- */
-
-function FlameIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M13 2.6c2.6 3 1 5.4 2.6 6.6 1.2.9 2.3-.4 2.3-.4 1.6 2.6 1.4 6.3-.8 8.6-2.6 2.8-7.5 3-10.2.3-2.4-2.4-2.4-6.4-.2-9 .5 1.3 1.7 1.9 2.5 1.4 1.9-1.2-.6-4.6 3.8-7.5z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function ShoeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M3 16.4c0-1.2.6-2 .6-3.4l1-4.2 3.6 1.6c1.4.6 2.3 2 3.9 2.9l6.5 2.5c1.4.6 2.4 1 2.4 2.2v1.4H3.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function HeartIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 20.4S3.4 15.2 3.4 9.4A4.8 4.8 0 0112 6.8a4.8 4.8 0 018.6 2.6c0 5.8-8.6 11-8.6 11z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" fill="currentColor" />
-    </svg>
-  )
-}
-
-function BoltIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M13.4 2.4L5.6 13.2h4.8l-.8 8.4 8-11.2h-5z" fill="currentColor" />
-    </svg>
-  )
 }

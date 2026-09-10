@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { IoAlert, IoCloudOfflineOutline, IoFileTrayOutline } from 'react-icons/io5'
 import { Alert } from '../components/Alert'
 import { Avatar } from '../components/Avatar'
 import { Box } from '../components/Box'
@@ -280,34 +281,13 @@ function Cell({
 /* -------------------------------- glyph set -------------------------------- */
 
 function TrayGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M4.7 4.4h14.6a1.2 1.2 0 011.15.85l1.5 5a1.2 1.2 0 01.05.35v3.4a1.2 1.2 0 01-1.2 1.2H3.2A1.2 1.2 0 012 14v-3.4c0-.12.02-.24.05-.35l1.5-5a1.2 1.2 0 011.15-.85zm.45 1.8L3.9 10.4h3.7a1.2 1.2 0 011.14.82l.3.9h5.92l.3-.9a1.2 1.2 0 011.14-.82h3.7l-1.25-4.2zM2 17a1.2 1.2 0 011.2-1.2h17.6A1.2 1.2 0 0122 17v1.4a1.2 1.2 0 01-1.2 1.2H3.2A1.2 1.2 0 012 18.4z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoFileTrayOutline aria-hidden />
 }
 
 function ExclamationGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 5.2a1.35 1.35 0 011.35 1.42l-.4 7.2a.95.95 0 01-1.9 0l-.4-7.2A1.35 1.35 0 0112 5.2zm0 11.1a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoAlert aria-hidden />
 }
 
 function WifiSlashGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M3.3 3.3a.9.9 0 011.27 0l15.9 15.9a.9.9 0 11-1.27 1.27L3.3 4.57a.9.9 0 010-1.27zM12 17a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zm0-4.2c.9 0 1.74.26 2.45.7l-1.4 1.4a2.6 2.6 0 00-2.65.36l-1.3-1.3a4.2 4.2 0 012.9-1.16zm0-4.3c2.1 0 4.03.75 5.53 2l-1.28 1.28A6.7 6.7 0 0012 10.3c-.55 0-1.09.06-1.6.19L8.9 9c.98-.32 2.02-.5 3.1-.5zm0-4.3c3.3 0 6.32 1.2 8.65 3.2l-1.3 1.3A11.2 11.2 0 0012 6c-1.4 0-2.75.22-4.02.63L6.6 5.25A13 13 0 0112 4.2z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCloudOfflineOutline aria-hidden />
 }

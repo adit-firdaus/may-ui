@@ -48,8 +48,22 @@
   flex-shrink: 0;
 }
 
-/* Sized in em so the glyph tracks the size rung; an explicit width wins. */
-.may-icon-button__glyph > svg:not([width]) {
+/*
+ * Sized in em so the glyph tracks the size rung; an explicit width still wins.
+ *
+ * Two selectors for one size, because a glyph reaches this slot in two shapes.
+ * A hand-written `<svg>` carries no width attribute. A react-icons glyph
+ * (Ionicons) ALWAYS carries one: IconBase writes `width`/`height` from
+ * `size || "1em"` as the last spread, so `size={undefined}` cannot drop them —
+ * it just restores the 1em default. Matching that exact default treats it as
+ * what it is — no size asked for — and keeps the glyph on the em ladder, while
+ * any real opt-out (`size={20}`, or `width="16"` on a bare svg) is a different
+ * value and so still wins. CSS beats the attribute either way: width/height on
+ * an outer `<svg>` are geometry properties, i.e. presentation attributes, which
+ * lose to any author rule.
+ */
+.may-icon-button__glyph > svg,
+.may-icon-button__glyph > svg[width='1em'] {
   width: 1.25em;
   height: 1.25em;
   display: block;

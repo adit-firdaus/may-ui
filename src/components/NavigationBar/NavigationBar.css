@@ -100,6 +100,17 @@
   gap: var(--may-space-1);
 }
 
+/* Button sizes a leading glyph with `.may-button__icon > svg`,
+ * which react-icons opts out of by rendering width/height as attributes. The
+ * chevron is therefore sized by its own class instead — an author rule outranks
+ * a presentation attribute — on the same 1.15em, so it still tracks the bar
+ * button's font-size rather than being pinned to a pixel height. */
+.may-nav-bar__back-chevron {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+}
+
 /* --------------------------------- title ---------------------------------- */
 
 .may-nav-bar__title {

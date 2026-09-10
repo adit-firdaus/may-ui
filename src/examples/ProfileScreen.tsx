@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IoCard, IoNavigate, IoPencil, IoPeople, IoStar } from 'react-icons/io5'
 import { AlertDialog } from '../components/AlertDialog'
 import { Avatar, AvatarGroup } from '../components/Avatar'
 import { Badge } from '../components/Badge'
@@ -61,7 +62,7 @@ export function ProfileScreen() {
                   priya.raghunathan@icloud.com
                 </Text>
               </Stack>
-              <Button variant="tinted" size="sm" pill leadingIcon={<PencilIcon />}>
+              <Button variant="tinted" size="sm" pill leadingIcon={<IoPencil aria-hidden />}>
                 Edit Profile
               </Button>
             </Stack>
@@ -81,7 +82,7 @@ export function ProfileScreen() {
             <ListRow
               leading={
                 <IconTile gradient="blue">
-                  <CardIcon />
+                  <IoCard aria-hidden />
                 </IconTile>
               }
               title="Payment & Shipping"
@@ -91,7 +92,7 @@ export function ProfileScreen() {
             <ListRow
               leading={
                 <IconTile gradient="indigo">
-                  <StarIcon />
+                  <IoStar aria-hidden />
                 </IconTile>
               }
               title="Subscriptions"
@@ -106,7 +107,7 @@ export function ProfileScreen() {
             <ListRow
               leading={
                 <IconTile gradient="green">
-                  <FamilyIcon />
+                  <IoPeople aria-hidden />
                 </IconTile>
               }
               title="Family Sharing"
@@ -124,7 +125,7 @@ export function ProfileScreen() {
             <ListRow
               leading={
                 <IconTile gradient="teal">
-                  <LocationIcon />
+                  <IoNavigate aria-hidden />
                 </IconTile>
               }
               title="Find My"
@@ -199,54 +200,5 @@ export function ProfileScreen() {
         onCancel={() => setSignOutOpen(false)}
       />
     </div>
-  )
-}
-
-/* ------------------------------- glyph set -------------------------------- */
-/* Row tiles are 29pt, so these are drawn as solid shapes rather than as thin
- * strokes: a 1.5pt stroke at that size disappears against the gradient. */
-
-function PencilIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M3.6 17.1L14.8 5.9l3.3 3.3L6.9 20.4l-4 .7z" />
-      <path d="M16.2 4.5l1.6-1.6a1.6 1.6 0 012.3 0l1 1a1.6 1.6 0 010 2.3l-1.6 1.6z" />
-    </svg>
-  )
-}
-
-function CardIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M4 5.6h16a2 2 0 012 2v1.2H2V7.6a2 2 0 012-2z" />
-      <path d="M2 11h20v5.4a2 2 0 01-2 2H4a2 2 0 01-2-2zm3 3.4v1.8h5v-1.8z" />
-    </svg>
-  )
-}
-
-function StarIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M12 3.2l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.6l6-.9z" />
-    </svg>
-  )
-}
-
-function FamilyIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <circle cx="9" cy="8.4" r="3.6" />
-      <path d="M2.4 19.4c0-3.2 3-5.2 6.6-5.2s6.6 2 6.6 5.2z" />
-      <circle cx="17.2" cy="9.4" r="2.8" />
-      <path d="M14.4 14.6c3.4-.6 7.2.9 7.2 4.2h-4.4c0-1.7-1.1-3.2-2.8-4.2z" />
-    </svg>
-  )
-}
-
-function LocationIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M20.8 3.2L4 10.1c-1 .4-.9 1.9.2 2.1l6.4 1.4 1.4 6.4c.2 1.1 1.7 1.2 2.1.2l6.9-16.8a.7.7 0 00-.2-.2z" />
-    </svg>
   )
 }

@@ -1,4 +1,13 @@
 import { useRef, useState } from 'react'
+import {
+  IoArrowRedoOutline,
+  IoArrowUndoOutline,
+  IoAttachOutline,
+  IoEllipsisHorizontal,
+  IoFlagOutline,
+  IoFolderOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { Avatar } from '../components/Avatar'
 import { IconButton } from '../components/IconButton'
 import { Menu } from '../components/Menu'
@@ -58,26 +67,26 @@ export function MailDetailScreen() {
               aria-label="Message actions"
               trigger={
                 <IconButton aria-label="More">
-                  <EllipsisIcon />
+                  <IoEllipsisHorizontal aria-hidden />
                 </IconButton>
               }
               items={[
-                { label: 'Reply', icon: <ReplyIcon />, shortcut: '⌘R', onSelect: () => {} },
+                { label: 'Reply', icon: <IoArrowUndoOutline aria-hidden />, shortcut: '⌘R', onSelect: () => {} },
                 { label: 'Reply All', icon: <ReplyAllIcon />, shortcut: '⇧⌘R', onSelect: () => {} },
-                { label: 'Forward', icon: <ForwardIcon />, shortcut: '⇧⌘F', onSelect: () => {} },
+                { label: 'Forward', icon: <IoArrowRedoOutline aria-hidden />, shortcut: '⇧⌘F', onSelect: () => {} },
                 {
                   label: flagged ? 'Unflag' : 'Flag',
-                  icon: <FlagIcon />,
+                  icon: <IoFlagOutline aria-hidden />,
                   shortcut: '⇧⌘L',
                   separator: true,
                   onSelect: () => setFlagged((v) => !v),
                 },
-                { label: 'Move to Folder…', icon: <FolderIcon />, shortcut: '⇧⌘M', onSelect: () => {} },
+                { label: 'Move to Folder…', icon: <IoFolderOutline aria-hidden />, shortcut: '⇧⌘M', onSelect: () => {} },
                 /* `separator` opens a break ABOVE the item, which is how the
                    destructive action is fenced off from everything above it. */
                 {
                   label: 'Trash',
-                  icon: <TrashIcon />,
+                  icon: <IoTrashOutline aria-hidden />,
                   shortcut: '⌘⌫',
                   destructive: true,
                   separator: true,
@@ -158,22 +167,22 @@ export function MailDetailScreen() {
 
           {/* Attachments as static chips: no `onRemove`, so no trailing X. */}
           <Stack direction="row" gap={2} wrap>
-            <Tag leadingIcon={<PaperclipIcon />}>Milestone-3-Review.pdf · 2.4 MB</Tag>
-            <Tag leadingIcon={<PaperclipIcon />}>Burndown-September.png · 812 KB</Tag>
+            <Tag leadingIcon={<IoAttachOutline aria-hidden />}>Milestone-3-Review.pdf · 2.4 MB</Tag>
+            <Tag leadingIcon={<IoAttachOutline aria-hidden />}>Burndown-September.png · 812 KB</Tag>
           </Stack>
         </div>
       </div>
 
       <Toolbar placement="bottom" separator safeArea>
         <IconButton aria-label="Move to Trash" tone="danger">
-          <TrashIcon />
+          <IoTrashOutline aria-hidden />
         </IconButton>
         <ToolbarSpacer />
         <IconButton aria-label="Reply">
-          <ReplyIcon />
+          <IoArrowUndoOutline aria-hidden />
         </IconButton>
         <IconButton aria-label="Forward">
-          <ForwardIcon />
+          <IoArrowRedoOutline aria-hidden />
         </IconButton>
       </Toolbar>
     </div>
@@ -188,84 +197,28 @@ function FlagBadge() {
       role="img"
       style={{ display: 'inline-flex', color: 'var(--may-color-warning)' }}
     >
-      <FlagIcon />
+      <IoFlagOutline aria-hidden />
     </span>
   )
 }
 
 /* ------------------------------- glyph set -------------------------------- */
+/* Reply All stays hand-drawn: Ionicons carries no reply-all mark, and reusing
+ * the plain reply arrow would print the same glyph on two different items. */
 
 const stroke = {
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 1.8,
+  strokeWidth: 1.25,
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
 } as const
-
-function EllipsisIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <circle cx="4.6" cy="10" r="1.5" fill="currentColor" />
-      <circle cx="10" cy="10" r="1.5" fill="currentColor" />
-      <circle cx="15.4" cy="10" r="1.5" fill="currentColor" />
-    </svg>
-  )
-}
-
-function ReplyIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M8 4.5 3 9l5 4.5V11c4.2 0 6.8 1.4 8.5 4.5.2-5.6-2.6-8.6-8.5-8.8z" {...stroke} />
-    </svg>
-  )
-}
 
 function ReplyAllIcon() {
   return (
     <svg viewBox="0 0 20 20" aria-hidden focusable="false">
       <path d="M5.5 4.5.5 9l5 4.5" {...stroke} />
       <path d="M10 4.5 5 9l5 4.5V11c3.6 0 5.9 1.4 7.5 4.5.2-5.6-2.2-8.6-7.5-8.8z" {...stroke} />
-    </svg>
-  )
-}
-
-function ForwardIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M12 4.5 17 9l-5 4.5V11c-4.2 0-6.8 1.4-8.5 4.5-.2-5.6 2.6-8.6 8.5-8.8z" {...stroke} />
-    </svg>
-  )
-}
-
-function FlagIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M5 17V3.5m0 0h9l-2 3 2 3H5" {...stroke} />
-    </svg>
-  )
-}
-
-function FolderIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M2.5 6.2a1.7 1.7 0 0 1 1.7-1.7h3l1.6 2h6.5a1.7 1.7 0 0 1 1.7 1.7v6.3a1.7 1.7 0 0 1-1.7 1.7H4.2a1.7 1.7 0 0 1-1.7-1.7z" {...stroke} />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M4 6h12M8 6V4h4v2M6 6l.8 10h6.4L15 6M8.5 9v4M11.5 9v4" {...stroke} />
-    </svg>
-  )
-}
-
-function PaperclipIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden focusable="false">
-      <path d="M14.5 9.2 9.3 14.4a3.1 3.1 0 0 1-4.4-4.4l5.9-5.9a2.1 2.1 0 0 1 3 3l-5.9 5.9a1 1 0 0 1-1.5-1.5l5.2-5.2" {...stroke} />
     </svg>
   )
 }

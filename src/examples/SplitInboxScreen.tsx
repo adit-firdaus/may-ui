@@ -1,4 +1,11 @@
 import { useState } from 'react'
+import {
+  IoArchiveOutline,
+  IoArrowRedoOutline,
+  IoArrowUndoOutline,
+  IoDocumentOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { SplitPane } from '../desktop/SplitPane'
 import { Avatar } from '../components/Avatar'
 import { Badge } from '../components/Badge'
@@ -248,7 +255,15 @@ export function SplitInboxScreen() {
                   background: 'var(--may-color-fill-quaternary)',
                 }}
               >
-                <DocumentIcon />
+                <IoDocumentOutline
+                  aria-hidden
+                  style={{
+                    width: 'var(--may-space-4)',
+                    height: 'var(--may-space-4)',
+                    flexShrink: 0,
+                    color: 'var(--may-color-text-tertiary)',
+                  }}
+                />
                 <Text as="span" variant="footnote">
                   build-timings-3.2.csv
                 </Text>
@@ -265,17 +280,17 @@ export function SplitInboxScreen() {
               away from the three you reach for by reflex. */}
           <Toolbar placement="bottom" align="start" separator>
             <IconButton aria-label="Reply" onClick={() => {}}>
-              <ReplyIcon />
+              <IoArrowUndoOutline aria-hidden />
             </IconButton>
             <IconButton aria-label="Forward" onClick={() => {}}>
-              <ForwardIcon />
+              <IoArrowRedoOutline aria-hidden />
             </IconButton>
             <IconButton aria-label="Archive" onClick={() => {}}>
-              <ArchiveIcon />
+              <IoArchiveOutline aria-hidden />
             </IconButton>
             <ToolbarSpacer />
             <IconButton aria-label="Move to Bin" tone="danger" onClick={() => {}}>
-              <TrashIcon />
+              <IoTrashOutline aria-hidden />
             </IconButton>
           </Toolbar>
         </div>
@@ -332,83 +347,5 @@ function UnreadDot({ unread }: { unread: boolean }) {
         </>
       )}
     </span>
-  )
-}
-
-/* --------------------------------- glyph set -------------------------------- */
-
-function ReplyIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M8 5L3.5 9.5 8 14M4 9.5h7.5a5 5 0 0 1 5 5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function ForwardIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M12 5l4.5 4.5L12 14M16 9.5H8.5a5 5 0 0 0-5 5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function ArchiveIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M3 6.5h14M4.5 6.5V15a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5V6.5M3.5 3.5h13v3h-13zM8 10h4"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden focusable="false">
-      <path
-        d="M3.5 5.5h13M8 3.5h4M6 5.5V16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5.5M8.5 8.5v5M11.5 8.5v5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function DocumentIcon() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden
-      focusable="false"
-      style={{ width: 'var(--may-space-4)', height: 'var(--may-space-4)', flexShrink: 0 }}
-    >
-      <path
-        d="M11.5 2.5H6A1.5 1.5 0 0 0 4.5 4v12A1.5 1.5 0 0 0 6 17.5h8a1.5 1.5 0 0 0 1.5-1.5V6.5zM11.5 2.5v4h4"
-        stroke="var(--may-color-text-tertiary)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   )
 }

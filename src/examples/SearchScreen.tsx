@@ -1,5 +1,13 @@
 import type { ComponentType } from 'react'
 import { useState } from 'react'
+import {
+  IoLeaf,
+  IoMic,
+  IoMoon,
+  IoMusicalNotes,
+  IoSearchOutline,
+  IoTimeOutline,
+} from 'react-icons/io5'
 import { Button } from '../components/Button'
 import { EmptyState } from '../components/EmptyState'
 import { IconTile } from '../components/IconTile'
@@ -227,64 +235,25 @@ const RESULTS: Result[] = [
 /* -------------------------------- glyph set -------------------------------- */
 
 function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 2.8a9.2 9.2 0 100 18.4 9.2 9.2 0 000-18.4zm.9 4.4v5l3.4 2-.9 1.5-4.3-2.6V7.2z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoTimeOutline aria-hidden />
 }
 
 function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" fill="currentColor" />
-    </svg>
-  )
+  return <IoMoon aria-hidden />
 }
 
 function LeafIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M20.4 3.6c-9 0-14.2 3-14.2 9a6.7 6.7 0 001.3 4.1c-.9 1.3-1.5 2.6-1.9 4.1l2 .6c.3-1.2.8-2.2 1.4-3.2a6.9 6.9 0 003.6 1c6 0 7.8-6.6 7.8-15.6zm-9.2 12.7 5.4-6-6.6 3.9z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoLeaf aria-hidden />
 }
 
 function NoteIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M19.4 3.2 9.8 5.4a1.2 1.2 0 00-.9 1.2v8.9a3.4 3.4 0 101.9 3v-8.9l7.6-1.7v6a3.4 3.4 0 101.9 3V4.4a1.2 1.2 0 00-1.5-1.2z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoMusicalNotes aria-hidden />
 }
 
 function MicIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M12 2.8a3.2 3.2 0 013.2 3.2v5.6a3.2 3.2 0 01-6.4 0V6A3.2 3.2 0 0112 2.8zM6 10.8h1.9a4.1 4.1 0 008.2 0H18a6.1 6.1 0 01-5 6v2.6h2.6v2H8.4v-2H11v-2.6a6.1 6.1 0 01-5-6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoMic aria-hidden />
 }
 
 function MagnifierIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path
-        d="M10.6 3a7.6 7.6 0 015.9 12.4l4.6 4.5-1.5 1.5-4.6-4.6A7.6 7.6 0 1110.6 3zm0 2.2a5.4 5.4 0 100 10.8 5.4 5.4 0 000-10.8z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoSearchOutline aria-hidden />
 }

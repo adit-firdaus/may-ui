@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import { IoBookmarkOutline, IoCopyOutline, IoPrintOutline, IoWifiOutline } from 'react-icons/io5'
 import { Button } from '../../components/Button'
 import { List, ListRow } from '../../components/List'
 import { Popup } from './Popup'
@@ -37,19 +38,6 @@ function Screen({ children }: { children: ReactNode }) {
   )
 }
 
-const Glyph = ({ d }: { d: string }) => (
-  <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const icons = {
-  airdrop: 'M8 14a3.5 3.5 0 0 0 0-7 3.5 3.5 0 0 0 0 7zM3.2 9.5A6 6 0 0 1 8 2a6 6 0 0 1 4.8 7.5M5.4 10.6A3.4 3.4 0 0 1 8 5.2c1.2 0 2.2.6 2.8 1.6',
-  copy: 'M5.5 5.5V3.2A1.2 1.2 0 0 1 6.7 2h6.1A1.2 1.2 0 0 1 14 3.2v6.1a1.2 1.2 0 0 1-1.2 1.2h-2.3M3.2 5.5h6.1A1.2 1.2 0 0 1 10.5 6.7v6.1A1.2 1.2 0 0 1 9.3 14H3.2A1.2 1.2 0 0 1 2 12.8V6.7a1.2 1.2 0 0 1 1.2-1.2z',
-  bookmark: 'M4 2.5h8v11l-4-3-4 3z',
-  print: 'M4.5 6V2.5h7V6M4.5 11.5H3.2A1.2 1.2 0 0 1 2 10.3V7.2A1.2 1.2 0 0 1 3.2 6h9.6A1.2 1.2 0 0 1 14 7.2v3.1a1.2 1.2 0 0 1-1.2 1.2h-1.3M4.5 9.5h7v4h-7z',
-}
-
 /** A share sheet — the canonical thing a phone raises from the bottom edge. */
 export const Default: Story = {
   render: () => {
@@ -59,10 +47,26 @@ export const Default: Story = {
         <Button onClick={() => setOpen(true)}>Share</Button>
         <Popup visible={open} onClose={() => setOpen(false)} title="Share Link">
           <List variant="plain">
-            <ListRow title="AirDrop" leading={<Glyph d={icons.airdrop} />} onClick={() => setOpen(false)} />
-            <ListRow title="Copy" leading={<Glyph d={icons.copy} />} onClick={() => setOpen(false)} />
-            <ListRow title="Add to Reading List" leading={<Glyph d={icons.bookmark} />} onClick={() => setOpen(false)} />
-            <ListRow title="Print" leading={<Glyph d={icons.print} />} onClick={() => setOpen(false)} />
+            <ListRow
+              title="AirDrop"
+              leading={<IoWifiOutline aria-hidden style={{ width: 20, height: 20 }} />}
+              onClick={() => setOpen(false)}
+            />
+            <ListRow
+              title="Copy"
+              leading={<IoCopyOutline aria-hidden style={{ width: 20, height: 20 }} />}
+              onClick={() => setOpen(false)}
+            />
+            <ListRow
+              title="Add to Reading List"
+              leading={<IoBookmarkOutline aria-hidden style={{ width: 20, height: 20 }} />}
+              onClick={() => setOpen(false)}
+            />
+            <ListRow
+              title="Print"
+              leading={<IoPrintOutline aria-hidden style={{ width: 20, height: 20 }} />}
+              onClick={() => setOpen(false)}
+            />
           </List>
         </Popup>
       </Screen>

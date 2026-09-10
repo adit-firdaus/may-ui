@@ -102,7 +102,10 @@
   color: var(--may-color-tint);
 }
 
-.may-pagination__arrow > .may-pagination__digit > svg:not([width]) {
+/* No :not([width]) guard: the arrow glyph is always the component's own, and
+ * react-icons renders width/height as attributes. An author rule outranks a
+ * presentation attribute, so the key's font-size still drives the chevron. */
+.may-pagination__arrow > .may-pagination__digit > svg {
   width: 1.05em;
   height: 1.05em;
   display: block;

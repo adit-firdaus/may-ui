@@ -185,7 +185,7 @@
   color: var(--may-color-text-tertiary);
 }
 
-.may-slider__adornment > svg:not([width]) {
+.may-slider__adornment > svg {
   width: 1.15em;
   height: 1.15em;
   display: block;

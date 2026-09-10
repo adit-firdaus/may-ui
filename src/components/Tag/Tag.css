@@ -99,8 +99,11 @@
   margin-inline-start: calc(var(--may-space-1) * -1);
 }
 
-/* Sized in em so a glyph scales with the chip; an explicit size wins. */
-.may-tag__icon > svg:not([width]) {
+/* Sized in em so a glyph scales with the chip; an explicit size wins.
+ * react-icons renders width/height="1em" as ATTRIBUTES rather than leaving them
+ * unset, so that form is matched too. A glyph sized in px still opts out. */
+.may-tag__icon > svg,
+.may-tag__icon > svg[width='1em'] {
   width: 1.1em;
   height: 1.1em;
   display: block;

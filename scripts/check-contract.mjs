@@ -90,6 +90,15 @@ const checks = [
     })(),
   ],
   [
+    'a scoped theme re-asserts inherited color, not only the tokens',
+    // Tokens alone do not fix a scoped theme: `color` is inherited, so it was
+    // already resolved on .may-root against the outer theme and does not
+    // re-resolve when the tokens beneath it change. Found by screenshotting the
+    // dark-pinned NowPlaying screen: every transport control rendered black on
+    // black, because IconButton has no colour of its own and inherits.
+    /\[data-may-theme\]\s*\{[^}]*color:\s*var\(--may-color-text\)/.test(css),
+  ],
+  [
     'reduced motion stops iteration, not just duration',
     /animation-iteration-count:\s*1\s*!important/.test(css),
   ],

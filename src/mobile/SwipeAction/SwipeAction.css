@@ -193,7 +193,7 @@
   display: inline-flex;
 }
 
-.may-swipe__action-icon > svg:not([width]) {
+.may-swipe__action-icon > svg {
   width: 1.35em;
   height: 1.35em;
   display: block;

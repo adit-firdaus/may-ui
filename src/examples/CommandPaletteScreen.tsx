@@ -1,6 +1,21 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 
+import {
+  IoArchiveOutline,
+  IoArrowRedoOutline,
+  IoArrowUndoOutline,
+  IoCreateOutline,
+  IoDocumentOutline,
+  IoDocumentTextOutline,
+  IoFileTrayOutline,
+  IoFlagOutline,
+  IoMoonOutline,
+  IoSendOutline,
+  IoSettingsOutline,
+  IoStarOutline,
+  IoTrashOutline,
+} from 'react-icons/io5'
 import { Avatar } from '../components/Avatar'
 import { Button } from '../components/Button'
 import { EmptyState } from '../components/EmptyState'
@@ -17,40 +32,35 @@ import { Sidebar, SidebarItem, SidebarSection, SidebarToggle } from '../desktop/
 /** Stroked, never filled, so a glyph sits at the weight of the text beside it. */
 const glyph = (d: string): ReactNode => (
   <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const ICON = {
-  compose: glyph('M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z'),
-  reply: glyph('M9 8 4 12l5 4m-5-4h9a7 7 0 0 1 7 7v1'),
-  replyAll: glyph('M8 7 3 11l5 4m5-8-5 4 5 4m-5-4h6a7 7 0 0 1 7 7v1'),
-  forward: glyph('M15 8l5 4-5 4m5-4h-9a7 7 0 0 0-7 7v1'),
-  inbox: glyph('M3 13h5l1.5 3h5L16 13h5M4 5h16l1 8v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5Z'),
-  sent: glyph('M21 3 10 14M21 3l-7 18-3.6-7.4L3 10Z'),
-  drafts: glyph('M5 3h9l5 5v13H5zM14 3v5h5M8.5 13h7m-7 3.5h4'),
-  gear: glyph('M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm9-3-2 .6-.6 1.5 1 1.8-2 2-1.8-1-1.5.6L12 21l-.6-2-1.5-.6-1.8 1-2-2 1-1.8L6.5 14 4.5 12l2-.6.6-1.5-1-1.8 2-2 1.8 1 1.5-.6L12 4l.6 2 1.5.6 1.8-1 2 2-1 1.8.6 1.5 2 .6Z'),
-  moon: glyph('M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z'),
-  trash: glyph('M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13'),
-  command: glyph('M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3Z'),
-}
-
-/* Sidebar chrome sits on the 16px grid, like the rest of the window furniture. */
-const rail = (d: string): ReactNode => (
-  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
     <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
+const ICON = {
+  compose: <IoCreateOutline aria-hidden />,
+  reply: <IoArrowUndoOutline aria-hidden />,
+  /* Ionicons has no reply-all arrow, so this one stays hand-drawn. */
+  replyAll: glyph('M8 7 3 11l5 4m5-8-5 4 5 4m-5-4h6a7 7 0 0 1 7 7v1'),
+  forward: <IoArrowRedoOutline aria-hidden />,
+  inbox: <IoFileTrayOutline aria-hidden />,
+  sent: <IoSendOutline aria-hidden />,
+  drafts: <IoDocumentTextOutline aria-hidden />,
+  gear: <IoSettingsOutline aria-hidden />,
+  moon: <IoMoonOutline aria-hidden />,
+  trash: <IoTrashOutline aria-hidden />,
+  /* The ⌘ loop-square is not in Ionicons either. */
+  command: glyph('M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3Z'),
+}
+
 const RAIL = {
-  inbox: rail('M1.5 8.5h3l1 2h5l1-2h3M2 4.5h12v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z'),
-  star: rail('M8 2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.2 4.4 13.1l.7-4L2.2 6.3l4-.6z'),
-  flag: rail('M4 14V2.5h8l-1.6 3L12 8.5H4'),
-  drafts: rail('M3.5 1.5h6l3 3v10h-9zM9.5 1.5v3h3'),
-  send: rail('M14 2L7 9m7-7l-4.5 12-2.2-5.3L2 6.5z'),
-  archive: rail('M2 5.5h12V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zM1.5 2.5h13v3h-13zM6.5 8.5h3'),
-  trash: rail('M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5'),
-  gear: rail('M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM8 1.5l1 1.7 1.9-.4.4 1.9 1.7 1-1 1.7 1 1.7-1.7 1-.4 1.9-1.9-.4-1 1.7-1-1.7-1.9.4-.4-1.9-1.7-1 1-1.7-1-1.7 1.7-1 .4-1.9 1.9.4z'),
+  inbox: <IoFileTrayOutline aria-hidden />,
+  star: <IoStarOutline aria-hidden />,
+  flag: <IoFlagOutline aria-hidden />,
+  drafts: <IoDocumentOutline aria-hidden />,
+  send: <IoSendOutline aria-hidden />,
+  archive: <IoArchiveOutline aria-hidden />,
+  trash: <IoTrashOutline aria-hidden />,
+  gear: <IoSettingsOutline aria-hidden />,
 }
 
 /**

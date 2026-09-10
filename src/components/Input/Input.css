@@ -130,7 +130,7 @@
 }
 
 /* Sized in em so an affix icon tracks the field's own type scale. */
-.may-input__affix > svg:not([width]) {
+.may-input__affix > svg {
   width: 1.1em;
   height: 1.1em;
   display: block;

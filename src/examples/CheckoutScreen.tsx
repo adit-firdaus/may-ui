@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IoCard, IoLockClosed, IoLogoApple, IoLogoPaypal } from 'react-icons/io5'
 import { NavBar } from '../mobile/NavBar'
 import { Selector } from '../mobile/Selector'
 import { Card, CardHeader, CardTitle, CardDescription, CardBody } from '../components/Card'
@@ -266,45 +267,17 @@ export function CheckoutScreen() {
 
 /** The Apple Pay mark, drawn as one silhouette so it inherits the row colour. */
 function ApplePayGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M15.6 4.2c-.7.9-1.9 1.5-2.8 1.4-.1-1 .4-2 1-2.6.7-.8 1.9-1.4 2.9-1.4.1 1-.3 2-1.1 2.6zm1 1.7c-1.6-.1-2.9.9-3.7.9-.8 0-1.9-.8-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.1 1.7 2.4 3 2.4 1.2-.1 1.6-.8 3-.8s1.8.8 3.1.8c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7 0 0-2.5-1-2.5-3.8 0-2.4 1.9-3.5 2-3.6-1.1-1.6-2.8-1.8-3.3-1.9z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoLogoApple aria-hidden />
 }
 
 function CardGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M2.5 7.4C2.5 6.1 3.6 5 5 5h14c1.4 0 2.5 1.1 2.5 2.4V8h-19zm0 3.1h19v6.1c0 1.3-1.1 2.4-2.5 2.4H5c-1.4 0-2.5-1.1-2.5-2.4zM5 14.4v1.7h4.2v-1.7z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoCard aria-hidden />
 }
 
 function PayPalGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M8.6 3h6c2.9 0 4.7 1.6 4.3 4.3-.4 2.8-2.6 4.4-5.5 4.4h-2.3L10.3 17H6.5zm-.9 15.3l.4-2.5h2.6c3.7 0 6.5-2 7.2-5.5.9.7 1.3 1.8 1.1 3.3-.4 3-2.8 4.7-6 4.7h-1.6l-.5 2.7H7z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoLogoPaypal aria-hidden />
 }
 
 function LockGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 2.6a4.4 4.4 0 00-4.4 4.4v2.4H7A2 2 0 005 11.4v7.2c0 1.1.9 2 2 2h10a2 2 0 002-2v-7.2a2 2 0 00-2-2h-.6V7A4.4 4.4 0 0012 2.6zm0 2a2.4 2.4 0 012.4 2.4v2.4H9.6V7A2.4 2.4 0 0112 4.6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
+  return <IoLockClosed aria-hidden />
 }

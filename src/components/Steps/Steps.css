@@ -145,8 +145,11 @@ button.may-steps__body:disabled {
  * the mark would flash and vanish.
  */
 .may-steps__check path {
-  stroke-dasharray: 14;
-  stroke-dashoffset: 14;
+  /* Measured in the glyph's own user units: Ionicons draws the checkmark in a
+   * 512 viewBox and the stroke runs ~476 of them, so the dash has to cover
+   * that rather than the 14 the old 16-unit path needed. */
+  stroke-dasharray: 480;
+  stroke-dashoffset: 480;
   animation: may-step-check var(--may-duration-settle) var(--may-ease-out) forwards;
 }
 
