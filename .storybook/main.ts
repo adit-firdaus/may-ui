@@ -24,6 +24,21 @@ const config: StorybookConfig = {
     // at the site root. Only the production build takes the sub-path; dev stays
     // at '/'.
     base: configType === 'PRODUCTION' ? '/may-ui/storybook/' : config.base,
+    /*
+     * Storybook inherits the root vite.config, which carries vite-plugin-dts for
+     * the LIBRARY build. Storybook needs no type declarations, and the plugin's
+     * `rollupTypes` step writes a temporary api-extractor.json that breaks the
+     * build in CI. Drop it here — it has no business running for a preview.
+     */
+    plugins: (config.plugins ?? []).filter(
+      (plugin) =>
+        !(
+          plugin &&
+          typeof plugin === 'object' &&
+          'name' in plugin &&
+          String((plugin as { name?: unknown }).name).includes('dts')
+        ),
+    ),
     server: {
       ...config.server,
       allowedHosts: [...((config.server?.allowedHosts as string[]) ?? []), '.ts.net'],
