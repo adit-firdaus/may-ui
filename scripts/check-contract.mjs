@@ -39,9 +39,12 @@ function stripHoverGuards(source) {
 const unguarded = stripHoverGuards(css)
 
 /**
- * Every rule in the sheet, as [selector, body]. Good enough for a contract
- * check: the built CSS is machine-generated, so there is no exotic nesting to
- * trip over.
+ * Every style rule in the sheet, as [selector, body].
+ *
+ * At-rules are RECURSED INTO rather than skipped, which is load-bearing: the
+ * whole sheet ships wrapped in `@layer may-ui`, so a parser that treated an
+ * at-rule as one opaque rule would find no style rules at all and every check
+ * built on this would pass vacuously.
  */
 function rules(source) {
   const out = []
@@ -58,7 +61,9 @@ function rules(source) {
     } else if (ch === '}') {
       depth--
       if (depth === 0) {
-        out.push([sel, buf])
+        // An at-rule wraps more rules; a style rule's body is declarations.
+        if (sel.startsWith('@')) out.push(...rules(buf))
+        else out.push([sel, buf])
         buf = ''
       } else buf += ch
     } else buf += ch

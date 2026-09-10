@@ -39,6 +39,31 @@ export function App() {
 
 `theme` is `'system'` (default), `'light'` or `'dark'` — see [Theming](theming.md).
 
+## The stylesheet is a cascade layer
+
+`styles.css` ships wrapped in `@layer may-ui`. Unlayered CSS beats every layered
+rule whatever its specificity, so this is what lets a utility or an override at
+your call site win against a component's own rule — which is the way round most
+people expect:
+
+```jsx
+<Skeleton className="h-7" />   /* 28px: your utility wins */
+```
+
+Plain CSS of your own needs nothing: unlayered always beats layered.
+
+**With Tailwind**, layer order decides, and layers rank in the order they are
+first declared. Declare the order yourself so it cannot depend on import order:
+
+```css
+@layer theme, base, may-ui, components, utilities;   /* declare order first */
+@import 'tailwindcss';
+@import '@adit_firdaus/may-ui/styles.css' layer(may-ui);
+```
+
+With `may-ui` ahead of `utilities`, every Tailwind utility wins on a May
+component. Move it after `utilities` if you would rather May won.
+
 ## The three entry points
 
 ```tsx
