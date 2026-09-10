@@ -16,6 +16,15 @@
   --may-thumb-settle: var(--may-duration-fast);
   position: relative;
   display: inline-flex;
+  /*
+   * `inline-flex` says "hug the segments", but a flex or grid parent
+   * BLOCKIFIES that to `flex` and then stretches it: the track grew to the
+   * container's width while the segments stayed `flex: 0 0 auto`, leaving a
+   * dead strip of visible track past the last one. An explicit width wins over
+   * `align-items: stretch`, which `align-self` could not do without also
+   * changing the cross-axis alignment inside a row. `--full` overrides it below.
+   */
+  width: fit-content;
   align-items: stretch;
   padding: 2px;
   border-radius: var(--may-radius-full);
