@@ -19,9 +19,20 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// `--may-alert-gap` tells a dismissing alert how much of the column's gap to
+// take with it, so the neighbours slide the whole way instead of jumping the
+// last 12px when the node unmounts.
 const Column = ({ children }: { children: React.ReactNode }) => (
   <div
-    style={{ display: 'flex', flexDirection: 'column', gap: 'var(--may-space-3)', maxWidth: 480 }}
+    style={
+      {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--may-space-3)',
+        maxWidth: 480,
+        '--may-alert-gap': 'var(--may-space-3)',
+      } as React.CSSProperties
+    }
   >
     {children}
   </div>

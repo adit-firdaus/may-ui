@@ -11,9 +11,19 @@
 }
 
 .may-pagination__list {
+  /* Positioned and isolated so the sliding thumb measures against the row and
+   * cannot punch through whatever the pager sits on. */
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  /*
+   * No wrap. The thumb slides on one axis, and a row that breaks onto a second
+   * line has no single axis to slide along. The row is width-stable by design
+   * (see `slotsFor`), so at a genuinely narrow width the keys tighten rather
+   * than fold; a pager that truly cannot fit is what `compact` is for.
+   */
+  flex-wrap: nowrap;
   gap: var(--may-space-1);
   margin: 0;
   padding: 0;
@@ -22,6 +32,22 @@
 
 .may-pagination__item {
   display: inline-flex;
+}
+
+/*
+ * The sliding fill — the current key's background, made a moving element so it
+ * travels between slots instead of springing in and out per key. Laid out at
+ * 1px and scaled by `applyThumb`; full row height, so it matches the keys.
+ */
+.may-pagination__thumb {
+  position: absolute;
+  z-index: 0;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 1px;
+  transform-origin: 0 50%;
+  background: var(--may-color-primary);
+  pointer-events: none;
 }
 
 /* ----------------------------------- key ---------------------------------- */
@@ -43,9 +69,6 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
   cursor: pointer;
-  /* Keeps the fill's stacking local, so a pager inside a card cannot punch
-   * through whatever it is sitting on. */
-  isolation: isolate;
   transition:
     color var(--may-duration-fast) var(--may-ease-out),
     opacity var(--may-duration-fast) var(--may-ease-out);
@@ -65,37 +88,17 @@
 }
 
 /*
- * The fill. It sits behind the digit at 55% and springs to full size when the
- * page becomes current, so paging reads as the selection *landing* on a key
- * rather than two background colours swapping places. The old key's fill
- * shrinks away on the same curve, which is what sells the jump.
+ * The current key's fill is the sliding `.may-pagination__thumb`, not a
+ * per-key background — so paging reads as the selection travelling to a new
+ * key rather than two colours swapping in place. The digit's colour still
+ * cross-fades to `on-primary` over the same beat, roughly as the thumb arrives.
  */
-.may-pagination__page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background: var(--may-color-primary);
-  transform: scale(0.55);
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    transform var(--may-duration-settle) var(--may-spring-bouncy),
-    opacity var(--may-duration-fast) var(--may-ease-out);
-}
-
 .may-pagination__page[aria-current='page'] {
   color: var(--may-color-on-primary);
   font-weight: 600;
   /* Already the loudest thing in the row; a hover highlight on top of the
    * fill would only muddy it. */
   cursor: default;
-}
-
-.may-pagination__page[aria-current='page']::before {
-  transform: scale(1);
-  opacity: 1;
 }
 
 .may-pagination__arrow {

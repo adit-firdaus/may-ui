@@ -17,8 +17,6 @@
   padding: 0;
   border: 0;
   border-radius: var(--may-radius-full);
-  background: var(--may-fab-solid);
-  color: var(--may-fab-on-solid);
   font-family: inherit;
   font-weight: var(--may-text-headline-weight);
   line-height: 1;
@@ -35,8 +33,16 @@
     box-shadow var(--may-duration-settle) var(--may-spring-bouncy),
     background-color var(--may-duration-fast) var(--may-ease-out),
     opacity var(--may-duration-fast) var(--may-ease-out);
-  /* A FAB should arrive, not appear. */
-  animation: may-fab-in var(--may-duration-settle) var(--may-spring-bouncy);
+  /*
+   * A FAB should arrive, not appear -- but on `ease-out`, like the rest of the
+   * system, and from 0.9 rather than 0.6, which read as a pop.
+   *
+   * Deliberately NO fill mode. A filled animation keeps owning `transform`
+   * after it ends, and animations outrank author rules, so `both` here would
+   * silently kill the hover and press scales below. With no delay there is
+   * nothing for `backwards` to cover anyway.
+   */
+  animation: may-fab-in var(--may-duration-settle) var(--may-ease-out);
 }
 
 .may-fab:disabled {
@@ -44,6 +50,19 @@
   opacity: 0.35;
   /* A disabled control is not floating any more, so it settles onto the surface. */
   box-shadow: var(--may-shadow-sm);
+}
+
+/*
+ * The fill is consumed here, not on the bare `.may-fab`, and the reason is
+ * specificity: base.css resets `.may-root button` to `background: none`, which
+ * at (0,1,1) beats a lone class at (0,1,0) and left every FAB transparent
+ * however healthy --may-fab-solid was. The attribute takes this to (0,2,0),
+ * which wins regardless of the order a bundler emits the sheets in. Tone rules
+ * below still only SET variables.
+ */
+.may-fab[data-tone] {
+  background: var(--may-fab-solid);
+  color: var(--may-fab-on-solid);
 }
 
 /* ---------------------------------- tones --------------------------------- */
@@ -129,6 +148,12 @@
   padding-inline: var(--may-space-5);
 }
 
+/* A glyph reads lighter than text, so an equal inset leaves the icon side
+ * looking slack. Button tightens the same way when it carries an icon. */
+.may-fab--extended:has(.may-fab__glyph) {
+  padding-inline-start: var(--may-space-4);
+}
+
 .may-fab__spinner {
   width: 1.2em;
   height: 1.2em;
@@ -142,16 +167,16 @@
 /* ---------------------------------- press --------------------------------- */
 
 /*
- * Bigger than anything else in the system, on purpose: pressing a floating
- * object should look like pushing it down onto the surface, so the scale drops
- * hard and the shadow contracts with it. Release rides the bouncy spring in the
- * base transition, which overshoots past resting size — the FAB pops back up.
+ * Pressing a floating object should look like pushing it down onto the surface,
+ * so the shadow contracts with the scale. The scale itself matches the rest of
+ * the system at 0.96 -- it used to drop to 0.9, which stood out whenever a FAB
+ * sat near ordinary buttons.
  *
  * Out-specifies `.may-pressable[data-pressed='true']` in base.css, which would
- * otherwise apply its gentler generic squish.
+ * otherwise apply its own generic squish.
  */
 .may-fab.may-pressable[data-pressed='true'] {
-  transform: scale(0.9);
+  transform: scale(0.96);
   box-shadow: var(--may-shadow-sm);
   transition:
     transform var(--may-duration-instant) var(--may-ease-out),
@@ -170,8 +195,9 @@
 @media (hover: hover) and (pointer: fine) {
   .may-fab.may-hoverable[data-tone]:hover:not(:disabled):not([data-pressed]) {
     background-color: color-mix(in srgb, var(--may-fab-solid) 88%, var(--may-label));
-    transform: scale(1.06);
-    box-shadow: var(--may-shadow-xl);
+    /* A hint of lift, not a jump. The shadow deliberately stays on the resting
+     * `--may-shadow-lg`: hovering is not a change of altitude. */
+    transform: scale(1.03);
   }
 }
 
@@ -207,7 +233,7 @@
 }
 
 @keyframes may-fab-in {
-  from { opacity: 0; transform: scale(0.6); }
+  from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
 

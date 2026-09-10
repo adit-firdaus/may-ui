@@ -79,6 +79,20 @@
   touch-action: manipulation;
 }
 
+/*
+ * One exception to the line above, and it has to live here because that rule
+ * out-specifies the component's own.
+ *
+ * `manipulation` still hands panning to the page, which is right for every
+ * other row in that list -- they are things you tap. A segmented control is a
+ * thing you DRAG along its own axis, so leaving the horizontal pan to the
+ * scroller meant the gesture was never the control's to receive: on a phone it
+ * simply could not be dragged.
+ */
+.may-root [data-slot='segmented'] {
+  touch-action: none;
+}
+
 .may-root p,
 .may-root [data-selectable],
 .may-root [data-slot='content'],
@@ -164,23 +178,29 @@
  * Scrolling
  * ------------------------------------------------------------------ */
 
-.may-root [data-slot='scroll-area'] {
+/* `data-scroll-area` is the way in for an element whose `data-slot` is already
+ * spoken for — a ContextMenu panel is a menu first and a scroller second. */
+.may-root [data-slot='scroll-area'],
+.may-root [data-scroll-area='true'] {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--may-scrollbar-thumb) transparent;
 }
 
-.may-root [data-slot='scroll-area']::-webkit-scrollbar {
+.may-root [data-slot='scroll-area']::-webkit-scrollbar,
+.may-root [data-scroll-area='true']::-webkit-scrollbar {
   width: var(--may-scrollbar-size);
   height: var(--may-scrollbar-size);
 }
 
-.may-root [data-slot='scroll-area']::-webkit-scrollbar-track {
+.may-root [data-slot='scroll-area']::-webkit-scrollbar-track,
+.may-root [data-scroll-area='true']::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.may-root [data-slot='scroll-area']::-webkit-scrollbar-thumb {
+.may-root [data-slot='scroll-area']::-webkit-scrollbar-thumb,
+.may-root [data-scroll-area='true']::-webkit-scrollbar-thumb {
   background: var(--may-scrollbar-thumb);
   border-radius: var(--may-radius-full);
   /* Inset the thumb without a wrapper element. */
@@ -188,7 +208,8 @@
   background-clip: content-box;
 }
 
-.may-root [data-slot='scroll-area']::-webkit-scrollbar-thumb:hover {
+.may-root [data-slot='scroll-area']::-webkit-scrollbar-thumb:hover,
+.may-root [data-scroll-area='true']::-webkit-scrollbar-thumb:hover {
   background: var(--may-scrollbar-thumb-hover);
   background-clip: content-box;
 }
@@ -298,4 +319,37 @@
 .may-root svg:not([width]):not([height]):not([class]) {
   width: 1em;
   height: 1em;
+}
+
+/* ------------------------------------------------------------------ *
+ * Scroll hint
+ *
+ * A scrollbar is not an affordance you can rely on: on macOS it is an overlay
+ * that measures zero and only appears once you are already scrolling, so a
+ * clipped menu row reads as a rendering fault rather than as "there is more".
+ *
+ * These four layers are the classic pure-CSS answer and need no JavaScript to
+ * know whether the box actually overflows. The two `local` layers scroll WITH
+ * the content, so they sit over the shadows and hide them at the very top and
+ * the very bottom; the two `scroll` layers stay put. The shadow is therefore
+ * visible only on the edge that has content beyond it.
+ *
+ * Opt in with `data-scroll-hint`, on a surface painted --may-color-surface.
+ * ------------------------------------------------------------------ */
+
+.may-root [data-scroll-hint='true'] {
+  background-image:
+    linear-gradient(to bottom, var(--may-color-surface) 30%, transparent),
+    linear-gradient(to top, var(--may-color-surface) 30%, transparent),
+    linear-gradient(
+      to bottom,
+      rgba(var(--may-shadow-color), var(--may-shadow-a4)),
+      transparent
+    ),
+    linear-gradient(to top, rgba(var(--may-shadow-color), var(--may-shadow-a4)), transparent);
+  background-position: top center, bottom center, top center, bottom center;
+  background-size: 100% var(--may-space-6), 100% var(--may-space-6), 100% var(--may-space-2),
+    100% var(--may-space-2);
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
 }

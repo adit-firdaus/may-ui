@@ -4,9 +4,16 @@ import { IoSearch } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
+/* The overlay lifetime helper lives with Popover, which is where every other
+ * dismissable surface takes it from. */
+import { useExitDelay } from '../../components/Popover/Popover'
 import { Kbd } from '../../components/Kbd/Kbd'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
 import './CommandPalette.css'
+
+/** Matches the exit transition in CommandPalette.css. */
+const EXIT_MS = 150
 
 export interface CommandItem {
   id: string
@@ -301,6 +308,8 @@ export function CommandPalette({
   className,
 }: CommandPaletteProps) {
   const id = useAutoId()
+  const reducedMotion = useReducedMotion()
+  const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const restoreTo = useRef<HTMLElement | null>(null)
@@ -508,7 +517,9 @@ export function CommandPalette({
     }
   }
 
-  if (!open) return null
+  // Stays mounted for the length of its exit, so a dismissal animates instead
+  // of blinking off the screen next to an entrance that springs.
+  if (!mounted) return null
 
   const listId = `${id}-list`
 
@@ -516,6 +527,7 @@ export function CommandPalette({
     <div
       className="may-command__scrim"
       data-slot="scrim"
+      data-state={open ? 'open' : 'closed'}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onOpenChange(false)
       }}
@@ -525,6 +537,7 @@ export function CommandPalette({
         aria-modal="true"
         aria-label={label}
         data-slot="command-palette"
+        data-state={open ? 'open' : 'closed'}
         className={cx('may-command', className)}
       >
         <div className="may-command__field">

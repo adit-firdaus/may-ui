@@ -83,7 +83,7 @@
 
 .may-popover__surface[data-positioned='true'][data-state='open'] {
   opacity: 1;
-  animation: may-popover-in var(--may-duration-settle) var(--may-spring-bouncy);
+  animation: may-popover-in var(--may-duration-settle) var(--may-ease-out);
 }
 
 .may-popover__surface[data-state='closed'] {

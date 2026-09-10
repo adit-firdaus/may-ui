@@ -1,10 +1,26 @@
 import type { KeyboardEvent } from 'react'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { cx } from '../../utils/cx'
-import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { applyThumb, geometryFor, segmentAt } from '../../motion/sliding-thumb'
+import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
 import './SegmentedControl.css'
+
+/*
+ * How much the thumb puffs while held — the primitive's own default, and the
+ * value ss-ui uses. It does overhang the track's 2px inset, which is the point:
+ * a thumb that grows within its own groove reads as inflating, one that grows
+ * past it reads as lifting off.
+ */
+const PRESS_SCALE = 1.16
+
+/*
+ * The sheet curve, which is what ss-ui settles on, and 340ms — the same clock
+ * `--may-duration-settle` carries for the rest of the system. Both were tuned
+ * by watching the control rather than guessed; the git history has the walk
+ * from 340 down to 220 and back if the numbers ever look arbitrary.
+ */
+const SETTLE_EASING = 'var(--may-ease-sheet)'
+const SETTLE_MS = 340
 
 export interface SegmentedOption {
   label: string
@@ -26,15 +42,14 @@ export interface SegmentedControlProps {
   'aria-label'?: string
 }
 
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
-
 /**
  * iOS's segmented control.
  *
  * The thumb **slides** between segments and can be dragged, which is the part
  * that reads as iOS — both reference implementations cross-fade an indicator
- * between segments instead, and it is the most conspicuous missing motion in
- * either. Positioning is transform-only so it stays on the compositor.
+ * between segments instead. The whole gesture — slide, press squish, elastic
+ * overdrag, select-on-release — lives in `useSlidingThumb`; this component owns
+ * the selection, the keyboard, and the track fill that squeezes under the press.
  */
 export function SegmentedControl({
   options,
@@ -48,46 +63,11 @@ export function SegmentedControl({
 }: SegmentedControlProps) {
   const [internal, setInternal] = useState(defaultValue ?? options[0]?.value ?? '')
   const current = value ?? internal
-  const reducedMotion = useReducedMotion()
-
-  const trackRef = useRef<HTMLDivElement>(null)
-  const thumbRef = useRef<HTMLSpanElement>(null)
-  const segmentRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const [dragging, setDragging] = useState(false)
-  const firstPaint = useRef(true)
 
   const selectedIndex = Math.max(
     0,
     options.findIndex((o) => o.value === current),
   )
-
-  const position = useCallback(
-    (index: number, opts: { following?: boolean; pressed?: boolean } = {}) => {
-      const track = trackRef.current
-      const thumb = thumbRef.current
-      const segment = segmentRefs.current[index]
-      if (!track || !thumb || !segment) return
-      applyThumb(thumb, geometryFor(track, segment), {
-        ...opts,
-        // Never animate into place on first paint — the thumb would fly in
-        // from the leading edge on every mount.
-        reducedMotion: reducedMotion || firstPaint.current,
-      })
-    },
-    [reducedMotion],
-  )
-
-  useIsomorphicLayoutEffect(() => {
-    position(selectedIndex, { pressed: dragging })
-    firstPaint.current = false
-  }, [selectedIndex, dragging, position, options.length])
-
-  useEffect(() => {
-    if (typeof ResizeObserver === 'undefined' || !trackRef.current) return
-    const ro = new ResizeObserver(() => position(selectedIndex))
-    ro.observe(trackRef.current)
-    return () => ro.disconnect()
-  }, [position, selectedIndex])
 
   const commit = (next: string) => {
     if (next === current) return
@@ -95,27 +75,19 @@ export function SegmentedControl({
     onValueChange?.(next)
   }
 
-  /** Dragging across the control selects as you go, the way iOS does. */
-  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return
-    setDragging(true)
-    trackRef.current?.setPointerCapture(event.pointerId)
-  }
-
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragging) return
-    const segments = segmentRefs.current.filter(Boolean) as HTMLElement[]
-    const index = segmentAt(segments, event.clientX)
-    if (index >= 0 && !options[index]?.disabled) commit(options[index]!.value)
-  }
-
-  const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragging) return
-    setDragging(false)
-    if (trackRef.current?.hasPointerCapture(event.pointerId)) {
-      trackRef.current.releasePointerCapture(event.pointerId)
-    }
-  }
+  const { trackRef, thumbRef, registerItem, dragging, onPointerDown } = useSlidingThumb<
+    HTMLDivElement,
+    HTMLButtonElement
+  >({
+    itemCount: options.length,
+    selectedIndex,
+    onSelect: (index) => commit(options[index]!.value),
+    isDisabled: (index) => Boolean(options[index]?.disabled),
+    roundEnds: true,
+    pressScale: PRESS_SCALE,
+    easing: SETTLE_EASING,
+    settleMs: SETTLE_MS,
+  })
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const delta = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
@@ -127,7 +99,9 @@ export function SegmentedControl({
       if (!options[next]?.disabled) break
     }
     commit(options[next]!.value)
-    segmentRefs.current[next]?.focus()
+    trackRef.current
+      ?.querySelectorAll<HTMLButtonElement>('.may-segmented__segment')
+      [next]?.focus()
   }
 
   return (
@@ -140,18 +114,13 @@ export function SegmentedControl({
       data-dragging={dragging ? 'true' : undefined}
       className={cx('may-segmented', fullWidth && 'may-segmented--full', className)}
       onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
       onKeyDown={onKeyDown}
     >
       <span ref={thumbRef} className="may-segmented__thumb" aria-hidden />
       {options.map((option, index) => (
         <button
           key={option.value}
-          ref={(node) => {
-            segmentRefs.current[index] = node
-          }}
+          ref={registerItem(index)}
           type="button"
           role="tab"
           aria-selected={option.value === current}

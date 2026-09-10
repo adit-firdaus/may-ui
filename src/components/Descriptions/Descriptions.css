@@ -57,7 +57,17 @@
   gap: var(--may-space-4);
   min-width: 0;
   min-height: var(--may-control-h);
-  padding: var(--may-space-2) var(--may-space-4);
+  /*
+   * Derived, not typed. `align-items: baseline` pins the content to the top of
+   * the row, so any height that min-height adds beyond the content falls
+   * entirely BELOW the label -- 8px above and 14px under it, and a different
+   * gap again on any row whose value is taller. Sizing the block padding so a
+   * single line of body text already fills the 44px target means the row is
+   * that height on its own, and the space above and below the label stays
+   * equal however tall the value grows.
+   */
+  padding: calc((var(--may-control-h) - var(--may-text-body-leading)) / 2)
+    var(--may-space-4);
 }
 
 /*
@@ -120,6 +130,14 @@
 .may-descriptions[data-layout='stacked'] .may-desc__item {
   flex-direction: column;
   align-items: stretch;
+  /*
+   * Content stays at the TOP, deliberately. A grid row stretches every cell to
+   * the tallest one, so a pair whose values differ in length leaves the shorter
+   * cell with slack underneath -- but centring that cell to even the slack out
+   * drops its label below its neighbour's, and two labels side by side at
+   * different heights is far more visible than uneven space under them.
+   */
+  justify-content: flex-start;
   gap: var(--may-space-1);
   padding-block: var(--may-space-3);
 }

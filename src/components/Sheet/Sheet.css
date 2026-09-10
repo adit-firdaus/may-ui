@@ -5,6 +5,7 @@
   display: flex;
   background: var(--may-color-scrim);
   animation: may-fade-in var(--may-duration-fast) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-sheet__scrim[data-presentation='sheet'] { align-items: flex-end; }
@@ -22,6 +23,7 @@
   color: var(--may-color-text);
   box-shadow: var(--may-shadow-xl);
   overflow: hidden;
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 /* ----------------------------- phone: a sheet ---------------------------- */
@@ -60,7 +62,7 @@
   width: 100%;
   border-radius: var(--may-radius-sheet);
   max-height: calc(100vh - var(--may-space-16));
-  animation: may-dialog-in var(--may-duration-settle) var(--may-spring-bouncy);
+  animation: may-dialog-in var(--may-duration-settle) var(--may-ease-out);
 }
 
 .may-sheet[data-presentation='dialog'][data-size='sm'] { max-width: 360px; }
@@ -120,4 +122,24 @@
 @keyframes may-dialog-in {
   from { opacity: 0; transform: scale(0.94); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/*
+ * Leaving is a TRANSITION on opacity, not an animation — and deliberately does
+ * not touch `transform`.
+ *
+ * There was no exit at all before: `open` going false unmounted the tree, so a
+ * sheet that rose over 500ms vanished in a single frame. It fades rather than
+ * sliding back down because an exit animation owns every property it names from
+ * its own `from` value, so naming `transform` would snap a sheet dismissed
+ * mid-rise back to its start before moving — and would fight the drag-to-dismiss
+ * transform besides.
+ */
+.may-sheet__scrim[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.may-sheet[data-state='closed'] {
+  opacity: 0;
 }

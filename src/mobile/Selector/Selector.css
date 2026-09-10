@@ -257,3 +257,41 @@
   opacity: 1;
   transform: none;
 }
+
+/* ------------------------------- thumb mode ------------------------------- */
+
+/*
+ * A sliding pill for single-select chips on one line. The group becomes the
+ * track; the pill is a wash of the tint that travels behind the selected chip
+ * instead of each chip's own fill switching on and off. The check is the
+ * indicator no longer, so it is held closed — which also keeps every chip's
+ * width fixed, so the thumb never chases a chip that is growing under it.
+ */
+.may-selector[data-thumb='true'] {
+  position: relative;
+  isolation: isolate;
+}
+
+.may-selector__thumb {
+  position: absolute;
+  z-index: 0;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 1px;
+  transform-origin: 0 50%;
+  background: color-mix(in srgb, var(--may-color-primary) 14%, transparent);
+  pointer-events: none;
+}
+
+/* The pill is the fill now; the chip's own selected wash would double it. */
+.may-selector[data-thumb='true'] .may-selector__option[data-selected='true'] {
+  background: transparent;
+}
+
+/* Held closed: no widen, so widths stay put and the row cannot re-wrap under
+ * the measurement that turned the thumb on. */
+.may-selector[data-thumb='true'] .may-selector__option[data-selected='true'] .may-selector__check {
+  width: 0;
+  margin-inline-end: 0;
+  opacity: 0;
+}

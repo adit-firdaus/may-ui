@@ -5,7 +5,13 @@ import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
 import { clampWithRubber, draggable, projectFlick } from '../../motion/gesture'
+/* The overlay lifetime helper lives with Popover, which is where every other
+ * dismissable surface takes it from. */
+import { useExitDelay } from '../Popover/Popover'
 import './Sheet.css'
+
+/** Matches the exit transition in Sheet.css. */
+const EXIT_MS = 150
 
 export interface SheetProps {
   open: boolean
@@ -61,6 +67,7 @@ export function Sheet({
   const id = useAutoId()
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
+  const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
   const [dragging, setDragging] = useState(false)
 
   const onKeyDown = useCallback(
@@ -131,7 +138,9 @@ export function Sheet({
     })
   }, [open, isDesktop, dismissible, reducedMotion, onClose])
 
-  if (!open) return null
+  // Stays mounted for the length of its exit, so a dismissal animates instead
+  // of blinking off the screen next to an entrance that rises.
+  if (!mounted) return null
 
   const presentation = isDesktop ? 'dialog' : 'sheet'
 
@@ -139,6 +148,7 @@ export function Sheet({
     <div
       className="may-sheet__scrim"
       data-slot="scrim"
+      data-state={open ? 'open' : 'closed'}
       data-presentation={presentation}
       onMouseDown={(event) => {
         if (closeOnScrimClick && event.target === event.currentTarget) onClose()
@@ -152,6 +162,7 @@ export function Sheet({
         aria-describedby={description ? `${id}-description` : undefined}
         tabIndex={-1}
         data-slot="sheet"
+        data-state={open ? 'open' : 'closed'}
         data-presentation={presentation}
         data-size={size}
         data-dragging={dragging ? 'true' : undefined}

@@ -4,9 +4,13 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { duration, resolveCurve, spring } from '../../motion/springs'
+import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import { Badge } from '../../components/Badge'
 import type { MayTone } from '../../types'
 import './TabBar.css'
+
+/** A whisper of a puff — the glyph's own pop carries most of the press. */
+const PRESS_SCALE = 1.06
 
 export interface TabBarItem {
   /** Identity of the tab — what `onValueChange` reports. */
@@ -36,14 +40,19 @@ export interface TabBarProps extends Omit<HTMLAttributes<HTMLElement>, 'onChange
   /** Uncontrolled initial selection. Falls back to the first item. */
   defaultValue?: string
   onValueChange?: (value: string) => void
-  /** Pin the bar to the bottom edge of the viewport. @default true */
+  /** Float the bar above the bottom edge of the viewport. @default true */
   fixed?: boolean
   /** Keep the labels under the glyphs. Off is iOS's compact landscape bar. @default true */
   labels?: boolean
-  /** Draw the hairline between the bar and the content above it. @default true */
-  separator?: boolean
   /** Tint of the selected item. @default 'tint' */
   tone?: MayTone
+  /**
+   * The detached control beside the capsule — search in Phone, compose in
+   * Notes. Anything at all: an `IconButton`, a `Fab`, a `SearchField`. The bar
+   * owns where it sits and how far it sits from the capsule; you own what it
+   * is. Omit it and the capsule centres alone.
+   */
+  children?: ReactNode
 }
 
 /** How far the glyph dips before it springs back. */
@@ -72,8 +81,8 @@ export function TabBar({
   onValueChange,
   fixed = true,
   labels = true,
-  separator = true,
   tone = 'tint',
+  children,
   className,
   'aria-label': ariaLabel = 'Tabs',
   ...rest
@@ -87,6 +96,25 @@ export function TabBar({
     if (next !== current) onValueChange?.(next)
   }
 
+  /*
+   * A selection pill that SLIDES between items rather than a tint switching on
+   * and off. Press-only: a tab bar is tapped, and a drag-to-select over a row
+   * that may be `<a>` links would race their navigation. The squish is a
+   * whisper — the glyph's own WAAPI pop already answers the tap.
+   */
+  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
+    HTMLDivElement,
+    HTMLElement
+  >({
+    itemCount: items.length,
+    selectedIndex: Math.max(
+      0,
+      items.findIndex((item) => item.value === current),
+    ),
+    roundEnds: true,
+    pressScale: PRESS_SCALE,
+  })
+
   return (
     <nav
       {...rest}
@@ -94,19 +122,26 @@ export function TabBar({
       data-slot="tab-bar"
       data-tone={tone}
       data-fixed={fixed ? 'true' : undefined}
-      data-separator={separator ? 'true' : undefined}
       className={cx('may-tab-bar', className)}
     >
-      {items.map((item) => (
-        <TabBarItemView
-          key={item.value}
-          item={item}
-          selected={item.value === current}
-          labels={labels}
-          reducedMotion={reducedMotion}
-          onSelect={select}
-        />
-      ))}
+      {/* The nav is a frame, not the bar you can see: it spans the width so the
+        * capsule and the detached control can be laid out against each other,
+        * and lets pointers through everywhere it is empty. */}
+      <div ref={trackRef} className="may-tab-bar__capsule" onPointerDown={onPointerDown}>
+        <span ref={thumbRef} className="may-tab-bar__thumb" aria-hidden />
+        {items.map((item, index) => (
+          <TabBarItemView
+            key={item.value}
+            item={item}
+            selected={item.value === current}
+            labels={labels}
+            reducedMotion={reducedMotion}
+            itemRef={registerItem(index)}
+            onSelect={select}
+          />
+        ))}
+      </div>
+      {children != null && <div className="may-tab-bar__action">{children}</div>}
     </nav>
   )
 }
@@ -116,6 +151,7 @@ interface TabBarItemViewProps {
   selected: boolean
   labels: boolean
   reducedMotion: boolean
+  itemRef: (node: HTMLElement | null) => void
   onSelect: (value: string) => void
 }
 
@@ -123,7 +159,14 @@ interface TabBarItemViewProps {
  * One item. Split out because the press hook cannot be called from inside a
  * `map`, and because the glyph pop needs a ref of its own.
  */
-function TabBarItemView({ item, selected, labels, reducedMotion, onSelect }: TabBarItemViewProps) {
+function TabBarItemView({
+  item,
+  selected,
+  labels,
+  reducedMotion,
+  itemRef,
+  onSelect,
+}: TabBarItemViewProps) {
   const glyphRef = useRef<HTMLSpanElement>(null)
   const { pressProps } = usePressFeedback(item.disabled)
 
@@ -185,6 +228,7 @@ function TabBarItemView({ item, selected, labels, reducedMotion, onSelect }: Tab
 
   const shared = {
     ...pressProps,
+    ref: itemRef,
     onClick: handleClick,
     'data-slot': 'tab-bar-item',
     // A composed name only where the label is genuinely a string; a rich node

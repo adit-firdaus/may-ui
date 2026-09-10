@@ -20,13 +20,13 @@
   padding-block-start: min(16vh, var(--may-space-24));
   background: var(--may-color-scrim);
   animation: may-command-scrim-in var(--may-duration-fast) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 /*
- * Scales in past its resting size and settles: --may-spring-bouncy samples
- * above 1.16, so the panel arrives rather than appears. It also rises a little,
- * because a launcher summoned by a chord should look like it came from the
- * keyboard rather than from nowhere.
+ * Scales onto its resting size and stops there — `ease-out`, no overshoot. It
+ * also rises a little, because a launcher summoned by a chord should look like
+ * it came from the keyboard rather than from nowhere.
  */
 .may-command {
   display: flex;
@@ -40,7 +40,8 @@
   color: var(--may-color-text);
   box-shadow: var(--may-shadow-2xl);
   overflow: hidden;
-  animation: may-command-in var(--may-duration-settle) var(--may-spring-bouncy);
+  animation: may-command-in var(--may-duration-settle) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 @keyframes may-command-scrim-in {
@@ -302,4 +303,20 @@
   .may-command__scrim {
     animation: none;
   }
+}
+
+/*
+ * Leaving. There was no exit before — closing unmounted the palette outright,
+ * so a panel that sprang in over 340ms disappeared in one frame. A transition
+ * on opacity rather than an animation, and deliberately not on `transform`: an
+ * exit animation owns each property it names from its own `from` value, which
+ * would snap a palette dismissed mid-entrance back to its starting scale.
+ */
+.may-command__scrim[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.may-command[data-state='closed'] {
+  opacity: 0;
 }

@@ -1,11 +1,14 @@
 import type { HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { applyThumb, geometryFor } from '../../motion/sliding-thumb'
+import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
 import './CapsuleTabs.css'
+
+/** A gentle puff — the chips sit close, so the pill stays inside its lane. */
+const PRESS_SCALE = 1.1
 
 export interface CapsuleTab {
   /** Identity of the tab — what `onValueChange` reports. */
@@ -111,9 +114,6 @@ export function CapsuleTabs({
   const reducedMotion = useReducedMotion()
 
   const scrollerRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const thumbRef = useRef<HTMLSpanElement>(null)
-  const chipRefs = useRef<(HTMLButtonElement | null)[]>([])
   const firstPaint = useRef(true)
   const lastValue = useRef<string | null>(null)
 
@@ -122,60 +122,37 @@ export function CapsuleTabs({
     items.findIndex((item) => item.value === current),
   )
 
-  const position = useCallback((index: number, animate: boolean) => {
-    const track = trackRef.current
-    const thumb = thumbRef.current
-    const chip = chipRefs.current[index]
-    if (!track || !thumb || !chip) return
+  /*
+   * The thumb, the radius correction, the squish and the reflow-on-resize all
+   * live in `useSlidingThumb`. No `onSelect`, so it is press-only: on a strip
+   * that scrolls, a horizontal drag already belongs to the scroller, and a
+   * control that fights its own scroll container for the same gesture loses
+   * both.
+   */
+  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
+    HTMLDivElement,
+    HTMLButtonElement
+  >({
+    itemCount: items.length,
+    selectedIndex,
+    roundEnds: true,
+    pressScale: PRESS_SCALE,
+  })
 
-    // Every measurement first, then every write: interleaving them makes the
-    // browser flush layout twice for one selection change.
-    const geometry = geometryFor(track, chip)
-    const radius = thumb.offsetHeight / 2
-    if (geometry.width <= 0) return
-
-    applyThumb(thumb, geometry, { reducedMotion: !animate })
-
-    /*
-     * The thumb is 1px wide and stretched by scaleX, and a border radius is
-     * stretched with it — which is why the underline in Tabs is square and
-     * accepts it. A capsule cannot: authored as `--may-radius-full` the corner
-     * would render as a shear across half the pill. Dividing the horizontal
-     * half of the radius by the same factor the transform multiplies it by
-     * cancels the stretch exactly, leaving circular ends at every width. The
-     * browser's own clamping then handles the case where the pill is narrower
-     * than it is tall, which is the answer we wanted there anyway.
-     */
-    if (radius > 0) thumb.style.borderRadius = `${radius / geometry.width}px / ${radius}px`
-  }, [])
-
+  // The strip follows the selection: choosing a chip half off the edge scrolls
+  // it back into view. Positioning is the hook's; this is only the scroll.
   useIsomorphicLayoutEffect(() => {
-    // Never animate into place on first paint — the thumb would fly in from the
-    // strip's leading edge on every mount.
-    const settled = !firstPaint.current && !reducedMotion
-    position(selectedIndex, settled)
-
-    // Only on a real change: re-running this every render would fight a user
-    // who is mid-scroll through a long strip.
     if (lastValue.current !== current) {
-      lastValue.current = current
-      revealChip(scrollerRef.current, chipRefs.current[selectedIndex], {
+      revealChip(scrollerRef.current, trackRef.current?.querySelector<HTMLElement>(
+        '[data-slot="capsule-tab"][aria-selected="true"]',
+      ) ?? null, {
         onMount: firstPaint.current,
         reducedMotion,
       })
+      lastValue.current = current
     }
-
     firstPaint.current = false
-  }, [current, selectedIndex, position, reducedMotion, items.length])
-
-  useEffect(() => {
-    const track = trackRef.current
-    if (!track || typeof ResizeObserver === 'undefined') return
-    // A resize is not a selection: snap, never slide.
-    const observer = new ResizeObserver(() => position(selectedIndex, false))
-    observer.observe(track)
-    return () => observer.disconnect()
-  }, [position, selectedIndex])
+  }, [current, reducedMotion])
 
   const select = (next: string) => {
     if (value === undefined) setInternal(next)
@@ -216,7 +193,9 @@ export function CapsuleTabs({
     // whatever the strip is nested inside.
     event.preventDefault()
     select(items[next]!.value)
-    chipRefs.current[next]?.focus()
+    trackRef.current
+      ?.querySelectorAll<HTMLButtonElement>('[data-slot="capsule-tab"]')
+      [next]?.focus()
   }
 
   return (
@@ -234,6 +213,7 @@ export function CapsuleTabs({
         aria-label={ariaLabel}
         className="may-capsule-tabs__track"
         onKeyDown={onKeyDown}
+        onPointerDown={onPointerDown}
       >
         {/*
          * Measured against the track, which does not itself scroll — the
@@ -244,9 +224,7 @@ export function CapsuleTabs({
         {items.map((item, index) => (
           <CapsuleTabChip
             key={item.value}
-            chipRef={(node) => {
-              chipRefs.current[index] = node
-            }}
+            chipRef={registerItem(index)}
             item={item}
             selected={item.value === current}
             onSelect={select}

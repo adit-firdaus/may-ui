@@ -58,9 +58,9 @@
 
 .may-tooltip__surface[data-positioned='true'][data-state='open'] {
   opacity: 1;
-  /* A hint has already made the user wait for the delay; arriving is quick, with
-   * just enough overshoot to read as a thing rather than a repaint. */
-  animation: may-tooltip-in var(--may-duration-fast) var(--may-ease-back);
+  /* A hint has already made the user wait for the delay, so arriving is quick —
+   * and it decelerates onto its resting size rather than springing past it. */
+  animation: may-tooltip-in var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-tooltip__surface[data-state='closed'] {

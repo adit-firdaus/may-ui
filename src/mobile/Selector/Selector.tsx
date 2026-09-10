@@ -1,10 +1,16 @@
 import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
-import { useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import { IoCheckmark } from 'react-icons/io5'
 import type { MaySize } from '../../types'
 import './Selector.css'
+
+/** The pill lifts under the press, matching the chip family elsewhere. */
+const PRESS_SCALE = 1.1
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export interface SelectorOption {
   /** Primary line. */
@@ -135,6 +141,51 @@ export function Selector(props: SelectorProps) {
    * nothing selected yet the first option a user could actually pick takes it. */
   const tabStop = selectedIndex >= 0 ? selectedIndex : options.findIndex((o) => !o.disabled)
 
+  /*
+   * A sliding pill, but only where one makes sense: single-select chips that sit
+   * on ONE line. Cards are a two-dimensional grid, multi-select has several
+   * selections at once, and wrapped chips span rows — none of which a single
+   * indicator can follow. Everywhere else the fill and checkmark stay.
+   *
+   * `oneLine` is measured, not assumed, because wrapping depends on the width
+   * the group happens to get. The measurement is naturally stable: turning the
+   * thumb on hides the checkmarks (the thumb is the indicator now), which only
+   * makes the row NARROWER, so a row that fit with checks keeps fitting without
+   * them — and turning it off shows them again, so a row that wrapped stays
+   * wrapped. The gap between those two widths is the hysteresis that stops it
+   * flickering at the boundary.
+   */
+  const canThumb = variant === 'chip' && !multiple
+  const [oneLine, setOneLine] = useState(true)
+  const thumbMode = canThumb && oneLine
+
+  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
+    HTMLDivElement,
+    HTMLButtonElement
+  >({
+    itemCount: options.length,
+    selectedIndex: thumbMode ? selectedIndex : -1,
+    roundEnds: true,
+    pressScale: PRESS_SCALE,
+    enabled: thumbMode,
+  })
+
+  useIsomorphicLayoutEffect(() => {
+    if (!canThumb || typeof ResizeObserver === 'undefined') return
+    const group = trackRef.current
+    if (!group) return
+    const measure = () => {
+      const chips = buttons.current.filter(Boolean) as HTMLElement[]
+      if (chips.length < 2) return setOneLine(true)
+      const top = chips[0]!.offsetTop
+      setOneLine(chips.every((c) => c.offsetTop === top))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(group)
+    return () => ro.disconnect()
+  }, [canThumb, options.length])
+
   /**
    * Radio-group keys. Multi-select is a set of independent toggle buttons, so
    * it keeps the natural tab order instead — arrows there would move focus and
@@ -170,6 +221,7 @@ export function Selector(props: SelectorProps) {
 
   return (
     <div
+      ref={trackRef}
       role={multiple ? 'group' : 'radiogroup'}
       aria-label={props['aria-label']}
       data-slot="selector"
@@ -177,6 +229,7 @@ export function Selector(props: SelectorProps) {
       data-size={size}
       data-columns={typeof columns === 'number' ? 'fixed' : 'auto'}
       data-disabled={disabled ? 'true' : undefined}
+      data-thumb={thumbMode ? 'true' : undefined}
       className={cx('may-selector', className)}
       style={
         typeof columns === 'number'
@@ -184,7 +237,11 @@ export function Selector(props: SelectorProps) {
           : undefined
       }
       onKeyDown={onKeyDown}
+      onPointerDown={thumbMode ? onPointerDown : undefined}
     >
+      {/* The sliding pill, only in thumb mode. First child so it paints beneath
+        * the chips; the chips' own fills go transparent under `data-thumb`. */}
+      {thumbMode && <span ref={thumbRef} className="may-selector__thumb" aria-hidden />}
       {options.map((option, index) => (
         <SelectorItem
           key={option.value}
@@ -197,6 +254,7 @@ export function Selector(props: SelectorProps) {
           onSelect={() => choose(option)}
           register={(node) => {
             buttons.current[index] = node
+            registerItem(index)(node)
           }}
         />
       ))}

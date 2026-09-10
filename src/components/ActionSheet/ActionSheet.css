@@ -14,6 +14,7 @@
   inset: 0;
   display: flex;
   animation: may-action-sheet-scrim-in var(--may-duration-fast) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-action-sheet__scrim[data-presentation='sheet'] {
@@ -54,6 +55,7 @@
   gap: var(--may-space-2);
   /* iOS's own presentation timing — the curve the reference Sheet rises on. */
   animation: may-action-sheet-rise var(--may-duration-sheet-in) var(--may-ease-sheet);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 /* ----------------------------- desktop: a menu ---------------------------- */
@@ -71,8 +73,9 @@
    * reads as a dropped frame.
    */
   animation:
-    may-action-sheet-menu-in var(--may-duration-settle) var(--may-spring-bouncy),
+    may-action-sheet-menu-in var(--may-duration-settle) var(--may-ease-out),
     may-action-sheet-fade var(--may-duration-fast) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-action-sheet[data-anchored='true'] {
@@ -260,6 +263,27 @@
   .may-action-sheet__action[data-destructive='true']
   .may-action-sheet__icon {
   color: currentColor;
+}
+
+/*
+ * Leaving is a TRANSITION on opacity, not an animation — and deliberately does
+ * not touch `transform`.
+ *
+ * There was no exit at all before: `open` going false unmounted the tree, so a
+ * sheet that rose over 500ms vanished in one frame.
+ *
+ * It fades rather than sliding back down because an exit animation owns every
+ * property it names from its own `from` value: naming `transform` would snap a
+ * sheet dismissed mid-rise back to its start position before moving. Fading
+ * leaves the rise to finish undisturbed underneath.
+ */
+.may-action-sheet__scrim[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.may-action-sheet[data-state='closed'] {
+  opacity: 0;
 }
 
 @keyframes may-action-sheet-scrim-in {

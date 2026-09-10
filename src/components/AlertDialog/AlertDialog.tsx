@@ -2,9 +2,16 @@ import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent
 import { useEffect, useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
 import { Button } from '../Button'
+/* The overlay lifetime helper lives with Popover, which is where every other
+ * dismissable surface takes it from. */
+import { useExitDelay } from '../Popover/Popover'
 import './AlertDialog.css'
+
+/** Matches the exit animation in AlertDialog.css. */
+const EXIT_MS = 150
 
 export interface AlertDialogProps {
   open: boolean
@@ -57,9 +64,18 @@ export function AlertDialog({
   const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
   const isDesktop = useIsDesktop()
+  const reducedMotion = useReducedMotion()
+  const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
 
+  /*
+   * Keyed to `mounted`, not `open`. The scroll lock hands the page's scrollbar
+   * width back as body padding; releasing it the moment `open` flips would put
+   * the scrollbar back while the panel is still animating out, and the viewport
+   * narrowing under it makes the dialog's width visibly snap mid-exit. Holding
+   * the lock until the tree actually unmounts keeps the geometry still.
+   */
   useEffect(() => {
-    if (!open) return
+    if (!mounted) return
     restoreTo.current = document.activeElement as HTMLElement | null
 
     const body = document.body
@@ -81,7 +97,7 @@ export function AlertDialog({
       body.style.paddingRight = previousPadding
       restoreTo.current?.focus?.()
     }
-  }, [open, destructive])
+  }, [mounted, destructive])
 
   /**
    * Restart the nudge from zero. Setting the attribute again while the
@@ -128,12 +144,15 @@ export function AlertDialog({
     panelRef.current?.focus()
   }
 
-  if (!open) return null
+  // Stays mounted for the length of its exit, so a dismissal animates instead
+  // of blinking off the screen next to an entrance that springs.
+  if (!mounted) return null
 
   return (
     <div
       className="may-alert-dialog__scrim"
       data-slot="scrim"
+      data-state={open ? 'open' : 'closed'}
       onMouseDown={onScrimDown}
       onKeyDown={onKeyDown}
     >
@@ -145,6 +164,7 @@ export function AlertDialog({
         aria-describedby={description ? `${id}-description` : undefined}
         tabIndex={-1}
         data-slot="alert-dialog"
+        data-state={open ? 'open' : 'closed'}
         data-presentation={isDesktop ? 'desktop' : 'compact'}
         data-destructive={destructive ? 'true' : undefined}
         // Clears the flag once the shake finishes, so the next one can start it
@@ -152,7 +172,7 @@ export function AlertDialog({
         onAnimationEnd={() => panelRef.current?.removeAttribute('data-nudge')}
         className={cx('may-alert-dialog', className)}
       >
-        <div className="may-alert-dialog__content">
+        <div className="may-alert-dialog__content" data-slot="scroll-area">
           <h2 className="may-alert-dialog__title" id={`${id}-title`}>
             {title}
           </h2>

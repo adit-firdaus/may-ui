@@ -2,10 +2,7 @@ import type { HTMLAttributes, ReactNode, RefObject } from 'react'
 import { useEffect, useRef } from 'react'
 import { IoChevronBack } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
-// A value import: the back button IS a Button, so its stylesheet has to travel
-// with this one. A type-only import is erased at compile time and the bundler
-// then code-splits those rules away from a page that only renders a nav bar.
-import { Button } from '../Button/Button'
+import { usePressFeedback } from '../../hooks/usePressFeedback'
 import './NavigationBar.css'
 
 export interface NavigationBarProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
@@ -24,7 +21,12 @@ export interface NavigationBarProps extends Omit<HTMLAttributes<HTMLElement>, 't
   trailing?: ReactNode
   /** Renders the iOS back button into the leading slot. */
   onBack?: () => void
-  /** @default 'Back' */
+  /**
+   * Where back goes — "Settings", "Mailboxes". The iOS 26 chip paints no
+   * words, so this is the button's ACCESSIBLE NAME rather than its text; a
+   * non-string is ignored, since aria-label cannot hold a node.
+   * @default 'Back'
+   */
   backLabel?: ReactNode
   /**
    * The scroll container driving the collapse. Omit to listen on the window,
@@ -68,6 +70,7 @@ export function NavigationBar({
   const rootRef = useRef<HTMLElement>(null)
   /** The uncollapsed large title. Its height is the scroll distance. */
   const largeTitleRef = useRef<HTMLHeadingElement>(null)
+  const backPress = usePressFeedback()
 
   useEffect(() => {
     const root = rootRef.current
@@ -80,6 +83,7 @@ export function NavigationBar({
 
     let frame = 0
     let lastDistance = -1
+    let lastProgress = ''
     let lastScrolled: boolean | null = null
 
     const read = () => {
@@ -95,8 +99,18 @@ export function NavigationBar({
         root.style.setProperty('--may-nav-large-h', `${distance}px`)
       }
 
-      const progress = distance > 0 ? Math.min(1, Math.max(0, y / distance)) : 0
-      root.style.setProperty('--may-nav-progress', progress.toFixed(3))
+      /*
+       * Guarded like the two below it, and for the same reason: setting a custom
+       * property invalidates style for the whole subtree, so doing it every
+       * frame costs a recalc per frame — and on a bar with no large title the
+       * answer is 0.000 forever, which was 60 invalidations a second to say
+       * nothing had changed.
+       */
+      const progress = (distance > 0 ? Math.min(1, Math.max(0, y / distance)) : 0).toFixed(3)
+      if (progress !== lastProgress) {
+        lastProgress = progress
+        root.style.setProperty('--may-nav-progress', progress)
+      }
 
       // An attribute write invalidates style for the subtree, so it happens
       // only on the frame the answer actually changes.
@@ -124,21 +138,27 @@ export function NavigationBar({
     }
   }, [scrollRef, largeTitle])
 
+  /*
+   * A bare chevron in a circle, with no words in it. `backLabel` still says
+   * where back goes -- it just says it to a screen reader now instead of
+   * painting it, which is the whole shape of the iOS 26 bar.
+   *
+   * Not a `Button`: a Button is a capsule with its own inline padding, and
+   * talking one down into a 36px circle overrides more than it contributes.
+   * The visible circle stays under the touch minimum on purpose; the hit slop
+   * in the stylesheet takes the target back to a full 44px.
+   */
   const back = onBack && (
-    <Button
-      variant="plain"
-      tone="tint"
-      // The bar button is a real 44pt target, not a text link: `sm` would
-      // draw it under the minimum with nothing to make the difference up.
-      size="md"
+    <button
+      {...backPress.pressProps}
+      type="button"
       onClick={onBack}
-      leadingIcon={
-        <IoChevronBack className="may-nav-bar__back-chevron" aria-hidden focusable="false" />
-      }
-      className="may-nav-bar__back"
+      aria-label={typeof backLabel === 'string' ? backLabel : undefined}
+      data-slot="nav-bar-back"
+      className="may-nav-bar__back-chip may-pressable may-hoverable"
     >
-      {backLabel}
-    </Button>
+      <IoChevronBack className="may-nav-bar__back-chevron" aria-hidden focusable="false" />
+    </button>
   )
 
   return (

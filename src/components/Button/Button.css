@@ -14,7 +14,7 @@
   justify-content: center;
   gap: var(--may-space-2);
   border: 0;
-  border-radius: var(--may-radius-lg);
+  border-radius: var(--may-radius-full);
   font-family: inherit;
   font-size: var(--may-text-body);
   font-weight: 600;
@@ -108,26 +108,25 @@
   height: var(--may-control-h-xs);
   padding-inline: var(--may-space-3);
   font-size: var(--may-text-footnote);
-  border-radius: var(--may-radius-xs);
   gap: var(--may-space-1);
 }
 .may-button[data-size='sm'] {
   height: var(--may-control-h-sm);
   padding-inline: var(--may-space-4);
   font-size: var(--may-text-subheadline);
-  border-radius: var(--may-radius-sm);
 }
 .may-button[data-size='md'] {
   height: var(--may-control-h-md);
   padding-inline: var(--may-space-5);
-  border-radius: var(--may-radius-md);
 }
 .may-button[data-size='lg'] {
   height: var(--may-control-h-lg);
   padding-inline: var(--may-space-6);
-  border-radius: var(--may-radius-lg);
 }
 
+/* Every button is a capsule now, so `pill` is the default rather than a
+ * variant. The class is kept so the prop stays valid and any consumer style
+ * hanging off it still matches. */
 .may-button--pill { border-radius: var(--may-radius-full); }
 .may-button--full { width: 100%; }
 

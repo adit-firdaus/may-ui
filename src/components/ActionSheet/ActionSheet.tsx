@@ -8,8 +8,15 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
+/* The overlay lifetime helper lives with Popover, which is where every other
+ * dismissable surface takes it from. */
+import { useExitDelay } from '../Popover/Popover'
 import './ActionSheet.css'
+
+/** Matches the exit transition in ActionSheet.css. */
+const EXIT_MS = 150
 
 export interface ActionSheetAction {
   label: string
@@ -80,6 +87,10 @@ export function ActionSheet({
   const id = useAutoId()
   const isDesktop = useIsDesktop()
   const [placement, setPlacement] = useState<Placement | null>(null)
+  const reducedMotion = useReducedMotion()
+  // Stays mounted for the length of its exit, so a dismissal animates instead
+  // of blinking off the screen next to an entrance that rises.
+  const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
 
   const menu = isDesktop
   // Derived from the measurement rather than from the ref, so the panel is
@@ -163,13 +174,24 @@ export function ActionSheet({
       )
     }
 
+    /*
+     * A scroll inside the sheet's own list is not the anchor moving, and
+     * re-placing on it means a getBoundingClientRect per scroll event for a
+     * position that cannot have changed — a layout read on every frame of a
+     * finger drag. ContextMenu guards its own scrollport the same way.
+     */
+    const onScroll = (event: Event) => {
+      if (panel.contains(event.target as Node)) return
+      place()
+    }
+
     place()
     window.addEventListener('resize', place)
     // Capture, so an anchor inside a scrolling pane is tracked too.
-    window.addEventListener('scroll', place, true)
+    window.addEventListener('scroll', onScroll, true)
     return () => {
       window.removeEventListener('resize', place)
-      window.removeEventListener('scroll', place, true)
+      window.removeEventListener('scroll', onScroll, true)
     }
   }, [open, menu, anchorRef, actions.length])
 
@@ -225,7 +247,7 @@ export function ActionSheet({
     if (event.target === event.currentTarget) onClose()
   }
 
-  if (!open) return null
+  if (!mounted) return null
 
   const presentation = menu ? 'menu' : 'sheet'
   const labelledBy = title ? `${id}-title` : undefined
@@ -234,6 +256,7 @@ export function ActionSheet({
     <div
       className="may-action-sheet__scrim"
       data-slot="scrim"
+      data-state={open ? 'open' : 'closed'}
       data-presentation={presentation}
       onMouseDown={onScrimDown}
       onKeyDown={onKeyDown}
@@ -246,6 +269,7 @@ export function ActionSheet({
         aria-describedby={description ? `${id}-description` : undefined}
         tabIndex={-1}
         data-slot="action-sheet"
+        data-state={open ? 'open' : 'closed'}
         data-presentation={presentation}
         data-anchored={anchored ? 'true' : undefined}
         data-side={placement?.side}

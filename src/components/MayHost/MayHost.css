@@ -14,7 +14,9 @@
   z-index: var(--may-z-toast);
   display: flex;
   flex-direction: column;
-  gap: var(--may-space-2);
+  /* Named, because a dismissing slot has to cancel exactly this much. */
+  --may-toast-gap: var(--may-space-2);
+  gap: var(--may-toast-gap);
   /*
    * The viewport spans the edge and only aligns its children; the toasts carry
    * their own width. Pointers pass straight through the gaps, so a stack in the
@@ -45,3 +47,70 @@
 .may-toast-viewport[data-align='start'] { align-items: flex-start; }
 .may-toast-viewport[data-align='center'] { align-items: center; }
 .may-toast-viewport[data-align='end'] { align-items: flex-end; }
+
+/* --------------------------------- the slot -------------------------------- */
+
+/*
+ * The toast animates itself -- it scales, fades and swipes. What it cannot do
+ * is animate the space it occupies, because that space belongs to the viewport
+ * around it. So each toast sits in a slot whose grid track carries the height,
+ * exactly as an Alert does:
+ *
+ *   .may-toast-slot          the height track, 0fr -> 1fr
+ *     .may-toast-slot__inner what the track resizes; min-height:0 lets it
+ *     .may-toast             the capsule, always at its natural height
+ *
+ * `min-height: 0` on the inner is the whole trick: the toast sets a
+ * `min-height` of its own for the touch target, and a grid item cannot shrink
+ * below its content without it.
+ *
+ * Nothing clips. The capsule overflows the slot and stays whole while the room
+ * around it opens and closes -- and it has to, because a toast carries a shadow
+ * and can be swiped sideways past the slot's edges.
+ */
+.may-toast-slot {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: may-toast-slot-in var(--may-duration-settle) var(--may-ease-out) both;
+}
+
+.may-toast-slot__inner {
+  min-height: 0;
+}
+
+/*
+ * Timed to the toast's own exit (`--may-duration-sheet-out`), so the gap has
+ * finished closing at the moment the record leaves the store. `forwards` holds
+ * it shut across the frame between the two.
+ */
+.may-toast-slot[data-closing='true'] {
+  animation: may-toast-slot-out var(--may-duration-sheet-out) var(--may-ease-out) forwards;
+}
+
+/*
+ * The negative margin cancels the viewport's own `gap`. A flex gap reserves
+ * space for an item the instant it mounts and hands it back the instant it
+ * unmounts, and CSS gives no way to animate one item's share of it -- so the
+ * slot collapses its own gap in step with its height, at both ends.
+ */
+@keyframes may-toast-slot-in {
+  from {
+    grid-template-rows: 0fr;
+    margin-block-end: calc(-1 * var(--may-toast-gap, 0px));
+  }
+  to {
+    grid-template-rows: 1fr;
+    margin-block-end: 0;
+  }
+}
+
+@keyframes may-toast-slot-out {
+  from {
+    grid-template-rows: 1fr;
+    margin-block-end: 0;
+  }
+  to {
+    grid-template-rows: 0fr;
+    margin-block-end: calc(-1 * var(--may-toast-gap, 0px));
+  }
+}

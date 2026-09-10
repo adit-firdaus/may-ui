@@ -4,8 +4,15 @@ import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
+/* The overlay lifetime helper lives with Popover, which is where every other
+ * dismissable surface takes it from. */
+import { useExitDelay } from '../Popover/Popover'
 import './Modal.css'
+
+/** Matches the exit animation in Modal.css. */
+const EXIT_MS = 150
 
 export interface ModalProps {
   open: boolean
@@ -61,10 +68,19 @@ export function Modal({
   const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
   const isDesktop = useIsDesktop()
+  const reducedMotion = useReducedMotion()
+  const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
   const { pressProps } = usePressFeedback()
 
+  /*
+   * Keyed to `mounted`, not `open`. The scroll lock hands the page's scrollbar
+   * width back as body padding; releasing it the moment `open` flips would put
+   * the scrollbar back while the panel is still animating out, and the viewport
+   * narrowing under it makes the dialog's width visibly snap mid-exit. Holding
+   * the lock until the tree actually unmounts keeps the geometry still.
+   */
   useEffect(() => {
-    if (!open) return
+    if (!mounted) return
     const panel = panelRef.current
     restoreTo.current = document.activeElement as HTMLElement | null
 
@@ -90,7 +106,7 @@ export function Modal({
       body.style.paddingRight = previousPadding
       restoreTo.current?.focus?.()
     }
-  }, [open])
+  }, [mounted])
 
   /*
    * Keys are handled on the scrim rather than on `document`. Both overlays in a
@@ -131,12 +147,15 @@ export function Modal({
     panelRef.current?.focus()
   }
 
-  if (!open) return null
+  // Stays mounted for the length of its exit, so a dismissal animates instead
+  // of blinking off the screen next to an entrance that springs.
+  if (!mounted) return null
 
   return (
     <div
       className="may-modal__scrim"
       data-slot="scrim"
+      data-state={open ? 'open' : 'closed'}
       onMouseDown={onScrimDown}
       onKeyDown={onKeyDown}
     >
@@ -148,6 +167,7 @@ export function Modal({
         aria-describedby={description ? `${id}-description` : undefined}
         tabIndex={-1}
         data-slot="modal"
+        data-state={open ? 'open' : 'closed'}
         data-size={size}
         data-presentation={isDesktop ? 'desktop' : 'compact'}
         data-closable={closeButton ? 'true' : undefined}

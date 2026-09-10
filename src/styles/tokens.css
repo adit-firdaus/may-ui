@@ -245,6 +245,132 @@
   --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));
 }
 
+/*
+ * Explicit opt-in, the other way.
+ *
+ * This scope has to exist for the same reason the dark one does, and its
+ * absence was a real bug: MayProvider stamps data-may-theme on its own div, not
+ * on the document element, so on a dark OS the media query below matches :root
+ * (which never carries the attribute) and hands the whole page dark tokens. A
+ * div asking for light then had nothing to restore them with, and light mode
+ * simply could not be pinned. Re-declaring the full palette here is what makes
+ * the toggle work in both directions.
+ */
+[data-may-theme='light'] {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --may-bg-grouped: #f2f2f7;
+  --may-bg-elevated: #ffffff;
+  --may-bg-nested: #f2f2f7;
+  --may-bg-base: #ffffff;
+  /* Labels */
+  --may-label: #000000;
+  --may-label-secondary: rgba(60, 60, 67, 0.6);
+  --may-label-tertiary: rgba(60, 60, 67, 0.3);
+  --may-label-quaternary: rgba(60, 60, 67, 0.18);
+  /* Fills. These replace borders on every control. */
+  --may-fill-primary: rgba(120, 120, 128, 0.2);
+  --may-fill-secondary: rgba(120, 120, 128, 0.16);
+  --may-fill-tertiary: rgba(118, 118, 128, 0.12);
+  --may-fill-quaternary: rgba(116, 116, 128, 0.08);
+  /* Separators */
+  --may-separator: rgba(60, 60, 67, 0.29);
+  --may-separator-opaque: #c6c6c8;
+  /* System colours */
+  --may-blue: #007aff;
+  --may-green: #34c759;
+  --may-indigo: #5856d6;
+  --may-orange: #ff9500;
+  --may-pink: #ff2d55;
+  --may-purple: #af52de;
+  --may-red: #ff3b30;
+  --may-teal: #30b0c7;
+  --may-yellow: #ffcc00;
+  --may-mint: #00c7be;
+  --may-cyan: #32ade6;
+  --may-brown: #a2845e;
+  /* Gray ramp */
+  --may-gray: #8e8e93;
+  --may-gray-2: #aeaeb2;
+  --may-gray-3: #c7c7cc;
+  --may-gray-4: #d1d1d6;
+  --may-gray-5: #e5e5ea;
+  --may-gray-6: #f2f2f7;
+  /* Overlay + chrome */
+  --may-scrim: rgba(0, 0, 0, 0.4);
+  --may-scrollbar-thumb: rgba(60, 60, 67, 0.28);
+  --may-scrollbar-thumb-hover: rgba(60, 60, 67, 0.42);
+  --may-on-color: #ffffff;
+  --may-shadow-color: 0, 0, 0;
+  --may-shadow-a1: 0.03;
+  --may-shadow-a2: 0.04;
+  --may-shadow-a3: 0.06;
+  --may-shadow-a4: 0.08;
+  --may-shadow-a5: 0.12;
+  --may-shadow-a6: 0.16;
+  --may-shadow-a7: 0.2;
+
+  /* ---------------------------------------------------------------- *
+   * Semantic colour and elevation — the tier components consume.
+   *
+   * Declared in EVERY theme scope on purpose. These are aliases, and an alias
+   * is substituted where it is declared: if they lived only on :root they
+   * would resolve against the light primitives and a scoped dark subtree
+   * would inherit light values while its own primitives sat unused.
+   * ---------------------------------------------------------------- */
+
+  --may-color-bg: var(--may-bg-grouped);
+  --may-color-surface: var(--may-bg-elevated);
+  --may-color-surface-nested: var(--may-bg-nested);
+
+  --may-color-text: var(--may-label);
+  --may-color-text-secondary: var(--may-label-secondary);
+  --may-color-text-tertiary: var(--may-label-tertiary);
+  --may-color-text-quaternary: var(--may-label-quaternary);
+
+  --may-color-fill: var(--may-fill-primary);
+  --may-color-fill-secondary: var(--may-fill-secondary);
+  --may-color-fill-tertiary: var(--may-fill-tertiary);
+  --may-color-fill-quaternary: var(--may-fill-quaternary);
+
+  --may-color-separator: var(--may-separator);
+  --may-color-separator-opaque: var(--may-separator-opaque);
+
+  /* Brand as text vs brand as fill — see the header note. */
+  --may-color-tint: var(--may-blue);
+  --may-color-primary: var(--may-blue);
+  --may-color-on-primary: var(--may-on-color);
+
+  /* Destructive, likewise split. */
+  --may-color-danger: var(--may-red);
+  --may-color-destructive: var(--may-red);
+  --may-color-on-destructive: var(--may-on-color);
+
+  --may-color-success: var(--may-green);
+  --may-color-warning: var(--may-orange);
+  --may-color-info: var(--may-blue);
+
+  /* One highlight rule for every selectable row in the system. */
+  --may-color-highlight: var(--may-fill-quaternary);
+  --may-color-highlight-strong: var(--may-fill-tertiary);
+
+  --may-color-scrim: var(--may-scrim);
+  --may-color-ring: var(--may-color-tint);
+
+  /* Elevation. No hairline rings: surfaces separate by value, and only
+   * genuinely floating layers cast a shadow at all. The dark scope redefines
+   * every alpha, so these must re-resolve with it. */
+  --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));
+  --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+  --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));
+  --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));
+  --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));
+  --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));
+  --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));
+  --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));
+}
+
 /* The OS setting, unless a light theme is pinned. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-may-theme='light']) {
@@ -501,6 +627,22 @@
   --may-inset-bottom: env(safe-area-inset-bottom, 0px);
   --may-inset-left: env(safe-area-inset-left, 0px);
   --may-inset-right: env(safe-area-inset-right, 0px);
+
+  /* The room the floating bars occupy, for a scroller to pad itself with. Both
+   * bars overlay their content rather than sitting in flow, so the space they
+   * take is not something layout can work out on its own. Constants rather than
+   * measurements: they resolve before the first frame, need no JavaScript, and
+   * exist whether or not a bar is on screen -- a view with no tab bar simply
+   * never mentions --may-tab-bar-space. */
+  /* How much of a stack's own gap a dismissing Alert takes with it. Declared
+   * here at zero so a lone alert behaves exactly as it always did; a stack sets
+   * it on the container, and an override on a nearer ancestor beats this. */
+  --may-alert-gap: 0px;
+
+  --may-nav-bar-space: calc(var(--may-navbar-h) + var(--may-inset-top));
+  --may-tab-bar-space: calc(
+    var(--may-tabbar-h) + var(--may-inset-bottom) + var(--may-space-4) * 2
+  );
 
   /* iOS app-icon gradients, for IconTile. */
   --may-grad-blue: linear-gradient(180deg, #64b5ff 0%, #007aff 52%, #005ecb 100%);

@@ -1,4 +1,10 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
+import type {
+  ButtonHTMLAttributes,
+  HTMLAttributes,
+  KeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
+} from 'react'
 import {
   createContext,
   useCallback,
@@ -13,7 +19,7 @@ import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { SETTLE_EASE, SETTLE_MS, applyThumb, geometryFor } from '../../motion/sliding-thumb'
+import { applyThumb, geometryFor } from '../../motion/sliding-thumb'
 import type { MaySize } from '../../types'
 import './Tabs.css'
 
@@ -36,6 +42,7 @@ interface TabsContextValue {
   value: string
   select: (value: string) => void
   orientation: TabsOrientation
+  variant: TabsVariant
   baseId: string
 }
 
@@ -52,36 +59,11 @@ const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : us
 const tabNodes = (root: HTMLElement | null): HTMLButtonElement[] =>
   Array.from(root?.querySelectorAll<HTMLButtonElement>('[data-slot="tab"]') ?? [])
 
-interface VerticalGeometry {
-  /** Offset from the track's block-start edge, in px. */
-  y: number
-  height: number
-}
-
 /**
- * The block-axis mirrors of `geometryFor` / `applyThumb`.
- *
- * sliding-thumb.ts is inline-axis only — every consumer in the system so far
- * (SegmentedControl, the tab bar) slides left to right. Rather than widen a
- * shared primitive for one caller, the mirror lives here and borrows that
- * module's constants, so the two can never settle on different curves.
+ * How much the pill puffs while its own tab is pressed. Small — a tab strip's
+ * pill sits closer to its neighbours than a segmented control's does.
  */
-function verticalGeometryFor(track: HTMLElement, tab: HTMLElement): VerticalGeometry {
-  const t = track.getBoundingClientRect()
-  const s = tab.getBoundingClientRect()
-  return { y: s.top - t.top, height: s.height }
-}
-
-function applyThumbVertical(
-  thumb: HTMLElement,
-  { y, height }: VerticalGeometry,
-  reducedMotion: boolean,
-): void {
-  thumb.style.transition = reducedMotion
-    ? 'transform 1ms linear'
-    : `transform ${SETTLE_MS}ms ${SETTLE_EASE}`
-  thumb.style.transform = `translateY(${y}px) scaleY(${height})`
-}
+const PRESS_SCALE = 1.08
 
 export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   children?: ReactNode
@@ -133,8 +115,8 @@ export function Tabs({
   )
 
   const context = useMemo<TabsContextValue>(
-    () => ({ value: current, select, orientation, baseId }),
-    [current, select, orientation, baseId],
+    () => ({ value: current, select, orientation, variant, baseId }),
+    [current, select, orientation, variant, baseId],
   )
 
   return (
@@ -177,13 +159,17 @@ export function TabList({
   'aria-labelledby': ariaLabelledBy,
   ...rest
 }: TabListProps) {
-  const { value, select, orientation } = useTabsContext('TabList')
+  const { value, select, orientation, variant } = useTabsContext('TabList')
   const reducedMotion = useReducedMotion()
+  const axis = orientation === 'vertical' ? 'block' : 'inline'
 
   const trackRef = useRef<HTMLDivElement>(null)
   const thumbRef = useRef<HTMLSpanElement>(null)
   const firstPaint = useRef(true)
   const lastValue = useRef<string | null>(null)
+  /** True while the selected tab is held, so the pill puffs. Never state: a
+   *  render per press would be wasted, and the layout effect reads it live. */
+  const pressed = useRef(false)
   /** The fallback we have already asked for, so a controlled parent that
    * ignores it cannot spin us in a render loop. */
   const requested = useRef<string | null>(null)
@@ -199,14 +185,59 @@ export function TabList({
         return
       }
       thumb.style.opacity = ''
-      if (orientation === 'vertical') {
-        applyThumbVertical(thumb, verticalGeometryFor(track, active), !animate)
-      } else {
-        applyThumb(thumb, geometryFor(track, active), { reducedMotion: !animate })
+      const geometry = geometryFor(track, active, axis)
+
+      /*
+       * A pill is a capsule, and a capsule laid out at 1px and stretched carries
+       * its radius stretched too — a full radius would shear across half of it.
+       * Dividing the along-axis half-radius by the scale cancels that exactly,
+       * at every width; the underline is a square bar and wants none of it.
+       */
+      if (variant === 'pill' && geometry.width > 0) {
+        const radius = (axis === 'block' ? thumb.offsetWidth : thumb.offsetHeight) / 2
+        if (radius > 0) {
+          const shrunk = `${radius / geometry.width}px`
+          thumb.style.borderRadius =
+            axis === 'block' ? `${radius}px / ${shrunk}` : `${shrunk} / ${radius}px`
+        }
       }
+
+      applyThumb(thumb, geometry, {
+        axis,
+        // The underline is a thin bar; a puff on it reads as noise, so only the
+        // pill takes the press scale.
+        pressed: pressed.current && variant === 'pill',
+        pressScale: PRESS_SCALE,
+        reducedMotion: !animate,
+      })
     },
-    [orientation],
+    [axis, variant],
   )
+
+  /*
+   * The squish. Pressing the SELECTED tab puffs the pill and holds it until
+   * release; pressing any other tab is a plain selection, and those tabs carry
+   * their own `.may-pressable` feedback. No pointer tracking and no
+   * `touch-action` claim — the strip scrolls, and a scroll fires pointercancel,
+   * which lets the puff go.
+   */
+  const onTrackPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    const tab = (event.target as HTMLElement | null)?.closest<HTMLButtonElement>('[data-slot="tab"]')
+    if (!tab || tab.getAttribute('aria-selected') !== 'true' || tab.disabled) return
+    pressed.current = true
+    positionIndicator(true)
+    const ctrl = new AbortController()
+    const release = () => {
+      if (!pressed.current) return
+      pressed.current = false
+      positionIndicator(true)
+      ctrl.abort()
+    }
+    window.addEventListener('pointerup', release, { signal: ctrl.signal })
+    window.addEventListener('pointercancel', release, { signal: ctrl.signal })
+    window.addEventListener('lostpointercapture', release, { signal: ctrl.signal })
+  }
 
   // No dependency array: the indicator has to re-measure whenever the tabs
   // themselves change, and there is no prop that reliably announces that.
@@ -316,6 +347,7 @@ export function TabList({
         aria-orientation={orientation}
         className={cx('may-tabs__track', fullWidth && 'may-tabs__track--full')}
         onKeyDown={handleKeyDown}
+        onPointerDown={onTrackPointerDown}
       >
         <span ref={thumbRef} className="may-tabs__indicator" aria-hidden />
         {children}

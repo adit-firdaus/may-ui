@@ -1,7 +1,8 @@
 /*
  * The whole disclosure is two properties: a grid track that goes 0fr → 1fr,
- * and a chevron that rotates. Both ride the SAME spring, so the panel and its
- * indicator are visibly one gesture rather than two coincidental animations.
+ * and a chevron that rotates. They run on the same 340ms but DIFFERENT curves:
+ * the panel eases out, while the chevron keeps its spring and overshoots. They
+ * start and finish together; only the shape of the travel between differs.
  *
  * Every open-state rule uses the child combinator. A descendant combinator
  * would force a nested collapsible's panel open whenever its ancestor was.
@@ -84,7 +85,7 @@
   grid-template-rows: 0fr;
   visibility: hidden;
   transition:
-    grid-template-rows var(--may-duration-settle) var(--may-spring-bouncy),
+    grid-template-rows var(--may-duration-settle) var(--may-ease-out),
     visibility 0s linear var(--may-duration-settle);
 }
 
@@ -92,14 +93,16 @@
   grid-template-rows: 1fr;
   visibility: visible;
   transition:
-    grid-template-rows var(--may-duration-settle) var(--may-spring-bouncy),
+    grid-template-rows var(--may-duration-settle) var(--may-ease-out),
     visibility 0s;
 }
 
 /*
  * An `fr` track in an auto-height container resolves to the content's own
- * height, so the spring's overshoot past 1fr is clamped rather than opening a
- * gap under the content — which is what makes a bouncy curve safe here.
+ * height, so any overshoot past 1fr is clamped by layout rather than opening a
+ * gap under the content. `ease-out` never overshoots, so this is currently
+ * belt-and-braces — but it is what keeps a springy curve safe here if the
+ * panel is ever switched back to one.
  */
 .may-collapsible__clip {
   overflow: hidden;

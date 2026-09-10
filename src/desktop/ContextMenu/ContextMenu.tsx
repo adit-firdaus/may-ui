@@ -5,13 +5,17 @@ import type {
   ReactNode,
   RefObject,
 } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { IoCheckmark, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { Kbd } from '../../components/Kbd/Kbd'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
 import './ContextMenu.css'
+
+/** Matches the exit transition in ContextMenu.css. */
+const EXIT_MS = 150
 
 export interface ContextMenuAction {
   type?: 'item'
@@ -290,6 +294,8 @@ interface MenuPanelProps {
   size: 'sm' | 'md'
   /** 0 for the root menu; every submenu is 1 or deeper. */
   level: number
+  /** True while the menu is playing its exit and waiting to be unmounted. */
+  closing?: boolean
   autoFocus: boolean
   label?: string
   panelRef?: RefObject<HTMLDivElement>
@@ -314,6 +320,7 @@ function MenuPanel({
   placement,
   size,
   level,
+  closing,
   autoFocus,
   label,
   panelRef,
@@ -472,8 +479,13 @@ function MenuPanel({
       aria-orientation="vertical"
       tabIndex={-1}
       data-slot="menu"
+      /* The panel is its own scroller, so it takes the system's scroll-area
+       * styling — a long menu is the common case, not the exception. */
+      data-scroll-area="true"
+      data-scroll-hint="true"
       data-size={size}
       data-level={level}
+      data-state={closing ? 'closed' : 'open'}
       data-placed={resolved ? 'true' : undefined}
       onKeyDown={onKeyDown}
       className="may-menu"
@@ -567,11 +579,35 @@ export function ContextMenu({
   ...rest
 }: ContextMenuProps) {
   const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null)
+  /*
+   * Closing is its own state because the anchor IS the mount: dropping it the
+   * moment the menu is dismissed took the panel with it, so a menu that sprang
+   * open over 340ms vanished in a frame. The anchor is held for the length of
+   * the exit and only then released.
+   */
+  const [closing, setClosing] = useState(false)
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const restoreTo = useRef<HTMLElement | null>(null)
+  const reducedMotion = useReducedMotion()
+
+  const dismiss = useCallback(() => {
+    setClosing(true)
+    if (exitTimer.current) clearTimeout(exitTimer.current)
+    exitTimer.current = setTimeout(
+      () => {
+        setAnchor(null)
+        setClosing(false)
+      },
+      reducedMotion ? 0 : EXIT_MS,
+    )
+  }, [reducedMotion])
+
+  // A menu still on its way out must not outlive the component that owns it.
+  useEffect(() => () => { if (exitTimer.current) clearTimeout(exitTimer.current) }, [])
 
   const close = () => {
-    setAnchor(null)
+    dismiss()
     onOpenChange?.(false)
     restoreTo.current?.focus?.()
   }
@@ -582,6 +618,10 @@ export function ContextMenu({
     if (disabled || event.defaultPrevented) return
     event.preventDefault()
     restoreTo.current = document.activeElement as HTMLElement | null
+    // Re-opening cancels a pending exit: the new menu is not the old one
+    // finishing its own dismissal.
+    if (exitTimer.current) clearTimeout(exitTimer.current)
+    setClosing(false)
     setAnchor({ x: event.clientX, y: event.clientY })
     onOpenChange?.(true)
   }
@@ -595,7 +635,7 @@ export function ContextMenu({
     // underneath it starts reacting to the press.
     const onPointerDown = (event: PointerEvent) => {
       if (!inside(event.target)) {
-        setAnchor(null)
+        dismiss()
         onOpenChange?.(false)
       }
     }
@@ -651,6 +691,7 @@ export function ContextMenu({
           // remounts it so it measures, flips and springs from the new corner.
           key={`${anchor.x},${anchor.y}`}
           entries={items}
+          closing={closing}
           placement={{ kind: 'point', x: anchor.x, y: anchor.y }}
           size={size}
           level={0}

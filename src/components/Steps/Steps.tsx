@@ -2,8 +2,12 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { IoAlert, IoCheckmark } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
 import './Steps.css'
+
+/** The marker disc lifts a little under the press. Subtle — it wears a halo. */
+const PRESS_SCALE = 1.12
 
 /**
  * `error` is not derived from `current` — it is the only status a caller has
@@ -57,17 +61,18 @@ interface StepProps {
   status: StepStatus
   last: boolean
   clickable: boolean
+  markerRef: (node: HTMLSpanElement | null) => void
   onSelect?: (index: number) => void
 }
 
-function Step({ item, index, status, last, clickable, onSelect }: StepProps) {
+function Step({ item, index, status, last, clickable, markerRef, onSelect }: StepProps) {
   // Going forward is the stepper's job, not the user's: only ground already
   // covered can be pressed.
   const interactive = clickable && status !== 'upcoming'
   const { pressProps } = usePressFeedback(!interactive)
 
   const marker = (
-    <span className="may-steps__marker" aria-hidden>
+    <span ref={markerRef} className="may-steps__marker" aria-hidden>
       {item.icon ??
         (status === 'complete' ? (
           <IoCheckmark className="may-steps__check" aria-hidden focusable="false" />
@@ -138,23 +143,52 @@ export function Steps({
   'aria-label': ariaLabel = 'Progress',
   ...rest
 }: StepsProps) {
+  const statusAt = (index: number): StepStatus =>
+    items[index]?.status ??
+    (index < current ? 'complete' : index === current ? 'current' : 'upcoming')
+
+  /*
+   * A filled disc that SLIDES to the current step instead of one marker's fill
+   * switching off as another's switches on. Press-only: tapping a finished step
+   * is what moves the selection (the step's own button owns that click), and
+   * the thumb follows — a stepper is walked, not scrubbed, and a live drag would
+   * have to pass the solid disc through the intermediate markers' own fills.
+   * Inert unless `clickable`, so a read-only progress display is untouched.
+   */
+  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
+    HTMLOListElement,
+    HTMLSpanElement
+  >({
+    axis: orientation === 'vertical' ? 'block' : 'inline',
+    itemCount: items.length,
+    selectedIndex: current,
+    roundEnds: true,
+    pressScale: PRESS_SCALE,
+    enabled: clickable,
+  })
+
   return (
     <ol
       {...rest}
+      ref={trackRef}
       aria-label={ariaLabel}
       data-slot="steps"
       data-orientation={orientation}
       data-size={size}
+      data-clickable={clickable ? 'true' : undefined}
       className={cx('may-steps', className)}
+      onPointerDown={clickable ? onPointerDown : undefined}
     >
+      {clickable && <span ref={thumbRef} className="may-steps__thumb" aria-hidden />}
       {items.map((item, index) => (
         <Step
           key={index}
           item={item}
           index={index}
-          status={item.status ?? (index < current ? 'complete' : index === current ? 'current' : 'upcoming')}
+          status={statusAt(index)}
           last={index === items.length - 1}
           clickable={clickable}
+          markerRef={registerItem(index)}
           onSelect={onStepChange}
         />
       ))}

@@ -5,16 +5,94 @@
  */
 
 .may-segmented {
+  /*
+   * Fallbacks for the two variables `useSlidingThumb` writes on this track once
+   * it is live: `--may-thumb-overdrag` is the signed rubber-banded distance past
+   * an end, and `--may-thumb-settle` is the thumb's own settle duration. Both
+   * are declared here so the first frame — before the hook's write lands — and
+   * the token audit both have a value.
+   */
+  --may-thumb-overdrag: 0px;
+  --may-thumb-settle: var(--may-duration-fast);
   position: relative;
   display: inline-flex;
   align-items: stretch;
   padding: 2px;
-  border-radius: var(--may-radius-md);
-  background: var(--may-color-fill-tertiary);
+  border-radius: var(--may-radius-full);
   isolation: isolate;
+  /* `touch-action: none` lives in base.css, next to the shared rule that would
+   * otherwise out-specify it. The control owns its horizontal axis. */
+  /*
+   * A drag crosses the labels, and without this it starts selecting their text:
+   * the selection fights the gesture and leaves blue highlight behind. Chrome
+   * is furniture, not a document. Same stance as Toast's swipe.
+   */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/*
+ * The track's fill, and it squeezes under the press the way iOS's does.
+ *
+ * It is a PSEUDO-ELEMENT rather than the track's own background, and that is
+ * load-bearing: the gesture measures segment rects to decide what the pointer
+ * is over, and a transform on the track itself would scale those rects out
+ * from under the hit test -- the thumb would land a few pixels off its own
+ * finger, worst at the ends. A pseudo-element is never measured, so the fill
+ * can move while the geometry stays perfectly still.
+ *
+ * `inset` rather than `scale` because the squeeze has to read as the same few
+ * pixels whatever the track is: a uniform scale on a 300x32 control pulls the
+ * ends in by several pixels and the edges by a fraction of one, which reads as
+ * the track being pinched rather than pressed.
+ */
+.may-segmented::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Behind the thumb and the labels, but inside the track's own stacking
+   * context -- `isolation: isolate` above is what keeps this from falling
+   * through to whatever the control is sitting on. */
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--may-color-fill-tertiary);
+  /*
+   * The fill slides a QUARTER of the thumb's overdrag: whatever it travels it
+   * uncovers at the end it is leaving, and past roughly a sixth of the thumb's
+   * give that bare strip is more conspicuous than the motion it sells. Signed —
+   * negative past the leading end, positive past the trailing — and zero in
+   * every state except an overdrag.
+   */
+  transform: translateX(calc(var(--may-thumb-overdrag) * 0.25));
+  transition:
+    inset var(--may-thumb-settle) var(--may-ease-out),
+    transform var(--may-thumb-settle) var(--may-ease-out);
+}
+
+/*
+ * Held. The same 2px the track pads by, so at full squeeze the fill meets the
+ * thumb's groove exactly and the thumb's own puff overhangs it.
+ */
+.may-segmented[data-dragging='true']::before {
+  inset: 2px;
+}
+
+/*
+ * Once the finger is actually moving, the fill tracks it instead of easing
+ * toward it -- the same switch the thumb makes, on the same 90ms linear
+ * timing, so the two lag by the same amount and stay stuck together. Easing
+ * each frame toward a target that moves every frame is what turns a shift into
+ * rubbery lag.
+ */
+.may-segmented[data-following='true']::before {
+  transition:
+    inset var(--may-duration-follow) linear,
+    transform var(--may-duration-follow) linear;
 }
 
 .may-segmented--full { display: flex; width: 100%; }
+.may-segmented.may-segmented--full .may-segmented__segment { flex: 1 1 0; }
 
 .may-segmented__thumb {
   position: absolute;
@@ -23,23 +101,56 @@
   width: 1px;
   z-index: 0;
   transform-origin: 0 50%;
-  border-radius: calc(var(--may-radius-md) - 2px);
-  background: var(--may-color-surface);
-  box-shadow: var(--may-shadow-sm);
+  /* Authored value is a fallback only: `position()` overwrites this every time
+   * it moves, with the horizontal half divided by the scale. See the comment
+   * there -- a plain radius on a scaleX'd 1px box renders as a shear. */
+  border-radius: var(--may-radius-full);
+  /*
+   * The brand as a FILL, not as a surface. --may-color-primary is the fill half
+   * of the pair; the selected label below takes --may-color-on-primary, which
+   * is the only colour guaranteed to carry on top of it.
+   */
+  background: var(--may-color-primary);
+  /* The lightest rung there is. The thumb sits ON the track rather than over
+   * the page, so anything heavier reads as a second surface. */
+  box-shadow: var(--may-shadow-2xs);
+}
+
+/*
+ * Held. The fill stays solid -- ss-ui dims its thumb to 75% here and it was
+ * matched for a while, but a fill that fades while you hold it reads as the
+ * control losing confidence. The puff already says it is being held.
+ */
+.may-segmented[data-dragging='true'] .may-segmented__thumb {
+  box-shadow: var(--may-shadow-xs);
   pointer-events: none;
 }
 
-.may-segmented__segment {
+/*
+ * Scoped under the track for SPECIFICITY, not for tidiness. base.css neutralises
+ * the UA button chrome with `.may-root button { color: inherit }`, which at
+ * (0,1,1) out-specifies a lone class -- so every unselected label inherited the
+ * root's text colour and rendered black instead of the muted grey it asks for
+ * here. The drag rules below already carried enough weight to win; this is the
+ * resting state catching up with them.
+ */
+.may-segmented .may-segmented__segment {
   position: relative;
   z-index: 1;
-  flex: 1;
+  /*
+   * Sized by its own label, not by an equal share: "Day" and "Month" are not
+   * the same word and a track that pretends they are wastes the short one's
+   * room. `--full` puts the equal share back, because a control told to span
+   * its container has to actually span it.
+   */
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 0;
   padding-inline: var(--may-space-4);
   border: 0;
-  border-radius: calc(var(--may-radius-md) - 2px);
+  border-radius: var(--may-radius-full);
   background: transparent;
   color: var(--may-color-text-secondary);
   font: inherit;
@@ -51,8 +162,22 @@
     font-weight var(--may-duration-fast) var(--may-ease-out);
 }
 
+/*
+ * While a gesture owns the thumb the colours follow the THUMB, not the
+ * selection: the label under it takes the fill's colour and the still-selected
+ * one lets go of it. Selection itself does not move until you let go, so
+ * without this the white label would sit somewhere the thumb no longer is.
+ */
+.may-segmented[data-dragging='true'] .may-segmented__segment[aria-selected='true'] {
+  color: var(--may-color-text-secondary);
+}
+
+.may-segmented[data-dragging='true'] .may-segmented__segment[data-hit='true'] {
+  color: var(--may-color-on-primary);
+}
+
 .may-segmented__segment[aria-selected='true'] {
-  color: var(--may-color-text);
+  color: var(--may-color-on-primary);
   font-weight: 600;
 }
 

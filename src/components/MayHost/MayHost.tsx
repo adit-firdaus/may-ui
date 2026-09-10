@@ -67,6 +67,9 @@ export function MayHost({
   // decides which end of itself is "newest" from the edge it is pinned to.
   const groups = new Map<ToastPosition, ToastRecord[]>()
   for (const record of toasts) {
+    // Queued behind the limit: it has no place on screen yet, and rendering it
+    // would start its duration counting down before anyone could read it.
+    if (record.pending) continue
     const at = record.position ?? fallback
     const group = groups.get(at)
     if (group) group.push(record)
@@ -88,24 +91,39 @@ export function MayHost({
             className="may-toast-viewport"
           >
             {records.map((record) => (
-              <Toast
+              /*
+               * The slot animates the SPACE the toast occupies; the toast
+               * animates itself. Without it a dismissal only fades the capsule
+               * while its height stays put until React unmounts the record, and
+               * the rest of the stack jumps a whole toast plus one gap in a
+               * single frame. Same two-layer arrangement as Alert.
+               */
+              <div
                 key={record.id}
-                title={record.title}
-                description={record.description}
-                tone={record.tone}
-                icon={record.icon}
-                action={record.action}
-                dismissible={record.dismissible}
-                closeButton={record.closeButton}
-                closeLabel={record.closeLabel ?? closeLabel}
-                duration={record.duration ?? duration}
-                position={at}
-                closed={record.dismissed}
-                /* The store, not the component, decides when a record leaves —
-                   the toast only asks. That is what lets a dismissal survive
-                   the toast unmounting halfway through its exit. */
-                onDismiss={() => dismiss(record.id)}
-              />
+                className="may-toast-slot"
+                data-closing={record.dismissed ? 'true' : undefined}
+              >
+                <div className="may-toast-slot__inner">
+                  <Toast
+                    title={record.title}
+                    description={record.description}
+                    tone={record.tone}
+                    icon={record.icon}
+                    action={record.action}
+                    dismissible={record.dismissible}
+                    closeButton={record.closeButton}
+                    closeLabel={record.closeLabel ?? closeLabel}
+                    duration={record.duration ?? duration}
+                    position={at}
+                    closed={record.dismissed}
+                    /* The store, not the component, decides when a record
+                       leaves — the toast only asks. That is what lets a
+                       dismissal survive the toast unmounting halfway through
+                       its exit. */
+                    onDismiss={() => dismiss(record.id)}
+                  />
+                </div>
+              </div>
             ))}
           </div>
         )

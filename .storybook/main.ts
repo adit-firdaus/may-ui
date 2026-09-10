@@ -5,6 +5,26 @@ const config: StorybookConfig = {
   addons: ['@storybook/addon-essentials', '@storybook/addon-docs'],
   framework: { name: '@storybook/react-vite', options: {} },
   typescript: { reactDocgen: 'react-docgen-typescript' },
+  /*
+   * Storybook runs a host check of its own, ahead of Vite's and reading from a
+   * different place: this one. Without it the catalogue answers on the tailnet
+   * IP but returns "Invalid host" to the machine's own MagicDNS name, which is
+   * the address anyone would actually type.
+   */
+  core: { allowedHosts: ['.ts.net'] },
+  /*
+   * Storybook serves through Vite, and Vite rejects requests whose Host header
+   * it does not know. Naming the tailnet domain is what lets the catalogue be
+   * opened from another device on the tailnet rather than only from localhost;
+   * the leading dot covers every machine under it.
+   */
+  viteFinal: async (config) => ({
+    ...config,
+    server: {
+      ...config.server,
+      allowedHosts: [...((config.server?.allowedHosts as string[]) ?? []), '.ts.net'],
+    },
+  }),
 }
 
 export default config

@@ -47,6 +47,29 @@
   box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-danger) 40%, transparent);
 }
 
+/*
+ * Touch drops the ring.
+ *
+ * On a phone the field you are typing into is already obvious -- the keyboard
+ * is up and the caret is in it -- so a 4px halo adds nothing and reads as a
+ * stray artefact instead. The background shift stays, which is all the
+ * confirmation a tap needs; the ring is still drawn on pointer-fine devices,
+ * where a keyboard user genuinely needs to see where focus went.
+ *
+ * The invalid ring is re-stated rather than dropped: that one is not a focus
+ * cue, it is an error, and it has to survive.
+ */
+@media (hover: none) and (pointer: coarse) {
+  .may-input:focus-within {
+    box-shadow: none;
+  }
+
+  .may-input[data-invalid='true'],
+  .may-input[data-invalid='true']:focus-within {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
+  }
+}
+
 .may-input[data-disabled='true'] {
   opacity: 0.4;
   cursor: not-allowed;

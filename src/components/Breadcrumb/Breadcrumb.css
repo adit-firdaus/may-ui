@@ -37,9 +37,14 @@
   gap: var(--may-space-1);
   min-width: 0;
   min-height: var(--may-control-h-sm);
-  padding-inline: var(--may-space-2);
+  /* A capsule needs its text clear of the curve. Button spends roughly 0.45 of
+   * its height on inline padding; a 36px crumb follows the same ratio, and the
+   * size rules below keep that proportion at the other two heights. */
+  padding-inline: var(--may-space-4);
   border: 0;
-  border-radius: var(--may-radius-sm);
+  /* Capsule, like every other control. The ellipsis and the current-page crumb
+   * share this class, so the whole trail keeps one shape. */
+  border-radius: var(--may-radius-full);
   background: transparent;
   color: var(--may-color-tint);
   font-family: inherit;
@@ -119,6 +124,11 @@ button.may-breadcrumb__crumb::after {
 /* The fill is the affordance: it reads as a key you can press, with no stroke
  * and no change of height to the trail around it. */
 .may-breadcrumb__ellipsis {
+  /* Round, not an oval standing on end: the glyph is narrower than the crumb is
+   * tall, so with a full radius the shape has to be squared up. `aspect-ratio`
+   * does it at every size without repeating the heights. */
+  aspect-ratio: 1;
+  justify-content: center;
   padding-inline: var(--may-space-2);
   background: var(--may-color-fill-tertiary);
   color: var(--may-color-text-secondary);
@@ -179,8 +189,10 @@ button.may-breadcrumb__crumb::after {
 
 .may-breadcrumb[data-size='sm'] .may-breadcrumb__crumb {
   min-height: var(--may-control-h-xs);
+  padding-inline: var(--may-space-3);
 }
 
 .may-breadcrumb[data-size='lg'] .may-breadcrumb__crumb {
   min-height: var(--may-control-h-md);
+  padding-inline: var(--may-space-5);
 }

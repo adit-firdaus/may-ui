@@ -63,8 +63,19 @@ function Rows() {
   )
 }
 
-/** A pane that scrolls inside itself, which is what `scrollRef` is for. */
-function Pane(props: NavigationBarProps) {
+/**
+ * A pane that scrolls inside itself, which is what `scrollRef` is for.
+ *
+ * `transform: translateZ(0)` is load-bearing: a compact bar is `position:
+ * fixed`, and without a transformed ancestor it would pin itself to the
+ * viewport instead of to this pane. The TabBar stories' phone frame does the
+ * same thing for the same reason.
+ *
+ * The compact bar overlays rather than occupying a row, so the content pads
+ * itself past it with --may-nav-bar-space. A large title still sits in flow and
+ * needs no padding at all.
+ */
+function Pane({ padded = true, ...props }: NavigationBarProps & { padded?: boolean }) {
   const scroller = useRef<HTMLDivElement>(null)
   return (
     <div
@@ -73,10 +84,13 @@ function Pane(props: NavigationBarProps) {
         height: 480,
         overflowY: 'auto',
         background: 'var(--may-color-bg)',
+        transform: 'translateZ(0)',
       }}
     >
       <NavigationBar {...props} scrollRef={scroller} />
-      <Rows />
+      <div style={{ paddingBlockStart: padded ? 'var(--may-nav-bar-space)' : undefined }}>
+        <Rows />
+      </div>
     </div>
   )
 }
@@ -89,7 +103,7 @@ function Pane(props: NavigationBarProps) {
  */
 export const LargeTitle: Story = {
   args: { largeTitle: true, trailing: <Button variant="plain" size="md">Edit</Button> },
-  render: (args) => <Pane {...args} />,
+  render: (args) => <Pane {...args} padded={false} />,
 }
 
 /** A pushed view: back button leading, action trailing, title centred between

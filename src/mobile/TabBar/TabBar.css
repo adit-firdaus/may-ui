@@ -1,10 +1,13 @@
 /*
+ * A detached capsule floating over the content, with the option of a second,
+ * separate control beside it.
+ *
  * The bar is opaque on purpose. Rule 2 of the design contract forbids
  * backdrop-filter, and a translucent bar with nothing blurring behind it shows
- * the content sliding underneath — worse than either honest option. So the bar
- * paints --may-color-surface over the page's --may-color-bg and separates
- * itself with a hairline pseudo-element, which, being outside the box model,
- * can be switched off without moving a single item by a pixel.
+ * the content sliding underneath — worse than either honest option. Floating
+ * changes none of that: the capsule paints --may-color-surface and separates
+ * itself by elevation instead, which is what Fab and Toast already do and the
+ * only reason anything here owns a shadow.
  *
  * Tone modifiers only SET --may-tab-bar-active; the item rules only CONSUME
  * it, the same split Button uses — a new tone never touches an item rule.
@@ -17,24 +20,95 @@
 
   position: relative;
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-3);
   width: 100%;
-  background: var(--may-color-surface);
-  /*
-   * The home indicator is *extra* height, never a share of the bar's own: the
-   * items keep their full --may-tabbar-h on a notched phone and on a flat one.
-   * The inline insets matter in landscape, where the rounded display corners
-   * eat into the ends of the bar.
-   */
-  padding-block-end: var(--may-inset-bottom);
-  padding-inline: var(--may-inset-left) var(--may-inset-right);
+  min-width: 0;
 }
 
+/*
+ * The frame spans the width so the capsule and the detached control can be laid
+ * out against one another — but everything between and around them is a hole:
+ * pointers fall through to the content the bar is reporting on, exactly as the
+ * toast viewport does. The two real surfaces take their pointers back.
+ *
+ * The safe-area inset ADDS to the design gap rather than replacing padding, the
+ * same calc(inset + space) shape Fab uses, so the home indicator pushes the
+ * capsule up instead of eating into it.
+ */
 .may-tab-bar[data-fixed='true'] {
   position: fixed;
-  inset-inline: 0;
-  inset-block-end: 0;
   z-index: var(--may-z-nav);
+  inset-block-end: calc(var(--may-inset-bottom) + var(--may-space-4));
+  inset-inline: calc(var(--may-inset-left) + var(--may-space-4))
+    calc(var(--may-inset-right) + var(--may-space-4));
+  pointer-events: none;
+}
+
+.may-tab-bar__capsule,
+.may-tab-bar__action {
+  pointer-events: auto;
+}
+
+/*
+ * The matching edge at the bottom. Rows scrolling under a floating capsule
+ * collide with it the same way they collide with a title, so they dissolve into
+ * the page colour before they get there. Reaches above the capsule and past the
+ * safe-area inset below it, so neither end stops at a hard line.
+ */
+.may-tab-bar[data-fixed='true']::before {
+  content: '';
+  position: absolute;
+  inset-inline: calc(var(--may-space-4) * -1);
+  inset-block-end: calc((var(--may-inset-bottom) + var(--may-space-4)) * -1);
+  block-size: calc(100% + var(--may-inset-bottom) + var(--may-space-10));
+  background: linear-gradient(
+    to top,
+    var(--may-color-bg) 45%,
+    color-mix(in srgb, var(--may-color-bg) 60%, transparent) 72%,
+    transparent
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.may-tab-bar__capsule {
+  /* Positioned and isolated so the sliding pill measures against the capsule
+   * and layers inside it rather than over the shadow or the page. */
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  flex: 0 1 auto;
+  min-width: 0;
+  padding-inline: var(--may-space-2);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-surface);
+  box-shadow: var(--may-shadow-lg);
+}
+
+/*
+ * The selection pill. A wash of the active tone that slides behind the current
+ * item, laid out at 1px and scaled by `applyThumb`. It is inset from the
+ * capsule's full height so it reads as a pill on the bar, not a second bar; the
+ * glyph and label keep the tone as their colour and sit above it.
+ */
+.may-tab-bar__thumb {
+  position: absolute;
+  z-index: 0;
+  inset-block: var(--may-space-1);
+  inset-inline-start: 0;
+  width: 1px;
+  transform-origin: 0 50%;
+  background: color-mix(in srgb, var(--may-tab-bar-active) 14%, transparent);
+  pointer-events: none;
+}
+
+.may-tab-bar__action {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
 }
 
 /* ---------------------------------- tones --------------------------------- */
@@ -45,28 +119,18 @@
 .may-tab-bar[data-tone='success'] { --may-tab-bar-active: var(--may-color-success); }
 .may-tab-bar[data-tone='warning'] { --may-tab-bar-active: var(--may-color-warning); }
 
-/* -------------------------------- hairline -------------------------------- */
-
-.may-tab-bar[data-separator='true']::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 0;
-  height: 1px;
-  background: var(--may-color-separator);
-  pointer-events: none;
-}
-
-/* A separator is one device pixel, not one CSS pixel. */
-@media (min-resolution: 2dppx) {
-  .may-tab-bar[data-separator='true']::before { height: var(--may-hairline); }
-}
-
 /* ---------------------------------- item ---------------------------------- */
 
 .may-tab-bar__item {
   position: relative;
-  flex: 1 1 0;
+  /*
+   * Sized by content, not by an equal share. The bar used to span the screen,
+   * where dividing the width evenly was the whole layout; a capsule hugs what
+   * is inside it, and a basis of 0 would collapse it to nothing. Shrinkable, so
+   * five tabs on a narrow phone tighten rather than overflow.
+   */
+  flex: 0 1 auto;
+  min-width: calc(var(--may-control-h) * 1.15);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,7 +141,7 @@
   /* A floor, not the height: retuning --may-tabbar-h can never take an item
    * below the 44px touch target. */
   min-height: var(--may-control-h);
-  padding-inline: var(--may-space-1);
+  padding-inline: var(--may-space-3);
   border: 0;
   background: transparent;
   color: var(--may-color-text-secondary);

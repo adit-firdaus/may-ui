@@ -14,11 +14,57 @@
   --may-steps-pad: var(--may-space-2);
   --may-steps-track: 2px;
 
+  /* Positioned so the sliding thumb (clickable mode) measures against the ol
+   * and isolated so it cannot fall through to whatever the stepper sits on. */
+  position: relative;
+  isolation: isolate;
   display: flex;
   margin: 0;
   padding: 0;
   list-style: none;
   min-width: 0;
+}
+
+/*
+ * The sliding disc — the current step's fill, made a moving element so it
+ * travels to the step you tap instead of one marker's colour switching off as
+ * another's switches on. Laid out at 1px along its axis and scaled by
+ * `applyThumb`; the cross-axis size is the marker's, pinned by CSS because the
+ * marker does not fill the ol (a horizontal step has its label below it). The
+ * halo stays on the marker, not here — a box-shadow spread on a scaled box
+ * renders as an ellipse.
+ */
+.may-steps__thumb {
+  position: absolute;
+  z-index: 0;
+  background: var(--may-color-primary);
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.may-steps[data-orientation='horizontal'] .may-steps__thumb {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 1px;
+  height: var(--may-steps-marker);
+}
+
+.may-steps[data-orientation='vertical'] .may-steps__thumb {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: var(--may-steps-marker);
+  height: 1px;
+}
+
+/*
+ * In clickable mode the thumb IS the current marker's fill, so the marker turns
+ * transparent and lets the disc show through. The number stays on-primary and
+ * cross-fades from its finished colour over the settle, roughly in step with
+ * the disc arriving — the same handoff SegmentedControl makes with its label.
+ * The halo remains, drawn around the now-transparent marker.
+ */
+.may-steps[data-clickable='true'] .may-steps__step[data-status='current'] .may-steps__marker {
+  background: transparent;
 }
 
 .may-steps[data-orientation='horizontal'] {

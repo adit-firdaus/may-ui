@@ -14,6 +14,7 @@
   padding: var(--may-space-5);
   background: var(--may-color-scrim);
   animation: may-alert-scrim-in var(--may-duration-fast) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-alert-dialog {
@@ -38,8 +39,29 @@
    * as weight.
    */
   animation:
-    may-alert-in var(--may-duration-settle) var(--may-spring-bouncy),
+    may-alert-in var(--may-duration-settle) var(--may-ease-out),
     may-alert-fade var(--may-duration-fast) var(--may-ease-out);
+  /* Carries the exit; the entrance animation above outranks it while it runs. */
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
+}
+
+/*
+ * Leaving is a TRANSITION on opacity, not an animation — and deliberately does
+ * not touch `transform`.
+ *
+ * An exit animation owns every property it names from its own `from` value, so
+ * dismissing before the entrance had finished snapped the panel from wherever
+ * it had scaled to straight back to `scale(1)` — a visible jump in width —
+ * before shrinking again. Leaving `transform` alone means an interrupted
+ * entrance simply finishes while the panel fades.
+ */
+.may-alert-dialog__scrim[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.may-alert-dialog[data-state='closed'] {
+  opacity: 0;
 }
 
 /*

@@ -47,6 +47,15 @@ export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
  * it has visibly left rather than yanking it out from under the animation.
  * Under reduced motion base.css collapses that animation to 1ms, so the same
  * code path dismisses immediately with no special case here.
+ *
+ * In a STACK, set `--may-alert-gap` on the container to whatever its `gap` is:
+ *
+ *   <div style={{ display: 'flex', flexDirection: 'column',
+ *                 gap: 'var(--may-space-3)',
+ *                 ['--may-alert-gap' as string]: 'var(--may-space-3)' }}>
+ *
+ * Without it the gap the alert leaves behind collapses in a single frame when
+ * the node unmounts, which reads as a jump. See Alert.css.
  */
 export function Alert({
   tone = 'tint',
@@ -84,33 +93,41 @@ export function Alert({
       className={cx('may-alert', className)}
       onAnimationEnd={onAnimationEnd}
     >
-      {glyph != null && (
-        <span className="may-alert__icon" aria-hidden>
-          {glyph}
-        </span>
-      )}
+      {/* The root is a height track and the slot is what it resizes; the box
+       * is the card, at its natural height throughout. So appearing and
+       * dismissing animate the SPACE the alert occupies, while the card
+       * itself only scales and fades. See Alert.css. */}
+      <div className="may-alert__slot">
+        <div className="may-alert__box">
+          {glyph != null && (
+            <span className="may-alert__icon" aria-hidden>
+              {glyph}
+            </span>
+          )}
 
-      <div className="may-alert__content">
-        {title != null && <p className="may-alert__title">{title}</p>}
-        {children != null && (
-          <div className="may-alert__body" data-slot="body">
-            {children}
+          <div className="may-alert__content">
+            {title != null && <p className="may-alert__title">{title}</p>}
+            {children != null && (
+              <div className="may-alert__body" data-slot="body">
+                {children}
+              </div>
+            )}
+            {actions && <div className="may-alert__actions">{actions}</div>}
           </div>
-        )}
-        {actions && <div className="may-alert__actions">{actions}</div>}
-      </div>
 
-      {onDismiss && (
-        <button
-          {...pressProps}
-          type="button"
-          onClick={() => setExiting(true)}
-          aria-label={dismissLabel}
-          className="may-alert__dismiss may-pressable may-hoverable"
-        >
-          <IoClose aria-hidden focusable="false" />
-        </button>
-      )}
+          {onDismiss && (
+            <button
+              {...pressProps}
+              type="button"
+              onClick={() => setExiting(true)}
+              aria-label={dismissLabel}
+              className="may-alert__dismiss may-pressable may-hoverable"
+            >
+              <IoClose aria-hidden focusable="false" />
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

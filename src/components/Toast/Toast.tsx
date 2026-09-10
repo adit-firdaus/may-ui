@@ -62,6 +62,12 @@ export interface ToastRecord extends Omit<ToastOptions, 'id'> {
   createdAt: number
   /** True once dismissal has started; the record lives on for its exit animation. */
   dismissed?: boolean
+  /**
+   * True while the toast is queued behind the limit and not yet on screen. It
+   * is not rendered, so it is not counting down either — its duration starts
+   * when it is promoted.
+   */
+  pending?: boolean
 }
 
 /* -------------------------------------------------------------------------- *
@@ -80,7 +86,7 @@ export interface ToastRecord extends Omit<ToastOptions, 'id'> {
  */
 const EXIT_MS = 300
 
-/** Toasts on screen at once. Reaching it drops the oldest, FIFO. */
+/** Toasts on screen at once. Beyond it, toasts WAIT their turn, FIFO. */
 const DEFAULT_LIMIT = 3
 
 let queue: ToastRecord[] = []
@@ -120,23 +126,35 @@ function scheduleRemoval(id: string): void {
     id,
     setTimeout(() => {
       exitTimers.delete(id)
-      publish(queue.filter((entry) => entry.id !== id))
+      // Re-capped, not just filtered: a removal is what frees the place the
+      // next pending toast has been waiting for.
+      publish(capped(queue.filter((entry) => entry.id !== id)))
     }, EXIT_MS),
   )
 }
 
 /**
- * Enforce the stack limit, oldest first. A dropped toast is *dismissed* rather
- * than deleted, so it animates out under the arriving one instead of blinking
- * off the screen. Toasts already on their way out do not count against the
- * limit — otherwise a burst would drop live toasts to make room for corpses.
+ * Decide what is on screen. Everything past the limit WAITS instead of being
+ * dropped: it stays in the queue marked `pending`, and is promoted the moment
+ * something ahead of it starts leaving.
+ *
+ * This used to dismiss the surplus outright, which meant a burst of six under a
+ * limit of three mounted all six and marked the oldest three closed in the same
+ * frame — three capsules grew and shrank again while three others grew, and the
+ * first three messages were never readable. Queueing costs nothing: an unrendered
+ * toast has no `Toast` component, so its duration has not started ticking.
+ *
+ * Toasts already on their way out stay rendered but do not hold a place, so the
+ * next one moves up while the old one is still animating away.
  */
 function capped(next: ToastRecord[]): ToastRecord[] {
-  const live = next.filter((entry) => !entry.dismissed)
-  if (live.length <= limit) return next
-  const doomed = new Set(live.slice(0, live.length - limit).map((entry) => entry.id))
-  doomed.forEach((id) => scheduleRemoval(id))
-  return next.map((entry) => (doomed.has(entry.id) ? { ...entry, dismissed: true } : entry))
+  let shown = 0
+  return next.map((entry) => {
+    if (entry.dismissed) return entry.pending ? { ...entry, pending: false } : entry
+    const pending = shown >= limit
+    if (!pending) shown += 1
+    return Boolean(entry.pending) === pending ? entry : { ...entry, pending }
+  })
 }
 
 function enqueue(title: ReactNode, options: ToastOptions = {}): string {
@@ -190,7 +208,7 @@ export function dismiss(id: string): void {
   const record = queue.find((entry) => entry.id === id)
   if (!record || record.dismissed) return
   scheduleRemoval(id)
-  publish(queue.map((entry) => (entry.id === id ? { ...entry, dismissed: true } : entry)))
+  publish(capped(queue.map((entry) => (entry.id === id ? { ...entry, dismissed: true } : entry))))
   // Fired only once the queue already says the toast is leaving: a callback
   // that dismisses again — an onDismiss wired straight to dismissAll, say —
   // would otherwise recurse forever.
@@ -205,10 +223,9 @@ export function dismissAll(): void {
 /**
  * How many toasts stay on screen. `MayHost` drives this from its `max` prop.
  *
- * The cap lives in the store rather than in the host's render because dropping
- * the oldest has to happen when a toast is *queued*: a host that merely
- * rendered the newest three would leave the rest counting down invisibly and
- * popping into view as the stack drained.
+ * The cap lives in the store rather than in the host's render because the queue
+ * is what knows the order things arrived in, and promotion has to happen on the
+ * same publish that frees a place. The host simply renders what is not pending.
  */
 export function setToastLimit(next: number): void {
   limit = Math.max(1, next)
@@ -294,6 +311,12 @@ export function Toast({
   const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const [swiping, setSwiping] = useState(false)
+  /*
+   * True once the arrival has played. It exists because `data-swiping` clears
+   * the `animation` shorthand while a finger is down: lifting that finger put
+   * the shorthand back, which RESTARTED the entrance. Every tap replayed it.
+   */
+  const [entered, setEntered] = useState(false)
   const { pressProps } = usePressFeedback()
 
   const side = position.startsWith('top') ? 'top' : 'bottom'
@@ -446,7 +469,14 @@ export function Toast({
       data-state={closed ? 'closed' : 'open'}
       data-dismissible={dismissible ? 'true' : undefined}
       data-swiping={swiping ? 'true' : undefined}
+      data-entered={entered ? 'true' : undefined}
       className={cx('may-toast', className)}
+      onAnimationEnd={(event) => {
+        // Only the capsule's own arrival — the close chip and the progress bar
+        // animate too, and their events bubble through here.
+        if (event.target !== event.currentTarget) return
+        if (event.animationName === 'may-toast-in') setEntered(true)
+      }}
       onPointerEnter={(event) => {
         // Only a real cursor pauses: on touch, pointerenter fires on tap and the
         // matching leave can be swallowed by the gesture, freezing the countdown.

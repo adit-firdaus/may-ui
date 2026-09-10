@@ -162,6 +162,25 @@ ${emit(dark, '  ')}
 ${themed}
 }
 
+/*
+ * Explicit opt-in, the other way.
+ *
+ * This scope has to exist for the same reason the dark one does, and its
+ * absence was a real bug: MayProvider stamps data-may-theme on its own div, not
+ * on the document element, so on a dark OS the media query below matches :root
+ * (which never carries the attribute) and hands the whole page dark tokens. A
+ * div asking for light then had nothing to restore them with, and light mode
+ * simply could not be pinned. Re-declaring the full palette here is what makes
+ * the toggle work in both directions.
+ */
+[data-may-theme='light'] {
+  color-scheme: light;
+
+${emit(light, '  ')}
+
+${themed}
+}
+
 /* The OS setting, unless a light theme is pinned. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-may-theme='light']) {
@@ -311,6 +330,22 @@ ${themed.split(String.fromCharCode(10)).map(l => l ? '  ' + l : l).join(String.f
   --may-inset-bottom: env(safe-area-inset-bottom, 0px);
   --may-inset-left: env(safe-area-inset-left, 0px);
   --may-inset-right: env(safe-area-inset-right, 0px);
+
+  /* The room the floating bars occupy, for a scroller to pad itself with. Both
+   * bars overlay their content rather than sitting in flow, so the space they
+   * take is not something layout can work out on its own. Constants rather than
+   * measurements: they resolve before the first frame, need no JavaScript, and
+   * exist whether or not a bar is on screen -- a view with no tab bar simply
+   * never mentions --may-tab-bar-space. */
+  /* How much of a stack's own gap a dismissing Alert takes with it. Declared
+   * here at zero so a lone alert behaves exactly as it always did; a stack sets
+   * it on the container, and an override on a nearer ancestor beats this. */
+  --may-alert-gap: 0px;
+
+  --may-nav-bar-space: calc(var(--may-navbar-h) + var(--may-inset-top));
+  --may-tab-bar-space: calc(
+    var(--may-tabbar-h) + var(--may-inset-bottom) + var(--may-space-4) * 2
+  );
 
   /* iOS app-icon gradients, for IconTile. */
   --may-grad-blue: linear-gradient(180deg, #64b5ff 0%, #007aff 52%, #005ecb 100%);

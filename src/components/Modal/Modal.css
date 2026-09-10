@@ -18,6 +18,7 @@
   padding-block-end: calc(var(--may-space-5) + var(--may-inset-bottom));
   background: var(--may-color-scrim);
   animation: may-modal-scrim-in var(--may-duration-fast) var(--may-ease-out);
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-modal {
@@ -33,15 +34,16 @@
   box-shadow: var(--may-shadow-xl);
   overflow: hidden;
   /*
-   * Two animations on deliberately different curves. The transform rides the
-   * bouncy spring — whose linear() samples reach 1.166 — so scaling 0.9 → 1
-   * lands at roughly 1.017 before settling back: the dialog arrives rather than
-   * appearing. Opacity is held on a short ease instead, because a panel that is
-   * still translucent while it overshoots reads as a rendering glitch.
+   * Both on `ease-out`: the panel accelerates away from its start and settles
+   * onto full size without overshooting it. The two are split only so the fade
+   * can be shorter than the move — a panel still translucent once it has
+   * finished travelling reads as a dropped frame.
    */
   animation:
-    may-modal-in var(--may-duration-settle) var(--may-spring-bouncy),
+    may-modal-in var(--may-duration-settle) var(--may-ease-out),
     may-modal-fade var(--may-duration-fast) var(--may-ease-out);
+  /* Carries the exit; the entrance animation above outranks it while it runs. */
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 .may-modal[data-size='sm'] { max-width: 360px; }
@@ -160,6 +162,25 @@
 
 .may-modal[data-presentation='compact'] .may-modal__footer > * { width: 100%; }
 
+/*
+ * Leaving is a TRANSITION on opacity, not an animation — and deliberately does
+ * not touch `transform`.
+ *
+ * An exit animation owns every property it names from its own `from` value, so
+ * closing before the entrance had finished snapped the panel from wherever it
+ * had scaled to straight back to `scale(1)` — a visible jump in width — before
+ * shrinking again. Leaving `transform` alone means an interrupted entrance
+ * simply finishes travelling while the panel fades, with nothing to jump from.
+ */
+.may-modal__scrim[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.may-modal[data-state='closed'] {
+  opacity: 0;
+}
+
 @keyframes may-modal-scrim-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -170,7 +191,7 @@
   to { opacity: 1; }
 }
 
-/* Starts small and slightly low, so the bounce carries it up into place. */
+/* Starts small and slightly low, and rises into place as it grows. */
 @keyframes may-modal-in {
   from { transform: translateY(var(--may-space-2)) scale(0.9); }
   to { transform: translateY(0) scale(1); }

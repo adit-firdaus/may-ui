@@ -133,7 +133,14 @@
 }
 
 .may-tabs[data-variant='pill'] .may-tabs__indicator {
-  border-radius: var(--may-radius-md);
+  /*
+   * A full capsule. The value here is only the first-frame fallback: once the
+   * indicator is positioned, `positionIndicator` overwrites `border-radius`
+   * inline with the shear-cancelled form (the along-axis half divided by the
+   * scale), because a plain radius on a 1px box stretched to tab width renders
+   * as a diagonal shear. The underline opts out — a square bar is honest.
+   */
+  border-radius: var(--may-radius-full);
   background: color-mix(in srgb, var(--may-color-primary) 15%, transparent);
 }
 

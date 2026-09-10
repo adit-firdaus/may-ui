@@ -23,6 +23,7 @@ import {
   IoTodayOutline,
 } from 'react-icons/io5'
 import { TabBar } from './TabBar'
+import { IconButton } from '../../components/IconButton'
 import { List, ListRow } from '../../components/List'
 
 const meta = {
@@ -154,7 +155,9 @@ export const OverAScrollingScreen: Story = {
             height: '100%',
             overflowY: 'auto',
             padding: 'var(--may-space-4)',
-            paddingBottom: 'calc(var(--may-tabbar-h) + var(--may-space-8))',
+            /* The bar floats over the content, so the scroller pads itself past
+             * it. One token rather than a number nobody can re-derive later. */
+            paddingBottom: 'var(--may-tab-bar-space)',
           }}
         >
           <List header="Updated Today">
@@ -166,6 +169,56 @@ export const OverAScrollingScreen: Story = {
           </List>
         </div>
         <TabBar {...args} value={value} onValueChange={setValue} />
+      </Phone>
+    )
+  },
+}
+
+/**
+ * The Phone app's bar: tabs in the capsule, search detached beside it.
+ *
+ * The slot takes anything — this is an `IconButton`, but a `Fab` or a whole
+ * `SearchField` would sit here just as well. What the bar guarantees is where
+ * it sits and how far it sits from the capsule; what it is, is yours.
+ *
+ * Note the hole between the two: the frame lets pointers through everywhere it
+ * is not painted, so a stack of chrome in the corner never blocks the content
+ * it is reporting on.
+ */
+export const WithAction: Story = {
+  args: {
+    items: [
+      { value: 'calls', label: 'Calls', icon: <TodayIcon />, activeIcon: <TodayIcon filled /> },
+      { value: 'contacts', label: 'Contacts', icon: <PeopleIcon />, activeIcon: <PeopleIcon filled /> },
+      { value: 'keypad', label: 'Keypad', icon: <AlbumsIcon />, activeIcon: <AlbumsIcon filled /> },
+    ],
+  },
+  render: (args) => {
+    const [value, setValue] = useState('calls')
+    return (
+      <Phone>
+        <div
+          data-slot="scroll-area"
+          style={{
+            height: '100%',
+            overflowY: 'auto',
+            padding: 'var(--may-space-4)',
+            paddingBottom: 'var(--may-tab-bar-space)',
+          }}
+        >
+          <List header="Recents">
+            {['Allison Cain', 'Shota Aoyagi', 'Kevin Angel', 'Alexis Kay', 'Kelly Altick'].map(
+              (name) => (
+                <ListRow key={name} title={name} detail="mobile" onClick={() => {}} />
+              ),
+            )}
+          </List>
+        </div>
+        <TabBar {...args} value={value} onValueChange={setValue}>
+          <IconButton aria-label="Search" variant="gray" size="lg">
+            <IoSearchOutline />
+          </IconButton>
+        </TabBar>
       </Phone>
     )
   },

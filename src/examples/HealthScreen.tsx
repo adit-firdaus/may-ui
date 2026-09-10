@@ -25,7 +25,8 @@ import { Text } from '../components/Text'
  *
  * Two structural things are worth copying out of this screen.
  *
- * The scroller is ours, not the page's: `NavigationBar` is `position: sticky`
+ * The scroller is ours, not the page's: a large-title `NavigationBar` is
+ * `position: sticky` (the compact bar floats instead, overlaying its content)
  * and collapses against whatever container it is handed, so the large title
  * only animates if it is *inside* the overflow element and `scrollRef` points
  * at that same element. Sticky against the window would be wrong here — a

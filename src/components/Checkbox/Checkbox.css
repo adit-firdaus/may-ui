@@ -2,18 +2,26 @@
  * The tick draws.
  *
  * `pathLength="1"` normalises the stroke, so one dash-offset transition covers
- * every size, and it rides --may-spring-bouncy: the overshoot pushes the dash
- * a little past its end, which reads as the stroke snapping into place rather
- * than sliding across the box. Together with the fill landing at the same
- * moment, that is the whole gesture.
+ * every size, and it rides --may-ease-out: the stroke leaves fast and eases
+ * onto its end without going past it. Together with the fill landing at the
+ * same moment, that is the whole gesture.
  */
 
 .may-checkbox {
   position: relative;
   display: inline-flex;
-  align-items: center;
+  /*
+   * The box aligns to the FIRST LINE of the label, never to the middle of the
+   * block. With `center`, a label that wraps pushes the box down half its own
+   * height -- a full line adrift on three lines, while a one-line label looks
+   * fine, which is what makes it read as inconsistent rather than simply off.
+   * The block padding is derived so a single line still fills the 44px target
+   * with equal space above and below.
+   */
+  align-items: flex-start;
   gap: var(--may-space-3);
   min-height: var(--may-control-h);
+  padding-block: calc((var(--may-control-h) - var(--may-text-body-leading)) / 2);
   /* Bleed the padding outward so the hover row hugs the content but the hit
    * target still reaches Apple's 44px. */
   padding-inline: var(--may-space-2);
@@ -31,10 +39,10 @@
   transform: none;
 }
 
-/* With a description the box aligns to the first line, the way a Settings row
- * hangs its control off the title rather than centring on the block. */
+/* A described row is tall enough already, so it spends less on block padding
+ * than a bare one. The first-line alignment it used to set here is now the
+ * default for every checkbox. */
 .may-checkbox:has(.may-checkbox__description) {
-  align-items: flex-start;
   padding-block: var(--may-space-2);
 }
 
@@ -53,6 +61,16 @@
   flex-shrink: 0;
   width: var(--may-check-size);
   height: var(--may-check-size);
+  /*
+   * Centre the box on the label's first line. Negative whenever the box is
+   * taller than a line, which is every size but `sm`.
+   *
+   * Mirrored top AND bottom on purpose: the pair cancels out, so the box
+   * contributes exactly one line's worth of height to the row however large it
+   * is. Without the bottom half the row grows by the overhang and the space
+   * above the box no longer matches the space below it.
+   */
+  margin-block: calc((var(--may-text-body-leading) - var(--may-check-size)) / 2);
   border-radius: var(--may-radius-xs);
   background: var(--may-color-fill-tertiary);
   /* The tick and the dash both paint in currentColor. */
@@ -102,16 +120,20 @@
 }
 
 /*
- * The dash is 1.5 path-lengths long, not 1, and the offset lands on 0.5 rather
- * than 0. That extra half-length is what absorbs the spring's overshoot: with
- * a dash exactly as long as the path, the bounce past the end drags the gap
- * back over the stroke's tail and the tick visibly breaks for two frames.
- * Oversized, the overshoot spends itself on stroke that is already covered.
+ * The tick draws on `ease-out`: it accelerates away and settles onto the end of
+ * the stroke without overshooting it.
+ *
+ * The dash stays 1.5 path-lengths long, not 1, with the offset landing on 0.5
+ * rather than 0. `ease-out` never travels past its target so nothing needs
+ * absorbing today, but the oversize costs nothing and is what keeps a springy
+ * curve safe here: with a dash exactly as long as the path, a bounce past the
+ * end drags the gap back over the stroke's tail and the tick visibly breaks
+ * for two frames.
  */
 .may-checkbox__tick path {
   stroke-dasharray: 1.5 3;
   stroke-dashoffset: 1.5;
-  transition: stroke-dashoffset var(--may-duration-settle) var(--may-spring-bouncy);
+  transition: stroke-dashoffset var(--may-duration-settle) var(--may-ease-out);
 }
 
 .may-checkbox__input:checked + .may-checkbox__box .may-checkbox__tick path {

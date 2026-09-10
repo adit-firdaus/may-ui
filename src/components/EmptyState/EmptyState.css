@@ -13,6 +13,10 @@
   min-width: 0;
   padding: var(--may-space-10) var(--may-space-6);
   color: var(--may-color-text);
+  /* A fade and nothing else. An empty state is a dead end, not an arrival --
+   * it should appear without asking to be watched. `both` holds the from-state
+   * so there is no frame at full opacity first. */
+  animation: may-empty-in var(--may-duration-settle) var(--may-ease-out) both;
 }
 
 .may-empty__glyph {
@@ -93,42 +97,18 @@
 /* --------------------------------- entrance -------------------------------- */
 
 /*
- * Staggered by one press-length each, so the screen composes itself top-down.
- * `backwards` fill keeps a delayed part hidden until its turn instead of
- * flashing in place first.
+ * No stagger and no transform. The parts used to animate one at a time on a
+ * spring, each with its own delay -- which also needed a reduced-motion escape
+ * hatch, because base.css can collapse a duration but not a delay, so a
+ * staggered entrance held every part invisible and then snapped it in. One
+ * fade on the parent has none of that: base.css shortens it to 1ms and the
+ * block is simply there.
  */
-.may-empty__glyph,
-.may-empty__title,
-.may-empty__description,
-.may-empty__action {
-  animation: may-empty-in var(--may-duration-settle) var(--may-spring-bouncy) backwards;
-}
-
-.may-empty__title { animation-delay: var(--may-duration-instant); }
-.may-empty__description { animation-delay: calc(var(--may-duration-instant) * 1.5); }
-.may-empty__action { animation-delay: calc(var(--may-duration-instant) * 2); }
-
 @keyframes may-empty-in {
   from {
     opacity: 0;
-    transform: scale(0.94) translateY(var(--may-space-2));
   }
   to {
     opacity: 1;
-    transform: none;
-  }
-}
-
-/*
- * base.css collapses animation DURATION for reduced motion but cannot clear a
- * delay, and a staggered entrance would then hold each part invisible for its
- * delay before snapping in. Drop the animation entirely instead.
- */
-@media (prefers-reduced-motion: reduce) {
-  .may-empty__glyph,
-  .may-empty__title,
-  .may-empty__description,
-  .may-empty__action {
-    animation: none;
   }
 }

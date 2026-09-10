@@ -2,8 +2,12 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
 import './Pagination.css'
+
+/** The key lifts a little under the press, the way a segmented thumb does. */
+const PRESS_SCALE = 1.14
 
 /** xs is absent: a pager key that small stops being a touch target. */
 export type PaginationSize = Exclude<MaySize, 'xs'>
@@ -75,15 +79,25 @@ interface KeyProps {
   disabled?: boolean
   onClick: () => void
   className?: string
+  keyRef?: (node: HTMLButtonElement | null) => void
 }
 
 /** One key of the pager. Always a real `<button>`. */
-function PagerKey({ children, label, current = false, disabled = false, onClick, className }: KeyProps) {
+function PagerKey({
+  children,
+  label,
+  current = false,
+  disabled = false,
+  onClick,
+  className,
+  keyRef,
+}: KeyProps) {
   const { pressProps } = usePressFeedback(disabled)
 
   return (
     <button
       {...pressProps}
+      ref={keyRef}
       type="button"
       // The visible digit is not the accessible name: "4" alone tells a screen
       // reader nothing about what pressing it does.
@@ -124,6 +138,28 @@ export function Pagination({
     if (clamped !== current) onPageChange(clamped)
   }
 
+  const slots = compact ? [] : slotsFor(current, total, siblingCount)
+
+  /*
+   * A filled key that SLIDES between slot positions instead of one key's fill
+   * springing in as another's springs out. The thumb tracks the slot the
+   * current page occupies, not the page number: the row of slots is a fixed
+   * width, so when the window shifts the digits scroll under a thumb that holds
+   * its place — and when the current page walks toward an end, the thumb slides
+   * with it. Press-only: a page is tapped, not scrubbed. Inert when compact,
+   * which draws no keys at all.
+   */
+  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
+    HTMLUListElement,
+    HTMLButtonElement
+  >({
+    itemCount: slots.length,
+    selectedIndex: slots.findIndex((slot) => slot === current),
+    roundEnds: true,
+    pressScale: PRESS_SCALE,
+    enabled: !compact,
+  })
+
   const previous = (
     <li className="may-pagination__item">
       <PagerKey
@@ -146,7 +182,10 @@ export function Pagination({
       data-compact={compact ? 'true' : undefined}
       className={cx('may-pagination', className)}
     >
-      <ul className="may-pagination__list">
+      <ul ref={trackRef} className="may-pagination__list" onPointerDown={onPointerDown}>
+        {/* The sliding fill. First child so it paints beneath the keys; a bare
+          * span in a list is furniture, hidden from the tree. */}
+        {!compact && <span ref={thumbRef} className="may-pagination__thumb" aria-hidden />}
         {previous}
 
         {compact ? (
@@ -157,10 +196,11 @@ export function Pagination({
             </span>
           </li>
         ) : (
-          slotsFor(current, total, siblingCount).map((slot) =>
+          slots.map((slot, index) =>
             typeof slot === 'number' ? (
               <li key={slot} className="may-pagination__item">
                 <PagerKey
+                  keyRef={registerItem(index)}
                   label={slot === current ? `Page ${slot}, current page` : `Go to page ${slot}`}
                   current={slot === current}
                   onClick={() => go(slot)}

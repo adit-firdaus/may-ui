@@ -303,9 +303,20 @@ export function Popover({
     if (!mounted) return
     reposition()
 
-    // Capture phase: scroll does not bubble, and the panel has to follow an
-    // ancestor scroller as readily as the window.
-    const onScroll = () => reposition()
+    /*
+     * Capture phase: scroll does not bubble, and the panel has to follow an
+     * ancestor scroller as readily as the window.
+     *
+     * But a scroll INSIDE the panel is not the anchor moving, and repositioning
+     * on it breaks the panel outright: `reposition` clears `max-height` to take
+     * an unconstrained measurement, which stops the body overflowing for that
+     * instant, and the browser clamps its scrollTop back to 0. Every wheel tick
+     * therefore undid itself and a long menu could not be scrolled at all.
+     */
+    const onScroll = (event: Event) => {
+      if (surfaceRef.current?.contains(event.target as Node)) return
+      reposition()
+    }
     window.addEventListener('scroll', onScroll, true)
     window.addEventListener('resize', onScroll)
 
@@ -447,7 +458,7 @@ export function Popover({
           className={cx('may-popover__surface', surfaceClassName)}
         >
           {arrow && <span className="may-popover__arrow" aria-hidden />}
-          <div className="may-popover__body" data-slot="scroll-area">
+          <div className="may-popover__body" data-slot="scroll-area" data-scroll-hint="true">
             {children}
           </div>
         </div>
