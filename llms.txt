@@ -1,0 +1,29 @@
+# May UI
+
+> Apple's design language as a React library — iOS/macOS shapes, real spring
+> physics compiled to CSS linear(), a --may-* token layer, and no runtime
+> dependencies beyond React. Published on npm as @adit_firdaus/may-ui.
+
+## Docs
+
+- [README](https://github.com/adit-firdaus/may-ui/blob/master/README.md): overview, install, the full tour
+- [Getting started](https://github.com/adit-firdaus/may-ui/blob/master/docs/getting-started.md): install, MayProvider + MayHost, first component, styling your own markup
+- [Theming](https://github.com/adit-firdaus/may-ui/blob/master/docs/theming.md): token layers, light/dark, scoped themes, tint vs primary
+- [Motion](https://github.com/adit-firdaus/may-ui/blob/master/docs/motion.md): generated linear() springs, the sliding-thumb system and useSlidingThumb, exit animations
+- [Components](https://github.com/adit-firdaus/may-ui/blob/master/docs/components.md): the three families and where each shape lives
+
+## Live
+
+- [Examples gallery](https://adit-firdaus.github.io/may-ui/): composed app screens, adaptive phone→desktop
+- [Storybook](https://adit-firdaus.github.io/may-ui/storybook/): every component with its props and states
+
+## Contributing
+
+- [AGENTS.md](https://github.com/adit-firdaus/may-ui/blob/master/AGENTS.md): conventions for coding agents — the gate, code style, commit format
+- [CONTRIBUTING.md](https://github.com/adit-firdaus/may-ui/blob/master/CONTRIBUTING.md): human contributor guide
+
+## Package
+
+- Install: `npm install @adit_firdaus/may-ui` (react, react-dom 18+ are peer deps)
+- Import: `import { Button } from '@adit_firdaus/may-ui'` and `import '@adit_firdaus/may-ui/styles.css'`
+- Entries: `@adit_firdaus/may-ui` (adaptive), `/desktop`, `/mobile`

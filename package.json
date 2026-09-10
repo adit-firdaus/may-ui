@@ -76,6 +76,7 @@
     "check:contract": "node scripts/check-contract.mjs",
     "examples": "vite --config examples/vite.config.ts",
     "examples:build": "vite build --config examples/vite.config.ts",
+    "docs:build": "node scripts/build-docs.mjs",
     "check:coverage": "node scripts/check-coverage.mjs"
   },
   "peerDependencies": {
@@ -91,6 +92,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "easing-utils": "^1.0.0",
+    "marked": "^18.0.12",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "storybook": "^8.6.14",

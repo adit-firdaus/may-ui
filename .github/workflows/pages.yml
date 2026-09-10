@@ -31,12 +31,16 @@ jobs:
         run: npm run examples:build
       - name: Build Storybook
         run: npm run build-storybook
-      - name: Assemble the site (gallery at /, Storybook at /storybook)
+      - name: Build the docs
+        run: npm run docs:build
+      - name: Assemble the site (gallery /, Storybook /storybook, docs /docs)
         run: |
           rm -rf _site
-          mkdir -p _site/storybook
+          mkdir -p _site/storybook _site/docs
           cp -r examples/dist/. _site/
           cp -r storybook-static/. _site/storybook/
+          cp -r docs-site/. _site/docs/
+          cp llms.txt _site/llms.txt
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

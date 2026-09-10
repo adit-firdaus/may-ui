@@ -10,6 +10,8 @@ and a token layer you can theme.
 - **Light and dark** — follows the OS by default, pinnable per subtree
 - **Typed** — bundled `.d.ts` per entry, JSDoc on every prop
 
+**[Docs](docs/)** · **[Gallery](https://adit-firdaus.github.io/may-ui/)** · **[Storybook](https://adit-firdaus.github.io/may-ui/storybook/)** · **[Contributing](CONTRIBUTING.md)**
+
 ## Install
 
 ```bash
