@@ -39,6 +39,33 @@ export function App() {
 
 `theme` is `'system'` (default), `'light'` or `'dark'` — see [Theming](theming.md).
 
+## Routing
+
+Anything that renders an `href` — `TabBar`, `Breadcrumb` — uses a plain `<a>` by
+default, which in an SPA is a full page reload. Give the provider your router's
+link component once and every one of them picks it up:
+
+```tsx
+import { Link } from '@tanstack/react-router'
+
+// May emits `href`; adapt it to whatever prop your router takes.
+const RouterLink = ({ href, ...props }) => <Link to={href} {...props} />
+
+<MayProvider linkComponent={RouterLink}>…</MayProvider>
+```
+
+For a single control rather than a whole tree, `Button`, `IconButton` and `Fab`
+take `asChild` and render their presentation onto your element instead:
+
+```tsx
+<Button asChild variant="filled">
+  <Link to="/albums">Open albums</Link>
+</Button>
+```
+
+That keeps the real anchor, so middle-click, cmd-click and open-in-new-tab all
+still work.
+
 ## The stylesheet is a cascade layer
 
 `styles.css` ships wrapped in `@layer may-ui`. Unlayered CSS beats every layered

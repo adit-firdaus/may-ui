@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
+import { useLinkComponent } from '../../hooks/link'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import type { FlipSnapshot } from '../../motion/flip'
@@ -56,6 +57,7 @@ interface Entry {
  * cannot reach at all.
  */
 function Crumb({ item, current }: { item: BreadcrumbItem; current: boolean }) {
+  const Link = useLinkComponent()
   const interactive = !current && (item.href != null || item.onClick != null)
   const { pressProps } = usePressFeedback(!interactive)
 
@@ -79,15 +81,16 @@ function Crumb({ item, current }: { item: BreadcrumbItem; current: boolean }) {
   }
 
   if (item.href != null) {
+    // The provider's link element, so a crumb routes instead of reloading.
     return (
-      <a
+      <Link
         {...pressProps}
         href={item.href}
         onClick={item.onClick}
         className="may-breadcrumb__crumb may-pressable may-hoverable"
       >
         {content}
-      </a>
+      </Link>
     )
   }
 

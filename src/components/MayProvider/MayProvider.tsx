@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
+import type { ElementType, ReactNode } from 'react'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { cx } from '../../utils/cx'
+import { LinkComponentProvider } from '../../hooks/link'
 import { PlatformProvider, type MayPlatform } from '../../hooks/platform'
 import '../../styles/index.css'
 import './MayProvider.css'
@@ -26,6 +27,12 @@ export interface MayProviderProps {
    * @default 'auto'
    */
   platform?: MayPlatform
+  /**
+   * What every navigational component renders an `href` with — a router's
+   * `Link`, typically. A plain `<a>` reloads the page, which stops an SPA
+   * being one. Defaults to `'a'`.
+   */
+  linkComponent?: ElementType
 }
 
 interface MayContextValue {
@@ -59,6 +66,7 @@ export function MayProvider({
   className,
   inline = false,
   platform = 'auto',
+  linkComponent = 'a',
 }: MayProviderProps) {
   const [current, setCurrent] = useState<MayTheme>(theme)
   const [systemDark, setSystemDark] = useState(prefersDark)
@@ -81,6 +89,7 @@ export function MayProvider({
   return (
     <MayContext.Provider value={value}>
       <PlatformProvider platform={platform}>
+      <LinkComponentProvider linkComponent={linkComponent}>
       <div
         data-slot="root"
         className={cx('may-root', inline && 'may-root--inline', className)}
@@ -93,6 +102,7 @@ export function MayProvider({
       >
         {children}
       </div>
+      </LinkComponentProvider>
       </PlatformProvider>
     </MayContext.Provider>
   )

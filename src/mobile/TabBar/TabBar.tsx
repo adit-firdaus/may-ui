@@ -1,6 +1,7 @@
 import type { HTMLAttributes, MouseEvent, ReactNode } from 'react'
 import { useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
+import { useLinkComponent } from '../../hooks/link'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { duration, resolveCurve, spring } from '../../motion/springs'
@@ -167,6 +168,7 @@ function TabBarItemView<T extends string = string>({
   itemRef,
   onSelect,
 }: TabBarItemViewProps<T>) {
+  const Link = useLinkComponent()
   const glyphRef = useRef<HTMLSpanElement>(null)
   const { pressProps } = usePressFeedback(item.disabled)
 
@@ -242,14 +244,15 @@ function TabBarItemView<T extends string = string>({
   }
 
   if (item.href !== undefined) {
+    // The provider's link element, so a tab tap routes instead of reloading.
     return (
-      <a
+      <Link
         {...shared}
         href={item.disabled ? undefined : item.href}
         aria-disabled={item.disabled || undefined}
       >
         {content}
-      </a>
+      </Link>
     )
   }
 
