@@ -277,7 +277,7 @@
   --may-font-sans: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
   --may-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
-  --may-font-rounded: ui-rounded, 'SF Pro Rounded', var(--may-font-sans);
+  --may-font-rounded: ui-rounded, var(--may-font-sans);
 
   --may-text-caption-2: 0.6875rem;
   --may-text-caption-2-leading: 0.8125rem;

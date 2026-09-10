@@ -2,121 +2,138 @@
 
 Repo-specific findings for future syncs. Read this before touching anything.
 
+## What this design system is
+
+May UI was **completely rebuilt** on Apple's design language (commit `5a3b46d`). The
+previous generic violet system is in git history at `f6013b7` and bears no relation to
+what is here now — do not use it as a reference for anything.
+
+74 components in three families, one shared token layer:
+
+| Entry | Count | What lives there |
+|---|---|---|
+| `mayui` | 59 | Adaptive components; they reshape at the breakpoint |
+| `mayui/desktop` | 6 | Shapes with no honest phone form (Sidebar, DataTable, CommandPalette…) |
+| `mayui/mobile` | 9 | Shapes with no desktop meaning (TabBar, PullToRefresh, SwipeAction…) |
+
 ## Setup facts
 
 - **Shape:** storybook. `.storybook/` is at the repo root; `storybookStatic` is
   `.design-sync/sb-reference`.
-- **Entry must be passed explicitly.** This is the package's own source repo, so
-  `node_modules/mayui` does not exist — the converter needs `--entry dist/mayui.js`
-  (recorded as `cfg.entry`).
-- **Build first.** `npm run build` (typecheck + vite lib build) must run before the
-  converter; it produces `dist/mayui.js` and `dist/mayui.css`.
-- **Machine setup (will NOT survive a fresh clone or a new machine):** node was installed
-  by hand at `~/.local/node` — there is no system node, so every command needs
-  `export PATH="$HOME/.local/bin:$PATH"`. Chromium also needed
-  `npx playwright install-deps chromium` (it was missing `libnspr4.so`) before any render
-  check or compare would launch. Expect to repeat both.
+- **Entry must be passed explicitly** — this is the package's own source repo, so
+  `node_modules/mayui` does not exist. `cfg.entry` is `dist/mayui.js`, and
+  `cfg.extraEntries` carries `./dist/desktop.js` and `./dist/mobile.js`, because the
+  two dedicated families are **separate build outputs** and would otherwise be missing
+  from `window.MayUI` entirely.
+- **Build first.** `npm run build` regenerates the token and spring CSS, typechecks, and
+  emits all three bundles.
+- **Machine setup (will NOT survive a fresh clone):** node was installed by hand at
+  `~/.local/node` — there is no system node, so every command needs
+  `export PATH="$HOME/.local/bin:$PATH"`. Chromium needed
+  `npx playwright install-deps chromium` (missing `libnspr4.so`).
 
 ## Config decisions
 
-- `titleMap: {"Designtokens": null}` — the `Foundation/Design tokens` story is a
-  documentation page (colour swatches, spacing ramp, type scale), not a component.
-  Excluded deliberately; without this the build prints `[TITLE_UNMAPPED]`.
-- `overrides.Pagination.cardMode: "column"` — the `ManyPages` story (50 pages) renders
-  wider than a grid cell; validate flagged `[GRID_OVERFLOW] wide`.
-- `overrides.Tooltip.cardMode: "column"` — the `Placements` story lays four triggers out
-  horizontally inside 60px padding; same `wide` flag.
-- `readmeHeader: ".design-sync/conventions.md"` — the authored conventions header. Every
-  token, export and prop named in it was grepped against `_ds_bundle.css` / `_ds_bundle.js`
-  / the generated `.d.ts` files before shipping. Keep it true; do not rewrite it wholesale.
+- `titleMap: {"Overview": null}` — `Foundations/Overview` is the token catalog (colour
+  swatches, the type ramp, live motion demos), not a component.
+- `overrides` — ten components flagged `[GRID_OVERFLOW]`:
+  - `cardMode: "column"` for AlertDialog, Fab, Popover, Stepper, Toolbar, Tooltip, NavBar
+    (stories wider than a grid cell).
+  - `cardMode: "single"` for CommandPalette, FloatingBubble, TabBar (viewport-fixed
+    content that escapes any cell), each with a `primaryStory`.
+- `readmeHeader: ".design-sync/conventions.md"` — rewritten for the Apple system. Every
+  token, component and prop named in it was validated against the built artifacts before
+  shipping.
 
 ## Findings
 
+### `[GENERAL]` The compare harness cannot see viewport-fixed overlays
+
+**The most important thing in this file.** `compare.mjs` screenshots the storybook side
+with `el.screenshot()` on `#storybook-root`. A story whose entire visible output is a
+viewport-fixed overlay leaves that root with only a ~48px in-flow stub, so the reference
+shot is a blank grey band. At 314 bytes it clears the `png.length < 200` full-page
+fallback guard, so the pair is written, counted as `needs-grade`, and reports
+`counts.sb-error = 0` — **it looks gradeable when there is nothing to compare against.**
+
+Confirmed objectively on CommandPalette: three of its four stories have 314-byte
+reference shots against 15–32kB preview shots. The fourth escapes only because it renders
+an in-flow trigger.
+
+Consequence: the open state of every overlay in this system — Modal, Sheet, ActionSheet,
+AlertDialog, Popover, Menu, Popup, Toast, Tooltip, CommandPalette, ContextMenu — is
+**not verified by the compare oracle**. Most of those components are also
+interaction-gated, so both panels legitimately show only a trigger and grade `match`
+without exercising the overlay at all.
+
+What *does* cover them: `package-validate.mjs`'s render check (73/73 previews render
+cleanly, and that renders the real preview html including open overlays), and
+`scripts/smoke.mjs`, which SSR-renders every overlay open and asserts its modal
+semantics. Treat those two as the overlay gate, not the sheets.
+
+If overlay fidelity ever needs to be visually verified, the fix is in the harness — fall
+back to a full-viewport screenshot when the root box has no painted content, rather than
+keying the fallback on PNG byte length — not in any component.
+
 ### `[GENERAL]` Contact sheets invent deltas — always open the raw pair
 
-Three separate fan-out agents independently hit this. The compare sheet downscales hard
-enough to fabricate differences that do not exist:
+Reproduced on **every** grading run so far, across seven independent agents. The sheets
+downscale hard enough to fabricate differences: `$480`→`$980`, `64%`→`84%`,
+`$241.59`→`$241.09`, `MacBook Pro 14"`→`MacBook Pro 54"`, `$0.99`→`$0.98`, an unchecked
+checkbox reading as a circle. Every one was pixel-identical in
+`_screenshots/compare/raw/`. **Never write a mismatch or close verdict from the sheet
+alone** when the delta is small text, a digit, small geometry, or an icon's presence.
 
-- an unchecked `Checkbox` square read as a **circle**
-- `RadioGroup`'s "One payment of $480." read as **"$980."**
-- `Progress`/`With Value` read as **"64% vs 84%"**
+### `[GENERAL]` Framing differs by construction — not a defect
 
-All three were pixel-identical in `_screenshots/compare/raw/*__sb.png` vs `*__ds.png`. The
-storybook column is scaled harder than the preview column, so small glyphs and small
-geometry alias differently. **Never grade a small-text or small-shape delta off the sheet** —
-open the raw pair first, or you will chase a fix for a resampling artifact.
+Storybook shots are cropped tight to the story bounds (e.g. 868×92); preview shots are
+always the full 900×700 capture page with a 24px body pad. So the preview band is wider
+and content sits at a different x-offset on essentially every pair. On dense components
+it also shifts available content width by ~16px, which can move where text wraps. The
+rubric classes this as ignorable; it is not a padding bug.
 
-### `[GENERAL]` No `cfg.provider` needed
+### `[GENERAL]` Animated stories capture at an arbitrary phase
 
-`.storybook/preview.tsx` decorators bundle automatically into `preview-decorators.js` and
-supply the `<MayProvider theme={...} inline>` wrapper — which is what carries the tokens —
-to compiled previews exactly as they do to stories. Confirmed across all four batches
-(34 components / 108 stories, zero preview edits). Do not set `cfg.provider` for this repo.
+Spinner arcs and marquee offsets can differ between panels with no content difference
+(seen on Progress → Indeterminate, NoticeBar → Marquee). Judge shape, size and colour,
+not animation phase.
 
-### `[GENERAL]` No remote-asset or webfont exposure
+### `[GENERAL]` No provider config needed
 
-Every icon is an inline SVG, `Avatar` falls back to rendered initials, and typography uses
-the system stack (`--may-font-sans` / `--may-font-mono`). `[ASSETS_BLOCKED]` has nothing to
-trip on and `[FONT_MISSING]` is not a risk here — both panels render the same real faces.
+`.storybook/preview.tsx` decorators bundle automatically and supply the `<MayProvider>`
+tokens to previews. Do not set `cfg.provider` for this repo.
 
-### `[GENERAL]` Framing differs by design — ignore it
+### `[GENERAL]` No webfonts, deliberately
 
-The storybook raw shot is cropped to the story bounds; the preview shot is the full capture
-page. So the preview band is wider and content sits at a different x-offset on every sheet.
-This is the framing difference the §4 rubric tells you to ignore — it is not a padding or
-width bug and needs no per-component fix.
-
-### `[GENERAL]` Story-local helpers compile in correctly
-
-Helpers defined inside story files (the `Item` component in the layout stories, the inline
-SVG icon consts in `IconButton`/`Tooltip`/`Button` stories) come through the story-module
-compile intact. A missing helper elsewhere would therefore be a genuine bug, not expected
-behaviour.
-
-### `[GENERAL]` IconButton depended on a sibling's CSS — fixed at source
-
-`IconButton.tsx` applies `may-button`, `may-button--${variant}` and
-`may-button--tone-${tone}`, but those rules live only in `Button.css`; `IconButton.css` has
-none of them. Its only reference to Button was `import type { ButtonVariant }`, which is
-erased at compile. The shipped bundle was always correct (`vite.config.ts` sets
-`cssCodeSplit: false`, so `dist/mayui.css` concatenates everything), but **Storybook
-code-splits** — `assets/Button-*.css` vs `assets/IconButton-*.css` — and the IconButton
-story never loaded Button's chunk, so the *reference* rendered native unstyled buttons
-while the preview rendered correctly.
-
-Graded `match` under the §4 rule "when the REFERENCE side is the artifact", then fixed
-properly at source: `IconButton.tsx` now carries a value import of `../Button/Button.css`.
-The `dist/mayui.css` byte size did not change (Vite dedupes).
-
-**Pattern to watch:** any component whose CSS comes from a sibling reached only through a
-type-only import will under-render on the Storybook side while the shipped bundle stays
-correct. If a future component's reference looks unstyled, check its CSS imports before
-assuming the preview is wrong.
+The type stack is `-apple-system, system-ui`, so SF Pro on Apple platforms and a system
+fallback elsewhere. `--may-font-rounded` uses the `ui-rounded` CSS generic rather than
+naming `'SF Pro Rounded'`, which previously tripped `[FONT_MISSING]` by looking like a
+webfont reference that never ships. `[ASSETS_BLOCKED]` has nothing to trip on either —
+every icon is inline SVG.
 
 ## Re-sync risks
 
-Things that can silently go stale or mislead the next run:
-
-- **`Modal` and `Drawer` open state is never visually compared.** Both components' stories
-  are click-driven, so both panels legitimately render only the trigger buttons, and their
-  product cards show triggers too. They were graded `match` on that explicit basis — the
-  dialog/panel rendering itself is verified only by the validator's render check, not by the
-  compare oracle. If either component's open-state styling regresses, this sync would not
-  catch it. Adding an `open`-by-default story upstream would close the gap.
-- **`Foundation/Design tokens` is excluded** via `titleMap: {"Designtokens": null}`. If that
-  story is ever replaced by a real component, remove the exclusion.
-- **Generated `Button.d.ts` declares `style?: CSSProperties` unqualified** (not
-  `React.CSSProperties`). The validator's `.d.ts` parse passes and it did not block the sync,
-  but the design agent reads these files as prop contracts. Worth watching if the agent
-  starts mis-typing `style`.
-- **Sibling-trusted grades.** Batch B (Box, Stack, Grid, Divider, Card, Heading) graded its
-  primary story from images and marked the remaining stories `sibling-trusted` under the §4
-  sampling rule. Those siblings were captured but not individually eyeballed. Everything
-  else in the sync was exhaustively image-judged.
-- **The reference must be rebuilt whenever DS source changes.** `.design-sync/sb-reference`
-  and `dist/` move together; a stale reference makes every grade a comparison against the
-  old design. `[REFERENCE_STALE?]` in the capture log means you forgot.
-- **No owned previews exist.** `.design-sync/previews/` is empty by design — every generated
-  preview was correct. If a future run adds one, remember nothing ever machine-deletes it:
-  an owned preview landed for a global cause will permanently shadow the corrected generated
-  twin.
+- **Overlay open states are unverified by the compare oracle** (see the harness gap
+  above). This is the single biggest coverage gap in this sync. If an overlay's styling
+  regresses, the sheets will still read `match`.
+- **101 of 332 story verdicts are `sibling-trusted`** — the component's primary story was
+  image-judged and its siblings inherited that verdict under the §4 sampling rule. They
+  were captured but not individually eyeballed.
+- **`Table` grades only its desktop shape.** It is adaptive and collapses into grouped
+  list rows below the breakpoint, but the capture viewport is desktop-width, so the
+  mobile reshape is never photographed. Same for every other adaptive component's phone
+  form — `Sheet` in particular is graded as a centred dialog, never as a bottom sheet.
+- **Apple's label alphas are lower-contrast than ss-ui's tuned values** (0.60/0.30/0.18
+  vs 0.75/0.45/0.25). This was a deliberate fidelity-over-contrast choice, taken together
+  with Apple's true systemBlue. If secondary text reads faint in use, raising the alphas
+  in `scripts/gen-tokens.mjs` is a one-line fix.
+- **Two CSS files are generated** — `src/styles/tokens.css` and `src/styles/motion.css`.
+  Never hand-edit them; edit `scripts/gen-tokens.mjs` / `scripts/gen-springs.mjs` and run
+  `npm run generate`. The spring curves are sampled from real physics at build time.
+- **`--may-breakpoint-desktop` is read by both CSS and `useIsDesktop`.** Keep it that
+  way; ss-ui's JS (992px) and CSS (1024px) breakpoints disagreed and components took
+  different branches between the two.
+- **The build gates are the contract.** `npm run verify` runs typecheck, build, an SSR
+  smoke over all 90 exports with 22 accessibility assertions, a token audit, the design
+  contract (no borders, no blur, gated hover, unselectable chrome), and bundle budgets.
+  A design regression fails the build rather than shipping quietly.

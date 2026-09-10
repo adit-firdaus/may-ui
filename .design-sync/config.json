@@ -9,15 +9,46 @@
   "buildCmd": "npm run build",
   "storybookStatic": ".design-sync/sb-reference",
   "titleMap": {
-    "Designtokens": null
+    "Overview": null
   },
+  "readmeHeader": ".design-sync/conventions.md",
+  "extraEntries": [
+    "./dist/desktop.js",
+    "./dist/mobile.js"
+  ],
   "overrides": {
-    "Pagination": {
+    "AlertDialog": {
+      "cardMode": "column"
+    },
+    "Fab": {
+      "cardMode": "column"
+    },
+    "Popover": {
+      "cardMode": "column"
+    },
+    "Stepper": {
+      "cardMode": "column"
+    },
+    "Toolbar": {
       "cardMode": "column"
     },
     "Tooltip": {
       "cardMode": "column"
+    },
+    "NavBar": {
+      "cardMode": "column"
+    },
+    "CommandPalette": {
+      "cardMode": "single",
+      "primaryStory": "Open"
+    },
+    "FloatingBubble": {
+      "cardMode": "single",
+      "primaryStory": "AssistiveTouch"
+    },
+    "TabBar": {
+      "cardMode": "single",
+      "primaryStory": "Default"
     }
-  },
-  "readmeHeader": ".design-sync/conventions.md"
+  }
 }
