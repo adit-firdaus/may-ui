@@ -7,8 +7,11 @@ import react from '@vitejs/plugin-react'
  * reflects the working tree — editing a component updates the gallery on the
  * next HMR tick rather than after a rebuild.
  */
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: __dirname,
+  // The gallery is deployed to GitHub Pages under the repo path. Only the
+  // production build takes the sub-path; the dev server stays at '/'.
+  base: command === 'build' ? '/may-ui/' : '/',
   plugins: [react()],
   resolve: {
     alias: { 'may-ui': resolve(__dirname, '../src') },
@@ -31,4 +34,4 @@ export default defineConfig({
     allowedHosts: ['.ts.net'],
   },
   build: { outDir: 'dist', emptyOutDir: true },
-})
+}))

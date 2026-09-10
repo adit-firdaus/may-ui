@@ -18,8 +18,12 @@ const config: StorybookConfig = {
    * opened from another device on the tailnet rather than only from localhost;
    * the leading dot covers every machine under it.
    */
-  viteFinal: async (config) => ({
+  viteFinal: async (config, { configType }) => ({
     ...config,
+    // Deployed to GitHub Pages under the repo path, beside the examples gallery
+    // at the site root. Only the production build takes the sub-path; dev stays
+    // at '/'.
+    base: configType === 'PRODUCTION' ? '/may-ui/storybook/' : config.base,
     server: {
       ...config.server,
       allowedHosts: [...((config.server?.allowedHosts as string[]) ?? []), '.ts.net'],
