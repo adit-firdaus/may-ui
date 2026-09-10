@@ -89,6 +89,10 @@
 /* A destructive row is destructive all the way through. */
 .may-menu__item[data-destructive='true'] .may-menu__icon { color: inherit; }
 
+/* A checked row's mark carries the tint, not the muted icon colour: it is the
+ * answer to the menu's question, not decoration beside it. */
+.may-menu__item[data-checked='true'] .may-menu__icon { color: var(--may-color-tint); }
+
 /* Default glyph size that an explicit size on the icon overrides. */
 .may-menu__icon > svg {
   width: 1.15em;

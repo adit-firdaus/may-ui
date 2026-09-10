@@ -1,3 +1,4 @@
+import { IoCheckmark } from 'react-icons/io5'
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
@@ -14,6 +15,15 @@ export interface MenuItem {
   onSelect?: () => void
   /** Leading glyph. A bare `<svg>` is scaled to the row by CSS. */
   icon?: ReactNode
+  /**
+   * Marks a mutually-exclusive or toggled choice — a theme, a language, a sort
+   * order. Present at all (`true` OR `false`) makes the row checkable: it takes
+   * `menuitemcheckbox` semantics with `aria-checked`, and reserves the leading
+   * slot either way so the labels in a mixed menu still line up. Checked draws
+   * a checkmark in that slot, which is the macOS idiom and what a consumer
+   * would otherwise fake by swapping `icon`.
+   */
+  checked?: boolean
   /** Draws the row in the destructive tone. Delete, Report, Block. */
   destructive?: boolean
   disabled?: boolean
@@ -286,8 +296,10 @@ function MenuItemRow({ item, tabbable, register, onActivate, onHover }: MenuItem
       {...pressProps}
       ref={register}
       type="button"
-      role="menuitem"
+      role={item.checked === undefined ? 'menuitem' : 'menuitemcheckbox'}
+      aria-checked={item.checked}
       data-slot="menu-item"
+      data-checked={item.checked ? 'true' : undefined}
       data-destructive={item.destructive ? 'true' : undefined}
       data-separator={item.separator ? 'true' : undefined}
       // Roving focus: exactly one item is in the tab order, so Tab leaves the
@@ -298,9 +310,9 @@ function MenuItemRow({ item, tabbable, register, onActivate, onHover }: MenuItem
       onPointerEnter={onHover}
       className={cx('may-menu__item', 'may-hoverable')}
     >
-      {item.icon && (
+      {(item.icon || item.checked !== undefined) && (
         <span className="may-menu__icon" aria-hidden>
-          {item.icon}
+          {item.checked === undefined ? item.icon : item.checked ? <IoCheckmark /> : null}
         </span>
       )}
       <span className="may-menu__label">{item.label}</span>
