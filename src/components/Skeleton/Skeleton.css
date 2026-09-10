@@ -1,0 +1,107 @@
+/**
+ * The base is --may-color-fill-tertiary and the sweep is
+ * --may-color-fill-quaternary layered over it. Both are translucent greys from
+ * the same ramp, so the band composites DARKER on a light surface and LIGHTER
+ * on a dark one — the highlight always moves toward contrast, and the file
+ * needs no per-theme override at all.
+ */
+
+.may-skeleton {
+  display: block;
+  min-width: 0;
+
+  --may-skeleton-radius: var(--may-radius-md);
+  /* ~12px: the ink band of a line of body text, not its leading. */
+  --may-skeleton-line-h: calc(var(--may-text-body) * 0.72);
+  /* 1.5s. Fast enough to read as alive, slow enough not to nag while you wait. */
+  --may-skeleton-sweep: calc(var(--may-duration-sheet-in) * 3);
+}
+
+/* --------------------------------- surfaces -------------------------------- */
+
+/* Every shimmering surface, whether the root is the bar (block, circle) or
+ * holds a stack of them (text). */
+.may-skeleton[data-variant='block'],
+.may-skeleton[data-variant='circle'],
+.may-skeleton__line {
+  position: relative;
+  overflow: hidden;
+  background: var(--may-color-fill-tertiary);
+  border-radius: var(--may-skeleton-radius);
+}
+
+.may-skeleton[data-variant='block']::after,
+.may-skeleton[data-variant='circle']::after,
+.may-skeleton__line::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--may-color-fill-quaternary) 50%,
+    transparent 100%
+  );
+  /* Transform, not background-position: the sweep then lives on the compositor
+   * and a screen full of placeholders costs one layer each instead of a repaint. */
+  transform: translateX(-100%);
+  animation: may-skeleton-sweep var(--may-skeleton-sweep) var(--may-ease-standard) infinite;
+}
+
+@keyframes may-skeleton-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+/* --------------------------------- variants -------------------------------- */
+
+.may-skeleton[data-variant='text'] {
+  display: flex;
+  flex-direction: column;
+  /*
+   * The gap is what is LEFT of the line box once the bar is drawn, so a stack
+   * of placeholders lands on the same rhythm as the paragraph replacing it.
+   * The floor matters: a caller-supplied bar taller than the line box would
+   * otherwise compute a negative gap, and one invalid value takes the whole
+   * declaration down to `normal` — bars touching each other.
+   */
+  gap: max(var(--may-space-1), calc(var(--may-text-body-leading) - var(--may-skeleton-line-h)));
+  --may-skeleton-radius: var(--may-radius-full);
+}
+
+.may-skeleton__line {
+  height: var(--may-skeleton-line-h);
+  flex-shrink: 0;
+}
+
+.may-skeleton__line[data-tail='true'] { width: 60%; }
+
+.may-skeleton[data-variant='block'] {
+  width: 100%;
+  height: var(--may-control-h);
+}
+
+.may-skeleton[data-variant='circle'] {
+  width: var(--may-control-h);
+  /* Keeps it round when only a width is given; an explicit height wins. */
+  aspect-ratio: 1;
+  --may-skeleton-radius: var(--may-radius-full);
+}
+
+/* -------------------------------- reduced -------------------------------- */
+
+/*
+ * base.css would run the sweep once at 1ms and park it off the trailing edge,
+ * which is invisible but leaves a live animation on every placeholder. Remove
+ * it outright and hold the static base tone, as asked.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .may-skeleton[data-variant='block']::after,
+  .may-skeleton[data-variant='circle']::after,
+  .may-skeleton__line::after {
+    animation: none;
+    opacity: 0;
+  }
+}

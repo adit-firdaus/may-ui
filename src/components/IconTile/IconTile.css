@@ -1,0 +1,60 @@
+/**
+ * One variable — --may-tile-size — drives the box and everything inside it, so
+ * a glyph never has to know which rung it is being drawn at.
+ *
+ * The rungs are ratios of --may-control-h rather than literals: 0.66 lands on
+ * iOS's 29pt Settings icon against its 44pt row, and 1.375 on the 60pt
+ * home-screen icon. Retune the control height and the tiles follow.
+ */
+
+.may-icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-tile-size);
+  height: var(--may-tile-size);
+  /* 22% of the box — the squircle approximation, not a fixed radius, so the
+   * curve stays proportional at every size. */
+  border-radius: var(--may-radius-squircle);
+  color: var(--may-color-on-primary);
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1;
+  overflow: hidden;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  user-select: none;
+  /* No box-shadow. An app icon sits in the surface, not above it. */
+}
+
+.may-icon-tile[data-size='sm'] { --may-tile-size: calc(var(--may-control-h) * 0.66); }
+.may-icon-tile[data-size='md'] { --may-tile-size: var(--may-control-h); }
+.may-icon-tile[data-size='lg'] { --may-tile-size: calc(var(--may-control-h) * 1.375); }
+
+/* The glyph is a fixed fraction of the tile, the way SF Symbols are specced
+ * inside an app icon's grid. An explicitly sized svg opts out. */
+.may-icon-tile > svg:not([width]) {
+  width: calc(var(--may-tile-size) * 0.6);
+  height: calc(var(--may-tile-size) * 0.6);
+  display: block;
+}
+
+/* A text or emoji glyph scales with the tile too — this is the one place a
+ * ratio beats a named text style, because the type IS the artwork. */
+.may-icon-tile { font-size: calc(var(--may-tile-size) * 0.5); }
+
+.may-icon-tile[data-gradient='blue'] { background: var(--may-grad-blue); }
+.may-icon-tile[data-gradient='green'] { background: var(--may-grad-green); }
+.may-icon-tile[data-gradient='red'] { background: var(--may-grad-red); }
+.may-icon-tile[data-gradient='orange'] { background: var(--may-grad-orange); }
+.may-icon-tile[data-gradient='yellow'] { background: var(--may-grad-yellow); }
+.may-icon-tile[data-gradient='purple'] { background: var(--may-grad-purple); }
+.may-icon-tile[data-gradient='pink'] { background: var(--may-grad-pink); }
+.may-icon-tile[data-gradient='teal'] { background: var(--may-grad-teal); }
+.may-icon-tile[data-gradient='indigo'] { background: var(--may-grad-indigo); }
+.may-icon-tile[data-gradient='gray'] { background: var(--may-grad-gray); }
+.may-icon-tile[data-gradient='spectrum'] { background: var(--may-grad-spectrum); }
+
+/* Yellow is too light to carry white artwork; the label colour reads instead. */
+.may-icon-tile[data-gradient='yellow'] { color: var(--may-label); }

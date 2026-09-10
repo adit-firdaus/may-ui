@@ -1,0 +1,134 @@
+/*
+ * Muted by construction: the glyph is tertiary label, the title is plain text
+ * and the description is secondary. Nothing here competes with the action.
+ */
+
+.may-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--may-space-2);
+  min-width: 0;
+  padding: var(--may-space-10) var(--may-space-6);
+  color: var(--may-color-text);
+}
+
+.may-empty__glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-block-end: var(--may-space-2);
+  color: var(--may-color-text-tertiary);
+  font-size: var(--may-text-large-title);
+  line-height: 1;
+}
+
+/* An icon with no explicit size fills the glyph slot; one with a size keeps it. */
+.may-empty__glyph > svg:not([width]) {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
+
+.may-empty__title {
+  margin: 0;
+  font-size: var(--may-text-title-3);
+  line-height: var(--may-text-title-3-leading);
+  letter-spacing: var(--may-text-title-3-tracking);
+  font-weight: var(--may-text-title-3-weight);
+}
+
+.may-empty__description {
+  margin: 0;
+  /* A measure, not a width: past roughly 40 characters a centred paragraph
+   * stops being scannable. */
+  max-width: 38ch;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+.may-empty__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-3);
+  flex-wrap: wrap;
+  margin-block-start: var(--may-space-4);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-empty[data-size='sm'] {
+  padding: var(--may-space-6) var(--may-space-4);
+  gap: var(--may-space-1);
+}
+.may-empty[data-size='sm'] .may-empty__glyph { font-size: var(--may-text-title-1); }
+.may-empty[data-size='sm'] .may-empty__title {
+  font-size: var(--may-text-headline);
+  line-height: var(--may-text-headline-leading);
+  letter-spacing: var(--may-text-headline-tracking);
+  font-weight: var(--may-text-headline-weight);
+}
+.may-empty[data-size='sm'] .may-empty__description { font-size: var(--may-text-footnote); }
+.may-empty[data-size='sm'] .may-empty__action { margin-block-start: var(--may-space-3); }
+
+.may-empty[data-size='lg'] {
+  padding: var(--may-space-16) var(--may-space-6);
+}
+.may-empty[data-size='lg'] .may-empty__glyph {
+  font-size: calc(var(--may-text-large-title) * 1.6);
+}
+.may-empty[data-size='lg'] .may-empty__title {
+  font-size: var(--may-text-title-2);
+  line-height: var(--may-text-title-2-leading);
+  letter-spacing: var(--may-text-title-2-tracking);
+  font-weight: var(--may-text-title-2-weight);
+}
+.may-empty[data-size='lg'] .may-empty__description { font-size: var(--may-text-body); }
+
+/* --------------------------------- entrance -------------------------------- */
+
+/*
+ * Staggered by one press-length each, so the screen composes itself top-down.
+ * `backwards` fill keeps a delayed part hidden until its turn instead of
+ * flashing in place first.
+ */
+.may-empty__glyph,
+.may-empty__title,
+.may-empty__description,
+.may-empty__action {
+  animation: may-empty-in var(--may-duration-settle) var(--may-spring-bouncy) backwards;
+}
+
+.may-empty__title { animation-delay: var(--may-duration-instant); }
+.may-empty__description { animation-delay: calc(var(--may-duration-instant) * 1.5); }
+.may-empty__action { animation-delay: calc(var(--may-duration-instant) * 2); }
+
+@keyframes may-empty-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(var(--may-space-2));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * base.css collapses animation DURATION for reduced motion but cannot clear a
+ * delay, and a staggered entrance would then hold each part invisible for its
+ * delay before snapping in. Drop the animation entirely instead.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .may-empty__glyph,
+  .may-empty__title,
+  .may-empty__description,
+  .may-empty__action {
+    animation: none;
+  }
+}

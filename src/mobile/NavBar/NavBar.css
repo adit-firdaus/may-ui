@@ -1,0 +1,156 @@
+/*
+ * Nothing here draws a stroke. The bar separates itself from the content below
+ * by value (an opaque --may-color-surface over the page's --may-color-bg) and,
+ * where that is not enough, by a hairline pseudo-element — outside the box
+ * model, so turning it on never moves the title by a pixel.
+ */
+
+.may-nav-bar {
+  position: relative;
+  z-index: var(--may-z-nav);
+  width: 100%;
+  /*
+   * The notch is *extra* height above the bar, never a share of it: the row
+   * keeps its full --may-navbar-h on every phone. The inline insets matter in
+   * landscape, where the rounded corners eat into the ends of the bar.
+   */
+  padding-block-start: var(--may-inset-top);
+  padding-inline: var(--may-inset-left) var(--may-inset-right);
+  color: var(--may-color-text);
+  /* Snappy rather than bouncy: a bar that overshoots on its way back peels
+   * away from the top edge, and the gap behind it is the whole illusion. */
+  transition: transform var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-nav-bar[data-variant='surface'] { background: var(--may-color-surface); }
+.may-nav-bar[data-variant='plain'] { background: transparent; }
+
+.may-nav-bar[data-position='sticky'] {
+  position: sticky;
+  inset-block-start: 0;
+}
+
+.may-nav-bar[data-position='fixed'] {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+}
+
+/*
+ * Hidden by transform rather than by height or display: a transform stays on
+ * the compositor and, crucially, does not reflow the content underneath — a
+ * bar that collapsed its own height would drag the whole screen up with it.
+ * Pointer events go with it, so the strip it used to occupy is not a dead zone.
+ */
+.may-nav-bar[data-hidden='true'] {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* -------------------------------- hairline -------------------------------- */
+
+.may-nav-bar[data-separator='true']::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+  pointer-events: none;
+}
+
+/* A separator is one device pixel, not one CSS pixel. */
+@media (min-resolution: 2dppx) {
+  .may-nav-bar[data-separator='true']::after { height: var(--may-hairline); }
+}
+
+/* ---------------------------------- row ----------------------------------- */
+
+/*
+ * Three tracks. The outer two are `1fr` each, so they always take an equal
+ * share of the free space and the middle track sits dead-centre of the bar —
+ * a flex row would centre the title between the sides instead, which drifts
+ * the moment one side is wider than the other. Each side keeps its content's
+ * width (grid's automatic minimum), while the title's `min-width: 0` lets its
+ * track collapse, so the title is what truncates when the bar runs out of room.
+ */
+.may-nav-bar__row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--may-space-2);
+  height: var(--may-navbar-h);
+  padding-inline: var(--may-space-2);
+}
+
+.may-nav-bar__side {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-1);
+  min-width: 0;
+}
+
+.may-nav-bar__side--leading { justify-self: start; }
+.may-nav-bar__side--trailing { justify-self: end; }
+
+/* --------------------------------- title ---------------------------------- */
+
+.may-nav-bar__title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  /* headline, not body: same size, heavier and tighter — the pair iOS uses to
+   * separate a title from the text under it without changing its scale. */
+  font-size: var(--may-text-headline);
+  line-height: var(--may-text-headline-leading);
+  letter-spacing: var(--may-text-headline-tracking);
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text);
+}
+
+/* ------------------------------- back button ------------------------------ */
+
+.may-nav-bar__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-1);
+  height: var(--may-control-h);
+  /* Pulls the chevron's own side bearing back out, so the glyph — not the
+   * button's padding — lines up with the content edge below. */
+  margin-inline-start: calc(var(--may-space-1) * -1);
+  padding-inline: var(--may-space-1) var(--may-space-2);
+  border: 0;
+  border-radius: var(--may-radius-md);
+  background: transparent;
+  color: var(--may-color-tint);
+  font-family: inherit;
+  font-size: var(--may-text-body);
+  line-height: 1;
+  letter-spacing: var(--may-text-body-tracking);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+/* No :hover rule of its own — the button carries `.may-hoverable`, whose one
+ * gated highlight in base.css lands as a rounded rect against the radius above. */
+
+.may-nav-bar__chevron {
+  width: 1.05em;
+  height: 1.05em;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* The chevron points back, and back is the other way in a right-to-left script. */
+[dir='rtl'] .may-nav-bar__chevron { transform: scaleX(-1); }
+
+.may-nav-bar__back-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

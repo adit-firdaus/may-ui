@@ -1,0 +1,247 @@
+/*
+ * Two animated presences live here, and both split their motion across two
+ * elements: the wrapper animates presence (width, opacity, scale) while the
+ * button inside animates the press. `.may-pressable` owns `transform`, so a
+ * presence transform on the same node would be overwritten by the press
+ * transition and the pop-in would vanish.
+ */
+
+.may-search {
+  /* Measured at runtime; declared here so the value always resolves and the
+   * token audit can see it defined. */
+  --may-search-cancel-w: 0px;
+
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.may-search--full {
+  display: flex;
+  width: 100%;
+}
+
+/* ---------------------------------- the pill ------------------------------ */
+
+.may-search__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  /* No `gap`: the clear slot collapses to zero width when empty, and a gap
+   * would leave its spacing behind as phantom padding on the trailing edge. */
+  padding-inline: var(--may-space-3);
+  /* Fully rounded, always. A search bar is the one field iOS never squares off. */
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text);
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  cursor: text;
+  box-shadow: 0 0 0 0 transparent;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    box-shadow var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-search__field:focus-within {
+  background: var(--may-color-fill-quaternary);
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-ring) 28%, transparent);
+}
+
+.may-search[data-invalid='true'] .may-search__field {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
+}
+
+.may-search[data-invalid='true'] .may-search__field:focus-within {
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-danger) 40%, transparent);
+}
+
+.may-search[data-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-search:not([data-disabled='true']) .may-search__field:not(:focus-within):hover {
+    background: var(--may-color-fill-secondary);
+  }
+}
+
+.may-search[data-size='sm'] .may-search__field {
+  height: var(--may-control-h-sm);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+.may-search[data-size='md'] .may-search__field {
+  height: var(--may-control-h-md);
+}
+.may-search[data-size='lg'] .may-search__field {
+  height: var(--may-control-h-lg);
+  padding-inline: var(--may-space-4);
+}
+
+/* --------------------------------- contents ------------------------------- */
+
+.may-search__glyph {
+  width: 1.05em;
+  height: 1.05em;
+  flex-shrink: 0;
+  display: block;
+  margin-inline-end: var(--may-space-2);
+  color: var(--may-color-text-tertiary);
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-search__field:focus-within .may-search__glyph {
+  color: var(--may-color-text-secondary);
+}
+
+.may-search__control {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  /* base.css raises font-size to max(16px, 1em) so iOS never zooms; left alone. */
+  letter-spacing: inherit;
+  text-overflow: ellipsis;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.may-search__control::placeholder {
+  color: var(--may-color-text-tertiary);
+  opacity: 1;
+}
+
+/* WebKit draws its own clear button on type="search"; ours is the one that
+ * matches the system and animates. */
+.may-search__control::-webkit-search-cancel-button,
+.may-search__control::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* The pill draws the ring for the whole field. */
+.may-search__control:focus-visible {
+  outline: none;
+}
+
+/* --------------------------------- clear ---------------------------------- */
+
+.may-search__clear-slot {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  /* Springs in from nothing rather than fading — the pop is the confirmation
+   * that there is now something to clear. */
+  transform: scale(0.4);
+  transition:
+    width var(--may-duration-fast) var(--may-ease-out),
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-search__clear-slot[data-visible='true'] {
+  width: var(--may-control-h-xs);
+  opacity: 1;
+  transform: none;
+}
+
+.may-search__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Narrower than the 44px minimum by necessity — it lives inside a 36-52px
+   * pill. It is full-height for the vertical reach, and the field itself
+   * remains the large target. */
+  width: var(--may-control-h-xs);
+  height: 100%;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  background: transparent;
+  color: var(--may-color-text-tertiary);
+  cursor: pointer;
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-search__clear > svg {
+  width: 1.05em;
+  height: 1.05em;
+  display: block;
+}
+
+/* --------------------------------- cancel --------------------------------- */
+
+.may-search__cancel-slot {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(var(--may-space-4));
+  transition:
+    width var(--may-duration-settle) var(--may-ease-standard),
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-search[data-cancel='true'] .may-search__cancel-slot {
+  width: var(--may-search-cancel-w);
+  opacity: 1;
+  transform: none;
+}
+
+.may-search__cancel {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0 0 var(--may-space-3);
+  border: 0;
+  background: transparent;
+  color: var(--may-color-tint);
+  font: inherit;
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-search[data-size='sm'] .may-search__cancel {
+  font-size: var(--may-text-subheadline);
+}
+
+/*
+ * `.may-hoverable`'s generic highlight would paint a lozenge across the gap
+ * these two buttons deliberately leave, so both trade it for a colour shift.
+ * The extra class in the selector is there to win the specificity tie.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .may-search .may-search__clear.may-hoverable:hover:not(:disabled) {
+    background: transparent;
+    color: var(--may-color-text-secondary);
+  }
+
+  .may-search .may-search__cancel.may-hoverable:hover:not(:disabled) {
+    background: transparent;
+    color: color-mix(in srgb, var(--may-color-tint) 78%, var(--may-color-text));
+  }
+}

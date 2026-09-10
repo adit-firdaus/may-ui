@@ -1,0 +1,211 @@
+/*
+ * Everything the scroll drives reads ONE variable, --may-nav-progress, which a
+ * passive listener writes once per frame. No React state is involved, which is
+ * why the collapse costs nothing but a style recalc on the bar itself.
+ *
+ * There is no vibrancy in this system, so the bar is an opaque surface sitting
+ * on a value below the content it covers, and the only line it ever draws is
+ * the hairline that fades in once you have scrolled — a pseudo-element, never
+ * a border.
+ */
+
+.may-nav-bar {
+  /*
+   * 0 at rest, 1 once the large title has fully collapsed. Declared here so
+   * the bar renders correctly before the first scroll frame — and so the large
+   * title has a sane height during SSR, before JS has measured the real one.
+   */
+  --may-nav-progress: 0;
+  --may-nav-large-h: var(--may-text-large-title-leading);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+}
+
+/*
+ * Sticky rather than fixed, so the bar belongs to its scroll container: a nav
+ * bar inside a split view sticks to the top of its own pane, not the viewport.
+ */
+.may-nav-bar[data-sticky='true'] {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--may-z-nav);
+}
+
+/* The hairline is the whole separation story, and it only exists once there is
+ * something scrolled underneath to separate from. */
+.may-nav-bar::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-nav-bar[data-scrolled]::before {
+  opacity: 1;
+}
+
+@media (min-resolution: 2dppx) {
+  .may-nav-bar::before {
+    height: var(--may-hairline);
+  }
+}
+
+/* ----------------------------------- bar ---------------------------------- */
+
+/*
+ * Three columns, with the outer two given equal flexible width, is what keeps
+ * the title optically centred no matter how uneven the two slots are. A flex
+ * row with `justify-content: space-between` would centre it only when both
+ * ends happened to be the same width.
+ */
+.may-nav-bar__bar {
+  display: grid;
+  grid-template-columns: minmax(var(--may-control-h), 1fr) auto minmax(var(--may-control-h), 1fr);
+  align-items: center;
+  gap: var(--may-space-2);
+  min-height: var(--may-navbar-h);
+  padding-inline: var(--may-space-2);
+}
+
+.may-nav-bar__side {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-1);
+  min-width: 0;
+}
+
+.may-nav-bar__side--leading {
+  justify-content: flex-start;
+}
+
+.may-nav-bar__side--trailing {
+  justify-content: flex-end;
+}
+
+/* The iOS back button hugs the edge; Button's own inline padding is tuned for
+ * a free-standing control, so the bar trims it. */
+.may-nav-bar .may-button.may-nav-bar__back {
+  padding-inline: var(--may-space-2);
+  gap: var(--may-space-1);
+}
+
+/* --------------------------------- title ---------------------------------- */
+
+.may-nav-bar__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.may-nav-bar__title-text {
+  margin: 0;
+  font-size: var(--may-text-headline);
+  line-height: var(--may-text-headline-leading);
+  letter-spacing: var(--may-text-headline-tracking);
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.may-nav-bar__subtitle {
+  font-size: var(--may-text-caption-2);
+  line-height: var(--may-text-caption-2-leading);
+  letter-spacing: var(--may-text-caption-2-tracking);
+  color: var(--may-color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/*
+ * With a large title present the inline one is the destination of the
+ * collapse: it stays out of the way until the large title is nearly gone, then
+ * rises the last few pixels into place. The multiplier is what delays it —
+ * opacity stays clamped at 0 until progress passes 0.55.
+ */
+.may-nav-bar[data-large-title='true'] .may-nav-bar__title-text,
+.may-nav-bar[data-large-title='true'] .may-nav-bar__subtitle {
+  opacity: calc(var(--may-nav-progress) * 2.2 - 1.2);
+  transform: translateY(calc((1 - var(--may-nav-progress)) * var(--may-space-2)));
+}
+
+/* ------------------------------- large title ------------------------------ */
+
+/*
+ * The wrapper collapses; the title inside it does not. Anchoring the title to
+ * the wrapper's block-end means a shrinking wrapper slides it up and clips it
+ * from the top — the title disappearing *under* the bar, which is the motion
+ * iOS actually draws. Clipping from the bottom instead reads as a crop.
+ */
+.may-nav-bar__large {
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  block-size: calc(var(--may-nav-large-h) * (1 - var(--may-nav-progress)));
+  padding-inline: var(--may-space-4);
+}
+
+.may-nav-bar[data-large-title='true'] {
+  /* Collapses on the same curve, so the bar finishes exactly flush. */
+  padding-block-end: calc(var(--may-space-2) * (1 - var(--may-nav-progress)));
+}
+
+.may-nav-bar__large-title {
+  margin: 0;
+  font-size: var(--may-text-large-title);
+  line-height: var(--may-text-large-title-leading);
+  letter-spacing: var(--may-text-large-title-tracking);
+  font-weight: var(--may-text-large-title-weight);
+  color: var(--may-color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Shrinks toward its own baseline and leading edge, so it converges on the
+   * inline title rather than drifting toward the middle of the bar. */
+  transform-origin: 0 100%;
+  transform: scale(calc(1 - var(--may-nav-progress) * 0.14));
+  opacity: calc(1 - var(--may-nav-progress) * 1.5);
+}
+
+[dir='rtl'] .may-nav-bar__large-title {
+  transform-origin: 100% 100%;
+}
+
+/* -------------------------------- safe area ------------------------------- */
+
+/*
+ * The inline insets are the axis most ports forget: in landscape the rounded
+ * display corners and the sensor housing eat into the ends of the bar, which
+ * is exactly where its two slots live.
+ */
+.may-nav-bar[data-safe-area='true'] {
+  padding-block-start: var(--may-inset-top);
+}
+
+.may-nav-bar[data-safe-area='true'] .may-nav-bar__bar {
+  padding-inline: calc(var(--may-space-2) + var(--may-inset-left))
+    calc(var(--may-space-2) + var(--may-inset-right));
+}
+
+.may-nav-bar[data-safe-area='true'] .may-nav-bar__large {
+  padding-inline: calc(var(--may-space-4) + var(--may-inset-left))
+    calc(var(--may-space-4) + var(--may-inset-right));
+}

@@ -1,0 +1,98 @@
+/*
+ * The bar carries no stroke of its own. Where it needs to read as separate from
+ * the content it borders, that is either a change of surface value
+ * (data-variant="surface" over --may-color-bg) or a hairline drawn as a
+ * pseudo-element — which, being outside the box model, can be switched on
+ * without moving the bar's contents by a single pixel.
+ */
+
+.may-toolbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  width: 100%;
+  min-width: 0;
+  /* Never a literal: a bar is exactly one touch target tall before padding. */
+  min-height: var(--may-control-h);
+  padding: var(--may-space-2) var(--may-space-4);
+  color: var(--may-color-text);
+}
+
+.may-toolbar[data-align='start'] { justify-content: flex-start; }
+.may-toolbar[data-align='center'] { justify-content: center; }
+.may-toolbar[data-align='end'] { justify-content: flex-end; }
+.may-toolbar[data-align='between'] { justify-content: space-between; }
+
+.may-toolbar[data-variant='surface'] {
+  background: var(--may-color-surface);
+}
+
+/* --------------------------------- sticky --------------------------------- */
+
+/*
+ * `position: sticky` rather than fixed, so the bar belongs to its scroll
+ * container — a sheet's footer sticks inside the sheet, not to the viewport.
+ */
+.may-toolbar[data-sticky='true'] {
+  position: sticky;
+  z-index: var(--may-z-sticky);
+}
+
+.may-toolbar[data-sticky='true'][data-placement='top'] { inset-block-start: 0; }
+.may-toolbar[data-sticky='true'][data-placement='bottom'] { inset-block-end: 0; }
+
+/* -------------------------------- separator ------------------------------- */
+
+/* The hairline faces the content: a top bar draws it below, a bottom bar above. */
+.may-toolbar[data-separator='true']::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+  pointer-events: none;
+}
+
+.may-toolbar[data-separator='true'][data-placement='top']::before { inset-block-end: 0; }
+.may-toolbar[data-separator='true'][data-placement='bottom']::before { inset-block-start: 0; }
+
+@media (min-resolution: 2dppx) {
+  .may-toolbar[data-separator='true']::before { height: var(--may-hairline); }
+}
+
+/* -------------------------------- safe area ------------------------------- */
+
+/*
+ * The inline insets matter in landscape, where the rounded display corners and
+ * the sensor housing eat into the ends of the bar — the axis most ports forget.
+ */
+.may-toolbar[data-safe-area='true'] {
+  padding-inline:
+    calc(var(--may-space-4) + var(--may-inset-left))
+    calc(var(--may-space-4) + var(--may-inset-right));
+}
+
+.may-toolbar[data-safe-area='true'][data-placement='bottom'] {
+  padding-block-end: calc(var(--may-space-2) + var(--may-inset-bottom));
+}
+
+.may-toolbar[data-safe-area='true'][data-placement='top'] {
+  padding-block-start: calc(var(--may-space-2) + var(--may-inset-top));
+}
+
+/* --------------------------------- spacer --------------------------------- */
+
+.may-toolbar__spacer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/*
+ * A spacer and space-between fight each other — the spacer eats the free space
+ * the distribution was meant to hand out. Whenever one is present the bar packs
+ * from the start and lets the spacers do the pushing.
+ */
+.may-toolbar[data-align='between']:has(> .may-toolbar__spacer) {
+  justify-content: flex-start;
+}

@@ -1,0 +1,125 @@
+/*
+ * An alert is the smallest surface in the system and the only one that refuses
+ * to be dismissed by clicking away, so it carries no close affordance and no
+ * stroke — just a lighter surface over the dimmed page and a shadow.
+ */
+
+.may-alert-dialog__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--may-z-popover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--may-space-5);
+  background: var(--may-color-scrim);
+  animation: may-alert-scrim-in var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-alert-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* An alert never widens to fill: a question that spans a 27" display stops
+   * reading as urgent. iOS pins its own at 270pt; this leaves room for two
+   * side-by-side actions at the system's control heights. */
+  max-width: 320px;
+  max-height: calc(100% - var(--may-space-8));
+  border-radius: var(--may-radius-card);
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+  box-shadow: var(--may-shadow-xl);
+  overflow: hidden;
+  /*
+   * The transform rides the bouncy spring — samples reaching 1.166 — so 0.86 →
+   * 1 overshoots resting size by roughly 2% and settles: the alert lands in
+   * front of you. Opacity is kept on a short ease of its own, because a panel
+   * still fading in while it overshoots reads as a dropped frame rather than
+   * as weight.
+   */
+  animation:
+    may-alert-in var(--may-duration-settle) var(--may-spring-bouncy),
+    may-alert-fade var(--may-duration-fast) var(--may-ease-out);
+}
+
+/*
+ * The answer to a click on the scrim. An alert has exactly two answers and
+ * "somewhere else" is neither, so it refuses rather than closes — the same
+ * gesture an NSAlert makes, and far clearer than doing nothing at all.
+ */
+.may-alert-dialog[data-nudge='true'] {
+  animation: may-alert-nudge var(--may-duration-settle) var(--may-ease-standard);
+}
+
+.may-alert-dialog__content {
+  padding: var(--may-space-6) var(--may-space-5) var(--may-space-4);
+  overflow-y: auto;
+  text-align: center;
+}
+
+.may-alert-dialog__title {
+  margin: 0;
+  /* headline is body's size at semibold — the weight is the whole difference. */
+  font-size: var(--may-text-headline);
+  line-height: var(--may-text-headline-leading);
+  letter-spacing: var(--may-text-headline-tracking);
+  font-weight: var(--may-text-headline-weight);
+}
+
+.may-alert-dialog__description {
+  margin: var(--may-space-2) 0 0;
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+.may-alert-dialog__actions {
+  display: flex;
+  gap: var(--may-space-2);
+  padding: 0 var(--may-space-5) var(--may-space-5);
+  flex-shrink: 0;
+}
+
+/* Two equal halves under a mouse. */
+.may-alert-dialog[data-presentation='desktop'] .may-alert-dialog__actions {
+  flex-direction: row;
+}
+
+.may-alert-dialog[data-presentation='desktop'] .may-alert-dialog__actions > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/*
+ * Stacked full-width under a thumb, with the confirming action on top where a
+ * thumb reaches first. `column-reverse` gets that from the DOM order desktop
+ * already wants, so the two shapes share one tree.
+ */
+.may-alert-dialog[data-presentation='compact'] .may-alert-dialog__actions {
+  flex-direction: column-reverse;
+  align-items: stretch;
+}
+
+@keyframes may-alert-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes may-alert-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes may-alert-in {
+  from { transform: scale(0.86); }
+  to { transform: scale(1); }
+}
+
+@keyframes may-alert-nudge {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(calc(var(--may-space-2) * -1)); }
+  40% { transform: translateX(var(--may-space-2)); }
+  65% { transform: translateX(calc(var(--may-space-1) * -1)); }
+  85% { transform: translateX(var(--may-space-1)); }
+}

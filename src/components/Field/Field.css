@@ -1,0 +1,66 @@
+/*
+ * The Field itself draws nothing — no card, no rule, no box. It is a column of
+ * type around a control, and the control is what carries the fill. Anything
+ * else would put a second container around every input in a form.
+ */
+
+.may-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-2);
+  min-width: 0;
+  /* Column children stretch by default, so a control dropped in a Field fills
+   * the Field's width without every consumer passing `fullWidth`. */
+}
+
+.may-field__label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--may-space-1);
+  align-self: flex-start;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  /* headline weight, not subheadline's 400 — the label is the heading of the
+   * pair and has to win against the value typed underneath it. */
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text);
+  cursor: default;
+}
+
+/* Clicking the label focuses the control, so it must not read as disabled prose. */
+.may-field[data-disabled='true'] .may-field__label {
+  opacity: 0.4;
+}
+
+.may-field__required {
+  color: var(--may-color-danger);
+  font-size: var(--may-text-footnote);
+  line-height: 1;
+}
+
+.may-field__message {
+  margin: 0;
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+.may-field__message[data-kind='error'] {
+  color: var(--may-color-danger);
+  /* An error arrives; it does not blink into existence. The nudge downward is
+   * what makes it read as pushed out of the field rather than swapped in. */
+  animation: may-field-error-in var(--may-duration-settle) var(--may-spring-snappy) both;
+}
+
+@keyframes may-field-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--may-space-1)));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

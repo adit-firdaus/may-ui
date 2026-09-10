@@ -1,0 +1,141 @@
+/*
+ * The ring is a box-shadow, and every state writes the whole shadow rather than
+ * swapping a custom property into one. Custom properties are not interpolated
+ * unless they are registered, so a `--may-input-ring` indirection would make
+ * the ring appear instantly and silently lose the spring.
+ */
+
+.may-input {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  min-width: 0;
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text);
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  cursor: text;
+  box-shadow: 0 0 0 0 transparent;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    box-shadow var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-input--full {
+  display: flex;
+  width: 100%;
+}
+
+/*
+ * :focus-within, not :focus-visible. A text field focused by tapping it should
+ * show that it is focused — unlike a button, where a click-focus ring is noise.
+ * The wrapper owning the ring is also why the control kills its own outline
+ * below: two concentric rings is worse than none.
+ */
+.may-input:focus-within {
+  background: var(--may-color-fill-quaternary);
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-ring) 30%, transparent);
+}
+
+.may-input[data-invalid='true'] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
+}
+
+.may-input[data-invalid='true']:focus-within {
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-danger) 40%, transparent);
+}
+
+.may-input[data-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-input:not([data-disabled='true']):not(:focus-within):hover {
+    background: var(--may-color-fill-secondary);
+  }
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-input[data-size='sm'] {
+  height: var(--may-control-h-sm);
+  padding-inline: var(--may-space-3);
+  border-radius: var(--may-radius-sm);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+
+.may-input[data-size='md'] {
+  height: var(--may-control-h-md);
+  padding-inline: var(--may-space-4);
+  border-radius: var(--may-radius-md);
+}
+
+.may-input[data-size='lg'] {
+  height: var(--may-control-h-lg);
+  padding-inline: var(--may-space-5);
+  border-radius: var(--may-radius-lg);
+}
+
+/* -------------------------------- the input ------------------------------- */
+
+.may-input__control {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  /* base.css raises this to max(16px, 1em) on the way past — deliberately not
+   * overridden here, or a 15px `sm` field would zoom the viewport on iOS. */
+  letter-spacing: inherit;
+  text-overflow: ellipsis;
+}
+
+.may-input__control::placeholder {
+  color: var(--may-color-text-tertiary);
+  opacity: 1; /* Firefox dims placeholders a second time. */
+}
+
+.may-input__control:disabled {
+  cursor: not-allowed;
+  /* Safari greys disabled fields on its own; the wrapper already carries it. */
+  -webkit-text-fill-color: currentColor;
+  opacity: 1;
+}
+
+/* The fill draws the ring for the whole field; this would sit inside it. */
+.may-input__control:focus-visible {
+  outline: none;
+}
+
+/* ---------------------------------- affixes ------------------------------- */
+
+.may-input__affix {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--may-space-1);
+  color: var(--may-color-text-tertiary);
+  font-size: var(--may-text-subheadline);
+  white-space: nowrap;
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+/* Sized in em so an affix icon tracks the field's own type scale. */
+.may-input__affix > svg:not([width]) {
+  width: 1.1em;
+  height: 1.1em;
+  display: block;
+}
+
+.may-input:focus-within .may-input__affix[data-side='leading'] {
+  color: var(--may-color-text-secondary);
+}

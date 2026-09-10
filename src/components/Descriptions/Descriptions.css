@@ -1,0 +1,135 @@
+/*
+ * A grouped card of key/value pairs. The card is a grid rather than a stack so
+ * `columns` costs nothing at one column and needs no second layout at two.
+ */
+
+.may-descriptions-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Uppercase eyebrow above the card, as iOS Settings draws its section titles. */
+.may-descriptions__section-header {
+  padding: var(--may-space-4) var(--may-space-4) var(--may-space-2);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--may-color-text-secondary);
+}
+
+.may-descriptions__section-footer {
+  padding: var(--may-space-2) var(--may-space-4) var(--may-space-4);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+}
+
+.may-descriptions {
+  /* Declared here as well as inline, so the stylesheet stands on its own if a
+   * consumer renders the markup without the component. */
+  --may-desc-columns: 1;
+
+  display: grid;
+  grid-template-columns: repeat(var(--may-desc-columns), minmax(0, 1fr));
+  min-width: 0;
+  margin: 0;
+  background: var(--may-color-surface);
+}
+
+.may-descriptions[data-variant='inset'] {
+  border-radius: var(--may-radius-card);
+  overflow: hidden;
+}
+
+.may-descriptions[data-variant='plain'] {
+  background: transparent;
+}
+
+/* ---------------------------------- rows ---------------------------------- */
+
+.may-desc__item {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: var(--may-space-4);
+  min-width: 0;
+  min-height: var(--may-control-h);
+  padding: var(--may-space-2) var(--may-space-4);
+}
+
+/*
+ * Hairline on the row's own top edge, as a pseudo-element rather than a border
+ * so it stays out of the box model and row heights stay exact. Drawing it on
+ * TOP rather than under the previous row is what makes it work in a grid: with
+ * two columns the second column's first row has no sibling above it either.
+ */
+.may-desc__item::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+/* One column indents the hairline under the label, exactly as iOS does. Across
+ * columns the rule runs edge to edge instead, so it reads as one line. */
+.may-descriptions[data-columns='1'] .may-desc__item::before {
+  inset-inline-start: var(--may-space-4);
+}
+
+.may-desc__item[data-row-start='true']::before {
+  content: none;
+}
+
+@media (min-resolution: 2dppx) {
+  .may-desc__item::before { height: var(--may-hairline); }
+}
+
+.may-desc__label {
+  min-width: 0;
+  flex-shrink: 1;
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-desc__value {
+  margin: 0;
+  margin-inline-start: auto;
+  min-width: 0;
+  text-align: end;
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text);
+  /* Values are data — a serial number or an address wraps rather than losing
+   * its tail to an ellipsis. */
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------- stacked --------------------------------- */
+
+.may-descriptions[data-layout='stacked'] .may-desc__item {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--may-space-1);
+  padding-block: var(--may-space-3);
+}
+
+.may-descriptions[data-layout='stacked'] .may-desc__label {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+}
+
+.may-descriptions[data-layout='stacked'] .may-desc__value {
+  margin-inline-start: 0;
+  text-align: start;
+}

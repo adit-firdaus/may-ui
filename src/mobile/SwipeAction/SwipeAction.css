@@ -1,0 +1,251 @@
+/*
+ * Like Button, tone modifiers only SET variables and every other rule only
+ * CONSUMES them, so adding a tone never touches a geometry or motion rule.
+ *
+ * The one idea worth knowing: the action groups are pinned to the DISPLAY edges
+ * and their width is the drag itself (--may-swipe-reveal, written per frame).
+ * They are not slid in from off-screen behind the row, which is how a swipe row
+ * ends up with a gap of bare surface at the edge the moment anyone drags past
+ * the end of the actions. Here there is nothing behind them to show through:
+ * the tiles ARE the gap.
+ */
+
+.may-swipe {
+  --may-swipe-reveal: 0px;
+
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  /* Vertical panning still belongs to the page; the horizontal axis is ours. */
+  touch-action: pan-y;
+  background: var(--may-color-surface);
+  isolation: isolate;
+}
+
+/* --------------------------------- the row -------------------------------- */
+
+.may-swipe__content {
+  position: relative;
+  z-index: var(--may-z-base);
+  width: 100%;
+  min-width: 0;
+  background: var(--may-color-surface);
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+/*
+ * Stacked swipe rows separate the way a grouped list does — one hairline, drawn
+ * as a pseudo-element so it stays out of the box model and row heights stay
+ * exact, inset from the leading edge so it starts under the label. List's own
+ * rule cannot reach across the wrappers, and it travels with the row rather than
+ * staying behind it, which is what iOS does.
+ */
+.may-swipe + .may-swipe .may-swipe__content::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--may-space-4);
+  inset-inline-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-swipe + .may-swipe .may-swipe__content::before {
+    height: var(--may-hairline);
+  }
+}
+
+/* While the finger is down the row must track it exactly — easing reads as lag. */
+.may-swipe[data-dragging='true'] .may-swipe__content,
+.may-swipe[data-dragging='true'] .may-swipe__group {
+  transition: none;
+}
+
+/* ------------------------------- the groups ------------------------------- */
+
+.may-swipe__group {
+  position: absolute;
+  inset-block: 0;
+  display: flex;
+  width: 0;
+  overflow: hidden;
+  /*
+   * A width transition costs layout, which is normally worth avoiding — but the
+   * group is absolutely positioned and holds at most a handful of children, so
+   * the work is out of flow and never reaches the row. Sharing the row's own
+   * curve is what keeps the two edges of the gap moving as one thing.
+   */
+  transition: width var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+.may-swipe__group[data-side='leading'] {
+  inset-inline-start: 0;
+}
+
+/*
+ * Reversed so the FIRST action ends up against the display edge on both sides:
+ * the primary is the one the eye reaches first and the one a full swipe fires,
+ * and it must not swap ends depending on which way the row was dragged.
+ */
+.may-swipe__group[data-side='trailing'] {
+  inset-inline-end: 0;
+  flex-direction: row-reverse;
+}
+
+/* Only the side being dragged toward is uncovered; the other stays at zero. */
+.may-swipe[data-side='leading'] .may-swipe__group[data-side='leading'],
+.may-swipe[data-side='trailing'] .may-swipe__group[data-side='trailing'] {
+  width: var(--may-swipe-reveal);
+}
+
+/* ------------------------------- the tiles -------------------------------- */
+
+.may-swipe__action {
+  --may-swipe-fill: var(--may-gray);
+  --may-swipe-on: var(--may-on-color);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*
+   * The design width lives in the BASIS, which JS reads back from the computed
+   * style to learn how far "open" is — so the number the gesture works with and
+   * the number the browser lays out with are the same one. ~74pt, as iOS draws
+   * a row action, expressed against the touch target so one knob moves both.
+   */
+  flex: 1 1 calc(var(--may-control-h) * 1.7);
+  min-width: 0;
+  padding-inline: var(--may-space-2);
+  border: 0;
+  overflow: hidden;
+  background: var(--may-swipe-fill);
+  color: var(--may-swipe-on);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/*
+ * Qualified with `.may-pressable` on purpose: base.css gives that class a
+ * transform-only `transition`, and at equal specificity the shorthand that
+ * happens to be later in the bundle wins outright — which would silently drop
+ * every property below depending on stylesheet order.
+ */
+.may-swipe__action.may-pressable {
+  transition:
+    max-width var(--may-duration-settle) var(--may-spring-smooth),
+    padding var(--may-duration-settle) var(--may-spring-smooth),
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/* --------------------------------- tones ---------------------------------- */
+
+.may-swipe__action[data-tone='neutral'] {
+  --may-swipe-fill: var(--may-gray);
+  --may-swipe-on: var(--may-on-color);
+}
+.may-swipe__action[data-tone='tint'] {
+  --may-swipe-fill: var(--may-color-primary);
+  --may-swipe-on: var(--may-color-on-primary);
+}
+.may-swipe__action[data-tone='danger'] {
+  --may-swipe-fill: var(--may-color-destructive);
+  --may-swipe-on: var(--may-color-on-destructive);
+}
+.may-swipe__action[data-tone='success'] {
+  --may-swipe-fill: var(--may-color-success);
+  --may-swipe-on: var(--may-on-color);
+}
+.may-swipe__action[data-tone='warning'] {
+  --may-swipe-fill: var(--may-color-warning);
+  --may-swipe-on: var(--may-label);
+}
+
+/* -------------------------------- contents -------------------------------- */
+
+.may-swipe__action-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--may-space-1);
+  min-width: 0;
+  /* The tile cannot scale (see the press rule below), so the contents carry the
+   * motion — press, and the full-swipe pop. */
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-swipe__action-icon {
+  display: inline-flex;
+}
+
+.may-swipe__action-icon > svg:not([width]) {
+  width: 1.35em;
+  height: 1.35em;
+  display: block;
+}
+
+.may-swipe__action-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  letter-spacing: var(--may-text-caption-1-tracking);
+  font-weight: var(--may-text-headline-weight);
+}
+
+/* ------------------------------- full swipe ------------------------------- */
+
+/*
+ * Past the arming point the primary takes the row: the others fold to nothing
+ * and it grows into the space they leave, so the release reads as inevitable
+ * before it happens.
+ *
+ * They collapse through `max-width` rather than through flex-basis, so the
+ * basis stays exactly what the stylesheet declared — that is the number JS
+ * measures, and a value caught mid-transition would mis-measure the group.
+ */
+.may-swipe[data-armed='true'] .may-swipe__action:not([data-primary='true']) {
+  max-width: 0;
+  padding-inline: 0;
+  opacity: 0;
+}
+
+.may-swipe[data-armed='true'] .may-swipe__action[data-primary='true'] .may-swipe__action-inner {
+  transform: scale(1.14);
+}
+
+/* --------------------------------- press ---------------------------------- */
+
+/*
+ * The tile itself must NOT scale. A full-bleed action that shrinks tears away
+ * from the display edge and shows the row's surface behind it — so the glyph and
+ * label carry the press instead, over a fill that darkens the way a row
+ * highlight does. Out-specifies `.may-pressable[data-pressed='true']`.
+ */
+.may-swipe__action.may-pressable[data-pressed='true'] {
+  transform: none;
+  background-color: color-mix(in srgb, var(--may-swipe-fill) 84%, var(--may-label));
+}
+
+.may-swipe__action[data-pressed='true'] .may-swipe__action-inner {
+  transform: scale(0.88);
+}
+
+/* --------------------------------- hover ---------------------------------- */
+
+/*
+ * `.may-hoverable` in base.css paints --may-color-highlight, which is meant for
+ * a row on a neutral surface and would wash a filled tile out. Needs the extra
+ * specificity to beat it, exactly as Fab does.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .may-swipe__action.may-hoverable[data-tone]:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--may-swipe-fill) 88%, var(--may-label));
+  }
+}

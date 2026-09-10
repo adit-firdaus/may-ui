@@ -1,0 +1,178 @@
+/*
+ * The tick draws.
+ *
+ * `pathLength="1"` normalises the stroke, so one dash-offset transition covers
+ * every size, and it rides --may-spring-bouncy: the overshoot pushes the dash
+ * a little past its end, which reads as the stroke snapping into place rather
+ * than sliding across the box. Together with the fill landing at the same
+ * moment, that is the whole gesture.
+ */
+
+.may-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  min-height: var(--may-control-h);
+  /* Bleed the padding outward so the hover row hugs the content but the hit
+   * target still reaches Apple's 44px. */
+  padding-inline: var(--may-space-2);
+  margin-inline: calc(var(--may-space-2) * -1);
+  border-radius: var(--may-radius-md);
+  color: var(--may-color-text);
+  cursor: pointer;
+}
+
+/* A two-line row is far too large to squish convincingly — and text scaled
+ * mid-transition goes soft — so the press feel belongs to the box alone. The
+ * pressable class stays on the root so the control still reads as one to the
+ * rest of the system. */
+.may-checkbox[data-slot='checkbox'].may-pressable {
+  transform: none;
+}
+
+/* With a description the box aligns to the first line, the way a Settings row
+ * hangs its control off the title rather than centring on the block. */
+.may-checkbox:has(.may-checkbox__description) {
+  align-items: flex-start;
+  padding-block: var(--may-space-2);
+}
+
+.may-checkbox[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* -------------------------------- the box -------------------------------- */
+
+.may-checkbox__box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-check-size);
+  height: var(--may-check-size);
+  border-radius: var(--may-radius-xs);
+  background: var(--may-color-fill-tertiary);
+  /* The tick and the dash both paint in currentColor. */
+  color: var(--may-color-on-primary);
+  transform: scale(1);
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/* A description pushes the row taller than one line; nudge the box down by the
+ * difference between the label's leading and the box, so it centres on the
+ * first line instead of hanging above it. */
+.may-checkbox:has(.may-checkbox__description) .may-checkbox__box {
+  margin-block-start: calc((var(--may-text-body-leading) - var(--may-check-size)) / 2);
+}
+
+.may-checkbox[data-pressed='true'] .may-checkbox__box {
+  transform: scale(0.88);
+  transition: transform var(--may-duration-instant) var(--may-ease-out);
+}
+
+.may-checkbox__input:checked + .may-checkbox__box,
+.may-checkbox__input:indeterminate + .may-checkbox__box {
+  background: var(--may-color-primary);
+}
+
+/* Invalid is a wash of the destructive tone on the empty box and the full
+ * destructive fill once ticked — never a red ring around it. */
+.may-checkbox[data-invalid='true'] .may-checkbox__box {
+  background: color-mix(in srgb, var(--may-color-destructive) 18%, transparent);
+}
+
+.may-checkbox[data-invalid='true'] .may-checkbox__input:checked + .may-checkbox__box,
+.may-checkbox[data-invalid='true'] .may-checkbox__input:indeterminate + .may-checkbox__box {
+  background: var(--may-color-destructive);
+}
+
+.may-checkbox__input:focus-visible + .may-checkbox__box {
+  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.may-checkbox__tick {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * The dash is 1.5 path-lengths long, not 1, and the offset lands on 0.5 rather
+ * than 0. That extra half-length is what absorbs the spring's overshoot: with
+ * a dash exactly as long as the path, the bounce past the end drags the gap
+ * back over the stroke's tail and the tick visibly breaks for two frames.
+ * Oversized, the overshoot spends itself on stroke that is already covered.
+ */
+.may-checkbox__tick path {
+  stroke-dasharray: 1.5 3;
+  stroke-dashoffset: 1.5;
+  transition: stroke-dashoffset var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-checkbox__input:checked + .may-checkbox__box .may-checkbox__tick path {
+  stroke-dashoffset: 0.5;
+}
+
+/* Mixed wins over checked: a dash, and the tick stays undrawn. */
+.may-checkbox__input:indeterminate + .may-checkbox__box .may-checkbox__tick path {
+  stroke-dashoffset: 1.5;
+}
+
+.may-checkbox__dash {
+  position: absolute;
+  width: 55%;
+  height: calc(var(--may-check-size) / 10);
+  border-radius: var(--may-radius-full);
+  background: currentColor;
+  transform: scaleX(0);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-checkbox__input:indeterminate + .may-checkbox__box .may-checkbox__dash {
+  transform: scaleX(1);
+}
+
+/* -------------------------------- the text -------------------------------- */
+
+.may-checkbox__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.may-checkbox__label {
+  font-size: var(--may-check-text);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text);
+}
+
+.may-checkbox__description {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-checkbox[data-size='sm'] {
+  --may-check-size: var(--may-space-5);
+  --may-check-text: var(--may-text-subheadline);
+}
+
+.may-checkbox[data-size='md'] {
+  --may-check-size: var(--may-space-6);
+  --may-check-text: var(--may-text-body);
+}
+
+.may-checkbox[data-size='lg'] {
+  --may-check-size: calc(var(--may-space-6) + var(--may-space-1));
+  --may-check-text: var(--may-text-body);
+}

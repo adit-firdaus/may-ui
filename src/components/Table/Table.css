@@ -1,0 +1,342 @@
+/*
+ * One data set, two shapes.
+ *
+ * Above the desktop breakpoint this is a real <table> in a grouped card; below
+ * it the same records are List rows and almost none of these rules apply. The
+ * two layouts are written as if each were the only one, because a table that
+ * merely shrinks is the thing this component exists to avoid.
+ *
+ * Row state is painted on the CELLS, not on the <tr>, and every state is a
+ * translucent wash. That has two consequences worth keeping: the hover fill
+ * base.css puts on the row shows through from underneath — so zebra, selection
+ * and press layer over hover instead of having to out-specify it — and the
+ * corner cells can round the card themselves, which means no overflow container
+ * is needed for clipping. An overflow container here would silently break the
+ * sticky header.
+ */
+
+.may-table {
+  --may-table-row-h: var(--may-control-h-md);
+  --may-table-pad-x: var(--may-space-4);
+  --may-table-font: var(--may-text-subheadline);
+  --may-table-leading: var(--may-text-subheadline-leading);
+  --may-table-tracking: var(--may-text-subheadline-tracking);
+  /* One stagger step. A quarter of the press-down beat reads as a cascade
+   * without making the tenth row arrive noticeably late. */
+  --may-table-stagger: calc(var(--may-duration-instant) / 4);
+  /* Both of these are written by the component as inline styles. Declared here
+   * too, so the stylesheet stands on its own if a consumer renders the markup
+   * without it. */
+  --may-table-max: none;
+  --may-table-row-i: 0;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Uppercase eyebrow above the card — the same section title iOS Settings draws,
+ * and the accessible name of the table via aria-labelledby. */
+.may-table__caption {
+  padding: var(--may-space-4) var(--may-space-4) var(--may-space-2);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--may-color-text-secondary);
+}
+
+/* --------------------------------- sizes --------------------------------- */
+
+.may-table[data-size='sm'] {
+  --may-table-row-h: var(--may-control-h-sm);
+  --may-table-pad-x: var(--may-space-3);
+  --may-table-font: var(--may-text-footnote);
+  --may-table-leading: var(--may-text-footnote-leading);
+  --may-table-tracking: var(--may-text-footnote-tracking);
+}
+
+.may-table[data-size='lg'] {
+  --may-table-row-h: var(--may-control-h-lg);
+  --may-table-pad-x: var(--may-space-5);
+  --may-table-font: var(--may-text-body);
+  --may-table-leading: var(--may-text-body-leading);
+  --may-table-tracking: var(--may-text-body-tracking);
+}
+
+/* -------------------------------- the card -------------------------------- */
+
+.may-table__scroller {
+  min-width: 0;
+  /* Wide tables scroll sideways rather than squeezing their columns. */
+  overflow-x: auto;
+  background: var(--may-color-surface);
+  border-radius: var(--may-radius-card);
+}
+
+.may-table[data-bounded='true'] .may-table__scroller {
+  max-height: var(--may-table-max);
+  overflow-y: auto;
+}
+
+/*
+ * A sticky header needs a scrollport that actually scrolls. Unbounded, this
+ * wrapper is exactly as tall as its table, so making it an overflow container
+ * would pin the header to a viewport that never moves — it would look sticky
+ * and never stick. Hand the job to the page instead, and accept that a table
+ * wider than the page scrolls at the document level.
+ */
+.may-table[data-sticky='true']:not([data-bounded='true']) .may-table__scroller {
+  overflow: visible;
+}
+
+.may-table__table {
+  width: 100%;
+  /* `collapse` would resolve borders between cells; nothing here has one, and
+   * `separate` with zero spacing is what lets the corner cells round. */
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  color: var(--may-color-text);
+}
+
+/* --------------------------------- header --------------------------------- */
+
+.may-table__head-cell {
+  position: relative;
+  height: var(--may-table-row-h);
+  padding: var(--may-space-2) var(--may-table-pad-x);
+  text-align: start;
+  vertical-align: middle;
+  white-space: nowrap;
+  /* Footnote metrics at headline weight — the one deliberate mix of two named
+   * styles in this file, because a column header is a label, not body copy:
+   * footnote's own 400 disappears against the values under it. */
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text-secondary);
+  /*
+   * Opaque, not translucent: rows pass UNDERNEATH a pinned header and there is
+   * no blur in this system to hide them. Surface is the card's own colour, so
+   * the header reads as part of the card until something scrolls beneath it.
+   */
+  background: var(--may-color-surface);
+}
+
+.may-table[data-sticky='true'] .may-table__head-cell {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--may-z-sticky);
+}
+
+/* The header's own hairline, on its bottom edge. */
+.may-table__head-cell::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+.may-table__head-cell:first-child { border-start-start-radius: var(--may-radius-card); }
+.may-table__head-cell:last-child { border-start-end-radius: var(--may-radius-card); }
+
+/* ---------------------------------- rows ---------------------------------- */
+
+.may-table__row {
+  /* Every state below sets this one variable; the cells paint it. */
+  --may-table-row-bg: transparent;
+}
+
+.may-table__row[data-clickable='true'] { cursor: pointer; }
+
+/* Order matters more than specificity here: these all weigh the same, so the
+ * last one that matches wins — zebra, then selection, then press. */
+.may-table__row[data-zebra='true'] { --may-table-row-bg: var(--may-color-fill-quaternary); }
+
+.may-table__row[data-selected='true'] {
+  --may-table-row-bg: color-mix(in srgb, var(--may-color-tint) 12%, transparent);
+}
+
+.may-table__row[data-pressed='true'] { --may-table-row-bg: var(--may-color-highlight-strong); }
+
+.may-table__row[data-selected='true'][data-pressed='true'] {
+  --may-table-row-bg: color-mix(in srgb, var(--may-color-tint) 22%, transparent);
+}
+
+/*
+ * Rows arrive staggered, which reads as the table composing itself rather than
+ * as one block appearing. The animation runs once per mounted row, so a row
+ * added later slides in on its own while the rest hold still.
+ */
+@keyframes may-table-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--may-space-2));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.may-table__row,
+.may-table__mrow {
+  animation: may-table-row-in var(--may-duration-settle) var(--may-ease-out) both;
+  animation-delay: calc(var(--may-table-row-i) * var(--may-table-stagger));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* base.css collapses durations but not delays, and with `both` fill a
+   * staggered row would sit invisible for the whole delay and then pop. */
+  .may-table__row,
+  .may-table__mrow,
+  .may-table__check {
+    animation: none;
+  }
+}
+
+/* --------------------------------- cells ---------------------------------- */
+
+.may-table__cell {
+  position: relative;
+  height: var(--may-table-row-h);
+  padding: var(--may-space-2) var(--may-table-pad-x);
+  vertical-align: middle;
+  text-align: start;
+  font-size: var(--may-table-font);
+  line-height: var(--may-table-leading);
+  letter-spacing: var(--may-table-tracking);
+  color: var(--may-color-text);
+  background-color: var(--may-table-row-bg, transparent);
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-table__cell[data-align='center'],
+.may-table__head-cell[data-align='center'] { text-align: center; }
+
+.may-table__cell[data-align='end'],
+.may-table__head-cell[data-align='end'] { text-align: end; }
+
+/* Tabular figures, so a column of numbers lines up digit over digit instead of
+ * shimmying as the values change. */
+.may-table__cell[data-numeric='true'] { font-variant-numeric: tabular-nums; }
+
+/*
+ * The hairline sits on each cell's TOP edge rather than under the previous row:
+ * drawn per cell it needs no positioned <tr>, and the segments meet edge to
+ * edge so they read as one rule. The first body row is already separated by the
+ * header's own hairline.
+ */
+.may-table__cell::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+.may-table__row:first-child .may-table__cell::before { content: none; }
+
+@media (min-resolution: 2dppx) {
+  .may-table__head-cell::after,
+  .may-table__cell::before { height: var(--may-hairline); }
+}
+
+/*
+ * Selection accent. The bar is always in the DOM at zero height so it can ride
+ * a spring in and out; growing it from the centre keeps it direction-agnostic,
+ * and the overshoot past the cell is deliberate — it is what makes selecting a
+ * row feel like a switch throwing rather than a colour changing.
+ */
+.may-table__cell:first-child::after {
+  content: '';
+  position: absolute;
+  inset-block: var(--may-space-2);
+  inset-inline-start: 0;
+  width: var(--may-space-1);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-tint);
+  transform: scaleY(0);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-table__row[data-selected='true'] .may-table__cell:first-child::after {
+  transform: scaleY(1);
+}
+
+.may-table__row:last-child .may-table__cell:first-child {
+  border-end-start-radius: var(--may-radius-card);
+}
+.may-table__row:last-child .may-table__cell:last-child {
+  border-end-end-radius: var(--may-radius-card);
+}
+
+/*
+ * The row's activator. Deliberately styleless — the row is what lights up — but
+ * it is a real button, so a keyboard and a screen reader can reach the row at
+ * all. Only the primary column gets one, which is why a clickable table wants
+ * plain content in that column rather than a control of its own.
+ */
+.may-table__activator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-xs);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/* Shared by both shapes: the desktop colSpan cell and the phone card. */
+.may-table__empty {
+  padding: var(--may-space-8) var(--may-space-4);
+  text-align: center;
+  color: var(--may-color-text-secondary);
+}
+
+/* ------------------------------- collapsed -------------------------------- */
+
+/* The middle columns, read as one caption line. The dot is punctuation, not a
+ * separator element, so it stays out of the accessible name. */
+.may-table__sep {
+  padding-inline: var(--may-space-1);
+  color: var(--may-color-text-tertiary);
+}
+
+.may-table__value[data-numeric='true'] { font-variant-numeric: tabular-nums; }
+
+/*
+ * Selection on a phone is a tinted checkmark on the trailing edge — iOS's own
+ * signal, and one that survives being read aloud in a way a row wash does not.
+ * It springs in from nothing, which is the whole animation this row needs.
+ */
+.may-table__check {
+  width: var(--may-space-4);
+  height: var(--may-space-4);
+  flex-shrink: 0;
+  color: var(--may-color-tint);
+  animation: may-table-check-in var(--may-duration-settle) var(--may-spring-bouncy) both;
+}
+
+@keyframes may-table-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

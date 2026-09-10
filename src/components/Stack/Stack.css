@@ -1,0 +1,35 @@
+/*
+ * The gap arrives as one custom property set inline; the default here keeps
+ * the value inside the token layer when the prop is omitted.
+ */
+
+.may-stack {
+  --may-stack-gap: var(--may-space-0);
+
+  display: flex;
+  gap: var(--may-stack-gap);
+  /* A flex item defaults to min-width:auto, which stops long text from ever
+   * shrinking. Stacks nest constantly, so the fix belongs here, not per-use. */
+  min-width: 0;
+}
+
+.may-stack--wrap { flex-wrap: wrap; }
+.may-stack--full { width: 100%; }
+
+.may-stack[data-direction='row'] { flex-direction: row; }
+.may-stack[data-direction='column'] { flex-direction: column; }
+
+/* `start` and `end` map to the flex keywords so the prop reads the same on
+ * either axis — `start` is never "left" here, it is the writing direction. */
+.may-stack[data-align='start'] { align-items: flex-start; }
+.may-stack[data-align='center'] { align-items: center; }
+.may-stack[data-align='end'] { align-items: flex-end; }
+.may-stack[data-align='stretch'] { align-items: stretch; }
+.may-stack[data-align='baseline'] { align-items: baseline; }
+
+.may-stack[data-justify='start'] { justify-content: flex-start; }
+.may-stack[data-justify='center'] { justify-content: center; }
+.may-stack[data-justify='end'] { justify-content: flex-end; }
+.may-stack[data-justify='between'] { justify-content: space-between; }
+.may-stack[data-justify='around'] { justify-content: space-around; }
+.may-stack[data-justify='evenly'] { justify-content: space-evenly; }

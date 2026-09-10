@@ -1,0 +1,156 @@
+/*
+ * The dot scales in from nothing on --may-spring-bouncy, so it swells a touch
+ * past its resting size before settling. Selection in iOS is never a hard cut;
+ * something always arrives with a little momentum.
+ *
+ * Both states are driven by the input's own `:checked`, not by a class, so a
+ * radio deselected by a sibling repaints without React hearing about it.
+ */
+
+.may-radio-group {
+  display: flex;
+  min-width: 0;
+}
+
+.may-radio-group[data-orientation='vertical'] {
+  flex-direction: column;
+  gap: var(--may-space-1);
+}
+
+.may-radio-group[data-orientation='horizontal'] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--may-space-2) var(--may-space-5);
+  align-items: center;
+}
+
+/* --------------------------------- a radio -------------------------------- */
+
+.may-radio {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  min-height: var(--may-control-h);
+  /* Bleed the padding outward so the hover row hugs the content while the hit
+   * target still reaches Apple's 44px. */
+  padding-inline: var(--may-space-2);
+  margin-inline: calc(var(--may-space-2) * -1);
+  border-radius: var(--may-radius-md);
+  color: var(--may-color-text);
+  cursor: pointer;
+}
+
+/* The press feel belongs to the ring: a row carrying a description is too
+ * large to squish convincingly. The class stays on the root so the control
+ * still reads as pressable to the rest of the system. */
+.may-radio[data-slot='radio'].may-pressable {
+  transform: none;
+}
+
+.may-radio:has(.may-radio__description) {
+  align-items: flex-start;
+  padding-block: var(--may-space-2);
+}
+
+.may-radio[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.may-radio__ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-radio-size);
+  height: var(--may-radio-size);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  transform: scale(1);
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/* Centre the ring on the first line rather than the whole two-line block. */
+.may-radio:has(.may-radio__description) .may-radio__ring {
+  margin-block-start: calc((var(--may-text-body-leading) - var(--may-radio-size)) / 2);
+}
+
+.may-radio[data-pressed='true'] .may-radio__ring {
+  transform: scale(0.88);
+  transition: transform var(--may-duration-instant) var(--may-ease-out);
+}
+
+.may-radio__input:checked + .may-radio__ring {
+  background: var(--may-color-primary);
+}
+
+/* Invalid is a wash of the destructive tone, never a red ring drawn around it. */
+.may-radio[data-invalid='true'] .may-radio__ring {
+  background: color-mix(in srgb, var(--may-color-destructive) 18%, transparent);
+}
+
+.may-radio[data-invalid='true'] .may-radio__input:checked + .may-radio__ring {
+  background: var(--may-color-destructive);
+}
+
+.may-radio__input:focus-visible + .may-radio__ring {
+  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.may-radio__dot {
+  width: 38%;
+  height: 38%;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-on-primary);
+  transform: scale(0);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-radio__input:checked + .may-radio__ring .may-radio__dot {
+  transform: scale(1);
+}
+
+/* -------------------------------- the text -------------------------------- */
+
+.may-radio__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.may-radio__label {
+  font-size: var(--may-radio-text);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text);
+}
+
+.may-radio__description {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-radio[data-size='sm'] {
+  --may-radio-size: var(--may-space-5);
+  --may-radio-text: var(--may-text-subheadline);
+}
+
+.may-radio[data-size='md'] {
+  --may-radio-size: var(--may-space-6);
+  --may-radio-text: var(--may-text-body);
+}
+
+.may-radio[data-size='lg'] {
+  --may-radio-size: calc(var(--may-space-6) + var(--may-space-1));
+  --may-radio-text: var(--may-text-body);
+}

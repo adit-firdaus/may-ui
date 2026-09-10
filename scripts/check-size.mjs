@@ -11,8 +11,12 @@ const root = resolve(here, '..')
 const gz = (p) => gzipSync(readFileSync(p)).length
 
 const BUDGETS = {
-  'dist/mayui.js': 25 * 1024,
-  'dist/mayui.css': 20 * 1024,
+  // The adaptive default — what every consumer pays.
+  'dist/mayui.js': 34 * 1024,
+  'dist/mayui.css': 34 * 1024,
+  // Opt-in families. Importing 'mayui' pulls in neither.
+  'dist/desktop.js': 22 * 1024,
+  'dist/mobile.js': 22 * 1024,
 }
 
 let failed = false

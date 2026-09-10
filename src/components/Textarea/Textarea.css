@@ -1,0 +1,122 @@
+/*
+ * Structurally identical to Input — a fill that owns the radius, the type scale
+ * and the ring, wrapping a transparent control. The wrapper is not decoration:
+ * it is the only place a type size can live without base.css's
+ * `max(16px, 1em)` iOS-zoom guard overriding it.
+ */
+
+.may-textarea {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  padding: var(--may-space-3) var(--may-space-4);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text);
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  border-radius: var(--may-radius-md);
+  cursor: text;
+  box-shadow: 0 0 0 0 transparent;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    box-shadow var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-textarea--full {
+  width: 100%;
+}
+
+.may-textarea:focus-within {
+  background: var(--may-color-fill-quaternary);
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-ring) 30%, transparent);
+}
+
+.may-textarea[data-invalid='true'] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
+}
+
+.may-textarea[data-invalid='true']:focus-within {
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-danger) 40%, transparent);
+}
+
+.may-textarea[data-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-textarea:not([data-disabled='true']):not(:focus-within):hover {
+    background: var(--may-color-fill-secondary);
+  }
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-textarea[data-size='sm'] {
+  padding: var(--may-space-2) var(--may-space-3);
+  border-radius: var(--may-radius-sm);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+
+.may-textarea[data-size='md'] {
+  padding: var(--may-space-3) var(--may-space-4);
+  border-radius: var(--may-radius-md);
+}
+
+.may-textarea[data-size='lg'] {
+  padding: var(--may-space-4) var(--may-space-5);
+  border-radius: var(--may-radius-lg);
+}
+
+/* ------------------------------- the control ------------------------------ */
+
+.may-textarea__control {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  /* base.css raises font-size to max(16px, 1em); left alone on purpose. */
+  letter-spacing: inherit;
+  line-height: inherit;
+  display: block;
+}
+
+.may-textarea__control::placeholder {
+  color: var(--may-color-text-tertiary);
+  opacity: 1;
+}
+
+.may-textarea__control:disabled {
+  cursor: not-allowed;
+  -webkit-text-fill-color: currentColor;
+  opacity: 1;
+}
+
+/* The fill draws the ring for the whole field; this would sit inside it. */
+.may-textarea__control:focus-visible {
+  outline: none;
+}
+
+.may-textarea[data-resize='none'] .may-textarea__control {
+  resize: none;
+}
+.may-textarea[data-resize='vertical'] .may-textarea__control {
+  resize: vertical;
+}
+.may-textarea[data-resize='both'] .may-textarea__control {
+  resize: both;
+}
+
+/* An auto-growing field is exactly as tall as its text, so a scrollbar can only
+ * appear for a frame mid-measurement — hiding it removes that flicker. */
+.may-textarea[data-autogrow='true'] .may-textarea__control {
+  overflow-y: hidden;
+}

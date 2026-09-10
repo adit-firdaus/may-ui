@@ -1,0 +1,305 @@
+/*
+ * Three fills and no strokes: the marker is a filled disc, the connector is a
+ * filled track with a tinted fill growing along it, and the current step wears
+ * a halo rather than a ring. The halo is a box-shadow spread rather than a
+ * pseudo-element because a translucent overlay would tint the marker it sits
+ * on; the spread paints strictly outside the border box, and springs open when
+ * the step becomes current.
+ */
+
+.may-steps {
+  /* Structural sizes, local by design: no other component needs to agree with
+   * the weight of this track or the size of this disc. */
+  --may-steps-marker: var(--may-control-h-sm);
+  --may-steps-pad: var(--may-space-2);
+  --may-steps-track: 2px;
+
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.may-steps[data-orientation='horizontal'] {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.may-steps[data-orientation='vertical'] {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ---------------------------------- step ---------------------------------- */
+
+.may-steps__step {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+/* Equal columns, so the connectors between markers are all the same length. */
+.may-steps[data-orientation='horizontal'] .may-steps__step {
+  flex: 1 1 0;
+}
+
+/*
+ * The gap is padding on the step rather than `gap` on the list, so the
+ * connector — which is positioned against the step's padding box — has
+ * somewhere to run to.
+ */
+.may-steps[data-orientation='vertical'] .may-steps__step:not(:last-child) {
+  padding-block-end: var(--may-space-6);
+}
+
+.may-steps__body {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  padding: var(--may-steps-pad);
+  border: 0;
+  border-radius: var(--may-radius-md);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+button.may-steps__body {
+  cursor: pointer;
+}
+
+/* Not `not-allowed`: a step ahead of you is not an error, it is simply not
+ * your turn. */
+button.may-steps__body:disabled {
+  cursor: default;
+}
+
+.may-steps[data-orientation='horizontal'] .may-steps__body {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--may-space-2);
+  text-align: center;
+}
+
+.may-steps[data-orientation='vertical'] .may-steps__body {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--may-space-3);
+  text-align: start;
+}
+
+/* --------------------------------- marker --------------------------------- */
+
+.may-steps__marker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-steps-marker);
+  height: var(--may-steps-marker);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text-tertiary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--may-color-primary) 18%, transparent);
+  transition:
+    background-color var(--may-duration-settle) var(--may-ease-out),
+    color var(--may-duration-settle) var(--may-ease-out),
+    box-shadow var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-steps__marker > svg {
+  width: 58%;
+  height: 58%;
+  display: block;
+}
+
+.may-steps__step[data-status='complete'] .may-steps__marker {
+  background: color-mix(in srgb, var(--may-color-primary) 16%, transparent);
+  color: var(--may-color-tint);
+}
+
+.may-steps__step[data-status='current'] .may-steps__marker {
+  background: var(--may-color-primary);
+  color: var(--may-color-on-primary);
+  /* The halo: a spread of the tint, sprung open on the bouncy curve. */
+  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-primary) 18%, transparent);
+}
+
+.may-steps__step[data-status='error'] .may-steps__marker {
+  background: var(--may-color-destructive);
+  color: var(--may-color-on-destructive);
+}
+
+/*
+ * The checkmark draws itself in. The mark only exists while the step is
+ * complete, so the element is new every time and the animation runs on mount —
+ * no need to restart one on an attribute change. `forwards` matters: under
+ * reduced motion base.css collapses the duration to 1ms, and without the fill
+ * the mark would flash and vanish.
+ */
+.may-steps__check path {
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  animation: may-step-check var(--may-duration-settle) var(--may-ease-out) forwards;
+}
+
+@keyframes may-step-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------------------------------- text ---------------------------------- */
+
+.may-steps__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.may-steps__title {
+  color: var(--may-color-text-secondary);
+  font-weight: 500;
+  transition: color var(--may-duration-settle) var(--may-ease-out);
+}
+
+.may-steps__step[data-status='complete'] .may-steps__title {
+  color: var(--may-color-text);
+}
+
+.may-steps__step[data-status='current'] .may-steps__title {
+  color: var(--may-color-text);
+  font-weight: 600;
+}
+
+.may-steps__step[data-status='error'] .may-steps__title {
+  color: var(--may-color-danger);
+  font-weight: 600;
+}
+
+.may-steps__description {
+  color: var(--may-color-text-tertiary);
+  font-weight: 400;
+}
+
+/* -------------------------------- connector ------------------------------- */
+
+/*
+ * A track with a fill that grows along it, rather than a line that changes
+ * colour: the growth is what reads as progress. Transform-only, so it never
+ * touches layout.
+ */
+.may-steps__connector {
+  position: absolute;
+  overflow: hidden;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  pointer-events: none;
+}
+
+.may-steps__connector::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--may-color-primary);
+  transition: transform var(--may-duration-settle) var(--may-ease-out);
+}
+
+.may-steps[data-orientation='horizontal'] .may-steps__connector {
+  /* Aligned to the marker's centre line, which sits one pad below the top of
+   * the step and half a marker further down. */
+  inset-block-start: calc(var(--may-steps-pad) + var(--may-steps-marker) / 2);
+  inset-inline-start: calc(50% + var(--may-steps-marker) / 2 + var(--may-space-2));
+  width: calc(100% - var(--may-steps-marker) - var(--may-space-2) * 2);
+  height: var(--may-steps-track);
+  transform: translateY(-50%);
+}
+
+.may-steps[data-orientation='horizontal'] .may-steps__connector::before {
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+.may-steps[data-orientation='vertical'] .may-steps__connector {
+  inset-inline-start: calc(var(--may-steps-pad) + var(--may-steps-marker) / 2);
+  inset-block-start: calc(var(--may-steps-pad) + var(--may-steps-marker) + var(--may-space-2));
+  inset-block-end: var(--may-space-2);
+  width: var(--may-steps-track);
+  transform: translateX(-50%);
+}
+
+.may-steps[data-orientation='vertical'] .may-steps__connector::before {
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+}
+
+.may-steps__step[data-status='complete'] .may-steps__connector::before {
+  transform: scale(1);
+}
+
+/* The fill has to grow the way the language runs. */
+[dir='rtl'] .may-steps[data-orientation='horizontal'] .may-steps__connector::before {
+  transform-origin: 100% 50%;
+}
+
+[dir='rtl'] .may-steps[data-orientation='vertical'] .may-steps__connector {
+  transform: translateX(50%);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-steps[data-size='sm'] {
+  --may-steps-marker: var(--may-control-h-xs);
+}
+.may-steps[data-size='md'] {
+  --may-steps-marker: var(--may-control-h-sm);
+}
+.may-steps[data-size='lg'] {
+  --may-steps-marker: var(--may-control-h-md);
+}
+
+.may-steps[data-size='sm'] .may-steps__marker {
+  font-size: var(--may-text-caption-1);
+}
+.may-steps[data-size='md'] .may-steps__marker {
+  font-size: var(--may-text-footnote);
+}
+.may-steps[data-size='lg'] .may-steps__marker {
+  font-size: var(--may-text-subheadline);
+}
+
+.may-steps[data-size='sm'] .may-steps__title {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+}
+.may-steps[data-size='md'] .may-steps__title {
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+.may-steps[data-size='lg'] .may-steps__title {
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+}
+
+.may-steps[data-size='sm'] .may-steps__description,
+.may-steps[data-size='md'] .may-steps__description {
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  letter-spacing: var(--may-text-caption-1-tracking);
+}
+.may-steps[data-size='lg'] .may-steps__description {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+}

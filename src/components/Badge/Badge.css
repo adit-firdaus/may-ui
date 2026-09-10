@@ -1,0 +1,121 @@
+/**
+ * Tone modifiers only SET variables; variant rules only CONSUME them — the
+ * same split Button uses, so a new tone never touches variant CSS.
+ *
+ * Heights are a *fraction* of --may-control-h rather than one of the control
+ * rungs. A badge is not a touch target; sized to one it would dwarf the label
+ * it annotates. The fraction keeps it locked to the same scale all the same,
+ * so retuning the control height retunes badges with it.
+ */
+
+.may-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-1);
+  height: var(--may-badge-h);
+  padding-inline: var(--may-badge-pad);
+  border-radius: var(--may-radius-full);
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  flex-shrink: 0;
+  /* A count must not reflow as it ticks — 1 and 7 have to occupy one width. */
+  font-variant-numeric: tabular-nums;
+  /* The count pop scales about the middle rather than the text baseline. */
+  transform-origin: center;
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-badge[data-tone='tint'] {
+  --may-badge-solid: var(--may-color-primary);
+  --may-badge-on-solid: var(--may-color-on-primary);
+  --may-badge-text: var(--may-color-tint);
+}
+.may-badge[data-tone='neutral'] {
+  --may-badge-solid: var(--may-label);
+  --may-badge-on-solid: var(--may-bg-elevated);
+  --may-badge-text: var(--may-color-text-secondary);
+}
+.may-badge[data-tone='danger'] {
+  --may-badge-solid: var(--may-color-destructive);
+  --may-badge-on-solid: var(--may-color-on-destructive);
+  --may-badge-text: var(--may-color-danger);
+}
+.may-badge[data-tone='success'] {
+  --may-badge-solid: var(--may-color-success);
+  --may-badge-on-solid: var(--may-on-color);
+  --may-badge-text: var(--may-color-success);
+}
+.may-badge[data-tone='warning'] {
+  --may-badge-solid: var(--may-color-warning);
+  /* Orange is light enough that white text on it fails contrast; the label colour wins. */
+  --may-badge-on-solid: var(--may-label);
+  --may-badge-text: var(--may-color-warning);
+}
+
+/* -------------------------------- variants -------------------------------- */
+
+.may-badge[data-variant='solid'] {
+  background: var(--may-badge-solid);
+  color: var(--may-badge-on-solid);
+}
+
+/* A wash of the tone carrying tone-coloured text. iOS's inline weight. */
+.may-badge[data-variant='tinted'] {
+  background: color-mix(in srgb, var(--may-badge-solid) 16%, transparent);
+  color: var(--may-badge-text);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-badge[data-size='sm'] {
+  --may-badge-h: calc(var(--may-control-h) * 0.4);
+  --may-badge-pad: var(--may-space-2);
+  font-size: var(--may-text-caption-2);
+  letter-spacing: var(--may-text-caption-2-tracking);
+}
+.may-badge[data-size='md'] {
+  --may-badge-h: calc(var(--may-control-h) * 0.5);
+  --may-badge-pad: var(--may-space-2);
+  font-size: var(--may-text-caption-1);
+  letter-spacing: var(--may-text-caption-1-tracking);
+}
+.may-badge[data-size='lg'] {
+  --may-badge-h: calc(var(--may-control-h) * 0.6);
+  --may-badge-pad: var(--may-space-3);
+  font-size: var(--may-text-footnote);
+  letter-spacing: var(--may-text-footnote-tracking);
+}
+
+/* --------------------------------- shapes --------------------------------- */
+
+/* Circular at one digit; the min-width lets it grow into a pill at three. */
+.may-badge--count {
+  min-width: var(--may-badge-h);
+  padding-inline: var(--may-space-1);
+}
+
+.may-badge__dot {
+  width: 0.5em;
+  height: 0.5em;
+  flex-shrink: 0;
+  border-radius: var(--may-radius-full);
+  /* currentColor means the dot is right in both variants for free. */
+  background: currentColor;
+}
+
+/*
+ * A bare status dot — no label to wrap, so the badge *is* the dot. It takes
+ * the solid fill in either variant: a 16% wash of a dot this small is a smudge.
+ */
+.may-badge--dot-only[data-variant] {
+  width: calc(var(--may-badge-h) * 0.5);
+  height: calc(var(--may-badge-h) * 0.5);
+  min-width: 0;
+  padding-inline: 0;
+  background: var(--may-badge-solid);
+}

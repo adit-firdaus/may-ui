@@ -1,0 +1,46 @@
+/*
+ * The paint comes from `.may-hairline` in base.css — background, never a
+ * border, so the rule is a real 0.5px device pixel at 2dppx and never joins
+ * the box model. Everything here is geometry.
+ *
+ * The attribute selectors below outrank `.may-hairline` (0,2,0 against 0,1,0),
+ * so which stylesheet loads first can never change the outcome.
+ */
+
+.may-separator[data-orientation='horizontal'] { width: 100%; }
+
+.may-separator[data-orientation='vertical'] {
+  /* `.may-hairline` is a horizontal rule by default; stand it up. 1px here and
+   * a half pixel under the 2dppx query below, exactly as base.css sizes the
+   * horizontal case — a bare 0.5px would round away to nothing on a 1x screen. */
+  width: 1px;
+  height: auto;
+  align-self: stretch;
+  /* A block-level parent gives a stretched child no height at all, so keep a
+   * floor — a vertical rule that measures zero is just a bug you cannot see. */
+  min-height: var(--may-space-4);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-separator[data-orientation='vertical'] { width: var(--may-hairline); }
+}
+
+/* ------------------------------ labelled form ----------------------------- */
+
+.may-separator--labelled {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+}
+
+.may-separator__rule { flex: 1; }
+
+.may-separator__label {
+  flex-shrink: 0;
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-weight: var(--may-text-footnote-weight);
+  color: var(--may-color-text-secondary);
+}

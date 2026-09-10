@@ -1,0 +1,122 @@
+/*
+ * The whole disclosure is two properties: a grid track that goes 0fr → 1fr,
+ * and a chevron that rotates. Both ride the SAME spring, so the panel and its
+ * indicator are visibly one gesture rather than two coincidental animations.
+ *
+ * Every open-state rule uses the child combinator. A descendant combinator
+ * would force a nested collapsible's panel open whenever its ancestor was.
+ */
+
+.may-collapsible {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* --------------------------------- trigger -------------------------------- */
+
+.may-collapsible__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+  min-height: var(--may-control-h);
+  padding: var(--may-space-2) var(--may-space-3);
+  border: 0;
+  border-radius: var(--may-radius-md);
+  background: transparent;
+  color: var(--may-color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-collapsible__trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/*
+ * A row highlights on press; it does not scale. That is why `may-pressable`
+ * is deliberately absent here, exactly as it is on `ListRow` — shrinking a
+ * full-width row exposes the surface behind its edges and reads as a bug
+ * rather than as a press.
+ */
+.may-collapsible__trigger[data-pressed='true'] {
+  background-color: var(--may-color-highlight-strong);
+}
+
+.may-collapsible__label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+}
+
+.may-collapsible__chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--may-color-text-tertiary);
+  transform: rotate(0deg);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-collapsible[data-state='open'] > .may-collapsible__trigger > .may-collapsible__chevron {
+  /* Past 90° and back: the overshoot in the spring is the whole point of
+   * spending a transform on this at all. */
+  transform: rotate(90deg);
+}
+
+/* ---------------------------------- panel --------------------------------- */
+
+/*
+ * `visibility` is what actually closes the panel. `overflow: hidden` on a
+ * zero-height box still leaves buttons and links inside it focusable, so a
+ * keyboard user tabs into content they cannot see. The 0s transition delay
+ * holds visibility until the collapse has finished playing.
+ */
+.may-collapsible__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--may-duration-settle) var(--may-spring-bouncy),
+    visibility 0s linear var(--may-duration-settle);
+}
+
+.may-collapsible[data-state='open'] > .may-collapsible__panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--may-duration-settle) var(--may-spring-bouncy),
+    visibility 0s;
+}
+
+/*
+ * An `fr` track in an auto-height container resolves to the content's own
+ * height, so the spring's overshoot past 1fr is clamped rather than opening a
+ * gap under the content — which is what makes a bouncy curve safe here.
+ */
+.may-collapsible__clip {
+  overflow: hidden;
+  min-height: 0;
+  opacity: 0;
+  transition: opacity var(--may-duration-instant) var(--may-ease-out);
+}
+
+.may-collapsible[data-state='open'] > .may-collapsible__panel > .may-collapsible__clip {
+  opacity: 1;
+  transition: opacity var(--may-duration-settle) var(--may-ease-out);
+}
+
+.may-collapsible__content {
+  padding: var(--may-space-1) var(--may-space-3) var(--may-space-4);
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text-secondary);
+}

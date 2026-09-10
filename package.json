@@ -19,6 +19,16 @@
       "import": "./dist/mayui.js",
       "require": "./dist/mayui.cjs"
     },
+    "./desktop": {
+      "types": "./dist/desktop.d.ts",
+      "import": "./dist/desktop.js",
+      "require": "./dist/desktop.cjs"
+    },
+    "./mobile": {
+      "types": "./dist/mobile.d.ts",
+      "import": "./dist/mobile.js",
+      "require": "./dist/mobile.cjs"
+    },
     "./styles.css": "./dist/mayui.css",
     "./package.json": "./package.json"
   },

@@ -1,0 +1,201 @@
+/*
+ * Like Button, tone modifiers only SET variables and the rest of the file only
+ * CONSUMES them, so a new tone never touches a geometry or motion rule.
+ *
+ * The FAB is the only control here that reads as floating above the content
+ * rather than sitting in it, so it is the only one that owns a shadow at rest.
+ */
+
+.may-fab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-2);
+  height: var(--may-fab-size);
+  min-width: var(--may-fab-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  background: var(--may-fab-solid);
+  color: var(--may-fab-on-solid);
+  font-family: inherit;
+  font-weight: var(--may-text-headline-weight);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--may-shadow-lg);
+  /*
+   * Scale and shadow share the same spring so they move as one object. Split
+   * them across different curves and the shadow arrives after the button,
+   * which reads as a sticker rather than a solid thing.
+   */
+  transition:
+    transform var(--may-duration-settle) var(--may-spring-bouncy),
+    box-shadow var(--may-duration-settle) var(--may-spring-bouncy),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    opacity var(--may-duration-fast) var(--may-ease-out);
+  /* A FAB should arrive, not appear. */
+  animation: may-fab-in var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-fab:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+  /* A disabled control is not floating any more, so it settles onto the surface. */
+  box-shadow: var(--may-shadow-sm);
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-fab[data-tone='tint'] {
+  --may-fab-solid: var(--may-color-primary);
+  --may-fab-on-solid: var(--may-color-on-primary);
+}
+.may-fab[data-tone='neutral'] {
+  --may-fab-solid: var(--may-label);
+  --may-fab-on-solid: var(--may-bg-elevated);
+}
+.may-fab[data-tone='danger'] {
+  --may-fab-solid: var(--may-color-destructive);
+  --may-fab-on-solid: var(--may-color-on-destructive);
+}
+.may-fab[data-tone='success'] {
+  --may-fab-solid: var(--may-color-success);
+  --may-fab-on-solid: var(--may-on-color);
+}
+.may-fab[data-tone='warning'] {
+  --may-fab-solid: var(--may-color-warning);
+  --may-fab-on-solid: var(--may-label);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+/*
+ * A FAB sits above the content rather than in it, so every rung runs one step
+ * larger than the equivalent inline control — still derived from
+ * --may-control-h, never a literal, so retuning the touch target moves these too.
+ */
+.may-fab[data-size='sm'] {
+  --may-fab-size: var(--may-control-h-md);
+  font-size: var(--may-text-subheadline);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+.may-fab[data-size='md'] {
+  --may-fab-size: var(--may-control-h-lg);
+  font-size: var(--may-text-headline);
+  letter-spacing: var(--may-text-headline-tracking);
+}
+.may-fab[data-size='lg'] {
+  --may-fab-size: calc(var(--may-control-h-lg) + var(--may-space-2));
+  font-size: var(--may-text-title-3);
+  letter-spacing: var(--may-text-title-3-tracking);
+}
+
+/* -------------------------------- contents -------------------------------- */
+
+.may-fab__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.may-fab__glyph > svg:not([width]) {
+  width: 1.35em;
+  height: 1.35em;
+  display: block;
+}
+
+.may-fab__label { display: inline-block; }
+
+/* The circle grows into a pill only when it is carrying a label. */
+.may-fab--extended {
+  padding-inline: var(--may-space-5);
+}
+
+.may-fab__spinner {
+  width: 1.2em;
+  height: 1.2em;
+  flex-shrink: 0;
+  border-radius: var(--may-radius-full);
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: may-fab-spin 0.7s linear infinite;
+}
+
+/* ---------------------------------- press --------------------------------- */
+
+/*
+ * Bigger than anything else in the system, on purpose: pressing a floating
+ * object should look like pushing it down onto the surface, so the scale drops
+ * hard and the shadow contracts with it. Release rides the bouncy spring in the
+ * base transition, which overshoots past resting size — the FAB pops back up.
+ *
+ * Out-specifies `.may-pressable[data-pressed='true']` in base.css, which would
+ * otherwise apply its gentler generic squish.
+ */
+.may-fab.may-pressable[data-pressed='true'] {
+  transform: scale(0.9);
+  box-shadow: var(--may-shadow-sm);
+  transition:
+    transform var(--may-duration-instant) var(--may-ease-out),
+    box-shadow var(--may-duration-instant) var(--may-ease-out);
+}
+
+/* ---------------------------------- hover --------------------------------- */
+
+/*
+ * Two things need beating here. `.may-hoverable` in base.css paints
+ * --may-color-highlight, which is meant for a row on a neutral surface and
+ * would wash a filled FAB out; and the hover lift must not survive into the
+ * press, which is what `:not([data-pressed])` buys — while the finger is down,
+ * hover is simply not the state we are in.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .may-fab.may-hoverable[data-tone]:hover:not(:disabled):not([data-pressed]) {
+    background-color: color-mix(in srgb, var(--may-fab-solid) 88%, var(--may-label));
+    transform: scale(1.06);
+    box-shadow: var(--may-shadow-xl);
+  }
+}
+
+/* --------------------------------- fixed ---------------------------------- */
+
+/*
+ * Above sticky chrome such as a Toolbar, below anything modal. The safe-area
+ * insets are what keep it off the home indicator and clear of the rounded
+ * display corners in landscape.
+ */
+.may-fab--fixed {
+  position: fixed;
+  z-index: var(--may-z-nav);
+  inset-block-end: calc(var(--may-inset-bottom) + var(--may-space-5));
+}
+
+.may-fab--fixed[data-position='end'] {
+  inset-inline-end: calc(var(--may-inset-right) + var(--may-space-5));
+}
+
+.may-fab--fixed[data-position='start'] {
+  inset-inline-start: calc(var(--may-inset-left) + var(--may-space-5));
+}
+
+/*
+ * Centring uses the independent `translate` property rather than a transform,
+ * so it composes with the press and hover scales instead of being wiped out by
+ * them — the classic reason a centred FAB jumps to the left edge on tap.
+ */
+.may-fab--fixed[data-position='center'] {
+  inset-inline-start: 50%;
+  translate: -50% 0;
+}
+
+@keyframes may-fab-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes may-fab-spin {
+  to { transform: rotate(360deg); }
+}

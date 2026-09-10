@@ -1,0 +1,54 @@
+/*
+ * Label is Text with three additions: it lays the required marker out beside
+ * the copy, it can take the Settings eyebrow shape, and it dims with the
+ * control it belongs to. Rules carry both classes so they outrank `.may-text`
+ * regardless of bundle order.
+ */
+
+.may-text.may-label {
+  /* Baseline, not centre: the marker is a different size and has to sit on the
+   * same line as the last word, not float against its middle. */
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--may-space-1);
+  /* A label is chrome. base.css already makes it unselectable; the cursor is
+   * the other half — a text caret over a click target reads as a document. */
+  cursor: default;
+}
+
+/* Pointing at a real control, not just naming one. */
+.may-text.may-label[for] {
+  cursor: pointer;
+}
+
+/*
+ * Clicks on a label focus its control, which must not happen when that control
+ * is disabled — so the whole label stops taking pointer events rather than just
+ * looking dim.
+ */
+.may-text.may-label[data-disabled='true'] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Red because the convention is worth more than the novelty; the accessible
+ * name carries the actual meaning. */
+.may-label__required {
+  color: var(--may-color-danger);
+  /* The asterisk glyph hangs high in the em box, so it needs no extra lift. */
+  line-height: 1;
+}
+
+/*
+ * The Settings section eyebrow. Tracking opens up because uppercase runs read
+ * as one solid block at UI sizes, and iOS sets these noticeably looser than
+ * body copy.
+ */
+.may-text.may-label.may-label--eyebrow {
+  --may-txt-color: var(--may-color-text-secondary);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

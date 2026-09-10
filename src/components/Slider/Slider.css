@@ -1,0 +1,208 @@
+/*
+ * Geometry, once, so the three moving parts can never disagree:
+ * the thumb's CENTRE travels between half a thumb from each end, so the rail
+ * spans the whole control while the fill and the tick marks are measured
+ * against that inset travel. Measuring the fill against the full width instead
+ * is why so many web sliders show their fill running out past the thumb at the
+ * far end.
+ *
+ * The travel is expressed in container units (`cqi`) rather than percentages
+ * because a percentage inside `translate` resolves against the THUMB's own
+ * box, not the track's — and cqi keeps the thumb on `translate`, which stays
+ * on the compositor instead of laying out on every frame of a drag.
+ */
+
+.may-slider {
+  /* Fallback so the calcs stay valid before React sets the real value. */
+  --may-slider-pct: 0;
+  --may-slider-rail-h: var(--may-space-1);
+  /* 28px — iOS's knob, expressed against the control scale rather than typed. */
+  --may-slider-thumb: calc(var(--may-control-h-xs) - var(--may-space-1));
+  /* Half the rail's own thickness, so a notch reads as a cut in the rail
+   * rather than as a stripe laid across it — and stays in proportion if the
+   * spacing scale is retuned. */
+  --may-slider-tick-w: calc(var(--may-slider-rail-h) / 2);
+
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+  min-width: 0;
+
+  /* A drag across the rail is not a text selection. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-slider[data-tone='tint'] { --may-slider-tint: var(--may-color-primary); }
+.may-slider[data-tone='neutral'] { --may-slider-tint: var(--may-label); }
+.may-slider[data-tone='success'] { --may-slider-tint: var(--may-color-success); }
+.may-slider[data-tone='warning'] { --may-slider-tint: var(--may-color-warning); }
+.may-slider[data-tone='danger'] { --may-slider-tint: var(--may-color-destructive); }
+
+.may-slider[data-disabled='true'] { opacity: 0.35; }
+
+/* --------------------------------- track ---------------------------------- */
+
+.may-slider__control {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  /* The full touch target is the row, not the 28px knob. */
+  height: var(--may-control-h);
+  container-type: inline-size;
+  cursor: pointer;
+  /*
+   * The rail owns every gesture that starts on it, as a native slider does —
+   * otherwise a scrub that drifts a few degrees off horizontal is stolen by
+   * the page scroll mid-drag. Scoped to the rail rather than the whole row, so
+   * a swipe that begins on the icons or the value still scrolls the page.
+   */
+  touch-action: none;
+}
+
+.may-slider[data-disabled='true'] .may-slider__control { cursor: not-allowed; }
+.may-slider[data-dragging='true'] .may-slider__control { cursor: grabbing; }
+
+.may-slider__rail {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  height: var(--may-slider-rail-h);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  /* Keeps the fill and the end ticks inside the rounded caps. */
+  overflow: hidden;
+}
+
+.may-slider__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(
+    var(--may-slider-thumb) / 2 + var(--may-slider-pct) * (100cqi - var(--may-slider-thumb))
+  );
+  border-radius: inherit;
+  background: var(--may-slider-tint);
+  transition: width var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-slider__ticks {
+  position: absolute;
+  inset-block: 0;
+  /* Aligned to the thumb's travel, so a mark sits exactly where the knob lands. */
+  inset-inline: calc(var(--may-slider-thumb) / 2);
+}
+
+.may-slider__tick {
+  position: absolute;
+  inset-block: 0;
+  width: var(--may-slider-tick-w);
+  translate: -50% 0;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-text-quaternary);
+}
+
+/* --------------------------------- thumb ---------------------------------- */
+
+.may-slider__thumb {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0;
+  width: var(--may-slider-thumb);
+  height: var(--may-slider-thumb);
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  /*
+   * The knob stays white in dark mode, exactly as iOS keeps it —
+   * --may-color-surface would turn it near-black and lose the knob against
+   * the rail.
+   */
+  background: var(--may-on-color);
+  box-shadow: var(--may-shadow-sm);
+  cursor: grab;
+  touch-action: none;
+
+  /*
+   * `translate` and `scale` are separate properties rather than one `transform`
+   * shorthand, because they need different timings at the same instant: the
+   * position tracks the finger at follow speed while the growth rides a spring.
+   * A single shorthand could only ever carry one.
+   */
+  translate: calc(var(--may-slider-pct) * (100cqi - var(--may-slider-thumb))) -50%;
+  scale: 1;
+  transition:
+    translate var(--may-duration-settle) var(--may-spring-snappy),
+    scale var(--may-duration-settle) var(--may-spring-bouncy),
+    box-shadow var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-slider__thumb:disabled { cursor: not-allowed; }
+
+/*
+ * Held: the thumb swells and lifts. `data-dragging` is set on pointerdown, so
+ * this is the press feedback too — it does not wait for movement.
+ */
+.may-slider[data-dragging='true'] .may-slider__thumb {
+  scale: 1.22;
+  cursor: grabbing;
+  box-shadow: var(--may-shadow-md);
+  /* Any easing on the position while a finger is down reads as lag. */
+  transition:
+    translate var(--may-duration-follow) linear,
+    scale var(--may-duration-settle) var(--may-spring-bouncy),
+    box-shadow var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-slider[data-dragging='true'] .may-slider__fill {
+  transition: width var(--may-duration-follow) linear;
+}
+
+/* Keyboard focus grows the thumb the same way a finger does, so an arrow-key
+ * user sees the same control state a dragging user does. */
+.may-slider__thumb:focus-visible { scale: 1.12; }
+
+/* Hover is excluded while dragging: the pointer is over the thumb for the
+ * whole gesture, and this selector would otherwise out-specify the grow. */
+@media (hover: hover) and (pointer: fine) {
+  .may-slider:not([data-disabled='true']):not([data-dragging='true']) .may-slider__thumb:hover {
+    scale: 1.1;
+  }
+}
+
+/* -------------------------------- trimmings ------------------------------- */
+
+.may-slider__adornment {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--may-color-text-tertiary);
+}
+
+.may-slider__adornment > svg:not([width]) {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+}
+
+.may-slider__value {
+  flex-shrink: 0;
+  /* ch units stop the row re-laying out as the digits change width. */
+  min-width: 4ch;
+  text-align: end;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text-secondary);
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+/* The value takes full contrast while it is being changed, then recedes. */
+.may-slider[data-dragging='true'] .may-slider__value { color: var(--may-color-text); }

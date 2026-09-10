@@ -1,0 +1,67 @@
+/*
+ * A keycap with no stroke on it. Depth is a translucent fill over whatever
+ * surface it sits on, plus the lightest shadow in the ramp — an outlined cap
+ * looks like a form field in light and a floating rectangle in dark.
+ *
+ * Sizing is em-relative rather than fixed, so a cap set inside a menu row grows
+ * and shrinks with the row's own type instead of needing a matching size prop.
+ */
+
+.may-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Square-ish, so a single character does not read narrower than a glyph. */
+  min-width: 1.9em;
+  padding-inline: var(--may-space-1);
+  padding-block: 0.15em;
+  border-radius: var(--may-radius-xs);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text-secondary);
+  font-family: var(--may-font-mono);
+  /* Digits in a shortcut list line up column-wise. */
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--may-shadow-2xs);
+  /* Release rides the bouncy spring, exactly as .may-pressable does. */
+  transition:
+    transform var(--may-duration-settle) var(--may-spring-bouncy),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    color var(--may-duration-fast) var(--may-ease-out),
+    box-shadow var(--may-duration-fast) var(--may-ease-out);
+}
+
+/*
+ * Down is instant and beats the eye; the cap sinks INTO the surface rather than
+ * shrinking uniformly, which is why the translate rides along with the scale.
+ */
+.may-kbd[data-pressed='true'] {
+  transform: translateY(1px) scale(0.94);
+  background: var(--may-color-fill);
+  color: var(--may-color-text);
+  box-shadow: none;
+  transition:
+    transform var(--may-duration-instant) var(--may-ease-out),
+    background-color var(--may-duration-instant) var(--may-ease-out),
+    box-shadow var(--may-duration-instant) var(--may-ease-out);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-kbd[data-size='xs'] {
+  font-size: var(--may-text-caption-2);
+  line-height: var(--may-text-caption-2-leading);
+}
+.may-kbd[data-size='sm'] {
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+}
+.may-kbd[data-size='md'] {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+}
+.may-kbd[data-size='lg'] {
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+}

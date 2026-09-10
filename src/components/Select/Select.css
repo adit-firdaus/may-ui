@@ -1,0 +1,176 @@
+/*
+ * A select is a FILL with a chevron, not a boxed field. Nothing here draws a
+ * stroke: the translucent fill is the affordance, and it deepens on hover the
+ * same way a gray Button does, so the two read as the same family of control.
+ *
+ * The wrapper carries the height, the fill and the chevron; the native
+ * <select> is transparent and stretched over the whole box, so the entire
+ * control — chevron included — is one hit target that opens the OS picker.
+ */
+
+.may-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--may-radius-md);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text);
+  cursor: pointer;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-select--full {
+  display: flex;
+  width: 100%;
+}
+
+.may-select[aria-disabled='true'] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* The press scale comes from .may-pressable; the fill deepening under the
+ * finger is what keeps the control looking touched once it stops moving. */
+.may-select[data-pressed='true'] {
+  background: var(--may-color-fill-secondary);
+}
+
+/* Invalid is a wash of the destructive tone, never a red ring. */
+.may-select[data-invalid='true'] {
+  background: color-mix(in srgb, var(--may-color-destructive) 14%, transparent);
+  color: var(--may-color-danger);
+}
+
+/*
+ * Hover exists only for real pointers — on touch a tap would leave it stuck.
+ *
+ * These selectors carry .may-hoverable and [data-size] purely for weight:
+ * base.css paints a generic translucent highlight on every .may-hoverable, and
+ * on a control that already owns a fill that highlight would wash it out.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .may-select.may-hoverable[data-size]:hover:not([aria-disabled='true']) {
+    background: var(--may-color-fill-secondary);
+  }
+  .may-select.may-hoverable[data-invalid='true']:hover:not([aria-disabled='true']) {
+    background: color-mix(in srgb, var(--may-color-destructive) 22%, transparent);
+  }
+}
+
+.may-select__native {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: var(--may-text-body-weight);
+  letter-spacing: var(--may-text-body-tracking);
+  line-height: 1;
+  text-overflow: ellipsis;
+  cursor: inherit;
+  /* Trailing room for the chevron the wrapper draws over the top. */
+  padding-inline: var(--may-space-4) calc(var(--may-space-4) + var(--may-space-5));
+}
+
+.may-select__native:disabled {
+  cursor: not-allowed;
+  /* Safari greys a disabled control a second time; the wrapper's opacity
+   * already carries the whole state. */
+  -webkit-text-fill-color: currentColor;
+  opacity: 1;
+}
+
+/* The wrapper is the visible control, so the ring belongs on it — two
+ * concentric rings, one per element, is worse than none. */
+.may-select__native:focus-visible {
+  outline: none;
+}
+
+.may-select:has(.may-select__native:focus-visible) {
+  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline-offset: 2px;
+}
+
+/*
+ * The open menu is painted by the OS and inherits none of the wrapper's
+ * colours — without this the options are black on black in dark mode on
+ * Windows and Linux.
+ */
+.may-select__native option {
+  color: var(--may-color-text);
+  background: var(--may-color-surface);
+}
+
+/* Until something is picked, the placeholder reads as secondary text. */
+.may-select[data-placeholder='true'] .may-select__native {
+  color: var(--may-color-text-secondary);
+}
+
+.may-select__chevron {
+  position: absolute;
+  inset-inline-end: var(--may-space-3);
+  width: var(--may-space-4);
+  height: var(--may-space-4);
+  flex-shrink: 0;
+  color: var(--may-color-text-tertiary);
+  /* The native element underneath owns every pointer event. */
+  pointer-events: none;
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-select[data-invalid='true'] .may-select__chevron {
+  color: var(--may-color-danger);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-select[data-size='xs'] {
+  height: var(--may-control-h-xs);
+  font-size: var(--may-text-footnote);
+  border-radius: var(--may-radius-xs);
+}
+.may-select[data-size='xs'] .may-select__native {
+  padding-inline: var(--may-space-3) calc(var(--may-space-3) + var(--may-space-4));
+}
+.may-select[data-size='xs'] .may-select__chevron {
+  inset-inline-end: var(--may-space-2);
+  width: var(--may-space-3);
+  height: var(--may-space-3);
+}
+
+.may-select[data-size='sm'] {
+  height: var(--may-control-h-sm);
+  font-size: var(--may-text-subheadline);
+  border-radius: var(--may-radius-sm);
+}
+.may-select[data-size='sm'] .may-select__native {
+  padding-inline: var(--may-space-3) calc(var(--may-space-3) + var(--may-space-5));
+}
+
+.may-select[data-size='md'] {
+  height: var(--may-control-h-md);
+  font-size: var(--may-text-body);
+  border-radius: var(--may-radius-md);
+}
+
+.may-select[data-size='lg'] {
+  height: var(--may-control-h-lg);
+  font-size: var(--may-text-body);
+  border-radius: var(--may-radius-lg);
+}
+.may-select[data-size='lg'] .may-select__native {
+  padding-inline: var(--may-space-5) calc(var(--may-space-5) + var(--may-space-5));
+}

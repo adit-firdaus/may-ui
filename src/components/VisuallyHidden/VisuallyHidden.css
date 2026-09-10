@@ -1,0 +1,29 @@
+/*
+ * The hiding itself is `.may-sr-only` in base.css — one definition shared by
+ * every component that captions something for a screen reader. What lives here
+ * is the other half of the pattern: coming back.
+ */
+
+/*
+ * A focusable descendant has to bring its container back into view, and it has
+ * to arrive with a surface of its own, because it lands on top of whatever was
+ * already painted there. Class + pseudo-class outranks `.may-sr-only`, so the
+ * reveal does not depend on stylesheet order.
+ */
+.may-visually-hidden--focusable:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+
+  display: inline-block;
+  padding: var(--may-space-2) var(--may-space-3);
+  border-radius: var(--may-radius-sm);
+  background: var(--may-color-surface);
+  box-shadow: var(--may-shadow-md);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+}

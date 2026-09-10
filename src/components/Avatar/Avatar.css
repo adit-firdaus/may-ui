@@ -1,0 +1,125 @@
+/**
+ * Every dimension inside an avatar is a multiple of --may-avatar-size, so one
+ * variable per size rung drives the box, the initials and the glyph together.
+ * `md` is exactly one touch target; the other rungs are proportions of it.
+ */
+
+.may-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-avatar-size);
+  height: var(--may-avatar-size);
+  overflow: hidden;
+  /* The neutral state — no name to colour from, so it stays furniture. */
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text-secondary);
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.may-avatar[data-shape='circle'] {
+  border-radius: var(--may-radius-full);
+}
+
+/* Square avatars are app-icon squircles, not rounded rectangles. */
+.may-avatar[data-shape='square'] {
+  border-radius: var(--may-radius-squircle);
+}
+
+.may-avatar__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.may-avatar__initials {
+  font-size: calc(var(--may-avatar-size) * 0.4);
+  letter-spacing: var(--may-text-headline-tracking);
+}
+
+.may-avatar__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.may-avatar__glyph > svg {
+  width: calc(var(--may-avatar-size) * 0.62);
+  height: calc(var(--may-avatar-size) * 0.62);
+  display: block;
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-avatar[data-size='xs'] { --may-avatar-size: calc(var(--may-control-h) * 0.55); }
+.may-avatar[data-size='sm'] { --may-avatar-size: calc(var(--may-control-h) * 0.73); }
+.may-avatar[data-size='md'] { --may-avatar-size: var(--may-control-h); }
+.may-avatar[data-size='lg'] { --may-avatar-size: calc(var(--may-control-h) * 1.36); }
+.may-avatar[data-size='xl'] { --may-avatar-size: calc(var(--may-control-h) * 2); }
+
+/* ---------------------------- fallback gradients --------------------------- */
+
+/* A tile, not a grey circle: a thread full of grey circles reads as missing data. */
+.may-avatar[data-hue] { color: var(--may-color-on-primary); }
+.may-avatar[data-hue='blue'] { background: var(--may-grad-blue); }
+.may-avatar[data-hue='indigo'] { background: var(--may-grad-indigo); }
+.may-avatar[data-hue='purple'] { background: var(--may-grad-purple); }
+.may-avatar[data-hue='pink'] { background: var(--may-grad-pink); }
+.may-avatar[data-hue='teal'] { background: var(--may-grad-teal); }
+.may-avatar[data-hue='green'] { background: var(--may-grad-green); }
+.may-avatar[data-hue='orange'] { background: var(--may-grad-orange); }
+.may-avatar[data-hue='gray'] { background: var(--may-grad-gray); }
+
+/* ---------------------------------- group ---------------------------------- */
+
+.may-avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.may-avatar-group > * {
+  /* How far each avatar slides under the one before it, and how wide the
+   * punched-out gap around a neighbour reads. Both scale with the avatar. */
+  --may-avatar-lap: calc(var(--may-avatar-size) * 0.3);
+  --may-avatar-cut-gap: calc(var(--may-avatar-size) * 0.055);
+}
+
+.may-avatar-group > * + * {
+  margin-inline-start: calc(var(--may-avatar-lap) * -1);
+}
+
+/*
+ * The separation between stacked avatars is punched out of the one underneath
+ * rather than drawn around the one on top — this system separates nothing with
+ * a stroke, and a mask stays correct over any background instead of only over
+ * the surface colour a ring would have to guess at.
+ *
+ * A neighbour's centre sits 1.5 avatar-widths along minus the overlap; the
+ * hole is its own radius plus the gap. Only the alpha of the mask matters, so
+ * the opaque half spends a token rather than inventing a literal colour.
+ */
+.may-avatar-group > *:not(:last-child) {
+  --may-avatar-cutout: radial-gradient(
+    circle calc(var(--may-avatar-size) * 0.5 + var(--may-avatar-cut-gap))
+      at calc(var(--may-avatar-size) * 1.5 - var(--may-avatar-lap)) 50%,
+    transparent 100%,
+    var(--may-color-text) 100%
+  );
+  -webkit-mask-image: var(--may-avatar-cutout);
+  mask-image: var(--may-avatar-cutout);
+}
+
+.may-avatar--more {
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text-secondary);
+  font-size: calc(var(--may-avatar-size) * 0.34);
+  font-variant-numeric: tabular-nums;
+}

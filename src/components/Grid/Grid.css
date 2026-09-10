@@ -1,0 +1,23 @@
+.may-grid {
+  --may-grid-gap: var(--may-space-0);
+  --may-grid-columns: 1;
+  /* Only read when auto-fill is on without an explicit floor. */
+  --may-grid-min: var(--may-space-20);
+
+  display: grid;
+  gap: var(--may-grid-gap);
+  /* minmax(0, 1fr), not 1fr: a bare 1fr track is min-content wide at minimum,
+   * so one long unbroken string widens the whole grid past its container. */
+  grid-template-columns: repeat(var(--may-grid-columns), minmax(0, 1fr));
+  min-width: 0;
+}
+
+/*
+ * auto-fill lays down as many tracks as fit at the floor width. The min(…,100%)
+ * is what stops the last column overflowing a container narrower than the floor
+ * itself — on a 320px phone a 360px floor would otherwise force a sideways
+ * scroll of the entire page.
+ */
+.may-grid[data-auto-fill='true'] {
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--may-grid-min), 100%), 1fr));
+}

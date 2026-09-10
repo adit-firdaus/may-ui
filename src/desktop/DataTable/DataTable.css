@@ -1,0 +1,380 @@
+/*
+ * DataTable adds four affordances to Table's stylesheet and nothing else: a
+ * sort glyph, a filter row, a resize grip and a pinned leading edge. Everything
+ * else you can see — the card, the hairlines, the cell metrics, the row washes,
+ * the staggered entrance — is Table.css, rendered through Table's own class
+ * names. Restating any of it here is how the two silently drift apart.
+ *
+ * Two pinned axes meet in the top-leading corner, and the stacking order there
+ * is the only genuinely fiddly part of this file:
+ *
+ *   pinned header cell   z = sticky + 1     wins both ways
+ *   header cells         z = sticky
+ *   pinned body cells    z = sticky - 1     above rows, below the header
+ *   everything else      auto
+ *
+ * A pinned body cell also has to be OPAQUE, because rows pass underneath it and
+ * there is no blur in this system to hide them. It therefore paints the card's
+ * own surface as a background COLOUR and the row's wash as a background IMAGE
+ * over the top — one element, two layers, so zebra, selection and press still
+ * stack exactly as they do in an unpinned cell.
+ */
+
+.may-datatable {
+  /* The checkbox column is exactly one touch target wide. */
+  --may-dt-select-w: var(--may-control-h);
+  position: relative;
+}
+
+/* Table's scroller is already a scroll-area with overflow-x. It needs a
+ * containing block for the sticky cells and nothing else. */
+.may-datatable__scroller {
+  position: relative;
+}
+
+/*
+ * Auto layout picks the first widths; once they have been measured the table
+ * switches to fixed so a drag actually moves an edge instead of being
+ * renegotiated by the content. `max-content` lets the sum of the columns exceed
+ * the card and scroll, while `min-width` keeps a narrow table filling it.
+ */
+.may-datatable[data-fixed='true'] .may-table__table {
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* --------------------------------- header --------------------------------- */
+
+/* Table pins its header off `data-sticky`, which also switches the scroller to
+ * `overflow: visible` when unbounded — that would unpin the first column too.
+ * DataTable therefore drives the same rule from its own attribute. */
+.may-datatable[data-sticky-head='true'] .may-table__head-cell {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--may-z-sticky);
+}
+
+/* Room for the grip, which straddles the cell's trailing edge. */
+.may-datatable .may-table__head-cell {
+  padding-inline-end: var(--may-space-3);
+}
+
+/*
+ * The whole header is the sort target, not just the glyph. It stretches to the
+ * cell so there is no dead strip between the label and the edge — a 20px sort
+ * hotspot is the difference between a table you sort and one you fight.
+ */
+.may-datatable__sorter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-1);
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-xs);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-datatable__sorter:hover {
+    color: var(--may-color-text);
+  }
+  /* The glyph is invisible until the column is sorted or hovered — a column of
+   * permanent grey chevrons reads as clutter, and as eight things to press. */
+  .may-datatable__sorter:hover .may-datatable__sort {
+    opacity: 1;
+  }
+}
+
+.may-datatable__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* An end-aligned column sorts from its trailing edge, so the glyph stays beside
+ * the numbers rather than stranded across the cell. */
+.may-datatable .may-table__head-cell[data-align='end'] .may-datatable__sorter {
+  flex-direction: row-reverse;
+}
+
+.may-datatable .may-table__head-cell[data-align='center'] .may-datatable__sorter {
+  justify-content: center;
+}
+
+/* ------------------------------- sort glyph ------------------------------- */
+
+/*
+ * ONE chevron that rotates, not two glyphs that swap. Reversing a sort is a
+ * reversal, and watching the arrow turn over is what says so — a cross-fade
+ * between an up and a down arrow says only "something changed".
+ */
+.may-datatable__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1em;
+  flex-shrink: 0;
+  opacity: 0;
+  color: var(--may-color-tint);
+  transition:
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-datatable__sort > svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-datatable__sort[data-direction] {
+  opacity: 1;
+}
+
+/* Descending is the resting state of the drawn chevron; ascending flips it. */
+.may-datatable__sort[data-direction='asc'] > svg {
+  transform: rotate(180deg);
+}
+
+/*
+ * The ordinal only appears once a second key exists. A "1" beside the only
+ * sorted column is noise; beside three of them it is the whole story.
+ */
+.may-datatable__rank {
+  font-size: var(--may-text-caption-2);
+  line-height: 1;
+  font-weight: var(--may-text-headline-weight);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-tint);
+  animation: may-dt-rank-in var(--may-duration-settle) var(--may-spring-bouncy) both;
+}
+
+@keyframes may-dt-rank-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------- resize grip ------------------------------ */
+
+/*
+ * A hairline you can grab. The line itself is half a device pixel; the target
+ * around it is a comfortable eight, because a 0.5px hit area is a hit area
+ * nobody can hit. The line only paints on hover, focus or drag — an idle table
+ * shows the column rule Table.css already draws, not a row of handles.
+ */
+.may-datatable__grip {
+  position: absolute;
+  inset-block: 0;
+  /* Wholly inside the cell rather than straddling the boundary: the last
+   * column's grip would otherwise hang off the card, and a translated handle
+   * lands on the wrong side of its own edge under RTL. */
+  inset-inline-end: 0;
+  width: var(--may-space-2);
+  z-index: var(--may-z-base);
+  cursor: col-resize;
+  -webkit-user-select: none;
+  user-select: none;
+  /* The pointer owns this element outright once it goes down on it. */
+  touch-action: none;
+}
+
+.may-datatable__grip::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--may-space-2);
+  inset-inline-end: 0;
+  width: 1px;
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-tint);
+  opacity: 0;
+  transform: scaleY(0.6);
+  transition:
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-datatable__grip::before {
+    width: var(--may-hairline);
+  }
+}
+
+.may-datatable__grip:focus-visible::before,
+.may-datatable__grip[data-dragging='true']::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-datatable__grip:hover::before {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* While a column is being dragged the line thickens and runs the full height,
+ * so it reads as the edge being moved rather than a handle being held. */
+.may-datatable__grip[data-dragging='true']::before {
+  inset-block: 0;
+  width: var(--may-space-1);
+}
+
+/* -------------------------------- filter row ------------------------------ */
+
+.may-datatable__filter-cell {
+  position: relative;
+  padding: var(--may-space-2) var(--may-table-pad-x);
+  vertical-align: middle;
+  /* Opaque, like the header: rows pass underneath a pinned filter row and
+   * nothing in this system blurs them. */
+  background: var(--may-color-surface);
+}
+
+/* Sits directly under the header row, which is exactly one row tall. */
+.may-datatable[data-sticky-head='true'] .may-datatable__filter-cell {
+  position: sticky;
+  inset-block-start: var(--may-table-row-h);
+  z-index: var(--may-z-sticky);
+}
+
+/* The filter row carries the header's hairline instead, so the two read as one
+ * block of chrome rather than two stacked bars. */
+.may-datatable:has(.may-datatable__filter-cell) .may-table__head-cell::after {
+  content: none;
+}
+
+.may-datatable__filter-cell::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-datatable__filter-cell::after {
+    height: var(--may-hairline);
+  }
+}
+
+/* --------------------------------- select --------------------------------- */
+
+.may-datatable__select-col,
+.may-datatable__select-cell {
+  width: var(--may-dt-select-w);
+}
+
+.may-datatable__select-cell {
+  padding-inline: var(--may-space-2);
+  text-align: center;
+}
+
+/*
+ * Checkbox reserves a full 44px row because it is normally a Settings row on a
+ * phone. Inside a cell the ROW is the touch target, so the box adopts the row's
+ * own height instead of forcing every table to md density.
+ */
+.may-datatable__check.may-checkbox {
+  min-height: var(--may-table-row-h);
+  padding-inline: 0;
+  margin-inline: 0;
+  justify-content: center;
+}
+
+/* ------------------------------ pinned column ----------------------------- */
+
+.may-datatable[data-sticky-column='true'] .may-datatable__pinned {
+  position: sticky;
+}
+
+.may-datatable[data-sticky-column='true'] .may-datatable__pinned[data-pin='lead'] {
+  inset-inline-start: 0;
+}
+
+.may-datatable[data-sticky-column='true'] .may-datatable__pinned[data-pin='body'] {
+  inset-inline-start: 0;
+}
+
+/* With a checkbox column in front of it, the first data column starts where
+ * that column ends. */
+.may-datatable[data-selectable='true'][data-sticky-column='true']
+  .may-datatable__pinned[data-pin='body'] {
+  inset-inline-start: var(--may-dt-select-w);
+}
+
+.may-datatable[data-sticky-column='true'] td.may-datatable__pinned {
+  z-index: calc(var(--may-z-sticky) - 1);
+  /* Opaque base, row wash layered over it — see the header note. */
+  background-color: var(--may-color-surface);
+  background-image: linear-gradient(
+    var(--may-table-row-bg, transparent),
+    var(--may-table-row-bg, transparent)
+  );
+}
+
+/* The two corner cells — pinned column meets pinned header — win both ways. */
+.may-datatable[data-sticky-column='true'] th.may-datatable__pinned,
+.may-datatable[data-sticky-column='true'] td.may-datatable__filter-cell.may-datatable__pinned {
+  z-index: calc(var(--may-z-sticky) + 1);
+}
+
+/*
+ * The edge cue appears only once there is something behind it. A permanent
+ * shadow down the middle of an unscrolled table is a seam the data does not
+ * have — the hairline is a box-shadow rather than a border because nothing in
+ * this system is separated by a stroke, and because a shadow costs no layout.
+ */
+.may-datatable[data-sticky-column='true'][data-scrolled-x='true'] .may-datatable__pinned {
+  box-shadow:
+    var(--may-space-1) 0 var(--may-space-2) calc(var(--may-space-2) * -1)
+      rgba(var(--may-shadow-color), var(--may-shadow-a4)),
+    var(--may-hairline) 0 0 0 var(--may-color-separator);
+}
+
+/* Only the trailing-most pinned cell draws the edge. */
+.may-datatable[data-selectable='true'][data-sticky-column='true'][data-scrolled-x='true']
+  .may-datatable__pinned[data-pin='lead'] {
+  box-shadow: none;
+}
+
+/* --------------------------------- footer --------------------------------- */
+
+.may-datatable__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--may-space-4);
+  flex-wrap: wrap;
+  padding: var(--may-space-3) var(--may-space-2) 0;
+}
+
+.may-datatable__status {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text-secondary);
+}
+
+/* ------------------------------ reduced motion ----------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .may-datatable__rank {
+    animation: none;
+  }
+}

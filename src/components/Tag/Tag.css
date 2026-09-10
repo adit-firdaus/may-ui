@@ -1,0 +1,166 @@
+/**
+ * Tone modifiers set --may-tag-bg / --may-tag-fg; nothing else in the file
+ * names a colour. Neutral deliberately uses the system fill rather than a wash
+ * of the label colour: a grey chip is furniture, and furniture is a fill.
+ */
+
+.may-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  max-width: 100%;
+  height: var(--may-tag-h);
+  padding-inline: var(--may-tag-pad);
+  border-radius: var(--may-radius-full);
+  background: var(--may-tag-bg);
+  color: var(--may-tag-fg);
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1;
+  vertical-align: middle;
+  /* A tag appears because the user just added one — the arrival should read.
+   * `both` holds the from-state so there is no flash at full size first. */
+  animation: may-tag-in var(--may-duration-settle) var(--may-spring-bouncy) both;
+}
+
+@keyframes may-tag-in {
+  from {
+    transform: scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* The X supplies its own trailing breathing room, so the padding gives it back. */
+.may-tag:has(.may-tag__remove) {
+  padding-inline-end: var(--may-space-1);
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-tag[data-tone='neutral'] {
+  --may-tag-bg: var(--may-color-fill-tertiary);
+  --may-tag-fg: var(--may-color-text);
+}
+.may-tag[data-tone='tint'] {
+  --may-tag-bg: color-mix(in srgb, var(--may-color-primary) 14%, transparent);
+  --may-tag-fg: var(--may-color-tint);
+}
+.may-tag[data-tone='success'] {
+  --may-tag-bg: color-mix(in srgb, var(--may-color-success) 16%, transparent);
+  --may-tag-fg: var(--may-color-success);
+}
+.may-tag[data-tone='warning'] {
+  --may-tag-bg: color-mix(in srgb, var(--may-color-warning) 20%, transparent);
+  --may-tag-fg: var(--may-color-warning);
+}
+.may-tag[data-tone='danger'] {
+  --may-tag-bg: color-mix(in srgb, var(--may-color-destructive) 14%, transparent);
+  --may-tag-fg: var(--may-color-danger);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-tag[data-size='sm'] {
+  --may-tag-h: var(--may-control-h-xs);
+  --may-tag-pad: var(--may-space-3);
+  font-size: var(--may-text-footnote);
+  letter-spacing: var(--may-text-footnote-tracking);
+}
+.may-tag[data-size='md'] {
+  --may-tag-h: var(--may-control-h-sm);
+  --may-tag-pad: var(--may-space-3);
+  font-size: var(--may-text-subheadline);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+.may-tag[data-size='lg'] {
+  --may-tag-h: var(--may-control-h-md);
+  --may-tag-pad: var(--may-space-4);
+  font-size: var(--may-text-body);
+  letter-spacing: var(--may-text-body-tracking);
+}
+
+/* --------------------------------- content -------------------------------- */
+
+.may-tag__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-tag__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-inline-start: calc(var(--may-space-1) * -1);
+}
+
+/* Sized in em so a glyph scales with the chip; an explicit size wins. */
+.may-tag__icon > svg:not([width]) {
+  width: 1.1em;
+  height: 1.1em;
+  display: block;
+}
+
+/* ------------------------------- the X button ------------------------------ */
+
+.may-tag__remove {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: calc(var(--may-tag-h) * 0.6);
+  height: calc(var(--may-tag-h) * 0.6);
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  /* Muted until you reach for it — the label is the content, not the X. */
+  opacity: 0.5;
+  transition:
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/*
+ * Hit slop. The glyph is ~20px because a chip cannot be taller, but the thing
+ * you tap has to be a full 44px — so the target is an invisible pseudo-element
+ * that overflows the button, rather than padding, which would inflate the chip.
+ *
+ * It grows to --may-control-h vertically but stops at the chip's own trailing
+ * edge horizontally. A symmetric 44px box would hang ~7px past the chip and
+ * steal taps from the next chip in a wrapped recipient field, which is a worse
+ * bug than a target that is 44 tall and a little narrower than it is high.
+ */
+.may-tag__remove::after {
+  --may-tag-slop: calc((var(--may-control-h) - var(--may-tag-h) * 0.6) / 2);
+  content: '';
+  position: absolute;
+  inset-block: calc(var(--may-tag-slop) * -1);
+  inset-inline-start: calc(var(--may-tag-slop) * -1);
+  inset-inline-end: calc(var(--may-space-1) * -1);
+}
+
+.may-tag__remove > svg {
+  width: 0.7em;
+  height: 0.7em;
+  display: block;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-tag__remove:hover {
+    opacity: 1;
+  }
+}
+
+.may-tag__remove[data-pressed='true'] {
+  opacity: 1;
+}

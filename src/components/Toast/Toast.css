@@ -1,0 +1,237 @@
+/*
+ * Like Button, tone modifiers only SET variables and every other rule only
+ * CONSUMES them, so adding a tone never touches a geometry or motion rule.
+ *
+ * A toast is one of the few surfaces in the system that genuinely floats, so it
+ * is one of the few that owns a shadow. It separates from the page by elevation
+ * and by value — never by a stroke, and never by blurring what is behind it.
+ */
+
+.may-toast {
+  /* Local, so an app can widen the measure without restyling the capsule. */
+  --may-toast-width: 24rem;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  max-width: min(100%, var(--may-toast-width));
+  min-height: var(--may-control-h);
+  padding-block: var(--may-space-2);
+  padding-inline: var(--may-space-4);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+  box-shadow: var(--may-shadow-lg);
+  /* The viewport passes pointers through; the capsule itself catches them. */
+  pointer-events: auto;
+  /* A banner is furniture, not a document: a long press here starts a swipe,
+   * and it must not raise the selection callout on the way. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  /*
+   * Arrives on the bouncy spring, whose samples pass 1.16: it overshoots its
+   * resting size and settles, rather than sliding into place. A notification
+   * that merely appears reads as a web page.
+   */
+  animation: may-toast-in var(--may-duration-settle) var(--may-spring-bouncy);
+  transition:
+    transform var(--may-duration-settle) var(--may-spring-bouncy),
+    opacity var(--may-duration-fast) var(--may-ease-out);
+}
+
+/* Entrance and exit travel toward the edge this toast lives on. */
+.may-toast[data-position^='top'] { --may-toast-enter: -100%; }
+.may-toast[data-position^='bottom'] { --may-toast-enter: 100%; }
+
+/* A trailing control sits in its own tap target, which already carries padding. */
+.may-toast:has(button) { padding-inline-end: var(--may-space-2); }
+
+/* Two lines is no longer a capsule — a pill radius at that height reads as a
+ * lozenge, so it relaxes to the card radius the way a banner does. */
+.may-toast:has(.may-toast__description) { border-radius: var(--may-radius-card); }
+
+/* The swipe has to own the vertical axis, or the page scrolls underneath it. */
+.may-toast[data-dismissible='true'] { touch-action: none; }
+
+/* While the finger is down the toast must track it exactly — easing reads as
+ * lag, and the entrance animation would fight the transform outright. */
+.may-toast[data-swiping='true'] {
+  transition: none;
+  animation: none;
+}
+
+.may-toast[data-state='closed'] {
+  animation: may-toast-out var(--may-duration-sheet-out) var(--may-ease-out) forwards;
+  pointer-events: none;
+}
+
+/* A toast flicked away leaves in the direction of the finger, so the scripted
+ * exit must not take the transform back off it. */
+.may-toast[data-swiped='true'] { animation: none; }
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-toast[data-tone='tint'] { --may-toast-accent: var(--may-color-tint); }
+.may-toast[data-tone='neutral'] { --may-toast-accent: var(--may-color-text-secondary); }
+.may-toast[data-tone='success'] { --may-toast-accent: var(--may-color-success); }
+.may-toast[data-tone='warning'] { --may-toast-accent: var(--may-color-warning); }
+.may-toast[data-tone='danger'] { --may-toast-accent: var(--may-color-danger); }
+
+/* --------------------------------- leading -------------------------------- */
+
+.may-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-control-h-xs);
+  height: var(--may-control-h-xs);
+  border-radius: var(--may-radius-full);
+  /* A wash of the tone carrying tone-coloured glyph — the same weight Button's
+   * `tinted` variant uses, so the two read as one family. */
+  background: color-mix(in srgb, var(--may-toast-accent) 16%, transparent);
+  color: var(--may-toast-accent);
+}
+
+.may-toast__icon > svg:not([width]) {
+  width: 55%;
+  height: 55%;
+  display: block;
+}
+
+/*
+ * With no icon a toned toast carries a dot instead. Neutral gets nothing at
+ * all: an unremarkable message is just text, which is how iOS draws it.
+ */
+.may-toast__dot {
+  flex-shrink: 0;
+  width: var(--may-space-2);
+  height: var(--may-space-2);
+  border-radius: var(--may-radius-full);
+  background: var(--may-toast-accent);
+}
+
+/* ---------------------------------- text ---------------------------------- */
+
+.may-toast__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.may-toast__title {
+  font-size: var(--may-text-headline);
+  line-height: var(--may-text-headline-leading);
+  letter-spacing: var(--may-text-headline-tracking);
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text);
+}
+
+.may-toast__description {
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+/* --------------------------------- actions -------------------------------- */
+
+.may-toast__action {
+  flex-shrink: 0;
+  /* The action is the only element allowed to be louder than the message. */
+  margin-inline-start: var(--may-space-1);
+}
+
+/*
+ * The action is drawn at the `sm` rung so the capsule stays capsule-shaped, and
+ * that is under the 44pt minimum — so it carries an invisible hit area at full
+ * height, the same expansion IconButton gives its small sizes. It can only ADD
+ * area: the button's own width is untouched.
+ */
+.may-toast__action::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc((var(--may-control-h-sm) - var(--may-control-h)) / 2);
+}
+
+.may-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* A full touch target; the visible chip inside it is deliberately smaller. */
+  width: var(--may-control-h);
+  height: var(--may-control-h);
+  /*
+   * ...and that target is not allowed to set the capsule's height. The negative
+   * block margin hands back the difference between the target and the chip, so
+   * the row lays out around the 32pt chip while the finger still gets its full
+   * 44pt. Overflowing the capsule is intentional — nothing sits directly above
+   * or below a toast for the overhang to steal taps from.
+   */
+  margin-block: calc((var(--may-control-h-xs) - var(--may-control-h)) / 2);
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  cursor: pointer;
+}
+
+.may-toast__close-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--may-control-h-xs);
+  height: var(--may-control-h-xs);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-toast__close-chip > svg {
+  width: 55%;
+  height: 55%;
+  display: block;
+}
+
+.may-toast__close[data-pressed='true'] .may-toast__close-chip {
+  background: var(--may-color-fill);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-toast__close:hover .may-toast__close-chip {
+    background: var(--may-color-fill-secondary);
+  }
+}
+
+/* --------------------------------- motion --------------------------------- */
+
+@keyframes may-toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--may-toast-enter, 100%), 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Retreats a short way back toward its edge while shrinking, so dismissing
+ * reads as the reverse of arriving rather than as a separate effect. */
+@keyframes may-toast-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, calc(var(--may-toast-enter, 100%) * 0.4), 0) scale(0.94);
+  }
+}

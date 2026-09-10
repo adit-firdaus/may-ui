@@ -1,0 +1,127 @@
+/**
+ * The whole component is one grid of type sizes, so `size` sets three named
+ * text styles at once rather than scaling a single number.
+ */
+
+.may-statistic {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--may-space-4);
+  min-width: 0;
+  color: var(--may-color-text);
+}
+
+/* The Health-tile shape: an elevated surface, no stroke, no shadow — it sits
+ * on the grouped background and separates from it by value alone. */
+.may-statistic[data-variant='card'] {
+  padding: var(--may-space-4);
+  border-radius: var(--may-radius-card);
+  background: var(--may-color-surface);
+}
+
+.may-statistic__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-1);
+  min-width: 0;
+}
+
+.may-statistic__label {
+  color: var(--may-color-text-secondary);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Rounded numerals with tabular figures: the readout treatment Fitness and
+ * Health use. Tabular is the load-bearing half — a live value whose digits
+ * change width shivers on every update.
+ */
+.may-statistic__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--may-space-1);
+  font-family: var(--may-font-rounded);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text);
+}
+
+.may-statistic__unit {
+  font-size: 0.5em;
+  font-weight: 600;
+  color: var(--may-color-text-secondary);
+  letter-spacing: 0;
+}
+
+.may-statistic__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-1);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text-secondary);
+}
+
+.may-statistic__delta[data-sentiment='positive'] { color: var(--may-color-success); }
+.may-statistic__delta[data-sentiment='negative'] { color: var(--may-color-danger); }
+
+/* One triangle, rotated — so flipping from rising to falling is a turn you can
+ * watch rather than a glyph that blinks into something else. */
+.may-statistic__arrow {
+  width: 0.85em;
+  height: 0.85em;
+  display: block;
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-statistic__delta[data-direction='down'] .may-statistic__arrow { transform: rotate(180deg); }
+
+/* Unchanged reads as a bar, not as an arrow pointing sideways. */
+.may-statistic__delta[data-direction='flat'] .may-statistic__arrow {
+  transform: rotate(90deg) scaleY(0.28);
+}
+
+.may-statistic__trailing {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-statistic[data-size='sm'] .may-statistic__value {
+  font-size: var(--may-text-title-3);
+  line-height: var(--may-text-title-3-leading);
+  letter-spacing: var(--may-text-title-3-tracking);
+  font-weight: var(--may-text-title-3-weight);
+}
+.may-statistic[data-size='sm'] .may-statistic__label {
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+}
+
+.may-statistic[data-size='md'] .may-statistic__value {
+  font-size: var(--may-text-title-1);
+  line-height: var(--may-text-title-1-leading);
+  letter-spacing: var(--may-text-title-1-tracking);
+  font-weight: var(--may-text-title-1-weight);
+}
+
+.may-statistic[data-size='lg'] .may-statistic__value {
+  font-size: var(--may-text-large-title);
+  line-height: var(--may-text-large-title-leading);
+  letter-spacing: var(--may-text-large-title-tracking);
+  font-weight: var(--may-text-large-title-weight);
+}
+.may-statistic[data-size='lg'] .may-statistic__label {
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+}

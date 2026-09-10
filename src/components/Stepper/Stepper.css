@@ -1,0 +1,140 @@
+/*
+ * One pill, two halves. The fill belongs to the container and the halves are
+ * transparent, so the control reads as a single object that lights up on one
+ * side rather than as two buttons that happen to touch.
+ */
+
+.may-stepper {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  border-radius: var(--may-radius-md);
+  background: var(--may-color-fill-tertiary);
+  isolation: isolate;
+}
+
+/*
+ * The divider is drawn by the container at its exact midpoint, not hung off
+ * the second half: a half scales when pressed, and a divider that travelled
+ * with it would visibly detach from the pill's edges. Inset from both ends,
+ * the way iOS draws it — it separates, it does not enclose.
+ */
+.may-stepper::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--may-space-2);
+  inset-inline-start: 50%;
+  width: 1px;
+  translate: -50% 0;
+  background: var(--may-color-separator);
+  pointer-events: none;
+}
+
+/* A separator is one physical pixel, not one CSS pixel. */
+@media (min-resolution: 2dppx) {
+  .may-stepper::before { width: var(--may-hairline); }
+}
+
+.may-stepper[data-disabled='true'] { cursor: not-allowed; }
+
+/* --------------------------------- halves --------------------------------- */
+
+.may-stepper__button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--may-color-text);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/* Only the outer corners round; the meeting edges stay square against the
+ * divider. Logical corners so an RTL layout mirrors without a second rule. */
+.may-stepper__button[data-action='decrement'] {
+  border-start-start-radius: inherit;
+  border-end-start-radius: inherit;
+}
+
+.may-stepper__button[data-action='increment'] {
+  border-start-end-radius: inherit;
+  border-end-end-radius: inherit;
+}
+
+/* At a limit the half dims but the pill does not — the control is still live,
+ * that direction simply has nowhere left to go. The limit is aria-disabled
+ * rather than disabled, so it has to be styled by hand. */
+.may-stepper__button:disabled,
+.may-stepper__button[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+/*
+ * The pressed wash is an overlay rather than a background on the button
+ * itself, so it stacks on top of the shared `.may-hoverable` highlight instead
+ * of fighting it for specificity.
+ */
+.may-stepper__button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: transparent;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  pointer-events: none;
+}
+
+.may-stepper__button[data-pressed='true']::after {
+  background-color: var(--may-color-fill-secondary);
+  /* Down beats the eye; the release fades out on the line above. */
+  transition-duration: var(--may-duration-instant);
+}
+
+.may-stepper__button > svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
+
+/* --------------------------------- sizes ---------------------------------- */
+
+/*
+ * Each half is wider than it is tall, in UIStepper's proportion — a square
+ * half reads as two separate buttons rather than one control.
+ */
+.may-stepper[data-size='sm'] {
+  height: var(--may-control-h-sm);
+  border-radius: var(--may-radius-sm);
+}
+.may-stepper[data-size='sm'] .may-stepper__button {
+  width: calc(var(--may-control-h-sm) * 1.55);
+  font-size: var(--may-text-footnote);
+}
+
+.may-stepper[data-size='md'] {
+  height: var(--may-control-h-md);
+  border-radius: var(--may-radius-md);
+}
+.may-stepper[data-size='md'] .may-stepper__button {
+  width: calc(var(--may-control-h-md) * 1.5);
+  font-size: var(--may-text-callout);
+}
+
+.may-stepper[data-size='lg'] {
+  height: var(--may-control-h-lg);
+  border-radius: var(--may-radius-lg);
+}
+.may-stepper[data-size='lg'] .may-stepper__button {
+  width: calc(var(--may-control-h-lg) * 1.45);
+  font-size: var(--may-text-body);
+}

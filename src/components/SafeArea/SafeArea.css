@@ -1,0 +1,13 @@
+/*
+ * Physical sides, not logical ones. env(safe-area-inset-left) is the left of
+ * the DEVICE — it does not flip under RTL, and neither may the padding that
+ * consumes it, or a notch in landscape ends up padded on the wrong edge.
+ *
+ * The --may-inset-* indirection (see tokens.css) is what lets a WebView shell
+ * inject real insets on a platform where env() reports zero.
+ */
+
+.may-safe-area[data-edges~='top'] { padding-top: var(--may-inset-top); }
+.may-safe-area[data-edges~='bottom'] { padding-bottom: var(--may-inset-bottom); }
+.may-safe-area[data-edges~='left'] { padding-left: var(--may-inset-left); }
+.may-safe-area[data-edges~='right'] { padding-right: var(--may-inset-right); }

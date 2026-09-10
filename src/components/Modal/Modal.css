@@ -1,0 +1,177 @@
+/*
+ * Nothing here is separated by a stroke. The panel reads as floating because it
+ * is a lighter surface (--may-color-surface) over the dimmed page plus a
+ * shadow; the header, body and footer read as distinct because of the space
+ * between them, not a rule across them.
+ */
+
+.may-modal__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--may-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Keeps the panel off the rounded display corners on a phone. */
+  padding: var(--may-space-5);
+  padding-block-start: calc(var(--may-space-5) + var(--may-inset-top));
+  padding-block-end: calc(var(--may-space-5) + var(--may-inset-bottom));
+  background: var(--may-color-scrim);
+  animation: may-modal-scrim-in var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  max-height: 100%;
+  border-radius: var(--may-radius-sheet);
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+  box-shadow: var(--may-shadow-xl);
+  overflow: hidden;
+  /*
+   * Two animations on deliberately different curves. The transform rides the
+   * bouncy spring — whose linear() samples reach 1.166 — so scaling 0.9 → 1
+   * lands at roughly 1.017 before settling back: the dialog arrives rather than
+   * appearing. Opacity is held on a short ease instead, because a panel that is
+   * still translucent while it overshoots reads as a rendering glitch.
+   */
+  animation:
+    may-modal-in var(--may-duration-settle) var(--may-spring-bouncy),
+    may-modal-fade var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-modal[data-size='sm'] { max-width: 360px; }
+.may-modal[data-size='md'] { max-width: 480px; }
+.may-modal[data-size='lg'] { max-width: 680px; }
+.may-modal[data-size='full'] { max-width: 960px; }
+
+/* ------------------------------- close chip ------------------------------- */
+
+.may-modal__close {
+  position: absolute;
+  inset-block-start: var(--may-space-2);
+  inset-inline-end: var(--may-space-2);
+  z-index: var(--may-z-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* A full touch target; the visible chip inside it is deliberately smaller. */
+  width: var(--may-control-h);
+  height: var(--may-control-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  cursor: pointer;
+}
+
+.may-modal__close-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--may-control-h-xs);
+  height: var(--may-control-h-xs);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-modal__close-chip > svg {
+  width: 60%;
+  height: 60%;
+  display: block;
+}
+
+.may-modal__close[data-pressed='true'] .may-modal__close-chip {
+  background: var(--may-color-fill);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-modal__close:hover .may-modal__close-chip {
+    background: var(--may-color-fill-secondary);
+  }
+}
+
+/* -------------------------------- contents -------------------------------- */
+
+.may-modal__header {
+  padding: var(--may-space-5) var(--may-space-5) var(--may-space-3);
+  flex-shrink: 0;
+}
+
+/* Leave the title room to breathe past the close chip rather than run under it. */
+.may-modal[data-closable='true'] .may-modal__header {
+  padding-inline-end: calc(var(--may-control-h) + var(--may-space-2));
+}
+
+.may-modal__title {
+  margin: 0;
+  font-size: var(--may-text-title-3);
+  line-height: var(--may-text-title-3-leading);
+  letter-spacing: var(--may-text-title-3-tracking);
+  font-weight: var(--may-text-title-3-weight);
+}
+
+.may-modal__description {
+  margin: var(--may-space-1) 0 0;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+.may-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--may-space-5) var(--may-space-5);
+}
+
+/* With no header above it, the body has to supply its own top padding. */
+.may-modal:not(:has(.may-modal__header)) .may-modal__body {
+  padding-block-start: var(--may-space-5);
+}
+
+.may-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--may-space-2);
+  padding: var(--may-space-4) var(--may-space-5) var(--may-space-5);
+  flex-shrink: 0;
+}
+
+/*
+ * The only part of a modal that adapts. On a phone, actions stack full-width
+ * with the primary on top — reachable by thumb and unmistakable in order.
+ * `column-reverse` gets that from the same DOM order desktop wants (secondary
+ * first, primary last), so neither shape needs its own markup.
+ */
+.may-modal[data-presentation='compact'] .may-modal__footer {
+  flex-direction: column-reverse;
+  align-items: stretch;
+  padding-block-start: var(--may-space-3);
+}
+
+.may-modal[data-presentation='compact'] .may-modal__footer > * { width: 100%; }
+
+@keyframes may-modal-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes may-modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Starts small and slightly low, so the bounce carries it up into place. */
+@keyframes may-modal-in {
+  from { transform: translateY(var(--may-space-2)) scale(0.9); }
+  to { transform: translateY(0) scale(1); }
+}

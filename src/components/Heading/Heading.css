@@ -1,0 +1,21 @@
+/*
+ * Heading borrows the whole scale from Text — variant, tone, weight, align and
+ * clamp all resolve against `.may-text`. Only what a title needs and body copy
+ * does not lives here, and each rule carries both classes so it outranks
+ * `.may-text` no matter which file the bundler emits first.
+ */
+
+.may-text.may-heading {
+  /*
+   * A two-line title with one word stranded on the second line is the most
+   * visible typographic defect in a UI, and it appears only at certain widths
+   * — which is exactly why it survives review. `balance` costs nothing on the
+   * short runs headings are, and degrades to normal wrapping where unsupported.
+   */
+  text-wrap: balance;
+  /*
+   * A heading reached by an in-page anchor must not land underneath the nav
+   * pinned over it.
+   */
+  scroll-margin-block-start: calc(var(--may-navbar-h) + var(--may-space-4));
+}

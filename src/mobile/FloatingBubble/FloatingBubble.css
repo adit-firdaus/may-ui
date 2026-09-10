@@ -1,0 +1,73 @@
+/*
+ * The bubble is a Fab that lives on the display rather than in the layout. Only
+ * the parking and the drag states are here; every tone, size, shadow and press
+ * curve comes from Fab.css, which is why this file has no colour rules at all.
+ *
+ * Position is the independent `translate` property, never a transform: the Fab
+ * inside owns `transform` for its press and hover scales, and the two have to
+ * compose instead of taking turns wiping each other out.
+ */
+
+.may-bubble {
+  position: fixed;
+  /*
+   * PHYSICAL anchoring, deliberately — the one place in the system that is not
+   * logical. The drag works in the physical pixels a pointer reports, so the
+   * origin it measures from must be physical too; an inline-start anchor would
+   * mirror the coordinate space under RTL and send every drag the wrong way.
+   * The logical half of the mirroring lives in the `edge` prop, resolved in JS.
+   */
+  top: 0;
+  left: 0;
+  /* Above sticky chrome and any toolbar, below anything modal: a bubble is not
+   * allowed to float over a sheet that is asking for a decision. */
+  z-index: var(--may-z-overlay);
+  display: inline-flex;
+  /*
+   * The gap from the display edge, safe area included. Keeping it in margins
+   * means JS never has to know about env() — it reads back whatever these
+   * resolved to, and a WebView shell that injects its own insets moves the
+   * bubble's whole travel range with one token.
+   */
+  margin-top: calc(var(--may-inset-top) + var(--may-space-4));
+  margin-bottom: calc(var(--may-inset-bottom) + var(--may-space-4));
+  margin-left: calc(var(--may-inset-left) + var(--may-space-4));
+  margin-right: calc(var(--may-inset-right) + var(--may-space-4));
+  translate: 0 0;
+  /*
+   * Thrown at an edge, it arrives and stays there. `smooth` is the one spring
+   * with no overshoot in its samples, and an overshoot proportional to a 300px
+   * throw would carry the bubble clean off the display before settling back.
+   */
+  transition: translate var(--may-duration-settle) var(--may-spring-smooth);
+  /* The gesture is entirely ours; a drag must never scroll the page behind it. */
+  touch-action: none;
+}
+
+/* Before the first placement there is no position to travel from, and the
+ * bubble would fly in from the top-left corner on mount. */
+.may-bubble:not([data-placed]),
+.may-bubble[data-dragging='true'] {
+  transition: none;
+}
+
+/*
+ * Lifted, not pressed. Out-specifies Fab's own press rule: the finger is down,
+ * but what it is doing is carrying the bubble, and a control that pushes itself
+ * into the surface while being dragged reads as stuck rather than as held.
+ */
+.may-bubble[data-dragging='true'] .may-fab.may-pressable {
+  transform: scale(1.1);
+  box-shadow: var(--may-shadow-2xl);
+  transition:
+    transform var(--may-duration-fast) var(--may-spring-bouncy),
+    box-shadow var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-bubble .may-fab {
+  cursor: grab;
+}
+
+.may-bubble[data-dragging='true'] .may-fab {
+  cursor: grabbing;
+}

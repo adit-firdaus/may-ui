@@ -1,0 +1,181 @@
+/*
+ * The geometry is one knob: --may-switch-h. Everything else is derived, so a
+ * size is a single line and the thumb can never drift out of its track.
+ *
+ *   thumb  = h - 4px      (2px of padding on every side)
+ *   travel = w - h        (track minus the thumb and both paddings)
+ *
+ * While held, the thumb GROWS by --may-switch-grow and the ON position
+ * subtracts that same growth, which pins its trailing edge instead of letting
+ * it push past the track — the detail that makes the iOS switch feel like a
+ * physical object taking pressure.
+ */
+
+.may-switch {
+  --may-switch-pad: calc(var(--may-space-1) / 2);
+  --may-switch-w: calc(var(--may-switch-h) * 1.62);
+  --may-switch-thumb: calc(var(--may-switch-h) - var(--may-space-1));
+  --may-switch-travel: calc(var(--may-switch-w) - var(--may-switch-h));
+  --may-switch-grow: 0px;
+  --may-switch-x: 0px;
+  /* 0 → 1 while a finger is dragging the thumb; written by Switch.tsx. */
+  --may-switch-drag: 0;
+  /* translateX is physical, the thumb travel is not: the track mirrors under
+   * RTL (inset-inline-start parks the thumb on the right), so "on" is to the
+   * left. Switch.tsx reads the same direction to flip the drag. */
+  --may-switch-dir: 1;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--may-space-4);
+  min-height: var(--may-control-h);
+  /* Bleed the padding outward so the hover row hugs the content while the hit
+   * target still reaches Apple's 44px. */
+  padding-inline: var(--may-space-2);
+  margin-inline: calc(var(--may-space-2) * -1);
+  border-radius: var(--may-radius-md);
+  color: var(--may-color-text);
+  cursor: pointer;
+}
+
+/* The switch's press feel is the thumb widening, not a squish of the whole
+ * row — scaling a label and its description would only make them soft. The
+ * class stays on the root so the control still reads as pressable to the rest
+ * of the system. */
+.may-switch[data-slot='switch'].may-pressable {
+  transform: none;
+}
+
+/* A two-line row keeps the toggle vertically centred, the way Settings draws
+ * a switch beside a subtitle — only a checkbox aligns to the first line. */
+.may-switch:has(.may-switch__description) {
+  padding-block: var(--may-space-2);
+}
+
+[dir='rtl'] .may-switch {
+  --may-switch-dir: -1;
+}
+
+.may-switch[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* -------------------------------- the track ------------------------------- */
+
+.may-switch__track {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--may-switch-w);
+  height: var(--may-switch-h);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill);
+  /* The horizontal drag belongs to the switch; vertical panning still belongs
+   * to whatever list the switch is sitting in. */
+  touch-action: pan-y;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-switch__input:checked + .may-switch__track {
+  background: var(--may-color-primary);
+}
+
+.may-switch__input:focus-visible + .may-switch__track {
+  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.may-switch__thumb {
+  position: absolute;
+  inset-block-start: var(--may-switch-pad);
+  inset-inline-start: var(--may-switch-pad);
+  width: calc(var(--may-switch-thumb) + var(--may-switch-grow));
+  height: var(--may-switch-thumb);
+  border-radius: var(--may-radius-full);
+  /* White in both themes, the way the iOS knob stays white on a dark track. */
+  background: var(--may-on-color);
+  box-shadow: var(--may-shadow-sm);
+  transform: translateX(calc(var(--may-switch-x) * var(--may-switch-dir)));
+  transition:
+    transform var(--may-duration-settle) var(--may-spring-bouncy),
+    width var(--may-duration-fast) var(--may-ease-out);
+}
+
+/* Held: the thumb takes the pressure and spreads. */
+.may-switch[data-pressed='true'] .may-switch__thumb {
+  --may-switch-grow: var(--may-space-1);
+}
+
+/* On: travel minus the growth, so a pressed thumb keeps its trailing edge on
+ * the track rather than overhanging it. The overshoot past this position and
+ * back is the spring's, not a keyframe's. */
+.may-switch__input:checked + .may-switch__track .may-switch__thumb {
+  --may-switch-x: calc(var(--may-switch-travel) - var(--may-switch-grow));
+}
+
+/* ------------------------------- the drag --------------------------------- */
+
+/*
+ * While a finger owns the thumb it tracks that finger exactly — any easing on
+ * the transform here reads as lag — and the track fills in proportion, so the
+ * colour arrives with the thumb instead of snapping when it lands. The second
+ * selector exists only to outweigh the `:checked` rule above; without it a
+ * switch that is already on refuses to be dragged off.
+ */
+.may-switch[data-dragging='true'] .may-switch__thumb,
+.may-switch[data-dragging='true'] .may-switch__input:checked + .may-switch__track .may-switch__thumb {
+  --may-switch-x: calc((var(--may-switch-travel) - var(--may-switch-grow)) * var(--may-switch-drag));
+  transition: width var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-switch[data-dragging='true'] .may-switch__input + .may-switch__track {
+  background: color-mix(
+    in srgb,
+    var(--may-color-primary) calc(var(--may-switch-drag) * 100%),
+    var(--may-color-fill)
+  );
+  transition: none;
+}
+
+/* -------------------------------- the text -------------------------------- */
+
+.may-switch__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.may-switch__label {
+  font-size: var(--may-switch-text);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text);
+}
+
+.may-switch__description {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-switch[data-size='sm'] {
+  --may-switch-h: var(--may-space-6);
+  --may-switch-text: var(--may-text-subheadline);
+}
+
+.may-switch[data-size='md'] {
+  --may-switch-h: var(--may-space-8);
+  --may-switch-text: var(--may-text-body);
+}
+
+.may-switch[data-size='lg'] {
+  --may-switch-h: var(--may-space-10);
+  --may-switch-text: var(--may-text-body);
+}

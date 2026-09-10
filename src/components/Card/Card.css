@@ -1,0 +1,189 @@
+/*
+ * Separation here is background VALUE plus, for one variant only, a shadow.
+ * The variant rules therefore only ever set --may-card-bg and a box-shadow;
+ * everything else — radius, padding, rhythm — is shared.
+ */
+
+.may-card {
+  --may-card-bg: var(--may-color-surface);
+  --may-card-pad: var(--may-space-5);
+  --may-card-gap: var(--may-space-4);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-card-gap);
+  min-width: 0;
+  padding: var(--may-card-pad);
+  border-radius: var(--may-radius-card);
+  background-color: var(--may-card-bg);
+  color: var(--may-color-text);
+  /* A card clips its own corners so a full-bleed child (a List, an image)
+   * never squares them off. */
+  overflow: hidden;
+}
+
+/* -------------------------------- variants ------------------------------- */
+
+.may-card[data-variant='elevated'] {
+  --may-card-bg: var(--may-color-surface);
+  box-shadow: var(--may-shadow-sm);
+}
+
+/* The iOS Settings card: same surface, no shadow. On the grouped page
+ * background the value difference alone is the separation. */
+.may-card[data-variant='grouped'] {
+  --may-card-bg: var(--may-color-surface);
+}
+
+/* For a card inside a card — the nested fill is what keeps the inner one
+ * readable without a stroke around it. */
+.may-card[data-variant='nested'] {
+  --may-card-bg: var(--may-color-surface-nested);
+}
+
+.may-card[data-variant='plain'] {
+  --may-card-bg: transparent;
+}
+
+/* --------------------------------- padding -------------------------------- */
+
+.may-card[data-padding='none'] {
+  --may-card-pad: var(--may-space-0);
+  --may-card-gap: var(--may-space-0);
+}
+.may-card[data-padding='xs'] {
+  --may-card-pad: var(--may-space-3);
+  --may-card-gap: var(--may-space-2);
+}
+.may-card[data-padding='sm'] {
+  --may-card-pad: var(--may-space-4);
+  --may-card-gap: var(--may-space-3);
+}
+.may-card[data-padding='md'] {
+  --may-card-pad: var(--may-space-5);
+  --may-card-gap: var(--may-space-4);
+}
+.may-card[data-padding='lg'] {
+  --may-card-pad: var(--may-space-6);
+  --may-card-gap: var(--may-space-5);
+}
+
+/* ------------------------------- interactive ------------------------------ */
+
+button.may-card {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition:
+    box-shadow var(--may-duration-settle) var(--may-ease-out),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+button.may-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/*
+ * base.css's .may-hoverable rule swaps background-color for a translucent
+ * highlight. That is right for a row sitting ON a surface and wrong for a card
+ * that IS one — it would go see-through over the page. So re-assert the card's
+ * own colour (winning on specificity) and layer the highlight above it as an
+ * image instead, which composites rather than replaces.
+ */
+@media (hover: hover) and (pointer: fine) {
+  button.may-card[data-variant]:hover:not(:disabled) {
+    background-color: var(--may-card-bg);
+    background-image: linear-gradient(
+      var(--may-color-highlight),
+      var(--may-color-highlight)
+    );
+  }
+
+  /* Only the variant that already floats can lift further. */
+  button.may-card[data-variant='elevated']:hover:not(:disabled) {
+    box-shadow: var(--may-shadow-md);
+  }
+}
+
+/* Pressing drops the card back onto the page — the shadow collapses on the way
+ * down and springs back with the scale. */
+button.may-card[data-variant='elevated'][data-pressed='true'] {
+  box-shadow: var(--may-shadow-2xs);
+  transition: box-shadow var(--may-duration-instant) var(--may-ease-out);
+}
+
+/* --------------------------------- sections ------------------------------- */
+
+.may-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--may-space-3);
+  min-width: 0;
+}
+
+.may-card__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.may-card__header-accessory {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.may-card__title {
+  margin: 0;
+  font-size: var(--may-text-headline);
+  line-height: var(--may-text-headline-leading);
+  letter-spacing: var(--may-text-headline-tracking);
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text);
+}
+
+.may-card__description {
+  margin: 0;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  font-weight: var(--may-text-subheadline-weight);
+  color: var(--may-color-text-secondary);
+}
+
+.may-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-3);
+  min-width: 0;
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+}
+
+.may-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--may-space-2);
+  /* Trailing-aligned and pinned down, so a row of cards of different content
+   * lengths still lines its actions up. */
+  margin-block-start: auto;
+  min-width: 0;
+}
+
+/* A card padded to nothing still needs its sections to breathe, so they take
+ * the padding back individually — except a body, which is the full-bleed case. */
+.may-card[data-padding='none'] > .may-card__header,
+.may-card[data-padding='none'] > .may-card__footer {
+  padding: var(--may-space-4);
+}

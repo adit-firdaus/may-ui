@@ -1,0 +1,47 @@
+/*
+ * Geometry only. Everything the toasts look like lives in Toast.css; this file
+ * decides where a stack of them sits and which end of it is the newest.
+ */
+
+/* The host is a mount point, not a box: it must never introduce a layout node
+ * into whatever it was dropped beside. */
+.may-host {
+  display: contents;
+}
+
+.may-toast-viewport {
+  position: fixed;
+  z-index: var(--may-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-2);
+  /*
+   * The viewport spans the edge and only aligns its children; the toasts carry
+   * their own width. Pointers pass straight through the gaps, so a stack in the
+   * corner never blocks the UI it is reporting on.
+   */
+  inset-inline: 0;
+  padding-inline-start: calc(var(--may-space-4) + var(--may-inset-left));
+  padding-inline-end: calc(var(--may-space-4) + var(--may-inset-right));
+  pointer-events: none;
+}
+
+/*
+ * Reversed at the top edge so the newest toast is always the one nearest the
+ * edge it dropped from, and the stack grows away from it. DOM order stays
+ * oldest-first either way, which is the order a screen reader reads them in.
+ */
+.may-toast-viewport[data-side='top'] {
+  inset-block-start: 0;
+  padding-block-start: calc(var(--may-space-4) + var(--may-inset-top));
+  flex-direction: column-reverse;
+}
+
+.may-toast-viewport[data-side='bottom'] {
+  inset-block-end: 0;
+  padding-block-end: calc(var(--may-space-4) + var(--may-inset-bottom));
+}
+
+.may-toast-viewport[data-align='start'] { align-items: flex-start; }
+.may-toast-viewport[data-align='center'] { align-items: center; }
+.may-toast-viewport[data-align='end'] { align-items: flex-end; }

@@ -1,0 +1,114 @@
+/**
+ * N spokes arranged around a hub, each fading from full to faint on one shared
+ * cycle but started at a different point in it. Nothing rotates — the travelling
+ * highlight is entirely opacity, which is why the indicator never resamples a
+ * rotating edge and stays crisp at 15px.
+ *
+ * The spoke is centred by LAYOUT (inset-inline-start) rather than by a
+ * translate inside the transform: a `translateX(-50%) rotate(θ)` would apply
+ * the translation in the already-rotated frame and fling each spoke off along
+ * its own axis. Leaving `transform` to hold nothing but the rotation also keeps
+ * the transform-origin arithmetic readable.
+ */
+
+.may-spinner {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--may-spinner-size);
+  height: var(--may-spinner-size);
+  vertical-align: middle;
+  /* Spokes paint with currentColor, so one tone rule colours all of them. */
+  color: var(--may-spinner-tint);
+
+  /* Fallback so the angle and delay calcs stay valid before React sets the
+   * real count. UIKit's own spoke count. */
+  --may-spinner-count: 8;
+
+  /* Proportions, not typed sizes: retuning a size rung retunes the spokes. */
+  --may-spinner-spoke-w: max(2px, calc(var(--may-spinner-size) * 0.1));
+  --may-spinner-spoke-h: calc(var(--may-spinner-size) * 0.3);
+  /* 1s. Faster reads as urgency the app has not earned; slower reads as stuck. */
+  --may-spinner-cycle: calc(var(--may-duration-sheet-in) * 2);
+  /* The trailing spoke never reaches zero — a gap in the ring reads as a
+   * missing spoke rather than as a fading tail. */
+  --may-spinner-dim: 0.16;
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+/* Neutral takes the fixed system grey rather than a label colour: UIKit's
+ * indicator is the same grey in light and dark, and a label-derived one would
+ * turn near-black on white and near-white on black. */
+.may-spinner[data-tone='neutral'] { --may-spinner-tint: var(--may-gray); }
+.may-spinner[data-tone='tint'] { --may-spinner-tint: var(--may-color-tint); }
+.may-spinner[data-tone='success'] { --may-spinner-tint: var(--may-color-success); }
+.may-spinner[data-tone='warning'] { --may-spinner-tint: var(--may-color-warning); }
+.may-spinner[data-tone='danger'] { --may-spinner-tint: var(--may-color-danger); }
+
+/* ---------------------------------- sizes --------------------------------- */
+
+/*
+ * Fractions of the control height rather than rungs of it. An indicator is not
+ * a touch target — at `--may-control-h` it would dwarf the row it sits in — but
+ * keeping it on the same scale means one knob still moves everything.
+ */
+.may-spinner[data-size='xs'] { --may-spinner-size: calc(var(--may-control-h) * 0.34); }
+.may-spinner[data-size='sm'] { --may-spinner-size: calc(var(--may-control-h) * 0.46); }
+.may-spinner[data-size='md'] { --may-spinner-size: calc(var(--may-control-h) * 0.62); }
+.may-spinner[data-size='lg'] { --may-spinner-size: calc(var(--may-control-h) * 0.86); }
+
+/* --------------------------------- spokes --------------------------------- */
+
+.may-spinner__spoke {
+  /* Overridden per spoke from JS; the fallback keeps a lone spoke at twelve
+   * o'clock rather than collapsing its transform to an invalid value. */
+  --may-spinner-i: 0;
+
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(50% - var(--may-spinner-spoke-w) / 2);
+  width: var(--may-spinner-spoke-w);
+  height: var(--may-spinner-spoke-h);
+  border-radius: var(--may-radius-full);
+  background: currentColor;
+
+  /*
+   * Tapered toward the hub, as UIKit draws them. clip-path intersects with the
+   * painted box, so the rounded outer cap that border-radius gave the spoke
+   * survives the clip while the inner half narrows.
+   */
+  clip-path: polygon(0 0, 100% 0, 74% 100%, 26% 100%);
+
+  /* The spoke's top edge sits on the rim, so half the ring below it is the hub. */
+  transform-origin: 50% calc(var(--may-spinner-size) / 2);
+  transform: rotate(calc(var(--may-spinner-i) * 1turn / var(--may-spinner-count)));
+
+  animation: may-spinner-fade var(--may-spinner-cycle) linear infinite;
+  /*
+   * A NEGATIVE delay starts each spoke already partway through the cycle, so
+   * the ring is fully lit on the first frame. A positive stagger would light
+   * the spokes one at a time on mount, which reads as a stutter.
+   */
+  animation-delay: calc(
+    -1 * var(--may-spinner-i) * var(--may-spinner-cycle) / var(--may-spinner-count)
+  );
+}
+
+@keyframes may-spinner-fade {
+  from { opacity: 1; }
+  to { opacity: var(--may-spinner-dim); }
+}
+
+/*
+ * base.css collapses duration and stops iteration for reduced motion, which
+ * would leave every spoke parked at the DIM end of its fade — a ring so faint
+ * it looks broken. Drop the animation and hold an evenly-lit ring instead: the
+ * indicator stops, which is what was asked for, and still reads as "busy".
+ */
+@media (prefers-reduced-motion: reduce) {
+  .may-spinner__spoke {
+    animation: none;
+    opacity: 0.55;
+  }
+}

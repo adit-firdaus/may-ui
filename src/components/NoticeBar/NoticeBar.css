@@ -1,0 +1,232 @@
+/**
+ * A banner, not a card: full-bleed, square, and SOLID rather than washed. That
+ * is the split with Alert — an alert is a message inside the content, drawn as
+ * a tinted panel; a notice bar is chrome laid across the top of it, and iOS
+ * draws that as a saturated band (the green recording bar, the blue hotspot
+ * bar) so it reads as system rather than as page.
+ *
+ * Tone rules set --may-notice-bg and --may-notice-fg; nothing else names a
+ * colour. Everything inside paints with currentColor, so the icon, the close
+ * button and any plain button in the action slot are correct for free.
+ */
+
+.may-notice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+  min-width: 0;
+  min-height: var(--may-control-h);
+  padding: var(--may-space-2) var(--may-space-4);
+  background: var(--may-notice-bg);
+  color: var(--may-notice-fg);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  font-weight: 500;
+  /* Drops in from above the edge it is attached to, and the bouncy spring
+   * overshoots a hair past resting — a bar that simply fades in reads as part
+   * of the layout rather than as something that just happened. */
+  animation: may-notice-in var(--may-duration-settle) var(--may-spring-bouncy) both;
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-notice[data-tone='tint'] {
+  --may-notice-bg: var(--may-color-primary);
+  --may-notice-fg: var(--may-color-on-primary);
+}
+/* Neutral is the one tone that stays a fill: a solid label-coloured band would
+ * be a black bar across the screen, which reads as an error, not as chrome. */
+.may-notice[data-tone='neutral'] {
+  --may-notice-bg: var(--may-color-fill-secondary);
+  --may-notice-fg: var(--may-color-text);
+}
+.may-notice[data-tone='success'] {
+  --may-notice-bg: var(--may-color-success);
+  --may-notice-fg: var(--may-on-color);
+}
+/* Orange is light enough that white on it fails contrast; the label wins. */
+.may-notice[data-tone='warning'] {
+  --may-notice-bg: var(--may-color-warning);
+  --may-notice-fg: var(--may-label);
+}
+.may-notice[data-tone='danger'] {
+  --may-notice-bg: var(--may-color-destructive);
+  --may-notice-fg: var(--may-color-on-destructive);
+}
+
+/* --------------------------------- contents -------------------------------- */
+
+.may-notice__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.may-notice__icon > svg:not([width]) {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+}
+
+.may-notice__action {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+/*
+ * A low-emphasis button in the action slot takes the BAND's colour, not the
+ * page's tint — a blue "View" on a blue bar is invisible. Matched through the
+ * public data-slot/data-variant contract rather than Button's class names, and
+ * deliberately not extended to `filled` or `tinted`, which carry their own
+ * background and would lose their pairing.
+ */
+.may-notice__action [data-slot='button'][data-variant='plain'],
+.may-notice__action [data-slot='button'][data-variant='gray'],
+.may-notice__action [data-slot='icon-button'][data-variant='plain'] {
+  color: inherit;
+}
+
+/* --------------------------------- marquee --------------------------------- */
+
+.may-notice__viewport {
+  flex: 1;
+  min-width: 0;
+  /* Clips the chase copy, and clips a non-scrolling overflow to the bar. */
+  overflow: hidden;
+}
+
+.may-notice__track {
+  /*
+   * Both are replaced from JS the moment the bar is measured. The fallbacks
+   * exist so the keyframes and the animation shorthand stay valid values in the
+   * frame before that — a marquee that has not measured yet simply does not
+   * move, rather than animating over an invalid duration.
+   */
+  --may-notice-shift: 0px;
+  --may-notice-duration: calc(var(--may-duration-sheet-in) * 20);
+
+  display: flex;
+  min-width: 0;
+}
+
+/*
+ * The copy carries the gap between loops as its own trailing padding, so ONE
+ * copy's width is exactly the distance the track travels — no gap arithmetic in
+ * JS, and no seam where the loop restarts. It is applied whether or not the bar
+ * ends up scrolling, so the width the effect measures is the width it animates.
+ */
+.may-notice[data-marquee='true'] .may-notice__copy {
+  flex: none;
+  white-space: nowrap;
+  padding-inline-end: var(--may-space-16);
+}
+
+.may-notice__track[data-scrolling='true'] {
+  animation: may-notice-marquee var(--may-notice-duration) linear infinite;
+  will-change: transform;
+}
+
+/* Linear, and only ever linear: any easing on a marquee reads as the text
+ * hesitating, which is exactly the thing you cannot un-see once noticed. */
+@keyframes may-notice-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-1 * var(--may-notice-shift))); }
+}
+
+/* A pointer over the bar means someone is reading it — give them the time. */
+@media (hover: hover) and (pointer: fine) {
+  .may-notice:hover .may-notice__track[data-scrolling='true'] {
+    animation-play-state: paused;
+  }
+}
+
+/* ------------------------------ the close button ---------------------------- */
+
+.may-notice__close {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: calc(var(--may-control-h) * 0.5);
+  height: calc(var(--may-control-h) * 0.5);
+  padding: 0;
+  border: 0;
+  border-radius: var(--may-radius-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  /* Muted until reached for — the notice is the content, not the X. */
+  opacity: 0.65;
+  transition:
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/* Hit slop out to the full 44px, without inflating the bar's own padding. */
+.may-notice__close::after {
+  --may-notice-slop: calc((var(--may-control-h) - var(--may-control-h) * 0.5) / 2);
+  content: '';
+  position: absolute;
+  inset: calc(var(--may-notice-slop) * -1);
+}
+
+.may-notice__close > svg {
+  width: 0.8em;
+  height: 0.8em;
+  display: block;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-notice__close:hover { opacity: 1; }
+}
+
+.may-notice__close[data-pressed='true'] { opacity: 1; }
+
+/* --------------------------------- motion --------------------------------- */
+
+@keyframes may-notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.may-notice[data-exiting='true'] {
+  animation: may-notice-out var(--may-duration-fast) var(--may-ease-out) forwards;
+  pointer-events: none;
+}
+
+@keyframes may-notice-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/*
+ * The JS already declines to render a chase copy under reduced motion, so this
+ * only covers the window where the preference flips while a loop is running:
+ * stop it dead rather than letting base.css run it once at 1ms, which would
+ * leave the message parked one full width to the left — off screen.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .may-notice__track[data-scrolling='true'] {
+    animation: none;
+    transform: none;
+  }
+}

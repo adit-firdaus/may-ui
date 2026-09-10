@@ -1,0 +1,163 @@
+/*
+ * This file is a skin over Collapsible: the mechanism (the 0fr → 1fr track,
+ * the rotating chevron) already works, so all that is left is making a row of
+ * one look like a row of a grouped list.
+ *
+ * Every override is scoped under .may-accordion so it outranks the primitive's
+ * own class regardless of which stylesheet a bundler happens to emit first.
+ */
+
+.may-accordion-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Uppercase eyebrow above the card, as iOS Settings draws its section titles. */
+.may-accordion__section-header {
+  padding: var(--may-space-4) var(--may-space-4) var(--may-space-2);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--may-color-text-secondary);
+}
+
+.may-accordion__section-footer {
+  padding: var(--may-space-2) var(--may-space-4) var(--may-space-4);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+}
+
+.may-accordion {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--may-color-surface);
+}
+
+/* overflow hides the corner overhang of a row highlight, so the trigger needs
+ * no radius of its own. */
+.may-accordion[data-variant='inset'] {
+  border-radius: var(--may-radius-card);
+  overflow: hidden;
+}
+
+.may-accordion[data-variant='plain'] {
+  background: transparent;
+}
+
+/* ---------------------------------- item ---------------------------------- */
+
+.may-accordion__item {
+  position: relative;
+  min-width: 0;
+}
+
+/*
+ * Same hairline technique as List: a pseudo-element rather than a border, inset
+ * from the leading edge so it starts under the label instead of at the card's
+ * edge. Out of the box model, so row heights stay exact.
+ */
+.may-accordion__item + .may-accordion__item::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--may-space-4);
+  inset-inline-end: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+/* Matches List's icon column, so a list and an accordion in the same group
+ * line their hairlines up. */
+.may-accordion__item:has(.may-accordion__leading) + .may-accordion__item::before {
+  inset-inline-start: calc(var(--may-space-4) * 2 + 29px);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-accordion__item + .may-accordion__item::before {
+    height: var(--may-hairline);
+  }
+}
+
+/* --------------------------------- trigger -------------------------------- */
+
+.may-accordion .may-accordion__trigger {
+  padding: var(--may-space-2) var(--may-space-4);
+  border-radius: 0;
+  min-height: var(--may-control-h);
+}
+
+.may-accordion__row {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.may-accordion__leading {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.may-accordion__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.may-accordion__title {
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  color: var(--may-color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-accordion__subtitle {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-accordion__detail {
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  color: var(--may-color-text-secondary);
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------- panel --------------------------------- */
+
+.may-accordion__panel > .may-collapsible__clip > .may-collapsible__content {
+  padding: var(--may-space-0) var(--may-space-4) var(--may-space-4);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  color: var(--may-color-text-secondary);
+}
+
+/* A panel made of its own rows (a nested List, a Descriptions) draws its own
+ * insets and hairlines, so the panel gives the full width back rather than
+ * indenting a second time. */
+.may-accordion__panel
+  > .may-collapsible__clip
+  > .may-collapsible__content:has(:is([data-slot='list'], [data-slot='descriptions'])) {
+  padding-inline: var(--may-space-0);
+}

@@ -1,0 +1,250 @@
+/*
+ * A floating menu with nothing drawn around it.
+ *
+ * Depth here is a surface at a different value plus the heaviest shadow in the
+ * ramp — never a hairline ring, which is the one treatment that reads as a
+ * dialog in light and as a floating rectangle in dark. Separators inside are
+ * pseudo-element hairlines, so they cost no layout and stay one device pixel.
+ */
+
+/*
+ * The trigger wrapper adds no box. A context menu is nearly always attached to
+ * something already laid out — a table row, a grid cell, a canvas — and a div
+ * appearing in the middle of that layout is a bug the consumer cannot fix.
+ *
+ * The one thing `display: contents` cannot save is a SIBLING selector: CSS
+ * combinators walk the DOM, not the box tree, so wrapping every row of a List
+ * individually breaks `.may-list-row + .may-list-row`. Wrap the container and
+ * read the row off the event instead — which is what Mail itself does.
+ */
+.may-context {
+  display: contents;
+}
+
+.may-menu {
+  position: fixed;
+  z-index: var(--may-z-popover);
+  display: flex;
+  flex-direction: column;
+  min-width: 13rem;
+  max-width: 22rem;
+  /* Long menus scroll rather than run off the screen; the root component leaves
+   * a margin for exactly this. */
+  max-height: calc(100vh - var(--may-space-4));
+  overflow-y: auto;
+  padding: var(--may-space-1);
+  border-radius: var(--may-radius-lg);
+  background: var(--may-color-surface);
+  color: var(--may-color-text);
+  box-shadow: var(--may-shadow-xl);
+  /* Held out of sight for exactly one frame, while it is measured. */
+  visibility: hidden;
+}
+
+/*
+ * Placed, and now visible. The spring overshoots past 1, so the panel arrives
+ * rather than appears, and `transform-origin` is written by the placer — a menu
+ * that flipped to the left of the pointer grows out of its RIGHT edge, so the
+ * motion always expands away from the cursor rather than across it.
+ */
+.may-menu[data-placed='true'] {
+  visibility: visible;
+  animation: may-menu-in var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+/* A submenu is a smaller gesture than the menu that spawned it — it is a
+ * continuation of something already open, not a new arrival. */
+.may-menu:not([data-level='0'])[data-placed='true'] {
+  animation-duration: var(--may-duration-fast);
+  animation-timing-function: var(--may-ease-back);
+}
+
+@keyframes may-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------- items --------------------------------- */
+
+/*
+ * A real box, not `display: contents`. `mouseenter` and `mouseleave` are
+ * derived from an element's box, and a boxless wrapper is exactly the kind of
+ * thing browsers disagree about — the whole hover-delay scheme hangs off these
+ * two events firing on this element.
+ */
+.may-menu__slot {
+  display: block;
+}
+
+.may-menu__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+  min-height: var(--may-control-h);
+  padding: var(--may-space-1) var(--may-space-3);
+  border: 0;
+  border-radius: var(--may-radius-sm);
+  background: transparent;
+  color: var(--may-color-text);
+  font-family: inherit;
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-menu[data-size='sm'] .may-menu__item {
+  min-height: var(--may-control-h-sm);
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+
+/*
+ * One active state, driven by both the pointer and the arrow keys — there is
+ * deliberately no pointer-hover rule anywhere in this file. A menu that lights
+ * on hover AND tracks a keyboard selection separately shows two selected rows
+ * the moment you touch the mouse, which is the classic hand-rolled-menu bug.
+ */
+.may-menu__item[data-active='true'] {
+  background: var(--may-color-highlight-strong);
+}
+
+.may-menu__item[data-pressed='true'] {
+  background: var(--may-color-fill-secondary);
+}
+
+.may-menu__item[aria-disabled='true'] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.may-menu__item[data-destructive='true'] {
+  color: var(--may-color-danger);
+}
+
+/*
+ * A fixed leading gutter, whether or not this particular row has anything in
+ * it. Checkmarks and icons appearing and disappearing are what make a menu's
+ * labels jitter as its state changes.
+ */
+.may-menu__lead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-space-4);
+  height: var(--may-space-4);
+  color: var(--may-color-text-secondary);
+}
+
+.may-menu__item[data-destructive='true'] .may-menu__lead {
+  color: var(--may-color-danger);
+}
+
+.may-menu__lead > svg:not([width]) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* The tick springs in from nothing — toggling a menu item is a state change
+ * worth seeing, and it is the only animation inside an open menu. */
+.may-menu__check {
+  color: var(--may-color-tint);
+  animation: may-menu-check-in var(--may-duration-settle) var(--may-spring-bouncy) both;
+}
+
+@keyframes may-menu-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.may-menu__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-menu__shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--may-space-1);
+  flex-shrink: 0;
+}
+
+.may-menu__chevron {
+  width: var(--may-space-3);
+  height: var(--may-space-3);
+  flex-shrink: 0;
+  color: var(--may-color-text-tertiary);
+}
+
+.may-menu__item[data-active='true'] .may-menu__chevron {
+  color: var(--may-color-text-secondary);
+}
+
+/* ------------------------------ separators -------------------------------- */
+
+/*
+ * A hairline drawn as a pseudo-element inside a spacer, not a border on the
+ * row above it. It is inset from both edges the way a macOS menu draws it, and
+ * because it is not part of the box model the rows either side keep their exact
+ * heights.
+ */
+.may-menu__separator {
+  position: relative;
+  height: var(--may-space-2);
+  flex-shrink: 0;
+}
+
+.may-menu__separator::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline: var(--may-space-2);
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-menu__separator::before {
+    height: var(--may-hairline);
+  }
+}
+
+.may-menu__section {
+  padding: var(--may-space-2) var(--may-space-3) var(--may-space-1);
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--may-color-text-secondary);
+}
+
+/* ------------------------------ reduced motion ----------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .may-menu[data-placed='true'],
+  .may-menu__check {
+    animation: none;
+  }
+}

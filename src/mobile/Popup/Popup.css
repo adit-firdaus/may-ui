@@ -1,0 +1,134 @@
+/*
+ * Popup renders a `Sheet` and pins it to the phone presentation, which means
+ * overriding rules that live in Sheet.css.
+ *
+ * Two disciplines keep that honest:
+ *
+ *   Scope. Every selector sits under `.may-popup-host`, so it can only ever
+ *   reach a Sheet that a Popup rendered. An ordinary Sheet elsewhere on the
+ *   page is untouched.
+ *
+ *   Weight. Sheet's own geometry rules are `.may-sheet[data-presentation][data-size]`
+ *   — three simple selectors. Every rule here carries at least that plus the
+ *   host, so the pinning wins on specificity rather than on file order, which
+ *   a bundler is free to change.
+ *
+ * Deliberately NOT overridden: `transition` and `touch-action`. Sheet clears
+ * its transform transition while `data-dragging` is set, and a heavier rule
+ * here would put the easing back — the finger would visibly lead the panel.
+ */
+
+.may-popup-host {
+  /* Generates no box of its own: the scrim is fixed-position, and the host
+     exists only to scope these rules and carry `--may-popup-h` down to the
+     panel. Custom properties still inherit through `display: contents`. */
+  display: contents;
+
+  /* Declared so the value always resolves and the token audit can see it
+     defined; an explicit `height` prop overrides it inline. */
+  --may-popup-h: auto;
+}
+
+/* --------------------------------- the mask ------------------------------- */
+
+.may-popup-host > .may-sheet__scrim[data-presentation] {
+  /* The dialog branch centres its panel inside a gutter. A popup is attached
+     to an edge and spans the full width, so both go. */
+  padding: var(--may-space-0);
+  justify-content: flex-start;
+}
+
+.may-popup-host[data-position='bottom'] > .may-sheet__scrim[data-presentation] {
+  align-items: flex-end;
+}
+
+.may-popup-host[data-position='top'] > .may-sheet__scrim[data-presentation] {
+  align-items: flex-start;
+}
+
+/* --------------------------------- the panel ------------------------------ */
+
+.may-popup-host .may-popup[data-presentation][data-size] {
+  width: 100%;
+  /* Sheet's dialog branch caps the panel at a readable dialog width; an edge
+     panel is as wide as the device. */
+  max-width: none;
+  height: var(--may-popup-h);
+  /* Stops short of the opposite edge even at `height: 100%`, so the layer
+     underneath stays visible and the popup reads as a layer rather than a
+     screen. Matches the inset iOS leaves above a presented sheet. */
+  max-height: calc(100dvh - var(--may-space-12));
+  /* Reset all four corners; the position rules below round only the two that
+     face into the screen. Zero is the absence of a radius, not a value. */
+  border-radius: 0;
+}
+
+.may-popup-host[data-position='bottom'] .may-popup[data-presentation][data-size] {
+  border-start-start-radius: var(--may-radius-sheet);
+  border-start-end-radius: var(--may-radius-sheet);
+  animation: may-popup-in-bottom var(--may-duration-sheet-in) var(--may-ease-sheet);
+}
+
+.may-popup-host[data-position='top'] .may-popup[data-presentation][data-size] {
+  border-end-start-radius: var(--may-radius-sheet);
+  border-end-end-radius: var(--may-radius-sheet);
+  animation: may-popup-in-top var(--may-duration-sheet-in) var(--may-ease-sheet);
+}
+
+/* -------------------------------- safe areas ------------------------------ */
+
+.may-popup-host[data-position='bottom'][data-safe-area='true'] .may-popup[data-presentation] {
+  padding-bottom: var(--may-inset-bottom);
+}
+
+/* Sheet pads the bottom inset unconditionally on the phone branch; opting out
+   has to say so at a weight that reaches it. */
+.may-popup-host[data-position='bottom'][data-safe-area='false'] .may-popup[data-presentation] {
+  padding-bottom: var(--may-space-0);
+}
+
+/* A panel attached to the top edge clears the notch, never the home indicator
+   — so it takes the top inset and gives back the bottom one Sheet assumed. */
+.may-popup-host[data-position='top'] .may-popup[data-presentation] {
+  padding-bottom: var(--may-space-0);
+}
+
+.may-popup-host[data-position='top'][data-safe-area='true'] .may-popup[data-presentation] {
+  padding-top: var(--may-inset-top);
+}
+
+/* -------------------------------- the content ----------------------------- */
+
+/*
+ * Edge to edge by default. A Popup is the container a picker, a filter panel
+ * or a grouped list is presented *in*, and every one of those draws its own
+ * gutters — Sheet's dialog padding would double them.
+ */
+.may-popup-host .may-popup[data-presentation] > .may-sheet__body {
+  padding: var(--may-space-0);
+}
+
+.may-popup-host[data-padded='true'] .may-popup[data-presentation] > .may-sheet__body {
+  padding-inline: var(--may-space-5);
+  padding-block-end: var(--may-space-5);
+}
+
+/* With no header above it the body has nothing to sit under, so it supplies
+   its own top gutter. */
+.may-popup-host[data-padded='true']
+  .may-popup[data-presentation]:not(:has(.may-sheet__header))
+  > .may-sheet__body {
+  padding-block-start: var(--may-space-5);
+}
+
+/* --------------------------------- entrances ------------------------------ */
+
+@keyframes may-popup-in-bottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes may-popup-in-top {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}

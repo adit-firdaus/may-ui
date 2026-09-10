@@ -1,0 +1,180 @@
+/*
+ * The bar is opaque on purpose. Rule 2 of the design contract forbids
+ * backdrop-filter, and a translucent bar with nothing blurring behind it shows
+ * the content sliding underneath — worse than either honest option. So the bar
+ * paints --may-color-surface over the page's --may-color-bg and separates
+ * itself with a hairline pseudo-element, which, being outside the box model,
+ * can be switched off without moving a single item by a pixel.
+ *
+ * Tone modifiers only SET --may-tab-bar-active; the item rules only CONSUME
+ * it, the same split Button uses — a new tone never touches an item rule.
+ */
+
+.may-tab-bar {
+  /* Derived rather than literal, so retuning the touch target retunes the
+   * glyphs with it. 0.59 lands on iOS's 26px icon at the default 44px rung. */
+  --may-tab-bar-icon: calc(var(--may-control-h) * 0.59);
+
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  background: var(--may-color-surface);
+  /*
+   * The home indicator is *extra* height, never a share of the bar's own: the
+   * items keep their full --may-tabbar-h on a notched phone and on a flat one.
+   * The inline insets matter in landscape, where the rounded display corners
+   * eat into the ends of the bar.
+   */
+  padding-block-end: var(--may-inset-bottom);
+  padding-inline: var(--may-inset-left) var(--may-inset-right);
+}
+
+.may-tab-bar[data-fixed='true'] {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: var(--may-z-nav);
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-tab-bar[data-tone='tint'] { --may-tab-bar-active: var(--may-color-tint); }
+.may-tab-bar[data-tone='neutral'] { --may-tab-bar-active: var(--may-color-text); }
+.may-tab-bar[data-tone='danger'] { --may-tab-bar-active: var(--may-color-danger); }
+.may-tab-bar[data-tone='success'] { --may-tab-bar-active: var(--may-color-success); }
+.may-tab-bar[data-tone='warning'] { --may-tab-bar-active: var(--may-color-warning); }
+
+/* -------------------------------- hairline -------------------------------- */
+
+.may-tab-bar[data-separator='true']::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+  pointer-events: none;
+}
+
+/* A separator is one device pixel, not one CSS pixel. */
+@media (min-resolution: 2dppx) {
+  .may-tab-bar[data-separator='true']::before { height: var(--may-hairline); }
+}
+
+/* ---------------------------------- item ---------------------------------- */
+
+.may-tab-bar__item {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-1);
+  min-width: 0;
+  height: var(--may-tabbar-h);
+  /* A floor, not the height: retuning --may-tabbar-h can never take an item
+   * below the 44px touch target. */
+  min-height: var(--may-control-h);
+  padding-inline: var(--may-space-1);
+  border: 0;
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-tab-bar__item[aria-current='page'] {
+  color: var(--may-tab-bar-active);
+}
+
+.may-tab-bar__item:disabled,
+.may-tab-bar__item[aria-disabled='true'] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/*
+ * The shared `.may-hoverable` fill would paint a grey slab across a whole
+ * quarter of the bar, which is the one place in the system where it reads as
+ * damage rather than feedback. The glyph takes the tint instead. Gated like
+ * every other hover — an ungated one leaves a tap stuck highlighted on a phone.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .may-tab-bar__item.may-hoverable:hover:not([disabled]):not([aria-disabled='true']) {
+    background-color: transparent;
+    color: var(--may-tab-bar-active);
+  }
+}
+
+/* --------------------------------- glyph ---------------------------------- */
+
+.may-tab-bar__glyph {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-tab-bar-icon);
+  height: var(--may-tab-bar-icon);
+  /* The pop scales about the glyph's middle rather than the label's baseline. */
+  transform-origin: center;
+}
+
+.may-tab-bar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fills the glyph box unless the caller sizes the artwork itself. */
+.may-tab-bar__icon > svg:not([width]) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/*
+ * Hangs off the glyph's trailing-top corner and overlaps it slightly, the way
+ * a springboard badge does. It rides inside the glyph so the pop carries it —
+ * a badge left behind by its own icon reads as two separate elements.
+ */
+.may-tab-bar__badge {
+  position: absolute;
+  inset-block-start: calc(var(--may-space-1) * -1);
+  inset-inline-start: calc(100% - var(--may-space-2));
+  pointer-events: none;
+}
+
+/* --------------------------------- label ---------------------------------- */
+
+.may-tab-bar__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--may-text-caption-2);
+  line-height: var(--may-text-caption-2-leading);
+  letter-spacing: var(--may-text-caption-2-tracking);
+  font-weight: 500;
+}
+
+/* Selected labels thicken as well as tint — colour alone is not a state. */
+.may-tab-bar__item[aria-current='page'] .may-tab-bar__label {
+  font-weight: 600;
+}
+
+/*
+ * With labels off the bar is glyph-only, so the glyph grows into the space the
+ * label gave up rather than floating in the middle of an empty item.
+ */
+.may-tab-bar:not(:has(.may-tab-bar__label)) .may-tab-bar__glyph {
+  width: calc(var(--may-tab-bar-icon) * 1.15);
+  height: calc(var(--may-tab-bar-icon) * 1.15);
+}

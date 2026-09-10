@@ -1,0 +1,333 @@
+/*
+ * The indicator is laid out once at 1px on the axis it slides along and moved
+ * entirely with translate + scale, exactly as SegmentedControl positions its
+ * thumb: a selection change never touches layout, so the slide stays on the
+ * compositor. Animating inset/width instead would reflow the strip on every
+ * frame of every tap.
+ *
+ * Nothing in this file draws a stroke. The underline variant separates the
+ * strip from its content with a hairline pseudo-element, and the pill variant
+ * with a wash of the tint — never a border.
+ */
+
+.may-tabs {
+  /*
+   * Bar weight. Structural rather than semantic — the same class of number as
+   * the 2px inset SegmentedControl gives its thumb — so it is a local
+   * variable, not a token no other component would ever agree with.
+   */
+  --may-tabs-bar: 3px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-4);
+  min-width: 0;
+}
+
+.may-tabs[data-orientation='vertical'] {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--may-space-5);
+}
+
+/* ---------------------------------- strip --------------------------------- */
+
+.may-tabs__list {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/*
+ * A strip wider than its container scrolls rather than wrapping or squeezing —
+ * the iOS behaviour. The scrollbar is suppressed because the strip is chrome;
+ * the selected tab is scrolled into view for you when selection moves.
+ */
+.may-tabs[data-orientation='horizontal'] .may-tabs__list {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.may-tabs[data-orientation='horizontal'] .may-tabs__list::-webkit-scrollbar {
+  display: none;
+}
+
+.may-tabs[data-orientation='vertical'] .may-tabs__list {
+  flex-shrink: 0;
+}
+
+.may-tabs__track {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: var(--may-space-1);
+  /* Fills the scroller when the tabs are narrow, grows past it when they are
+   * not — which is what lets the hairline below span the whole strip. */
+  min-width: 100%;
+  width: max-content;
+  isolation: isolate;
+}
+
+.may-tabs[data-orientation='vertical'] .may-tabs__track {
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.may-tabs__track--full > .may-tabs__tab {
+  flex: 1 1 0;
+}
+
+/* ------------------------------- indicator -------------------------------- */
+
+.may-tabs__indicator {
+  position: absolute;
+  z-index: 0;
+  /* Origin at the leading corner, because applyThumb translates first and then
+   * scales — a centred origin would drift the bar as it grows. */
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.may-tabs[data-orientation='horizontal'] .may-tabs__indicator {
+  inset-inline-start: 0;
+  width: 1px;
+}
+
+.may-tabs[data-orientation='vertical'] .may-tabs__indicator {
+  inset-block-start: 0;
+  height: 1px;
+}
+
+/* underline: a bar riding the content edge of the strip */
+.may-tabs[data-variant='underline'][data-orientation='horizontal'] .may-tabs__indicator {
+  inset-block-end: 0;
+  height: var(--may-tabs-bar);
+}
+
+.may-tabs[data-variant='underline'][data-orientation='vertical'] .may-tabs__indicator {
+  inset-inline-start: 0;
+  width: var(--may-tabs-bar);
+}
+
+.may-tabs[data-variant='underline'] .may-tabs__indicator {
+  background: var(--may-color-primary);
+}
+
+/*
+ * Deliberately un-rounded. Border radii resolve against the 1px layout box and
+ * are then stretched by the scale, so a "rounded" cap renders as a long
+ * diagonal shear rather than a cap. A square bar is honest; a sheared one is a
+ * bug you have to look twice to see.
+ */
+
+/* pill: a capsule of the tint sliding behind the selected tab */
+.may-tabs[data-variant='pill'][data-orientation='horizontal'] .may-tabs__indicator {
+  inset-block: 0;
+}
+
+.may-tabs[data-variant='pill'][data-orientation='vertical'] .may-tabs__indicator {
+  inset-inline: 0;
+}
+
+.may-tabs[data-variant='pill'] .may-tabs__indicator {
+  border-radius: var(--may-radius-md);
+  background: color-mix(in srgb, var(--may-color-primary) 15%, transparent);
+}
+
+/* The strip's own hairline, drawn outside the box model so switching variants
+ * never moves a tab by a pixel. */
+.may-tabs[data-variant='underline'] .may-tabs__track::before {
+  content: '';
+  position: absolute;
+  background: var(--may-color-separator);
+  pointer-events: none;
+}
+
+.may-tabs[data-variant='underline'][data-orientation='horizontal'] .may-tabs__track::before {
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 1px;
+}
+
+.may-tabs[data-variant='underline'][data-orientation='vertical'] .may-tabs__track::before {
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 1px;
+}
+
+/* A separator is one device pixel, not one CSS pixel. */
+@media (min-resolution: 2dppx) {
+  .may-tabs[data-variant='underline'][data-orientation='horizontal'] .may-tabs__track::before {
+    height: var(--may-hairline);
+  }
+  .may-tabs[data-variant='underline'][data-orientation='vertical'] .may-tabs__track::before {
+    width: var(--may-hairline);
+  }
+}
+
+/* ---------------------------------- tab ----------------------------------- */
+
+.may-tabs__tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--may-space-2);
+  flex-shrink: 0;
+  min-width: 0;
+  padding-inline: var(--may-space-4);
+  border: 0;
+  border-radius: var(--may-radius-md);
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    opacity var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-tabs[data-orientation='vertical'] .may-tabs__tab {
+  justify-content: flex-start;
+  text-align: start;
+}
+
+.may-tabs__tab:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.may-tabs__tab[aria-selected='true'] {
+  font-weight: 600;
+}
+
+.may-tabs[data-variant='underline'] .may-tabs__tab[aria-selected='true'] {
+  color: var(--may-color-text);
+}
+
+.may-tabs[data-variant='pill'] .may-tabs__tab[aria-selected='true'] {
+  color: var(--may-color-tint);
+}
+
+/*
+ * A selected pill already carries a fill; the shared `.may-hoverable`
+ * highlight would paint a second one on top of it and read as a smudge.
+ * Gated like every other hover in the system — an ungated one leaves a tap
+ * stuck highlighted on a phone.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .may-tabs[data-variant='pill'] .may-tabs__tab[aria-selected='true']:hover {
+    background-color: transparent;
+  }
+  .may-tabs__tab:hover:not(:disabled):not([aria-selected='true']) {
+    color: var(--may-color-text);
+  }
+}
+
+.may-tabs__tab-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Tracks the label's size unless the caller sizes the glyph itself. */
+.may-tabs__tab-icon > svg:not([width]) {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+}
+
+.may-tabs__tab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* A count, not a control: it takes the tertiary fill so it reads as quieter
+ * than the label it hangs off. */
+.may-tabs__tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: var(--may-space-5);
+  padding-inline: var(--may-space-1);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text-secondary);
+  font-size: var(--may-text-caption-2);
+  font-weight: 600;
+  line-height: var(--may-text-caption-2-leading);
+}
+
+.may-tabs__tab[aria-selected='true'] .may-tabs__tab-badge {
+  background: color-mix(in srgb, var(--may-color-primary) 18%, transparent);
+  color: var(--may-color-tint);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-tabs[data-size='sm'] .may-tabs__tab {
+  height: var(--may-control-h-sm);
+  padding-inline: var(--may-space-3);
+  font-size: var(--may-text-footnote);
+  letter-spacing: var(--may-text-footnote-tracking);
+}
+
+.may-tabs[data-size='md'] .may-tabs__tab {
+  height: var(--may-control-h-md);
+  font-size: var(--may-text-subheadline);
+  letter-spacing: var(--may-text-subheadline-tracking);
+}
+
+.may-tabs[data-size='lg'] .may-tabs__tab {
+  height: var(--may-control-h-lg);
+  padding-inline: var(--may-space-5);
+  font-size: var(--may-text-body);
+  letter-spacing: var(--may-text-body-tracking);
+}
+
+/*
+ * The small rung is drawn under the 44px minimum, so it carries an invisible
+ * hit area at full size — the same expansion UIKit gives a compact bar item.
+ * It can only add area, never remove it.
+ */
+.may-tabs[data-size='sm'] .may-tabs__tab::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  inset-block-start: 50%;
+  height: var(--may-control-h);
+  transform: translateY(-50%);
+}
+
+/* --------------------------------- panel ---------------------------------- */
+
+.may-tabs__panel {
+  min-width: 0;
+  flex: 1 1 auto;
+  /* Content, not chrome: it stays selectable, and enters with a short lift
+   * so a tab change reads as a move rather than a repaint. */
+  animation: may-tab-panel-in var(--may-duration-settle) var(--may-ease-out) both;
+}
+
+/* `hidden` is only a display:none in the UA sheet, which the flex above would
+ * otherwise beat. Only reachable with keepMounted. */
+.may-tabs__panel[hidden] {
+  display: none;
+}
+
+@keyframes may-tab-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--may-space-1));
+  }
+}

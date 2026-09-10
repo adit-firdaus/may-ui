@@ -1,0 +1,30 @@
+/*
+ * Scrollbar styling, momentum and overscroll containment all come from the
+ * [data-slot='scroll-area'] block in base.css. This file is only the box.
+ */
+
+.may-scroll-area {
+  --may-scroll-max: none;
+
+  position: relative;
+  max-height: var(--may-scroll-max);
+  /* A flex or grid child defaults to min-height:auto and refuses to shrink
+   * below its content, so the scrollbar never appears and the parent grows
+   * instead. This is the single most common reason a scroll area does nothing. */
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Locking the cross axis to hidden is deliberate: `overflow: auto` on both
+ * axes lets a one-pixel rounding difference produce a phantom scrollbar. */
+.may-scroll-area[data-axis='vertical'] {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.may-scroll-area[data-axis='horizontal'] {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.may-scroll-area[data-axis='both'] { overflow: auto; }

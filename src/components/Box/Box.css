@@ -1,0 +1,48 @@
+/*
+ * Padding arrives as four custom properties set inline by the component. The
+ * defaults below are what make that legal under the token rule: every value
+ * this file emits resolves to a var(--may-*), whether or not a prop was given.
+ */
+
+.may-box {
+  --may-box-pt: var(--may-space-0);
+  --may-box-pr: var(--may-space-0);
+  --may-box-pb: var(--may-space-0);
+  --may-box-pl: var(--may-space-0);
+
+  padding: var(--may-box-pt) var(--may-box-pr) var(--may-box-pb) var(--may-box-pl);
+  /* Without this a Box inside a flex or grid parent refuses to shrink below
+   * its content, and long text pushes the whole row wider than the screen. */
+  min-width: 0;
+}
+
+.may-box--full { width: 100%; }
+
+/* -------------------------------- surfaces -------------------------------- */
+
+/* `base` over `grouped` is the card-on-page contrast; no stroke separates them. */
+.may-box[data-surface='base'] { background-color: var(--may-color-surface); }
+.may-box[data-surface='nested'] { background-color: var(--may-color-surface-nested); }
+.may-box[data-surface='grouped'] { background-color: var(--may-color-bg); }
+
+/* --------------------------------- radius --------------------------------- */
+
+.may-box[data-radius='xs'] { border-radius: var(--may-radius-xs); }
+.may-box[data-radius='sm'] { border-radius: var(--may-radius-sm); }
+.may-box[data-radius='md'] { border-radius: var(--may-radius-md); }
+.may-box[data-radius='lg'] { border-radius: var(--may-radius-lg); }
+.may-box[data-radius='card'] { border-radius: var(--may-radius-card); }
+.may-box[data-radius='sheet'] { border-radius: var(--may-radius-sheet); }
+.may-box[data-radius='full'] { border-radius: var(--may-radius-full); }
+
+/* --------------------------------- shadow --------------------------------- */
+
+/* Only genuinely floating layers cast one — a card sitting on the grouped
+ * background separates by value alone. */
+.may-box[data-shadow='2xs'] { box-shadow: var(--may-shadow-2xs); }
+.may-box[data-shadow='xs'] { box-shadow: var(--may-shadow-xs); }
+.may-box[data-shadow='sm'] { box-shadow: var(--may-shadow-sm); }
+.may-box[data-shadow='md'] { box-shadow: var(--may-shadow-md); }
+.may-box[data-shadow='lg'] { box-shadow: var(--may-shadow-lg); }
+.may-box[data-shadow='xl'] { box-shadow: var(--may-shadow-xl); }
+.may-box[data-shadow='2xl'] { box-shadow: var(--may-shadow-2xl); }

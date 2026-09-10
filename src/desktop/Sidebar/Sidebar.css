@@ -1,0 +1,420 @@
+/*
+ * The rail is one animated property — width — and everything else keys off
+ * `data-collapsed` on the root so the collapse reads as a single gesture.
+ *
+ * Two sizes are worth explaining. The expanded width is 5.5 touch targets,
+ * which lands on the ~240px macOS sidebars use; the rail is exactly one touch
+ * target plus its gutters, so the icon column is a real 44px hit area rather
+ * than a decorative strip. Both are local variables, so an app can widen the
+ * sidebar without forking the component.
+ */
+
+.may-sidebar {
+  --may-sidebar-w: calc(var(--may-control-h) * 5.5);
+  --may-sidebar-gutter: var(--may-space-3);
+  --may-sidebar-rail-w: calc(var(--may-control-h) + var(--may-sidebar-gutter) * 2);
+  --may-sidebar-icon: var(--may-space-6);
+
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: var(--may-sidebar-w);
+  height: 100%;
+  min-height: 0;
+  /* The sidebar is the layer *under* the content, exactly as iPadOS stages it:
+   * grouped background here, elevated surface for whatever it navigates. */
+  background: var(--may-color-bg);
+  color: var(--may-color-text);
+  transition: width var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+.may-sidebar[data-collapsed='true'] {
+  width: var(--may-sidebar-rail-w);
+}
+
+.may-sidebar__header,
+.may-sidebar__footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  flex-shrink: 0;
+  min-height: var(--may-control-h);
+  padding: var(--may-space-2) var(--may-sidebar-gutter);
+  overflow: hidden;
+}
+
+/* Header and footer separate from the body by a hairline, not a border. */
+.may-sidebar__footer::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: var(--may-sidebar-gutter);
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-sidebar__footer::before {
+    height: var(--may-hairline);
+  }
+}
+
+.may-sidebar__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--may-space-4);
+  min-height: 0;
+  padding: var(--may-space-2) var(--may-sidebar-gutter);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* --------------------------------- section -------------------------------- */
+
+.may-sidebar-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/*
+ * On the rail there is no room for a title, so groups would lose their
+ * boundaries entirely. A hairline in the gap keeps them legible — the same
+ * job the eyebrow does, drawn rather than written.
+ */
+.may-sidebar[data-collapsed='true'] .may-sidebar-section + .may-sidebar-section::before {
+  content: '';
+  position: absolute;
+  inset-block-start: calc(var(--may-space-2) * -1);
+  inset-inline: var(--may-space-2);
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+@media (min-resolution: 2dppx) {
+  .may-sidebar[data-collapsed='true'] .may-sidebar-section + .may-sidebar-section::before {
+    height: var(--may-hairline);
+  }
+}
+
+.may-sidebar-section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-2);
+  width: 100%;
+  min-height: var(--may-control-h-xs);
+  padding: 0 var(--may-space-2);
+  margin-block-end: var(--may-space-1);
+  border: 0;
+  border-radius: var(--may-radius-sm);
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  font: inherit;
+  text-align: start;
+  overflow: hidden;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    opacity var(--may-duration-fast) var(--may-ease-out),
+    min-height var(--may-duration-settle) var(--may-spring-smooth),
+    margin-block-end var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+button.may-sidebar-section__header {
+  cursor: pointer;
+}
+
+.may-sidebar button.may-sidebar-section__header[data-pressed='true'] {
+  background-color: var(--may-color-highlight-strong);
+}
+
+/* The title folds away rather than fading in place — leaving a 32px hole where
+ * a header used to be is what makes a collapsed rail look broken. */
+.may-sidebar[data-collapsed='true'] .may-sidebar-section__header {
+  min-height: 0;
+  margin-block-end: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.may-sidebar-section__title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  font-weight: var(--may-text-headline-weight);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.may-sidebar-section__chevron {
+  width: var(--may-space-3);
+  height: var(--may-space-3);
+  flex-shrink: 0;
+  color: var(--may-color-text-tertiary);
+  transform: rotate(0deg);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-sidebar-section[data-state='open'] > .may-sidebar-section__header > .may-sidebar-section__chevron {
+  /* Past 90° and back — the overshoot is the reason to spend a transform here. */
+  transform: rotate(90deg);
+}
+
+/*
+ * `visibility` is what actually closes the group: a zero-height box with
+ * `overflow: hidden` still leaves its links focusable, so a keyboard user
+ * tabs into items they cannot see. The 0s delay holds it until the fold
+ * has finished playing.
+ */
+.may-sidebar-section__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--may-duration-settle) var(--may-spring-smooth),
+    visibility 0s linear var(--may-duration-settle);
+}
+
+.may-sidebar-section[data-state='open'] > .may-sidebar-section__panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--may-duration-settle) var(--may-spring-smooth),
+    visibility 0s;
+}
+
+.may-sidebar-section__clip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.may-sidebar-section__items {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* ---------------------------------- item ---------------------------------- */
+
+.may-sidebar-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--may-space-3);
+  width: 100%;
+  min-height: var(--may-control-h);
+  padding-inline: var(--may-sidebar-gutter);
+  border: 0;
+  border-radius: var(--may-radius-md);
+  background: transparent;
+  color: var(--may-color-text);
+  font-family: inherit;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  font-weight: var(--may-text-subheadline-weight);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background-color var(--may-duration-fast) var(--may-ease-out),
+    color var(--may-duration-fast) var(--may-ease-out),
+    padding-inline var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+.may-sidebar-item:disabled,
+.may-sidebar-item[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/*
+ * Centring the icon by padding rather than `justify-content` keeps it still
+ * while the label is clipping away: the icon column never moves, so the rail
+ * transition has exactly one moving edge.
+ */
+.may-sidebar[data-collapsed='true'] .may-sidebar-item {
+  padding-inline: calc(
+    (var(--may-sidebar-rail-w) - var(--may-sidebar-gutter) * 2 - var(--may-sidebar-icon)) / 2
+  );
+}
+
+/* Active is a tinted fill carrying tinted text. Never an outline. */
+.may-sidebar-item[data-active='true'] {
+  background: color-mix(in srgb, var(--may-color-tint) 14%, transparent);
+  color: var(--may-color-tint);
+  font-weight: var(--may-text-headline-weight);
+}
+
+/*
+ * These carry the `.may-sidebar` ancestor purely for specificity: `.may-hoverable`
+ * in base.css is four selectors deep, so a press or an active tint must out-weigh
+ * a plain hover wash no matter which stylesheet the bundler emits first.
+ */
+.may-sidebar .may-sidebar-item[data-pressed='true'] {
+  background: var(--may-color-highlight-strong);
+}
+
+.may-sidebar .may-sidebar-item[data-active='true'][data-pressed='true'] {
+  background: color-mix(in srgb, var(--may-color-tint) 24%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-sidebar .may-sidebar-item[data-active='true']:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--may-color-tint) 20%, transparent);
+  }
+}
+
+.may-sidebar-item__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-sidebar-icon);
+  height: var(--may-sidebar-icon);
+  color: inherit;
+}
+
+.may-sidebar-item__icon > svg:not([width]) {
+  width: 1.25em;
+  height: 1.25em;
+  display: block;
+}
+
+.may-sidebar-item__label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Asymmetric: the label leaves fast so it is gone before the width closes on
+   * it, and comes back late so it is not sliding while the rail is still
+   * opening. */
+  opacity: 1;
+  transition: opacity var(--may-duration-fast) var(--may-ease-out) var(--may-duration-fast);
+}
+
+.may-sidebar[data-collapsed='true'] .may-sidebar-item__label {
+  opacity: 0;
+  transition: opacity var(--may-duration-instant) var(--may-ease-out);
+}
+
+.may-sidebar-item__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: var(--may-space-5);
+  height: var(--may-space-5);
+  padding-inline: var(--may-space-2);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-text-secondary);
+  font-size: var(--may-text-caption-1);
+  line-height: var(--may-text-caption-1-leading);
+  font-weight: var(--may-text-headline-weight);
+  font-variant-numeric: tabular-nums;
+  transition:
+    min-width var(--may-duration-settle) var(--may-spring-smooth),
+    width var(--may-duration-settle) var(--may-spring-smooth),
+    height var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+.may-sidebar-item[data-active='true'] .may-sidebar-item__badge {
+  background: color-mix(in srgb, var(--may-color-tint) 22%, transparent);
+  color: var(--may-color-tint);
+}
+
+/*
+ * On the rail a count has nowhere to go, so it becomes the unread dot iOS puts
+ * on an app icon: same element, same colour, text clipped out of a circle.
+ */
+.may-sidebar[data-collapsed='true'] .may-sidebar-item__badge {
+  position: absolute;
+  inset-block-start: var(--may-space-2);
+  inset-inline-start: calc(50% + var(--may-space-1));
+  min-width: 0;
+  width: var(--may-space-2);
+  height: var(--may-space-2);
+  padding-inline: 0;
+  overflow: hidden;
+  color: transparent;
+  background: var(--may-color-primary);
+}
+
+/* --------------------------------- toggle --------------------------------- */
+
+.may-sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--may-control-h);
+  height: var(--may-control-h);
+  border: 0;
+  border-radius: var(--may-radius-md);
+  background: transparent;
+  color: var(--may-color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-sidebar-toggle__icon {
+  width: var(--may-space-4);
+  height: var(--may-space-4);
+  transform: rotate(0deg);
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-sidebar[data-collapsed='true'] .may-sidebar-toggle__icon {
+  transform: rotate(180deg);
+}
+
+/* --------------------------------- flyout --------------------------------- */
+
+/*
+ * The rail's label, restored for sighted mouse and keyboard users. Fixed
+ * positioning is what lets it escape the scrolling body, and the offset from
+ * the anchor lives in the transform so the measured coordinates stay pure.
+ */
+.may-sidebar__tooltip {
+  position: fixed;
+  z-index: var(--may-z-tooltip);
+  display: block;
+  max-width: calc(var(--may-control-h) * 5);
+  padding: var(--may-space-1) var(--may-space-3);
+  border-radius: var(--may-radius-sm);
+  background: var(--may-color-surface);
+  box-shadow: var(--may-shadow-md);
+  color: var(--may-color-text);
+  font-family: var(--may-font-sans);
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transform: translate(var(--may-space-2), -50%);
+  animation: may-sidebar-tip-in var(--may-duration-settle) var(--may-spring-bouncy) both;
+}
+
+/* Slides out of the rail rather than fading in place — it should read as
+ * coming from the icon it belongs to. */
+@keyframes may-sidebar-tip-in {
+  from {
+    opacity: 0;
+    transform: translate(calc(var(--may-space-2) * -0.5), -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(var(--may-space-2), -50%);
+  }
+}

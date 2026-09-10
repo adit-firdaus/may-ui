@@ -1,0 +1,121 @@
+/*
+ * There is no divider element and no border anywhere in this file. Attached
+ * children sit one hairline apart and the surface *behind* the group shows
+ * through the gap, so the seam is a hole rather than a stroke. That is what
+ * keeps it correct on a card, on the grouped background, and in dark mode
+ * without a single colour declaration here.
+ */
+
+.may-button-group {
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.may-button-group[data-orientation='vertical'] {
+  flex-direction: column;
+}
+
+.may-button-group[data-attached='false'] {
+  gap: var(--may-space-2);
+}
+
+/* One CSS pixel, dropping to a true device pixel where the screen has them —
+ * the same rule every other hairline in the system follows. */
+.may-button-group[data-attached='true'] { gap: 1px; }
+
+@media (min-resolution: 2dppx) {
+  .may-button-group[data-attached='true'] { gap: var(--may-hairline); }
+}
+
+/* ------------------------------ shared radius ----------------------------- */
+
+/*
+ * The cluster owns the outer radius: each child squares off only the corners it
+ * shares with a neighbour. Logical corner properties, so an RTL locale flips
+ * the cluster without a second rule.
+ *
+ * `> *` deliberately, not `> .may-button`: an IconButton, a link styled as a
+ * button, or a consumer's own control all belong in a group.
+ */
+.may-button-group[data-attached='true'][data-orientation='horizontal'] > *:not(:first-child) {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+.may-button-group[data-attached='true'][data-orientation='horizontal'] > *:not(:last-child) {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.may-button-group[data-attached='true'][data-orientation='vertical'] > *:not(:first-child) {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+.may-button-group[data-attached='true'][data-orientation='vertical'] > *:not(:last-child) {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+/* -------------------------------- full width ------------------------------ */
+
+.may-button-group--full {
+  display: flex;
+  width: 100%;
+}
+
+.may-button-group--full[data-orientation='horizontal'] > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.may-button-group--full[data-orientation='vertical'] > * {
+  width: 100%;
+}
+
+/* ---------------------------------- press --------------------------------- */
+
+/*
+ * An attached cluster is one object. Letting a single child scale down would
+ * tear its seams open mid-press — two hairline gaps become two visible slivers
+ * — so the child's squish is suppressed and the whole cluster takes the press
+ * instead. The amplitude is smaller than a lone button's because a wide object
+ * travelling as far as a small one reads as sloppy rather than springy.
+ */
+.may-button-group[data-attached='true'] .may-pressable[data-pressed='true'] {
+  transform: none;
+}
+
+.may-button-group[data-attached='true'] {
+  transform: scale(1);
+  transform-origin: center;
+  transition: transform var(--may-duration-settle) var(--may-spring-bouncy);
+}
+
+.may-button-group[data-attached='true']:has(.may-pressable[data-pressed='true']) {
+  transform: scale(0.98);
+  transition: transform var(--may-duration-instant) var(--may-ease-out);
+}
+
+/*
+ * The cluster is a plain div, so base.css's reduced-motion rule — which only
+ * reaches `.may-pressable` — never sees it. Without this the scale would still
+ * happen, just instantly, which is exactly the jolt the setting asks to avoid.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .may-button-group[data-attached='true'],
+  .may-button-group[data-attached='true']:has(.may-pressable[data-pressed='true']) {
+    transform: none;
+  }
+}
+
+/*
+ * Inside a cluster the neighbours are one hairline apart, so an IconButton's
+ * expanded 44px hit area would reach straight through the seam and swallow the
+ * next button's leading edge. Packed this tightly the cluster itself is already
+ * a comfortable target.
+ */
+.may-button-group[data-attached='true'] .may-icon-button::after {
+  content: none;
+}

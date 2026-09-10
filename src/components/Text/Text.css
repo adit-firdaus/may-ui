@@ -1,0 +1,147 @@
+/**
+ * Apple's named text styles.
+ *
+ * A variant sets four variables at once — size, leading, tracking and weight —
+ * because in iOS those four move together. `headline` is the same 17px as
+ * `body`, differing only in weight and tracking; `caption-2` opens its tracking
+ * up because small type needs the air. Exposing size on its own (what a
+ * `fontSize` prop encourages) is exactly how a ported Apple scale goes flat.
+ *
+ * Heading and Label render with `.may-text` too, so the scale is declared once
+ * and the three can never drift apart. Their own rules use two classes
+ * (`.may-text.may-heading`) so they win regardless of bundle order.
+ */
+
+.may-text {
+  margin: 0;
+  font-family: var(--may-font-sans);
+  /* Fallbacks keep the bare class usable without a data-variant. */
+  font-size: var(--may-txt-size, var(--may-text-body));
+  line-height: var(--may-txt-leading, var(--may-text-body-leading));
+  letter-spacing: var(--may-txt-tracking, var(--may-text-body-tracking));
+  font-weight: var(--may-txt-weight, var(--may-text-body-weight));
+  color: var(--may-txt-color, var(--may-color-text));
+  /* A long word in a narrow column breaks rather than pushing the layout out. */
+  overflow-wrap: break-word;
+  /* Fixes orphans where supported, without touching the metrics. */
+  text-wrap: pretty;
+  /* The only thing that moves at rest: a theme flip, or a tone change. */
+  transition: color var(--may-duration-fast) var(--may-ease-out);
+}
+
+/* -------------------------------- variants -------------------------------- */
+
+.may-text[data-variant='large-title'] {
+  --may-txt-size: var(--may-text-large-title);
+  --may-txt-leading: var(--may-text-large-title-leading);
+  --may-txt-tracking: var(--may-text-large-title-tracking);
+  --may-txt-weight: var(--may-text-large-title-weight);
+}
+.may-text[data-variant='title-1'] {
+  --may-txt-size: var(--may-text-title-1);
+  --may-txt-leading: var(--may-text-title-1-leading);
+  --may-txt-tracking: var(--may-text-title-1-tracking);
+  --may-txt-weight: var(--may-text-title-1-weight);
+}
+.may-text[data-variant='title-2'] {
+  --may-txt-size: var(--may-text-title-2);
+  --may-txt-leading: var(--may-text-title-2-leading);
+  --may-txt-tracking: var(--may-text-title-2-tracking);
+  --may-txt-weight: var(--may-text-title-2-weight);
+}
+.may-text[data-variant='title-3'] {
+  --may-txt-size: var(--may-text-title-3);
+  --may-txt-leading: var(--may-text-title-3-leading);
+  --may-txt-tracking: var(--may-text-title-3-tracking);
+  --may-txt-weight: var(--may-text-title-3-weight);
+}
+.may-text[data-variant='headline'] {
+  --may-txt-size: var(--may-text-headline);
+  --may-txt-leading: var(--may-text-headline-leading);
+  --may-txt-tracking: var(--may-text-headline-tracking);
+  --may-txt-weight: var(--may-text-headline-weight);
+}
+.may-text[data-variant='body'] {
+  --may-txt-size: var(--may-text-body);
+  --may-txt-leading: var(--may-text-body-leading);
+  --may-txt-tracking: var(--may-text-body-tracking);
+  --may-txt-weight: var(--may-text-body-weight);
+}
+.may-text[data-variant='callout'] {
+  --may-txt-size: var(--may-text-callout);
+  --may-txt-leading: var(--may-text-callout-leading);
+  --may-txt-tracking: var(--may-text-callout-tracking);
+  --may-txt-weight: var(--may-text-callout-weight);
+}
+.may-text[data-variant='subheadline'] {
+  --may-txt-size: var(--may-text-subheadline);
+  --may-txt-leading: var(--may-text-subheadline-leading);
+  --may-txt-tracking: var(--may-text-subheadline-tracking);
+  --may-txt-weight: var(--may-text-subheadline-weight);
+}
+.may-text[data-variant='footnote'] {
+  --may-txt-size: var(--may-text-footnote);
+  --may-txt-leading: var(--may-text-footnote-leading);
+  --may-txt-tracking: var(--may-text-footnote-tracking);
+  --may-txt-weight: var(--may-text-footnote-weight);
+}
+.may-text[data-variant='caption-1'] {
+  --may-txt-size: var(--may-text-caption-1);
+  --may-txt-leading: var(--may-text-caption-1-leading);
+  --may-txt-tracking: var(--may-text-caption-1-tracking);
+  --may-txt-weight: var(--may-text-caption-1-weight);
+}
+.may-text[data-variant='caption-2'] {
+  --may-txt-size: var(--may-text-caption-2);
+  --may-txt-leading: var(--may-text-caption-2-leading);
+  --may-txt-tracking: var(--may-text-caption-2-tracking);
+  --may-txt-weight: var(--may-text-caption-2-weight);
+}
+
+/* ---------------------------------- tones --------------------------------- */
+
+.may-text[data-tone='default'] { --may-txt-color: var(--may-color-text); }
+.may-text[data-tone='secondary'] { --may-txt-color: var(--may-color-text-secondary); }
+.may-text[data-tone='tertiary'] { --may-txt-color: var(--may-color-text-tertiary); }
+/* Brand as text, not as fill — this is the colour a link takes. */
+.may-text[data-tone='tint'] { --may-txt-color: var(--may-color-tint); }
+.may-text[data-tone='danger'] { --may-txt-color: var(--may-color-danger); }
+.may-text[data-tone='success'] { --may-txt-color: var(--may-color-success); }
+
+/* --------------------------------- weight --------------------------------- */
+
+/* Overrides only the weight the variant set, so a `headline` asked to go bold
+ * keeps its tighter tracking. */
+.may-text[data-weight='regular'] { --may-txt-weight: 400; }
+.may-text[data-weight='medium'] { --may-txt-weight: 500; }
+.may-text[data-weight='semibold'] { --may-txt-weight: 600; }
+.may-text[data-weight='bold'] { --may-txt-weight: 700; }
+
+/* --------------------------------- layout --------------------------------- */
+
+/* Logical, so an RTL locale flips without a second rule. */
+.may-text[data-align='start'] { text-align: start; }
+.may-text[data-align='center'] { text-align: center; }
+.may-text[data-align='end'] { text-align: end; }
+
+.may-text[data-mono='true'] {
+  font-family: var(--may-font-mono);
+  /* Serials, versions and prices line up column-wise. */
+  font-variant-numeric: tabular-nums;
+  /* SF Mono reads optically larger than SF at the same nominal size, so a
+   * monospaced run set at the variant's own size looks a step too big. */
+  font-size: calc(var(--may-txt-size, var(--may-text-body)) * 0.94);
+}
+
+.may-text[data-clamp='true'] {
+  /* Declared here so the token gate sees it; the `clamp` prop overrides it
+   * inline, and inline always wins over a stylesheet rule. */
+  --may-txt-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--may-txt-clamp);
+  line-clamp: var(--may-txt-clamp);
+  overflow: hidden;
+  /* Without this a clamped block refuses to shrink inside a flex row. */
+  min-width: 0;
+}

@@ -1,0 +1,72 @@
+/*
+ * Geometry only. Every colour, radius and press curve arrives from
+ * `.may-button` in Button.css, which is why there is not one colour token in
+ * this file — adding a tone to Button gives IconButton that tone with no edit
+ * here at all.
+ */
+
+.may-icon-button {
+  flex-shrink: 0;
+}
+
+/*
+ * The doubled class is load-bearing, not decoration: Button sets padding per
+ * size at `.may-button[data-size='…']`, which out-specifies a lone
+ * `.may-icon-button`. A square has no inline padding to give — it would squeeze
+ * the glyph inside a fixed width — so this has to win on specificity rather
+ * than on source order, which the bundler is free to reorder.
+ */
+.may-button.may-icon-button[data-size] {
+  padding-inline: 0;
+}
+
+/*
+ * The square's width mirrors the height token rather than repeating a number,
+ * so retuning --may-control-h keeps every icon button square. Button already
+ * sets the height for each size; this only supplies the missing axis.
+ */
+.may-icon-button[data-size='xs'] { width: var(--may-control-h-xs); }
+.may-icon-button[data-size='sm'] { width: var(--may-control-h-sm); }
+.may-icon-button[data-size='md'] { width: var(--may-control-h-md); }
+.may-icon-button[data-size='lg'] { width: var(--may-control-h-lg); }
+
+/*
+ * Out-specifies `.may-button[data-size='…']`, which would otherwise keep the
+ * rounded-rect radius. Specificity, not source order, decides this one: the two
+ * files can be concatenated in either order by the bundler.
+ */
+.may-icon-button[data-round='true'][data-size] {
+  border-radius: var(--may-radius-full);
+}
+
+.may-icon-button__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* A flex item shrinks by default; a glyph squashed to fit is worse than one
+   * that slightly overflows a hand-tuned size. */
+  flex-shrink: 0;
+}
+
+/* Sized in em so the glyph tracks the size rung; an explicit width wins. */
+.may-icon-button__glyph > svg:not([width]) {
+  width: 1.25em;
+  height: 1.25em;
+  display: block;
+}
+
+/*
+ * xs and sm are drawn smaller than the 44px minimum, so they carry an invisible
+ * hit area at full size — the same expansion UIKit gives a small bar button.
+ * It can only ADD area, never remove it, so md and lg are untouched.
+ */
+.may-icon-button[data-size='xs']::after,
+.may-icon-button[data-size='sm']::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  width: var(--may-control-h);
+  height: var(--may-control-h);
+  transform: translate(-50%, -50%);
+}

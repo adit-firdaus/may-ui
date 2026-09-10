@@ -1,0 +1,283 @@
+/*
+ * Two shapes from one tree. `data-presentation` on the panel switches every
+ * rule below, so neither shape needs its own markup — and neither shape is a
+ * scaled-down version of the other.
+ *
+ * Rows are divided by hairlines drawn as ::before pseudo-elements. A
+ * border-bottom would add a pixel to every row but the last, which is exactly
+ * how a grouped list ends up with one row imperceptibly taller than its
+ * neighbours.
+ */
+
+.may-action-sheet__scrim {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  animation: may-action-sheet-scrim-in var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-action-sheet__scrim[data-presentation='sheet'] {
+  z-index: var(--may-z-sheet);
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--may-space-2);
+  padding-block-end: calc(var(--may-space-2) + var(--may-inset-bottom));
+  background: var(--may-color-scrim);
+}
+
+/*
+ * The menu's scrim dims nothing. It exists only to catch the click that
+ * dismisses the menu — macOS does not darken the desktop to show you six
+ * commands, and a system that does reads as a web modal wearing a menu's shape.
+ */
+.may-action-sheet__scrim[data-presentation='menu'] {
+  z-index: var(--may-z-popover);
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.may-action-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  color: var(--may-color-text);
+}
+
+/* ----------------------------- phone: a sheet ----------------------------- */
+
+.may-action-sheet[data-presentation='sheet'] {
+  width: 100%;
+  /* Wide enough to fill a phone, capped so it does not sprawl on a tablet. */
+  max-width: 560px;
+  max-height: 100%;
+  gap: var(--may-space-2);
+  /* iOS's own presentation timing — the curve the reference Sheet rises on. */
+  animation: may-action-sheet-rise var(--may-duration-sheet-in) var(--may-ease-sheet);
+}
+
+/* ----------------------------- desktop: a menu ---------------------------- */
+
+.may-action-sheet[data-presentation='menu'] {
+  min-width: 220px;
+  max-width: 320px;
+  max-height: 100%;
+  box-shadow: var(--may-shadow-lg);
+  border-radius: var(--may-radius-lg);
+  /*
+   * Scales out of the corner it hangs from, on the bouncy spring — whose
+   * samples pass 1.16, so 0.92 → 1 overshoots by roughly 1.3% and settles.
+   * Opacity stays on a short ease: a menu caught half-transparent mid-bounce
+   * reads as a dropped frame.
+   */
+  animation:
+    may-action-sheet-menu-in var(--may-duration-settle) var(--may-spring-bouncy),
+    may-action-sheet-fade var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-action-sheet[data-anchored='true'] {
+  position: absolute;
+  margin: 0;
+}
+
+.may-action-sheet[data-side='bottom'] { transform-origin: top left; }
+.may-action-sheet[data-side='top'] { transform-origin: bottom left; }
+
+/* --------------------------------- groups --------------------------------- */
+
+.may-action-sheet__group {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  background: var(--may-color-surface);
+  border-radius: var(--may-radius-card);
+}
+
+.may-action-sheet[data-presentation='menu'] .may-action-sheet__group {
+  border-radius: var(--may-radius-lg);
+  padding-block: var(--may-space-1);
+}
+
+.may-action-sheet[data-presentation='sheet'] .may-action-sheet__group {
+  box-shadow: var(--may-shadow-lg);
+}
+
+/* Cancel never scrolls away with the list above it. */
+.may-action-sheet__group--cancel { flex-shrink: 0; }
+
+.may-action-sheet__group > * + *::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--may-color-separator);
+}
+
+/* A separator is one *device* pixel; 1 CSS px is twice what iOS draws at 2x. */
+@media (min-resolution: 2dppx) {
+  .may-action-sheet__group > * + *::before { height: var(--may-hairline); }
+}
+
+/* Menu items are spaced, not ruled — macOS separates commands by whitespace. */
+.may-action-sheet[data-presentation='menu'] .may-action-sheet__group > * + *::before {
+  content: none;
+}
+
+/* --------------------------------- header --------------------------------- */
+
+.may-action-sheet__header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-1);
+  padding: var(--may-space-4);
+  text-align: center;
+}
+
+.may-action-sheet__title {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-weight: var(--may-text-headline-weight);
+  color: var(--may-color-text-secondary);
+}
+
+.may-action-sheet__description {
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  color: var(--may-color-text-secondary);
+}
+
+.may-action-sheet[data-presentation='menu'] .may-action-sheet__header {
+  padding: var(--may-space-2) var(--may-space-3);
+  text-align: start;
+}
+
+/* ---------------------------------- rows ---------------------------------- */
+
+.may-action-sheet__action {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--may-color-tint);
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-action-sheet__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.may-action-sheet__action[data-destructive='true'] { color: var(--may-color-danger); }
+
+.may-action-sheet__action[data-pressed='true'] {
+  background: var(--may-color-highlight-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-action-sheet__action:hover:not(:disabled) {
+    background: var(--may-color-highlight);
+  }
+}
+
+/* Phone rows: centred, and taller than a standard control because iOS draws an
+ * action sheet row at 57pt — one touch target plus a comfortable margin. */
+.may-action-sheet[data-presentation='sheet'] .may-action-sheet__action {
+  justify-content: center;
+  min-height: calc(var(--may-control-h) + var(--may-space-3));
+  padding-inline: var(--may-space-4);
+  font-size: var(--may-text-title-3);
+  line-height: var(--may-text-title-3-leading);
+  letter-spacing: var(--may-text-title-3-tracking);
+  /* Title *size* at body *weight*: iOS reserves semibold for Cancel alone. */
+  font-weight: var(--may-text-body-weight);
+}
+
+.may-action-sheet__action--cancel {
+  color: var(--may-color-tint);
+  font-weight: var(--may-text-headline-weight);
+}
+
+/* Menu items: a normal control height, leading-aligned, label colour. */
+.may-action-sheet[data-presentation='menu'] .may-action-sheet__action {
+  justify-content: flex-start;
+  gap: var(--may-space-3);
+  min-height: var(--may-control-h);
+  padding-inline: var(--may-space-3);
+  color: var(--may-color-text);
+  font-size: var(--may-text-body);
+  line-height: var(--may-text-body-leading);
+  letter-spacing: var(--may-text-body-tracking);
+  font-weight: var(--may-text-body-weight);
+  text-align: start;
+}
+
+.may-action-sheet[data-presentation='menu']
+  .may-action-sheet__action[data-destructive='true'] {
+  color: var(--may-color-danger);
+}
+
+.may-action-sheet__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.may-action-sheet__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.may-action-sheet__icon > svg:not([width]) {
+  width: 1.1em;
+  height: 1.1em;
+  display: block;
+}
+
+/* Trailing on a phone — flush to the edge rather than nudging the centred
+ * label off-centre, which is how iOS lays the share sheet's rows out. */
+.may-action-sheet[data-presentation='sheet'] .may-action-sheet__icon {
+  position: absolute;
+  inset-inline-end: var(--may-space-4);
+}
+
+/* Leading in a menu, where the glyph column is what you scan down. */
+.may-action-sheet[data-presentation='menu'] .may-action-sheet__icon {
+  order: -1;
+  color: var(--may-color-text-secondary);
+}
+
+.may-action-sheet[data-presentation='menu']
+  .may-action-sheet__action[data-destructive='true']
+  .may-action-sheet__icon {
+  color: currentColor;
+}
+
+@keyframes may-action-sheet-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes may-action-sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes may-action-sheet-rise {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes may-action-sheet-menu-in {
+  from { transform: scale(0.92); }
+  to { transform: scale(1); }
+}

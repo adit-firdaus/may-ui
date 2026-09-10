@@ -10,10 +10,26 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      // Three entries: the adaptive default plus the two dedicated families.
+      // Consumers importing only `mayui` never pull the desktop DataTable or
+      // the mobile gesture code into their bundle.
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        desktop: resolve(__dirname, 'src/desktop.ts'),
+        mobile: resolve(__dirname, 'src/mobile.ts'),
+      },
       name: 'MayUI',
       formats: ['es', 'cjs'],
-      fileName: (format) => (format === 'es' ? 'mayui.js' : 'mayui.cjs'),
+      // The main entry keeps its historical filename so the design-sync bundle
+      // header and any existing imports stay valid.
+      fileName: (format, entryName) =>
+        entryName === 'index'
+          ? format === 'es'
+            ? 'mayui.js'
+            : 'mayui.cjs'
+          : format === 'es'
+            ? `${entryName}.js`
+            : `${entryName}.cjs`,
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime'],

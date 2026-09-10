@@ -1,0 +1,239 @@
+/**
+ * Two shapes, one tone vocabulary: the tone rules set --may-progress-tint and
+ * nothing else in the file names a colour, so the bar and the ring can never
+ * drift apart.
+ *
+ * Bar thickness comes from the SPACING scale rather than the control rungs. A
+ * progress bar is not a touch target — iOS draws it at 4px — and hanging it off
+ * --may-control-h would have produced fractions of a pixel at every rung.
+ */
+
+.may-progress,
+.may-ring {
+  --may-progress-tint: var(--may-color-primary);
+}
+
+.may-progress[data-tone='neutral'],
+.may-ring[data-tone='neutral'] { --may-progress-tint: var(--may-label); }
+.may-progress[data-tone='success'],
+.may-ring[data-tone='success'] { --may-progress-tint: var(--may-color-success); }
+.may-progress[data-tone='warning'],
+.may-ring[data-tone='warning'] { --may-progress-tint: var(--may-color-warning); }
+.may-progress[data-tone='danger'],
+.may-ring[data-tone='danger'] { --may-progress-tint: var(--may-color-destructive); }
+
+/* =============================== the bar ================================== */
+
+.may-progress {
+  /* Fallback so the fill's calc stays valid before React sets the real value. */
+  --may-progress-pct: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.may-progress__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--may-space-3);
+  min-width: 0;
+}
+
+.may-progress__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  color: var(--may-color-text);
+}
+
+.may-progress__value {
+  flex-shrink: 0;
+  /* ch plus tabular figures: the row must not re-lay-out as 9% becomes 10%. */
+  min-width: 4ch;
+  text-align: end;
+  font-size: var(--may-text-footnote);
+  line-height: var(--may-text-footnote-leading);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text-secondary);
+}
+
+.may-progress__track {
+  position: relative;
+  width: 100%;
+  height: var(--may-progress-h);
+  border-radius: var(--may-radius-full);
+  background: var(--may-color-fill-tertiary);
+  /* Contains the indeterminate shuttle, and clips the spring's overshoot when
+   * the fill springs past 100%. */
+  overflow: hidden;
+}
+
+.may-progress__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--may-progress-pct) * 100%);
+  border-radius: inherit;
+  background: var(--may-progress-tint);
+  /* Snappy overshoots a hair past the target width and settles back, so a jump
+   * from 20% to 80% reads as something arriving rather than being assigned. */
+  transition: width var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+.may-progress[data-size='xs'] { --may-progress-h: calc(var(--may-space-1) / 2); }
+.may-progress[data-size='sm'] { --may-progress-h: calc(var(--may-space-1) * 0.75); }
+.may-progress[data-size='md'] { --may-progress-h: var(--may-space-1); }
+.may-progress[data-size='lg'] { --may-progress-h: var(--may-space-2); }
+
+/* ------------------------------ indeterminate ------------------------------ */
+
+/*
+ * A shuttle rather than a full sweep. Percentages inside translate resolve
+ * against the FILL's own box, so -100% parks it exactly off the leading edge
+ * and 250% (2.5 × its own 40% width) clears the trailing one — the two numbers
+ * are locked to the width above and must move with it.
+ */
+.may-progress[data-indeterminate='true'] .may-progress__fill {
+  width: 40%;
+  transition: none;
+  animation: may-progress-sweep calc(var(--may-duration-sheet-in) * 3)
+    var(--may-ease-standard) infinite;
+}
+
+@keyframes may-progress-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+
+/* The shuttle is the whole message here, so it cannot simply be stopped
+ * mid-track. A dimmed full bar says "busy, extent unknown" without moving. */
+@media (prefers-reduced-motion: reduce) {
+  .may-progress[data-indeterminate='true'] .may-progress__fill {
+    animation: none;
+    width: 100%;
+    opacity: 0.4;
+  }
+}
+
+/* =============================== the ring ================================= */
+
+.may-ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--may-ring-size);
+  height: var(--may-ring-size);
+  vertical-align: middle;
+}
+
+.may-ring__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Progress starts at twelve o'clock, not three. */
+  transform: rotate(-90deg);
+}
+
+.may-ring__rail,
+.may-ring__fill {
+  fill: none;
+  stroke-width: var(--may-ring-stroke);
+}
+
+.may-ring__rail { stroke: var(--may-color-fill-tertiary); }
+
+.may-ring__fill {
+  stroke: var(--may-progress-tint);
+  stroke-linecap: round;
+  /* Paired with pathLength="100" on the circle, so one dash unit is one
+   * percent and no circumference is ever computed in JS. */
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset var(--may-duration-settle) var(--may-spring-snappy);
+}
+
+.may-ring__centre {
+  position: absolute;
+  font-size: var(--may-ring-font);
+  line-height: 1;
+  font-weight: var(--may-text-headline-weight);
+  letter-spacing: var(--may-text-footnote-tracking);
+  font-variant-numeric: tabular-nums;
+  color: var(--may-color-text);
+}
+
+/* ---------------------------------- sizes --------------------------------- */
+
+/*
+ * Stroke width is in viewBox units, so it scales with the ring: a small ring
+ * takes a proportionally THICKER stroke, which is how iOS keeps a 22px ring
+ * legible without turning a 66px one into a doughnut.
+ */
+.may-ring[data-size='xs'] {
+  --may-ring-size: calc(var(--may-control-h) * 0.5);
+  --may-ring-stroke: 10;
+  --may-ring-font: var(--may-text-caption-2);
+}
+.may-ring[data-size='sm'] {
+  --may-ring-size: calc(var(--may-control-h) * 0.72);
+  --may-ring-stroke: 9;
+  --may-ring-font: var(--may-text-caption-1);
+}
+.may-ring[data-size='md'] {
+  --may-ring-size: var(--may-control-h);
+  --may-ring-stroke: 8;
+  --may-ring-font: var(--may-text-footnote);
+}
+.may-ring[data-size='lg'] {
+  --may-ring-size: calc(var(--may-control-h) * 1.5);
+  --may-ring-stroke: 6.5;
+  --may-ring-font: var(--may-text-subheadline);
+}
+
+/* ------------------------------ indeterminate ------------------------------ */
+
+/*
+ * Two animations at deliberately incommensurate periods — 1.2s of rotation
+ * against 1.7s of breathing — so the loop never visibly repeats. A single
+ * period starts to look stuck after a few seconds of watching it.
+ */
+.may-ring[data-indeterminate='true'] .may-ring__svg {
+  animation: may-ring-spin calc(var(--may-duration-sheet-in) * 2.4) linear infinite;
+}
+
+.may-ring[data-indeterminate='true'] .may-ring__fill {
+  transition: none;
+  animation: may-ring-breathe calc(var(--may-duration-sheet-in) * 3.4)
+    var(--may-ease-standard) infinite;
+}
+
+/* The implicit `from` is the element's own rotate(-90deg), so this is one turn. */
+@keyframes may-ring-spin {
+  to { transform: rotate(270deg); }
+}
+
+@keyframes may-ring-breathe {
+  0%, 100% { stroke-dashoffset: 86; }
+  50% { stroke-dashoffset: 52; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .may-ring[data-indeterminate='true'] .may-ring__svg { animation: none; }
+  .may-ring[data-indeterminate='true'] .may-ring__fill {
+    animation: none;
+    /* A quarter-turn arc, parked. Still reads as a ring in progress. */
+    stroke-dashoffset: 75;
+  }
+}

@@ -1,0 +1,111 @@
+/*
+ * The whole gesture is two custom properties written straight to the root:
+ * --may-ptr-pull (how far the surface has given, in px) and --may-ptr-progress
+ * (0→1 toward the threshold). Every moving part reads one of them, so a frame
+ * of the pull costs one style write rather than a React render.
+ *
+ * Position is expressed with the INDEPENDENT `translate` / `scale` / `rotate`
+ * properties rather than a `transform` shorthand: they compose with each other
+ * instead of overwriting, which is what lets the ring travel, grow and turn on
+ * three different curves at once.
+ */
+
+.may-ptr {
+  --may-ptr-pull: 0px;
+  --may-ptr-progress: 0;
+  /* The indicator's parking slot above the top edge. At rest it sits exactly one
+   * slot up, so nothing is visible until the pull drags it down. */
+  --may-ptr-slot: var(--may-control-h);
+  /* The trailing spoke never reaches zero — a gap in the ring reads as a missing
+   * spoke rather than as one that has not lit yet. Matches Spinner's own floor. */
+  --may-ptr-dim: 0.16;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  /* A scroll container clips: the indicator parks above the top edge, and must
+   * not paint over whatever the host has put above the component. */
+  overflow: hidden;
+  background: var(--may-color-bg);
+}
+
+/* A pull dragged with a mouse must not select the list on its way down. */
+.may-ptr[data-pulling='true'] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ------------------------------- indicator -------------------------------- */
+
+.may-ptr__indicator {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: var(--may-z-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--may-ptr-slot);
+  pointer-events: none;
+  translate: 0 calc(var(--may-ptr-pull) - var(--may-ptr-slot));
+  /* Grows and turns as the pull fills, so the gesture is answered continuously
+   * rather than only at the moment the threshold is crossed. */
+  scale: calc(0.5 + var(--may-ptr-progress) * 0.5);
+  rotate: calc(var(--may-ptr-progress) * 0.5turn);
+  opacity: var(--may-ptr-progress);
+  transition:
+    translate var(--may-duration-settle) var(--may-spring-smooth),
+    scale var(--may-duration-fast) var(--may-spring-bouncy),
+    opacity var(--may-duration-fast) var(--may-ease-out);
+}
+
+/*
+ * While the finger is down the ring must track it exactly — any easing on the
+ * travel reads as lag. The scale keeps its spring, because that one is answering
+ * the threshold rather than the finger.
+ */
+.may-ptr[data-pulling='true'] .may-ptr__indicator {
+  transition: scale var(--may-duration-fast) var(--may-spring-bouncy);
+}
+
+/* The moment the threshold is crossed the ring pops past full size and settles.
+ * That overshoot is the whole message: let go now and it will refresh. */
+.may-ptr[data-status='ready'] .may-ptr__indicator {
+  scale: 1.16;
+  opacity: 1;
+}
+
+/*
+ * Before the release the ring is not spinning — it is FILLING. Each spoke lights
+ * as the pull reaches its share of the threshold, so the indicator is a gauge on
+ * the way down and an activity indicator once the work starts. Spinner's own
+ * animation takes back over the instant the status changes.
+ */
+.may-ptr[data-status='pulling'] .may-spinner__spoke,
+.may-ptr[data-status='ready'] .may-spinner__spoke {
+  animation: none;
+  opacity: clamp(
+    var(--may-ptr-dim),
+    calc(var(--may-ptr-progress) * var(--may-spinner-count) - var(--may-spinner-i)),
+    1
+  );
+}
+
+/* -------------------------------- scroller -------------------------------- */
+
+.may-ptr__scroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Travels with the pull, so the content itself is what gives — the indicator
+   * is uncovered by the list moving, not slid in over the top of it. */
+  translate: 0 var(--may-ptr-pull);
+  transition: translate var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+.may-ptr[data-pulling='true'] .may-ptr__scroller {
+  transition: none;
+}

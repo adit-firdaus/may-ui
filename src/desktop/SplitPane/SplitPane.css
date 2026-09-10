@@ -1,0 +1,161 @@
+/*
+ * The divider is the whole component. It is laid out as a hairline and
+ * hit-tested as a band: a pseudo-element extends the target 8px past the line
+ * on each side, so what you aim at is comfortable while what you see stays a
+ * single device pixel. Pseudo-elements hit-test as their originating element,
+ * so this costs no extra DOM and no pointer-event plumbing.
+ *
+ * Sizing runs through two custom properties. React owns --may-splitpane-size;
+ * the pointer drag writes --may-splitpane-drag, and CSS prefers it only while
+ * the gesture is live. Nothing imperative is left behind for React to diff
+ * against, and the handover at the end of a drag transitions for free.
+ */
+
+.may-splitpane {
+  --may-splitpane-size: var(--may-space-0);
+  /* Declared so it always resolves; the drag overrides it inline on this same
+   * element, and only the dragging rule below ever reads it. */
+  --may-splitpane-drag: var(--may-splitpane-size);
+  --may-splitpane-hit: var(--may-space-2);
+
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  background: var(--may-color-bg);
+}
+
+.may-splitpane[data-orientation='horizontal'] {
+  flex-direction: row;
+}
+
+.may-splitpane[data-orientation='vertical'] {
+  flex-direction: column;
+}
+
+/* ---------------------------------- panes --------------------------------- */
+
+.may-splitpane__pane {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.may-splitpane__pane--start {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: var(--may-splitpane-size);
+  transition: flex-basis var(--may-duration-settle) var(--may-spring-smooth);
+}
+
+/*
+ * While the pointer is down the pane IS the pointer — any easing here reads as
+ * lag. The child combinator matters: a nested split whose parent is being
+ * dragged must keep its own size.
+ */
+.may-splitpane[data-dragging='true'] > .may-splitpane__pane--start {
+  flex-basis: var(--may-splitpane-drag);
+  transition: none;
+}
+
+.may-splitpane__pane--end {
+  flex: 1 1 0;
+}
+
+/*
+ * `visibility` is what closes the pane. A zero-width box with `overflow: auto`
+ * still leaves its buttons and links focusable, so a keyboard user tabs into a
+ * pane that is not on screen; the delay holds it until the close has played.
+ */
+.may-splitpane[data-collapsed='true'] > .may-splitpane__pane--start {
+  overflow: hidden;
+  visibility: hidden;
+  transition:
+    flex-basis var(--may-duration-settle) var(--may-spring-smooth),
+    visibility 0s linear var(--may-duration-settle);
+}
+
+/* --------------------------------- divider -------------------------------- */
+
+.may-splitpane__divider {
+  position: relative;
+  flex: 0 0 auto;
+  align-self: stretch;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--may-color-separator);
+  /* Above both panes, so the widened hit area is reachable over their content. */
+  z-index: var(--may-z-base);
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+/*
+ * `touch-action: none` has to beat base.css's `.may-root button { touch-action:
+ * manipulation }`, which is one selector deeper than a bare class — hence the
+ * doubled attribute selector rather than a bare `.may-splitpane__divider`.
+ * Without it a touch drag scrolls the page instead of moving the divider.
+ */
+.may-splitpane__divider[data-slot='split-divider'] {
+  touch-action: none;
+}
+
+.may-splitpane[data-orientation='horizontal'] > .may-splitpane__divider {
+  width: 1px;
+  cursor: col-resize;
+}
+
+.may-splitpane[data-orientation='vertical'] > .may-splitpane__divider {
+  height: 1px;
+  cursor: row-resize;
+}
+
+@media (min-resolution: 2dppx) {
+  .may-splitpane[data-orientation='horizontal'] > .may-splitpane__divider {
+    width: var(--may-hairline);
+  }
+  .may-splitpane[data-orientation='vertical'] > .may-splitpane__divider {
+    height: var(--may-hairline);
+  }
+}
+
+/* The hit band, and — on hover or drag — the only thing that shows it. */
+.may-splitpane__divider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+}
+
+.may-splitpane[data-orientation='horizontal'] > .may-splitpane__divider::before {
+  inset-inline: calc(var(--may-splitpane-hit) * -1);
+}
+
+.may-splitpane[data-orientation='vertical'] > .may-splitpane__divider::before {
+  inset-block: calc(var(--may-splitpane-hit) * -1);
+}
+
+.may-splitpane[data-dragging='true'] > .may-splitpane__divider {
+  background: var(--may-color-tint);
+}
+
+.may-splitpane[data-dragging='true'] > .may-splitpane__divider::before {
+  background: color-mix(in srgb, var(--may-color-tint) 16%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .may-splitpane__divider:hover {
+    background: var(--may-color-tint);
+  }
+  .may-splitpane__divider:hover::before {
+    background: color-mix(in srgb, var(--may-color-tint) 10%, transparent);
+  }
+}
+
+/* The outline lands on a hairline, so it needs the band's width to be visible. */
+.may-splitpane__divider:focus-visible {
+  outline-offset: var(--may-space-1);
+}
