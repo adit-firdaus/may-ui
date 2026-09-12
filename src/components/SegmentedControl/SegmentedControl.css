@@ -39,10 +39,16 @@
 .may-segmented--full { display: flex; width: 100%; }
 .may-segmented.may-segmented--full .may-segmented__segment { flex: 1 1 0; }
 
-.may-segmented__thumb {
+.may-segmented__thumb-layout {
   position: absolute;
   inset: 0;
   z-index: 2;
+  pointer-events: none;
+}
+
+.may-segmented__thumb {
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -58,7 +64,6 @@
   /* The lightest rung there is. The thumb sits ON the track rather than over
    * the page, so anything heavier reads as a second surface. */
   box-shadow: var(--may-shadow-2xs);
-  pointer-events: none;
 }
 
 .may-segmented__thumb-label {
@@ -114,6 +119,7 @@
 .may-segmented__label {
   position: relative;
   z-index: 1;
+  transition: opacity var(--may-duration-fast) var(--may-ease-out);
 }
 
 /*

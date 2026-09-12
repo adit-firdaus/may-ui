@@ -95,11 +95,11 @@ export function SegmentedControl<T extends string = string>({
   const hitAt = (x: number) => boundsRef.current.find(({ left, right }) => x >= left && x <= right)?.index ?? -1
 
   const startDrag = (event: ReactPointerEvent<HTMLButtonElement>, index: number) => {
-    if (index !== selectedIndex || options[index]?.disabled) return
+    if (options[index]?.disabled) return
     cacheBounds()
     hitRef.current = index
     setPreviewIndex(index)
-    dragControls.start(event)
+    dragControls.start(event, { snapToCursor: true })
   }
 
   const previewDrag = (_event: PointerEvent, info: PanInfo) => {
@@ -169,25 +169,30 @@ export function SegmentedControl<T extends string = string>({
               {index === selectedIndex && (
                 <motion.span
                   layoutId={`may-segmented-thumb-${id}`}
-                  className="may-segmented__thumb"
-                  variants={THUMB_VARIANTS}
-                  transition={{ layout: LAYOUT_TRANSITION, scale: SCALE_TRANSITION }}
-                  drag="x"
-                  dragControls={dragControls}
-                  dragListener={false}
-                  dragConstraints={trackRef}
-                  dragElastic={0.12}
-                  dragMomentum={false}
-                  dragSnapToOrigin
-                  whileDrag={{ scale: PRESS_SCALE }}
-                  onDragStart={() => setDragging(true)}
-                  onDrag={previewDrag}
-                  onDragEnd={finishDrag}
+                  className="may-segmented__thumb-layout"
+                  transition={{ layout: LAYOUT_TRANSITION }}
                   aria-hidden
                 >
-                  <span className="may-segmented__thumb-label">
-                    {options[previewIndex ?? selectedIndex]?.label}
-                  </span>
+                  <motion.span
+                    className="may-segmented__thumb"
+                    variants={THUMB_VARIANTS}
+                    transition={{ scale: SCALE_TRANSITION }}
+                    drag="x"
+                    dragControls={dragControls}
+                    dragListener={false}
+                    dragConstraints={trackRef}
+                    dragElastic={0.12}
+                    dragMomentum={false}
+                    dragSnapToOrigin
+                    whileDrag={{ scale: PRESS_SCALE }}
+                    onDragStart={() => setDragging(true)}
+                    onDrag={previewDrag}
+                    onDragEnd={finishDrag}
+                  >
+                    <span className="may-segmented__thumb-label">
+                      {options[previewIndex ?? selectedIndex]?.label}
+                    </span>
+                  </motion.span>
                 </motion.span>
               )}
               <span className="may-segmented__label">{option.label}</span>

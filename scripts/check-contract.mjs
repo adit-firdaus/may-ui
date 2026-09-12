@@ -99,9 +99,9 @@ const overreachingResets = rules(css)
   .filter((sel) => weight(sel) > 1)
 
 const ruleBody = (selector) => rules(css).find(([candidate]) => candidate === selector)?.[1] ?? ''
-const segmentedLabel = ruleBody('.may-segmented .may-segmented__segment')
+const segmentedLabel = ruleBody('.may-segmented__label')
 const segmentedCss = rules(css)
-  .filter(([selector]) => selector.includes('.may-segmented'))
+  .filter(([selector]) => selector.includes('.may-segmented') && selector !== '.may-segmented__label')
   .map(([, body]) => body)
   .join(';')
 
@@ -194,10 +194,10 @@ const checks = [
     /@supports not \(animation-timing-function: linear/.test(css),
   ],
   [
-    'sliding-thumb taps animate compositor-only transforms',
+    'sliding-thumb motion stays on compositor properties',
     !/box-shadow\s+\$\{TINT_MS\}/.test(thumbRuntime) &&
       !/transition:/.test(segmentedCss) &&
-      !/transition:/.test(segmentedLabel),
+      /transition:\s*opacity\s+var\(--may-duration-fast\)\s+var\(--may-ease-out\)/.test(segmentedLabel),
   ],
   [
     'element resets cannot out-specify the components they paint over',

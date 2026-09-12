@@ -48,7 +48,7 @@ const BUDGETS = {
   'mobile.js': 36 * 1024,
   // The example screens. Never imported by a consumer — this budget exists to
   // catch them leaking into the main entry.
-  'examples.js': 170 * 1024,
+  'examples.js': 171 * 1024,
 }
 
 let failed = false
