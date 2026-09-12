@@ -13,11 +13,11 @@ import {
   IoSettingsOutline,
   IoTrashOutline,
 } from 'react-icons/io5'
-import { CommandPalette } from './CommandPalette'
-import type { CommandGroup, CommandItem, CommandPaletteProps } from './CommandPalette'
-import { Button } from '../../components/Button/Button'
-import { Kbd } from '../../components/Kbd/Kbd'
-import { List, ListRow } from '../../components/List/List'
+import { CommandPalette } from '.'
+import type { CommandGroup, CommandItem, CommandPaletteProps } from '.'
+import { Button } from '../../components/Button'
+import { Kbd } from '../../components/Kbd'
+import { List, ListRow } from '../../components/List'
 
 /* SF-Symbol-flavoured glyphs. Stroked, never filled, so they sit at the same
  * weight as the row's own text. */

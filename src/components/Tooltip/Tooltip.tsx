@@ -18,7 +18,6 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
  */
 import { placeFloating, useExitDelay } from '../Popover/Popover'
 import type { PopoverPlacement } from '../Popover/Popover'
-import './Tooltip.css'
 
 /** Gap between the control and its hint, in px — `--may-space-2`. */
 const DEFAULT_OFFSET = 8

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Label } from './Label'
-import { Text } from '../Text/Text'
+import { Label } from '.'
+import { Text } from '../Text'
 
 const meta = {
   title: 'Catalog/Adaptive/Label',

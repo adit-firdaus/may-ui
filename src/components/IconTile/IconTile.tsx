@@ -1,6 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
-import './IconTile.css'
 
 /** The eleven app-icon gradients defined in the token layer. */
 export type IconTileGradient =

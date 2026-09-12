@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Kbd } from './Kbd'
-import { Text } from '../Text/Text'
+import { Kbd } from '.'
+import { Text } from '../Text'
 
 const meta = {
   title: 'Catalog/Adaptive/Kbd',

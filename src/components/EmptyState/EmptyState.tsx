@@ -1,7 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
 import type { MaySize } from '../../types'
-import './EmptyState.css'
 
 // `title` is a node here, not the DOM's tooltip string, so the native one goes.
 export interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {

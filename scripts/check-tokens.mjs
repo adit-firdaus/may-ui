@@ -3,12 +3,7 @@
  * reads is defined somewhere in the same file, and no token is defined twice
  * with conflicting intent outside a theme block.
  */
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-
-const here = dirname(fileURLToPath(import.meta.url))
-const css = readFileSync(resolve(here, '../dist/mayui.css'), 'utf8')
+import { builtCss as css } from './built-styles.mjs'
 
 const defined = new Set([...css.matchAll(/(--may-[\w-]+)\s*:/g)].map((m) => m[1]))
 const used = new Set([...css.matchAll(/var\((--may-[\w-]+)/g)].map((m) => m[1]))

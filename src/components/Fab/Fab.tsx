@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
-import './Fab.css'
 
 export interface FabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
   /**

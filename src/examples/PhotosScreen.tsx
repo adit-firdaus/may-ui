@@ -11,7 +11,6 @@ import { ActionSheet } from '../components/ActionSheet'
 import { Badge } from '../components/Badge'
 import { Grid } from '../components/Grid'
 import { IconButton } from '../components/IconButton'
-import { MayHost } from '../components/MayHost'
 import { SegmentedControl } from '../components/SegmentedControl'
 import { Select } from '../components/Select'
 import { Stack } from '../components/Stack'
@@ -19,7 +18,6 @@ import { Text } from '../components/Text'
 import { toast } from '../components/Toast'
 import { Toolbar } from '../components/Toolbar'
 import { NavBar } from '../mobile/NavBar'
-import './PhotosScreen.css'
 
 interface Photo {
   /** The camera's own filename, which is what Photos shows in the info panel. */
@@ -267,9 +265,6 @@ export function PhotosScreen() {
         ]}
       />
 
-      {/* `toast()` is imperative and needs somewhere to land — exactly one host
-       * per screen, mounted last so its banners sit above the bar. */}
-      <MayHost />
     </div>
   )
 }

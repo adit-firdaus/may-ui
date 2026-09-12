@@ -18,23 +18,22 @@ and a token layer you can theme.
 npm install @adit_firdaus/may-ui
 ```
 
-`react` and `react-dom` (18+) are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
+`react` and `react-dom` 19 are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
 is a dependency — May UI draws its glyphs from Ionicons (`react-icons/io5`), and it stays
 external so your bundler tree-shakes it per icon.
 
 ## Use
 
-Import the stylesheet once at the root, wrap your tree in `MayProvider`, and mount
-`MayHost` once for imperative surfaces:
+Components carry their own React stylesheet resources. Add `MayProvider` when
+you need shared configuration or imperative surfaces—there is no CSS import or
+separate host to mount:
 
 ```tsx
-import '@adit_firdaus/may-ui/styles.css'
-import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from '@adit_firdaus/may-ui'
+import { MayProvider, Card, CardTitle, Stack, Text, Button } from '@adit_firdaus/may-ui'
 
 export function App() {
   return (
-    <MayProvider theme="system">
-      <MayHost />
+    <MayProvider theme={{ mode: 'system' }}>
       <Stack gap={4}>
         <Card>
           <CardTitle>Production deploy</CardTitle>
@@ -47,8 +46,10 @@ export function App() {
 }
 ```
 
-`MayProvider` renders the `.may-root` element carrying every token and the base layer.
-Components render unstyled without it.
+React 19 hoists and de-duplicates the component resources. Components use
+built-in tokens without a provider; the provider adds scoped themes, typed
+tokens, component defaults, routing, platform overrides, CSP, and one automatic
+imperative host.
 
 ## Three entry points
 
@@ -67,21 +68,24 @@ Consumers importing `@adit_firdaus/may-ui` never pull the desktop `DataTable` or
 
 ## Theming
 
-| `theme` prop | Behaviour |
+| `theme.mode` | Behaviour |
 |---|---|
 | `'system'` (default) | follows `prefers-color-scheme` |
 | `'light'` | pinned light |
 | `'dark'` | pinned dark |
 
 ```tsx
-const { theme, resolvedTheme, setTheme } = useMayTheme()
+const { mode, resolvedMode } = useMayTheme()
+const tokens = useMayTokens()
 ```
 
 Providers nest, so a region can be pinned dark inside an otherwise light page — the
 semantic aliases are re-declared in every theme scope, so a scoped `data-may-theme`
 re-resolves them rather than leaving them stuck at the outer theme's values.
 
-`accent` on the provider re-points the tint.
+The application owns theme state. Configure branding with
+`theme.tokens.colorTint` and `theme.tokens.colorPrimary`, plus optional `light`
+and `dark` token maps.
 
 ## Icons
 
@@ -193,7 +197,7 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 
 | Group | Components |
 |---|---|
-| Foundation | `MayProvider`, `MayHost`, `useMayTheme`, `PlatformProvider`, `usePlatform`, `useIsDesktop` |
+| Foundation | `MayProvider`, `useMayConfig`, `useMayTheme`, `useMayTokens`, `PlatformProvider`, `usePlatform`, `useIsDesktop` |
 | Layout | `Box`, `Stack`, `Grid`, `Separator`, `SafeArea`, `ScrollArea` |
 | Typography | `Heading`, `Text`, `Label`, `Kbd` |
 | Actions | `Button`, `IconButton`, `ButtonGroup`, `Fab`, `Toolbar`, `ToolbarSpacer` |
@@ -212,18 +216,19 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 
 ## Toasts
 
-Mount `MayHost` once, then call `toast` from anywhere — no hook, no provider:
+Wrap the application in `MayProvider`, then call `toast` from anywhere. The
+outer provider owns the host:
 
 ```tsx
 import { toast, dismiss, dismissAll, setToastLimit } from '@adit_firdaus/may-ui'
 
 toast('Saved')
 toast.success('Deploy promoted')
-toast.error('Health check failed')
+toast.danger('Health check failed')
 ```
 
-`dismiss(id)` closes one toast, `dismissAll()` clears the queue, `useToast()` reads it
-live, and `setToastLimit(n)` caps how many stack at once.
+`dismiss(id)` closes one toast, `dismissAll()` clears the queue, and `useToast()`
+reads it live. Configure stack limits with `MayProvider host={{ max: 3 }}`.
 
 ## Example screens
 
@@ -255,9 +260,9 @@ npm run build        # library build (four entries) + types
 npm run verify       # typecheck, smoke, tokens, contract, size, coverage
 ```
 
-`npm run generate` regenerates `src/styles/tokens.css` and `src/styles/motion.css` from
-`scripts/gen-tokens.mjs` and `scripts/gen-springs.mjs`. **Never edit those two CSS files
-by hand** — they are build output.
+`npm run generate` regenerates `src/styles/tokens.css`,
+`src/styles/tokens.generated.ts`, and `src/styles/motion.css`. **Never edit those
+files by hand** — they are build output.
 
 ### The gates
 
@@ -271,7 +276,8 @@ bundle budgets per entry and fails if any exported component appears in no examp
 
 1. `src/components/<Name>/` with `<Name>.tsx`, `<Name>.css`, `<Name>.stories.tsx`, `index.ts`
    (or `src/desktop/` / `src/mobile/` for a dedicated family)
-2. Import the CSS from the `.tsx` so the bundler picks it up
+2. In `index.ts`, import the CSS with `?inline`, create a `mayStyleSheet`, and
+   export the implementation through `withMayStyles`
 3. Class names are `may-<component>` with `__element` and `--modifier` (BEM)
 4. Style from tokens only — no literal colours, spacings, radii or shadows
 5. Draw glyphs with `react-icons/io5`, and size them in CSS against `.may-<component>__icon > svg`

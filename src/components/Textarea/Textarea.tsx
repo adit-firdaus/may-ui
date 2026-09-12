@@ -3,7 +3,6 @@ import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef } from 'rea
 import { cx } from '../../utils/cx'
 import { useFieldControl } from '../Field/Field'
 import type { MaySize } from '../../types'
-import './Textarea.css'
 
 export type TextareaSize = Exclude<MaySize, 'xs'>
 

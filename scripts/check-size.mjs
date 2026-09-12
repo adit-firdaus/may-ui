@@ -8,10 +8,11 @@
  * size *improvement* while the real cost to a consumer was unchanged — a gate
  * that passes for the wrong reason is worse than no gate.
  */
-import { readFileSync, statSync, existsSync } from 'node:fs'
+import { readFileSync, statSync, existsSync, readdirSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve, join } from 'node:path'
+import { builtStyleEntries, styleSheetsFor } from './built-styles.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
@@ -41,13 +42,13 @@ const raw = (files) => files.reduce((n, f) => n + statSync(join(dist, f)).size, 
 
 const BUDGETS = {
   // What every consumer of `mayui` pays.
-  'mayui.js': 44 * 1024,
+  'mayui.js': 82 * 1024,
   // Opt-in families. Importing 'mayui' pulls in neither.
-  'desktop.js': 26 * 1024,
-  'mobile.js': 26 * 1024,
+  'desktop.js': 42 * 1024,
+  'mobile.js': 36 * 1024,
   // The example screens. Never imported by a consumer — this budget exists to
   // catch them leaking into the main entry.
-  'examples.js': 145 * 1024,
+  'examples.js': 170 * 1024,
 }
 
 let failed = false
@@ -78,22 +79,36 @@ console.log(
     ` (${exampleOnly.length} chunk(s) exclusive to examples)`,
 )
 
-const cssPath = join(dist, 'mayui.css')
-const cssGz = gzipSync(readFileSync(cssPath)).length
-const CSS_BUDGET = 40 * 1024
-const cssOk = cssGz <= CSS_BUDGET
-if (!cssOk) failed = true
-console.log(
-  `  ${cssOk ? 'ok  ' : 'FAIL'} mayui.css   ${String(statSync(cssPath).size).padStart(7)} raw  ` +
-    `${String(cssGz).padStart(6)} gz  / ${CSS_BUDGET} budget`,
-)
-console.log(
-  '       (one stylesheet by design: cssCodeSplit is off so the design-sync',
-)
-console.log(
-  '        @import closure resolves. It therefore also carries the example',
-)
-console.log('        screens’ CSS — a few hundred bytes gzipped.)')
+const STYLE_BUDGETS = {
+  'mayui.js': 25 * 1024,
+  'desktop.js': 11 * 1024,
+  'mobile.js': 11 * 1024,
+  'examples.js': 33 * 1024,
+}
+
+console.log('\nembedded React style resources (unique per entry)\n')
+for (const [entry, budget] of Object.entries(STYLE_BUDGETS)) {
+  const modules = entry === 'examples.js'
+    ? Object.values(builtStyleEntries)
+    : [builtStyleEntries[entry]]
+  const sheets = new Map()
+  for (const module of modules) {
+    for (const sheet of styleSheetsFor(module)) sheets.set(sheet.href, sheet)
+  }
+  const source = [...sheets.values()].map((sheet) => sheet.css).join('\n')
+  const compressed = gzipSync(source).length
+  const ok = compressed <= budget
+  if (!ok) failed = true
+  console.log(
+    `  ${ok ? 'ok  ' : 'FAIL'} ${entry.padEnd(13)} ${String(source.length).padStart(7)} raw  ` +
+      `${String(compressed).padStart(6)} gz  / ${budget} budget  (${sheets.size} resources)`,
+  )
+}
+
+const cssAssets = readdirSync(dist).filter((file) => file.endsWith('.css'))
+const noCssAssets = cssAssets.length === 0
+if (!noCssAssets) failed = true
+console.log(`\n  ${noCssAssets ? 'ok  ' : 'FAIL'} no emitted CSS assets`)
 
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 const deps = Object.keys(pkg.dependencies ?? {})

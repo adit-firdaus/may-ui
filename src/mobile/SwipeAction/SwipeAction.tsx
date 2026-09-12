@@ -11,7 +11,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { draggable, projectFlick, rubber } from '../../motion/gesture'
 import { duration } from '../../motion/springs'
 import type { MayTone } from '../../types'
-import './SwipeAction.css'
 
 /** Which edge of the row the actions live on. */
 export type SwipeSide = 'leading' | 'trailing'
@@ -336,7 +335,7 @@ export function SwipeAction({
   const group = (
     items: SwipeActionItem[] | undefined,
     groupSide: SwipeSide,
-    ref: RefObject<HTMLDivElement>,
+    ref: RefObject<HTMLDivElement | null>,
   ) => {
     if (!items || items.length === 0) return null
     const revealed = open === groupSide

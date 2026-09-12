@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Box } from './Box'
+import { Box } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Box',

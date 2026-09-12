@@ -10,7 +10,6 @@ import { clampWithRubber, draggable, projectFlick } from '../../motion/gesture'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
 import { useExitDelay } from '../Popover/Popover'
-import './Sheet.css'
 
 /** Matches the exit transition in Sheet.css. */
 const EXIT_MS = 150

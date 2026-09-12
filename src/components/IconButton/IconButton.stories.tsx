@@ -9,7 +9,7 @@ import {
   IoShareOutline,
   IoTrash,
 } from 'react-icons/io5'
-import { IconButton } from './IconButton'
+import { IconButton } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/IconButton',

@@ -5,7 +5,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import { IoCheckmark } from 'react-icons/io5'
 import type { MaySize } from '../../types'
-import './Selector.css'
 
 /** The pill lifts under the press, matching the chip family elsewhere. */
 const PRESS_SCALE = 1.1

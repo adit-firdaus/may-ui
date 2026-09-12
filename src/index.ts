@@ -1,10 +1,9 @@
 /**
  * May UI — an Apple-native React design system.
  *
- * Import the stylesheet once at the root of your app:
- *   import 'mayui/styles.css'
- * then wrap your tree in <MayProvider>. Mount <MayHost/> once for the
- * imperative surfaces (toasts).
+ * Components carry React 19 stylesheet resources. Wrap the tree in
+ * <MayProvider> when it needs application-wide configuration or imperative
+ * surfaces; no stylesheet import or separate host is required.
  *
  * These are the ADAPTIVE components: one per concern, reshaping at the
  * breakpoint. Sheet rises from the bottom edge on phones and presents as a
@@ -20,7 +19,6 @@ export * as motion from './motion'
 
 // Foundation
 export * from './components/MayProvider'
-export * from './components/MayHost'
 
 // Layout
 export * from './components/Box'

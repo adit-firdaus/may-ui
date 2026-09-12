@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoAdd } from 'react-icons/io5'
-import { Button } from './Button'
+import { Button } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Button',

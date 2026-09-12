@@ -4,7 +4,6 @@ import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
-import './Sidebar.css'
 
 /* ------------------------------------------------------------------ *
  * Context

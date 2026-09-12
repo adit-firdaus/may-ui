@@ -5,8 +5,6 @@ import { Collapsible } from '../Collapsible/Collapsible'
 // The rows are Collapsible's markup wearing this component's classes, so its
 // stylesheet must be a value import — a type-only one is erased at compile and
 // Storybook then code-splits the rules away, leaving the panel unstyled.
-import '../Collapsible/Collapsible.css'
-import './Accordion.css'
 
 export type AccordionType = 'single' | 'multiple'
 

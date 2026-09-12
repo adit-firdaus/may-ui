@@ -25,7 +25,6 @@ import { IconTile } from '../components/IconTile'
 import type { IconTileGradient } from '../components/IconTile'
 import { Input } from '../components/Input'
 import { List, ListRow } from '../components/List'
-import { MayHost } from '../components/MayHost'
 import { Menu } from '../components/Menu'
 import type { MenuItem } from '../components/Menu'
 import { Modal } from '../components/Modal'
@@ -52,9 +51,8 @@ type ModalOverlay = 'sheet' | 'album' | 'actions' | 'confirm' | 'share'
  *  - `Popover`, `Menu` and `Tooltip` are anchored and non-modal. They keep
  *    their own open state beside their trigger, and dismiss on outside press,
  *    Escape, or focus leaving.
- *  - `toast()` is imperative and has no trigger relationship at all: it is
- *    called from anywhere and rendered by the one `<MayHost />` at the bottom
- *    of this file.
+ *  - `toast()` is imperative and has no trigger relationship at all; the
+ *    provider's host renders it.
  *
  * None of these portal. Each renders inline, right beside the button that
  * opened it, and reaches the whole viewport with a fixed scrim — so a Sheet can
@@ -339,7 +337,7 @@ export function OverlaysScreen() {
 
             <Trigger
               title="Toast"
-              description="The one imperative surface: toast() is called from anywhere and rendered by the single MayHost mounted at the bottom of this screen."
+              description="The one imperative surface: toast() is called from anywhere and rendered by the provider's host."
               gradient="green"
               glyph={<BellGlyph />}
               action={
@@ -426,9 +424,6 @@ export function OverlaysScreen() {
         </div>
       </div>
 
-      {/* Mounted once per app, near the root. Without it toast() enqueues into a
-        * store nothing is rendering, and the call silently does nothing. */}
-      <MayHost />
     </div>
   )
 }

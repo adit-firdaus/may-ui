@@ -1,7 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
-import './Card.css'
 
 /**
  * `elevated` floats above the page and is the only variant that casts a

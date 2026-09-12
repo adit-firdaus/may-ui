@@ -1,7 +1,6 @@
 import type { HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import { useRef } from 'react'
 import { cx } from '../../utils/cx'
-import './Toolbar.css'
 
 /** What the arrow keys are allowed to move between. */
 const FOCUSABLE =

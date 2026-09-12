@@ -5,10 +5,10 @@ import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { draggable } from '../../motion/gesture'
 import type { MaySize } from '../../types'
-import { Checkbox } from '../../components/Checkbox/Checkbox'
-import { Input } from '../../components/Input/Input'
-import { Select } from '../../components/Select/Select'
-import { Pagination } from '../../components/Pagination/Pagination'
+import { Checkbox } from '../../components/Checkbox'
+import { Input } from '../../components/Input'
+import { Select } from '../../components/Select'
+import { Pagination } from '../../components/Pagination'
 /*
  * The card, the hairlines, the cell metrics and the row washes are Table's, and
  * this component renders Table's own class names to inherit all four rather
@@ -21,8 +21,6 @@ import { Pagination } from '../../components/Pagination/Pagination'
  * rules here that reshape those controls for a table cell have to land after
  * the rules they are narrowing.
  */
-import '../../components/Table/Table.css'
-import './DataTable.css'
 
 export type DataTableSortDirection = 'asc' | 'desc'
 

@@ -41,8 +41,9 @@ without having run the gate.
   duration. If a value you need has no token, add it to the generator.
 - **No borders on controls.** Surfaces separate by value (fill + hairline), not
   by strokes. The contract check will reject a visible `border: … solid …`.
-- **Class names are BEM**: `may-<component>__element--modifier`. Import each
-  component's CSS from its `.tsx` so the bundler picks it up.
+- **Class names are BEM**: `may-<component>__element--modifier`. The component
+  barrel imports CSS with `?inline`, creates a `mayStyleSheet`, and exports the
+  implementation through `withMayStyles`; `.tsx` files never side-effect-import CSS.
 - **Glyphs come from `react-icons/io5`**, sized in CSS against
   `.may-<component>__icon > svg` — never with a `:not([width])` guard, which
   react-icons defeats.
@@ -96,7 +97,7 @@ fix(pages): drop vite-plugin-dts from the Storybook build
 | `src/desktop/` | Shapes with no honest phone form (`Sidebar`, `CommandPalette`, `Table`…) |
 | `src/mobile/` | Shapes with no desktop meaning (`TabBar`, `CapsuleTabs`, `Selector`…) |
 | `src/motion/` | The runtime motion layer — springs, gestures, `useSlidingThumb`, `sliding-thumb.ts` |
-| `src/styles/` | `base.css` (authored) and the **generated** `tokens.css` / `motion.css` |
+| `src/styles/` | React style-resource runtime, `base.css`, and generated token/motion artifacts |
 | `scripts/` | Token/spring generators and the `check:*` gates |
 | `examples/` | The example-screen gallery (a Vite app that builds against `src`) |
 | `.storybook/` | Storybook config (the component workshop) |

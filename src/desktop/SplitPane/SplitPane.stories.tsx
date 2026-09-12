@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
-import { SplitPane } from './SplitPane'
+import { SplitPane } from '.'
 import { List, ListRow } from '../../components/List'
 import { Button } from '../../components/Button'
 

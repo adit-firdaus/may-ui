@@ -5,7 +5,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
 import { useAutoId } from '../../utils/useId'
 import type { MaySize } from '../../types'
-import './RadioGroup.css'
 
 /** No `xs`: the dot would fall under the 44px touch target it has to fill. */
 export type RadioSize = Exclude<MaySize, 'xs'>

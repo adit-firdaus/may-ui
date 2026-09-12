@@ -5,7 +5,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
 import { IoChevronDown } from 'react-icons/io5'
 import type { MaySize } from '../../types'
-import './Select.css'
 
 export interface SelectOption {
   label: string

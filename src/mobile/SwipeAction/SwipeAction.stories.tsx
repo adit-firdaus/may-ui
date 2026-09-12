@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { IoArchive, IoEllipsisHorizontal, IoFlag, IoMail, IoPin, IoTrash } from 'react-icons/io5'
-import { SwipeAction } from './SwipeAction'
+import { SwipeAction } from '.'
 import { List, ListRow } from '../../components/List'
 
 const meta = {

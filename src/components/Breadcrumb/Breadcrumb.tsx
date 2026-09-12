@@ -8,7 +8,6 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import type { FlipSnapshot } from '../../motion/flip'
 import { play, snapshot } from '../../motion/flip'
 import type { MaySize } from '../../types'
-import './Breadcrumb.css'
 
 /** xs is absent: a crumb that small stops being a touch target. */
 export type BreadcrumbSize = Exclude<MaySize, 'xs'>

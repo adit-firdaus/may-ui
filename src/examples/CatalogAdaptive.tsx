@@ -71,7 +71,6 @@ import { Toast } from '../components/Toast'
 import { Toolbar, ToolbarSpacer } from '../components/Toolbar'
 import { Tooltip } from '../components/Tooltip'
 import { VisuallyHidden } from '../components/VisuallyHidden'
-import './CatalogAdaptive.css'
 
 /**
  * Every specimen on this page is a component, not a workflow.
@@ -144,9 +143,8 @@ const FILE_ACTIONS: MenuItem[] = [
  *    trigger each, and their captions say so. They render inline — no portal —
  *    which is why each one sits in its own cell beside the button that opens it.
  *
- * MayProvider and MayHost are the two members of the family with no specimen
- * here: both are mounted once at the root of an app, and the gallery already
- * supplies them. Rendering a second host would double every toast on screen.
+ * MayProvider has no specimen here: it is mounted once at the app root and
+ * supplies the theme plus the single imperative host.
  */
 export function CatalogAdaptive() {
   /* The modal overlays scrim the page and trap focus, so exactly one can be up

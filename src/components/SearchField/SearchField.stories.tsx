@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useMemo, useState } from 'react'
-import { SearchField } from './SearchField'
-import { Field } from '../Field/Field'
+import { SearchField } from '.'
+import { Field } from '../Field'
 
 const meta = {
   title: 'Catalog/Adaptive/SearchField',

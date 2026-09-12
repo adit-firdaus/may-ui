@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { duration, resolveCurve, spring } from '../../motion/springs'
 import type { MaySize, MayTone } from '../../types'
-import './Badge.css'
 
 /**
  * `tinted` is a wash of the tone carrying tone-coloured text — the weight iOS

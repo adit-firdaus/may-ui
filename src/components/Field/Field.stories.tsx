@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Field } from './Field'
-import { Input } from '../Input/Input'
-import { Textarea } from '../Textarea/Textarea'
+import { Field } from '.'
+import { Input } from '../Input'
+import { Textarea } from '../Textarea'
 
 const meta = {
   title: 'Catalog/Adaptive/Field',

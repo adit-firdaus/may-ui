@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoCheckmark, IoCloudOfflineOutline, IoTrashOutline } from 'react-icons/io5'
 import { useState } from 'react'
-import { Toast } from './Toast'
+import { Toast } from '.'
 import { Button } from '../Button'
 
 const meta = {

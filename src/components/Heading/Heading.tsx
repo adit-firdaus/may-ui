@@ -6,8 +6,6 @@ import type { TextAlign, TextTone, TextWeight } from '../Text/Text'
 // Value import, not a type-only one: Heading renders with Text's `.may-text`
 // classes, and a type-only import is erased at compile time — Storybook then
 // code-splits the scale away and the heading renders unstyled.
-import '../Text/Text.css'
-import './Heading.css'
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
 

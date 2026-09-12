@@ -20,7 +20,6 @@ import {
  * nothing but a PullToRefresh — which paints an empty ring.
  */
 import { Spinner } from '../../components/Spinner'
-import './PullToRefresh.css'
 
 export interface PullToRefreshProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onDrag'> {
   /**

@@ -1,6 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
-import './ButtonGroup.css'
 
 export interface ButtonGroupProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Stack } from './Stack'
+import { Stack } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Stack',

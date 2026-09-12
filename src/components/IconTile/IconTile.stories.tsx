@@ -13,9 +13,9 @@ import {
   IoTime,
   IoWifi,
 } from 'react-icons/io5'
-import { IconTile } from './IconTile'
-import type { IconTileGradient } from './IconTile'
-import { List, ListRow } from '../List/List'
+import { IconTile } from '.'
+import type { IconTileGradient } from '.'
+import { List, ListRow } from '../List'
 
 const meta = {
   title: 'Catalog/Adaptive/IconTile',

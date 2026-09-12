@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { cx } from '../utils/cx'
 import { PlatformProvider } from '../hooks/platform'
-import './DeviceFrame.css'
 
 export interface DeviceFrameProps {
   children?: ReactNode

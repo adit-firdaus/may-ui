@@ -1,7 +1,6 @@
 import type { HTMLAttributes } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
-import './SafeArea.css'
 
 export type SafeAreaEdge = 'top' | 'bottom' | 'left' | 'right'
 

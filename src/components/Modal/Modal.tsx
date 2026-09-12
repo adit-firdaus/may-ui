@@ -10,7 +10,6 @@ import { useAutoId } from '../../utils/useId'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
 import { useExitDelay } from '../Popover/Popover'
-import './Modal.css'
 
 /** Matches the exit animation in Modal.css. */
 const EXIT_MS = 150

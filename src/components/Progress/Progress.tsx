@@ -2,7 +2,6 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import type { MaySize, MayTone } from '../../types'
-import './Progress.css'
 
 /**
  * The ring is drawn in a 100×100 viewBox with `pathLength="100"`, so a dash

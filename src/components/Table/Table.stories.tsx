@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { IoBagHandleOutline } from 'react-icons/io5'
-import { Table } from './Table'
-import type { TableColumn, TableProps } from './Table'
-import { EmptyState } from '../EmptyState/EmptyState'
+import { Table } from '.'
+import type { TableColumn, TableProps } from '.'
+import { EmptyState } from '../EmptyState'
 
 interface Device {
   id: string

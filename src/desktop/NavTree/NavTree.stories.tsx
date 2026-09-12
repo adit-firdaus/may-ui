@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { IoCloudOutline, IoDocumentOutline, IoFolderOutline } from 'react-icons/io5'
-import { NavTree } from './NavTree'
-import type { NavTreeNode } from './NavTree'
+import { NavTree } from '.'
+import type { NavTreeNode } from '.'
 import { Button } from '../../components/Button'
 
 const meta = {

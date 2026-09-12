@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import type { CSSProperties } from 'react'
 import { useState } from 'react'
 import { List, ListRow } from '../List'
-import { Stepper } from './Stepper'
+import { Stepper } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Stepper',

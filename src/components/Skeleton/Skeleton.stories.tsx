@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Skeleton } from './Skeleton'
+import { Skeleton } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Skeleton',

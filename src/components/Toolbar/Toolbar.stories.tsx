@@ -7,7 +7,7 @@ import {
   IoShareOutline,
   IoTrashOutline,
 } from 'react-icons/io5'
-import { Toolbar, ToolbarSpacer } from './Toolbar'
+import { Toolbar, ToolbarSpacer } from '.'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 import { List, ListRow } from '../List'

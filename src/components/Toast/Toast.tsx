@@ -12,7 +12,6 @@ import type { MayTone } from '../../types'
  * ever renders a Toast — which paints an unstyled action.
  */
 import { Button } from '../Button'
-import './Toast.css'
 
 /** Edge the toast is anchored to, and how it aligns along that edge. */
 export type ToastPosition =
@@ -92,11 +91,34 @@ const DEFAULT_LIMIT = 3
 let queue: ToastRecord[] = []
 let limit = DEFAULT_LIMIT
 let sequence = 0
+let hosts = 0
+let warnedMissingHost = false
 const listeners = new Set<() => void>()
 const exitTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
 /** Stable identity: `useSyncExternalStore` compares snapshots by reference. */
 const EMPTY: ToastRecord[] = []
+
+declare const process: { env?: { NODE_ENV?: string } } | undefined
+const isDevelopment = typeof process === 'undefined' || process.env?.NODE_ENV !== 'production'
+
+/** Internal lifecycle used by MayProvider's automatic host. */
+export function registerToastHost(): () => void {
+  hosts += 1
+  warnedMissingHost = false
+  return () => {
+    hosts = Math.max(0, hosts - 1)
+  }
+}
+
+function warnIfUnhosted(): void {
+  if (!isDevelopment || hosts > 0 || warnedMissingHost) return
+  queueMicrotask(() => {
+    if (hosts > 0 || warnedMissingHost) return
+    warnedMissingHost = true
+    console.warn('May UI: toast() requires an outer MayProvider with hosting enabled')
+  })
+}
 
 function publish(next: ToastRecord[]): void {
   queue = next
@@ -158,6 +180,7 @@ function capped(next: ToastRecord[]): ToastRecord[] {
 }
 
 function enqueue(title: ReactNode, options: ToastOptions = {}): string {
+  warnIfUnhosted()
   const { id = `may-toast-${++sequence}`, ...rest } = options
   const record: ToastRecord = { ...rest, id, title, createdAt: Date.now() }
   const index = queue.findIndex((entry) => entry.id === id)
@@ -262,7 +285,7 @@ export function dismissAll(): void {
 }
 
 /**
- * How many toasts stay on screen. `MayHost` drives this from its `max` prop.
+ * How many toasts stay on screen. MayProvider's host configuration drives this.
  *
  * The cap lives in the store rather than in the host's render because the queue
  * is what knows the order things arrived in, and promotion has to happen on the
@@ -323,7 +346,7 @@ export interface ToastProps
 /**
  * One toast.
  *
- * Rendered for you by `MayHost`; exported because a toast is also a perfectly
+ * Rendered for you by MayProvider's host; exported because a toast is also a perfectly
  * good inline banner, and because a story can then show every tone at rest.
  *
  * Three behaviours make it feel native rather than like a web notification:

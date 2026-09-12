@@ -1,94 +1,107 @@
-# Theming
+# Provider and theming
 
-## Light and dark
+## Controlled appearance
 
-`MayProvider` takes a `theme` prop:
-
-| `theme` | Behaviour |
-|---|---|
-| `'system'` (default) | follows `prefers-color-scheme` |
-| `'light'` | pinned light |
-| `'dark'` | pinned dark |
-
-Read or change it from anywhere below the provider:
+`MayProvider` is configuration, not a state store. Keep a theme toggle in the
+application and pass its value through `theme.mode`:
 
 ```tsx
-const { theme, resolvedTheme, setTheme } = useMayTheme()
+const [mode, setMode] = useState<'light' | 'dark' | 'system'>('system')
+
+<MayProvider theme={{ mode }}>
+  <App />
+</MayProvider>
 ```
 
-## Scoped themes
+`useMayTheme()` returns the read-only `{ mode, resolvedMode }`. System mode
+follows `prefers-color-scheme`; the server snapshot is light while CSS media
+queries paint the correct appearance before hydration.
 
-Providers nest, so a region can be pinned dark inside an otherwise light page:
+## Typed token overrides
+
+Every public `--may-*` token has a camel-case `MayTokens` property. Common
+values apply to both appearances, and mode maps override the common value:
 
 ```tsx
-<MayProvider theme="light">
-  <Page />
-  <MayProvider theme="dark">
-    <Sidebar />   {/* dark, in a light page */}
+<MayProvider
+  theme={{
+    mode: 'system',
+    tokens: {
+      radiusCard: '18px',
+      fontSans: 'Inter, sans-serif',
+    },
+    light: { colorPrimary: '#0066ff' },
+    dark: { colorPrimary: '#4d8dff' },
+  }}
+>
+  <App />
+</MayProvider>
+```
+
+`useMayTokens()` returns the fully resolved token map for the active appearance.
+Tint and primary remain separate: `colorTint` is brand-as-text and
+`colorPrimary` is brand-as-fill.
+
+## Component defaults
+
+Provider defaults cover curated presentation and interaction-policy props.
+They never supply content, state, callbacks, IDs, accessibility labels, or DOM
+attributes. Explicit component props win.
+
+```tsx
+<MayProvider
+  components={{
+    Button: { size: 'lg', variant: 'tinted' },
+    Modal: { size: 'lg', closeOnScrimClick: false },
+  }}
+>
+  <Button>Large tinted default</Button>
+  <Button size="sm">Explicitly small</Button>
+</MayProvider>
+```
+
+Providers nest. Token maps merge by key and component maps merge by component
+and prop, so a child can change one default without repeating its parent:
+
+```tsx
+<MayProvider components={{ Button: { size: 'lg', variant: 'tinted' } }}>
+  <MayProvider
+    theme={{ mode: 'dark' }}
+    components={{ Button: { size: 'sm' } }}
+  >
+    <Button>Small, tinted, dark</Button>
   </MayProvider>
 </MayProvider>
 ```
 
-This works because the semantic aliases are re-declared in every theme scope — a
-scoped `data-may-theme` re-resolves them rather than leaving them stuck at the
-outer theme's values. (If you author your own scoped theme, that re-resolution
-is exactly what the design contract's "scoped dark re-resolves the semantic
-aliases" gate protects.)
+`useMayConfig()` returns the complete effective read-only configuration.
 
-## The token layers
+## CSP
 
-Two layers:
-
-- **Primitives** — raw values: `--may-blue`, `--may-gray-6`.
-- **Semantic aliases** — point at primitives: `--may-color-text: var(--may-label)`.
-
-**Style against the semantic layer**, so themes work. Reaching for a primitive
-directly pins a value that will not follow the theme.
-
-### Semantic tokens
-
-- Surfaces — `--may-color-bg`, `--may-color-surface`, `--may-color-surface-nested`
-- Text — `--may-color-text`, `--may-color-text-secondary`, `--may-color-text-tertiary`
-- Fills — `--may-color-fill` through `--may-color-fill-quaternary`
-- Lines — `--may-color-separator`
-- Status — `--may-color-success`, `--may-color-warning`, `--may-color-danger`, `--may-color-info`
-
-Apple's system palette is available raw when you genuinely want a fixed hue:
-`--may-blue` `--may-green` `--may-indigo` `--may-orange` `--may-pink`
-`--may-purple` `--may-red` `--may-teal` `--may-yellow` `--may-mint` `--may-cyan`.
-
-Plus spacing (`--may-space-*`), radii (`--may-radius-*`), shadows
-(`--may-shadow-*`) and durations (`--may-duration-*`).
-
-## tint ≠ primary
-
-`--may-color-tint` and `--may-color-primary` are **not** the same token:
-
-- **tint** is brand-as-text — a link, a selected tab label.
-- **primary** is brand-as-fill — a filled button, a selection pill.
-
-Collapsing them is what makes a ported Apple palette look wrong. Keep them
-distinct in your own markup too.
-
-## Re-pointing the accent
-
-`accent` on the provider re-points the tint:
+Pass the document style nonce to the outer provider. With streaming SSR, pass
+the same style nonce to React's renderer so managed resources receive it:
 
 ```tsx
-<MayProvider theme="system" accent="purple">
+const app = <MayProvider styleNonce={nonce}><App /></MayProvider>
+
+renderToPipeableStream(app, {
+  nonce: { style: nonce },
+  onAllReady() { /* pipe the response */ },
+})
 ```
 
-## Overriding tokens
+Nested providers inherit the outer nonce.
 
-Tokens are plain custom properties, so you can override any of them on a scope:
+## Breaking migration
 
-```css
-.my-brand {
-  --may-color-tint: var(--may-teal);
-  --may-radius-lg: 20px;
-}
-```
+| Before | Now |
+|---|---|
+| `import '@adit_firdaus/may-ui/styles.css'` | Remove it |
+| `theme="dark"` | `theme={{ mode: 'dark' }}` |
+| `accent="purple"` | `theme={{ tokens: { colorTint: 'purple', colorPrimary: 'purple' } }}` |
+| `useMayTheme().setTheme(...)` | Store mode in application state |
+| `<MayHost />` | Remove it; configure `MayProvider.host` |
 
-Everything under `.my-brand` picks it up. The generators
-(`scripts/gen-tokens.mjs`) are the source of the defaults — never edit the
-generated `src/styles/tokens.css` by hand.
+The internal generated CSS remains the browser-facing implementation of media
+queries, pseudo-elements, and motion. Consumers receive it only through React
+resources; the package emits no stylesheet asset.

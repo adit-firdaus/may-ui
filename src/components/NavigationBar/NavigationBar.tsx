@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react'
 import { IoChevronBack } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
-import './NavigationBar.css'
 
 export interface NavigationBarProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
   /** The view's title. Shown inline, and again as the large title when asked. */

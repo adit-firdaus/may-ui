@@ -6,8 +6,8 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5'
 import { useState } from 'react'
-import { Menu } from './Menu'
-import type { MenuItem } from './Menu'
+import { Menu } from '.'
+import type { MenuItem } from '.'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 

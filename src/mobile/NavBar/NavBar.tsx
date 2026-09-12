@@ -4,7 +4,6 @@ import { IoChevronBack } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import './NavBar.css'
 
 export interface NavBarProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
   /** Centre title. Truncates rather than wrapping — a nav bar is one line tall. */

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
   MayProvider,
-  MayHost,
   Stack,
   Text,
   Switch,
@@ -75,8 +74,7 @@ export function App() {
   }
 
   return (
-    <MayProvider theme={dark ? 'dark' : 'light'}>
-      <MayHost />
+    <MayProvider theme={{ mode: dark ? 'dark' : 'light' }}>
       <div style={{ display: 'flex', height: '100dvh', background: 'var(--may-color-bg)' }}>
         {isDesktop && (
           <Sidebar

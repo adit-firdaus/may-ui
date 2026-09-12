@@ -36,7 +36,8 @@ verify chain plus a look in Storybook is how you show a change works.
 
 ## Generated files
 
-`src/styles/tokens.css` and `src/styles/motion.css` are **build output**. Never
+`src/styles/tokens.css`, `src/styles/tokens.generated.ts`, and
+`src/styles/motion.css` are **build output**. Never
 edit them by hand — change `scripts/gen-tokens.mjs` / `scripts/gen-springs.mjs`
 and run `npm run generate`.
 
@@ -44,7 +45,8 @@ and run `npm run generate`.
 
 1. `src/components/<Name>/` with `<Name>.tsx`, `<Name>.css`, `<Name>.stories.tsx`,
    `index.ts` (or `src/desktop/` / `src/mobile/` for a dedicated family).
-2. Import the CSS from the `.tsx` so the bundler picks it up.
+2. In `index.ts`, import the CSS with `?inline`, create a `mayStyleSheet`, and
+   export the implementation through `withMayStyles`.
 3. Class names are `may-<component>` with `__element` and `--modifier` (BEM).
 4. Style from tokens only — no literal colours, spacings, radii or shadows.
 5. Draw glyphs with `react-icons/io5`, sized in CSS against

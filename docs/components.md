@@ -20,7 +20,7 @@ bundle — each family is a separate entry.
 
 | Group | Components |
 |---|---|
-| Foundation | `MayProvider`, `MayHost`, `useMayTheme`, `PlatformProvider`, `usePlatform`, `useIsDesktop` |
+| Foundation | `MayProvider`, `useMayConfig`, `useMayTheme`, `useMayTokens`, `PlatformProvider`, `usePlatform`, `useIsDesktop` |
 | Layout | `Box`, `Stack`, `Grid`, `Separator`, `SafeArea`, `ScrollArea` |
 | Typography | `Heading`, `Text`, `Label`, `Kbd` |
 | Actions | `Button`, `IconButton`, `ButtonGroup`, `Fab`, `Toolbar`, `ToolbarSpacer` |
@@ -73,8 +73,7 @@ hand has none, and would either lose the adaptive shape or have to rebuild it.
 
 ## Toasts and imperative surfaces
 
-Toasts, and dialogs opened from code, render through the single `MayHost` you
-mount at the root:
+Toasts render through the host mounted by the outer `MayProvider`:
 
 ```tsx
 import { toast } from '@adit_firdaus/may-ui'

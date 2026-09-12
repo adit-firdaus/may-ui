@@ -1,7 +1,6 @@
 import type { CSSProperties, HTMLAttributes } from 'react'
 import { cx } from '../../utils/cx'
 import type { MaySize, MayTone } from '../../types'
-import './Spinner.css'
 
 export interface SpinnerProps extends HTMLAttributes<HTMLSpanElement> {
   /**

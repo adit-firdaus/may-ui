@@ -2,7 +2,6 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
-import './List.css'
 
 export interface ListProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode

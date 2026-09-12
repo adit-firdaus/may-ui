@@ -2,7 +2,6 @@ import type { CSSProperties, ElementType, HTMLAttributes, ReactNode } from 'reac
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
 import type { MayTextStyle } from '../../types'
-import './Text.css'
 
 /**
  * Tone is a role, not a colour. `secondary` and `tertiary` are Apple's label

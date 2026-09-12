@@ -6,12 +6,7 @@
  * component. Asserting them here means a regression fails the build instead of
  * quietly shipping.
  */
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-
-const here = dirname(fileURLToPath(import.meta.url))
-const css = readFileSync(resolve(here, '../dist/mayui.css'), 'utf8')
+import { builtCss as css } from './built-styles.mjs'
 
 /** Strip every @media (hover: hover) block, so what remains is unguarded. */
 function stripHoverGuards(source) {

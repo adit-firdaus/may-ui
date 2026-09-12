@@ -35,7 +35,6 @@ import { SearchBar } from '../mobile/SearchBar'
 import { Selector } from '../mobile/Selector'
 import { SwipeAction } from '../mobile/SwipeAction'
 import { TabBar } from '../mobile/TabBar'
-import './CatalogMobile.css'
 
 /**
  * Every component in `mayui/mobile`, once, on one page.

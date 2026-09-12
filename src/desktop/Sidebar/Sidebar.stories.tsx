@@ -11,7 +11,7 @@ import {
   IoStarOutline,
   IoTrashOutline,
 } from 'react-icons/io5'
-import { Sidebar, SidebarItem, SidebarSection, SidebarToggle } from './Sidebar'
+import { Sidebar, SidebarItem, SidebarSection, SidebarToggle } from '.'
 
 const meta = {
   title: 'Catalog/Desktop/Sidebar',

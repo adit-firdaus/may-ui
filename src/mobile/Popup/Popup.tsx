@@ -5,8 +5,6 @@ import { Sheet } from '../../components/Sheet'
  * type-only import is erased at compile time — Storybook would then code-split
  * Sheet.css away and render the popup unstyled. It also fixes the cascade
  * order, so Popup.css (imported below) always lands after the rules it pins. */
-import '../../components/Sheet/Sheet.css'
-import './Popup.css'
 
 export interface PopupProps {
   /** Phone-shaped naming for what `Sheet` calls `open`. */

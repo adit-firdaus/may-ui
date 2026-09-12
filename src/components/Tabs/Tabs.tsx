@@ -21,7 +21,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { applyThumb, geometryFor } from '../../motion/sliding-thumb'
 import type { MaySize } from '../../types'
-import './Tabs.css'
 
 /**
  * `underline` is the bar that rides under the selected tab — the macOS/iPadOS

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Badge } from './Badge'
-import { Button } from '../Button/Button'
-import { List, ListRow } from '../List/List'
+import { Badge } from '.'
+import { Button } from '../Button'
+import { List, ListRow } from '../List'
 
 const meta = {
   title: 'Catalog/Adaptive/Badge',

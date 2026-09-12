@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useEffect, useState } from 'react'
-import { CircularProgress, Progress } from './Progress'
+import { CircularProgress, Progress } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Progress',

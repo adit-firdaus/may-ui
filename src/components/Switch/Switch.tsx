@@ -5,7 +5,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
 import { draggable } from '../../motion/gesture'
 import type { MaySize } from '../../types'
-import './Switch.css'
 
 /** No `xs`: below `sm` the thumb is too small to read as a physical object. */
 export type SwitchSize = Exclude<MaySize, 'xs'>

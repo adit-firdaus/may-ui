@@ -2,7 +2,6 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
 import { Children, createContext, isValidElement, useContext } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
-import './Descriptions.css'
 
 /**
  * Position of a row inside the grid, handed down so each row knows whether it

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Alert } from './Alert'
-import { Button } from '../Button/Button'
+import { Alert } from '.'
+import { Button } from '../Button'
 
 const meta = {
   title: 'Catalog/Adaptive/Alert',

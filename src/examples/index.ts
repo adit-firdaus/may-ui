@@ -10,8 +10,44 @@
  */
 
 import type { ComponentType, ReactNode } from 'react'
+import { mayStyleSheet, withMayStyles } from '../styles/runtime'
+import deviceFrameCss from './DeviceFrame.css?inline'
+import photosCss from './PhotosScreen.css?inline'
+import splitInboxCss from './SplitInboxScreen.css?inline'
+import catalogAdaptiveCss from './CatalogAdaptive.css?inline'
+import catalogMobileCss from './CatalogMobile.css?inline'
 
-export { DeviceFrame } from './DeviceFrame'
+import { DeviceFrame as DeviceFrameBase } from './DeviceFrame'
+import { PhotosScreen as PhotosScreenBase } from './PhotosScreen'
+import { SplitInboxScreen as SplitInboxScreenBase } from './SplitInboxScreen'
+import { CatalogAdaptive as CatalogAdaptiveBase } from './CatalogAdaptive'
+import { CatalogMobile as CatalogMobileBase } from './CatalogMobile'
+
+export const DeviceFrame = withMayStyles(
+  'DeviceFrame',
+  DeviceFrameBase,
+  [mayStyleSheet('DeviceFrame', deviceFrameCss)],
+)
+export const PhotosScreen = withMayStyles(
+  'PhotosScreen',
+  PhotosScreenBase,
+  [mayStyleSheet('PhotosScreen', photosCss)],
+)
+export const SplitInboxScreen = withMayStyles(
+  'SplitInboxScreen',
+  SplitInboxScreenBase,
+  [mayStyleSheet('SplitInboxScreen', splitInboxCss)],
+)
+export const CatalogAdaptive = withMayStyles(
+  'CatalogAdaptive',
+  CatalogAdaptiveBase,
+  [mayStyleSheet('CatalogAdaptive', catalogAdaptiveCss)],
+)
+export const CatalogMobile = withMayStyles(
+  'CatalogMobile',
+  CatalogMobileBase,
+  [mayStyleSheet('CatalogMobile', catalogMobileCss)],
+)
 export type { DeviceFrameProps } from './DeviceFrame'
 
 // Phone
@@ -19,7 +55,6 @@ export { SettingsScreen } from './SettingsScreen'
 export { MailInboxScreen } from './MailInboxScreen'
 export { MailDetailScreen } from './MailDetailScreen'
 export { NowPlayingScreen } from './NowPlayingScreen'
-export { PhotosScreen } from './PhotosScreen'
 export { ProfileScreen } from './ProfileScreen'
 export { NotificationsScreen } from './NotificationsScreen'
 export { CheckoutScreen } from './CheckoutScreen'
@@ -35,7 +70,6 @@ export { DataTableAdminScreen } from './DataTableAdminScreen'
 export { FileBrowserScreen } from './FileBrowserScreen'
 export { CommandPaletteScreen } from './CommandPaletteScreen'
 export { PreferencesScreen } from './PreferencesScreen'
-export { SplitInboxScreen } from './SplitInboxScreen'
 export { TeamScreen } from './TeamScreen'
 
 // Cross-cutting
@@ -45,15 +79,12 @@ export { StatesScreen } from './StatesScreen'
 export { OverlaysScreen } from './OverlaysScreen'
 
 // Catalogs
-export { CatalogAdaptive } from './CatalogAdaptive'
 export { CatalogDesktop } from './CatalogDesktop'
-export { CatalogMobile } from './CatalogMobile'
 
 import { SettingsScreen } from './SettingsScreen'
 import { MailInboxScreen } from './MailInboxScreen'
 import { MailDetailScreen } from './MailDetailScreen'
 import { NowPlayingScreen } from './NowPlayingScreen'
-import { PhotosScreen } from './PhotosScreen'
 import { ProfileScreen } from './ProfileScreen'
 import { NotificationsScreen } from './NotificationsScreen'
 import { CheckoutScreen } from './CheckoutScreen'
@@ -67,15 +98,12 @@ import { DataTableAdminScreen } from './DataTableAdminScreen'
 import { FileBrowserScreen } from './FileBrowserScreen'
 import { CommandPaletteScreen } from './CommandPaletteScreen'
 import { PreferencesScreen } from './PreferencesScreen'
-import { SplitInboxScreen } from './SplitInboxScreen'
 import { TeamScreen } from './TeamScreen'
 import { AuthScreen } from './AuthScreen'
 import { FormShowcaseScreen } from './FormShowcaseScreen'
 import { StatesScreen } from './StatesScreen'
 import { OverlaysScreen } from './OverlaysScreen'
-import { CatalogAdaptive } from './CatalogAdaptive'
 import { CatalogDesktop } from './CatalogDesktop'
-import { CatalogMobile } from './CatalogMobile'
 
 export interface ExampleScreen {
   id: string

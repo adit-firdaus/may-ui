@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoPerson } from 'react-icons/io5'
-import { Input } from './Input'
-import { Field } from '../Field/Field'
+import { Input } from '.'
+import { Field } from '../Field'
 
 const meta = {
   title: 'Catalog/Adaptive/Input',

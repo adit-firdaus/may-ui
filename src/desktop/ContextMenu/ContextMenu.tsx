@@ -10,9 +10,8 @@ import { IoCheckmark, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { Kbd } from '../../components/Kbd/Kbd'
+import { Kbd } from '../../components/Kbd'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
-import './ContextMenu.css'
 
 /** Matches the exit transition in ContextMenu.css. */
 const EXIT_MS = 150
@@ -298,7 +297,7 @@ interface MenuPanelProps {
   closing?: boolean
   autoFocus: boolean
   label?: string
-  panelRef?: RefObject<HTMLDivElement>
+  panelRef?: RefObject<HTMLDivElement | null>
   onSelectAction: (item: ContextMenuAction) => void
   /** Tear the whole menu down — an item was chosen, or Tab left it. */
   onCloseAll: () => void

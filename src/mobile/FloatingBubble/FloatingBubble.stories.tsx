@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { IoAccessibility, IoCall, IoChatbubble } from 'react-icons/io5'
-import { FloatingBubble } from './FloatingBubble'
+import { FloatingBubble } from '.'
 import { List, ListRow } from '../../components/List'
 
 const RingIcon = () => <IoAccessibility aria-hidden />

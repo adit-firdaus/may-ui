@@ -8,7 +8,6 @@ import { Button } from '../Button'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
 import { useExitDelay } from '../Popover/Popover'
-import './AlertDialog.css'
 
 /** Matches the exit animation in AlertDialog.css. */
 const EXIT_MS = 150

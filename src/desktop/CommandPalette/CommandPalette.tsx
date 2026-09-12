@@ -8,9 +8,8 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
 import { useExitDelay } from '../../components/Popover/Popover'
-import { Kbd } from '../../components/Kbd/Kbd'
+import { Kbd } from '../../components/Kbd'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
-import './CommandPalette.css'
 
 /** Matches the exit transition in CommandPalette.css. */
 const EXIT_MS = 150

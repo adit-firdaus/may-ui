@@ -2,7 +2,6 @@ import type { CSSProperties, HTMLAttributes } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
 import type { MaySpaceStep } from '../Box/Box'
-import './Grid.css'
 
 export interface GridProps extends HTMLAttributes<HTMLDivElement> {
   /** Fixed number of equal columns. @default 1 */

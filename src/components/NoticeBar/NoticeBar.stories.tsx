@@ -6,8 +6,8 @@ import {
   IoLinkOutline,
 } from 'react-icons/io5'
 import { useState } from 'react'
-import { NoticeBar } from './NoticeBar'
-import { Button } from '../Button/Button'
+import { NoticeBar } from '.'
+import { Button } from '../Button'
 
 const meta = {
   title: 'Catalog/Adaptive/NoticeBar',

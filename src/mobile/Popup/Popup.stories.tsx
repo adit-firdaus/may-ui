@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { IoBookmarkOutline, IoCopyOutline, IoPrintOutline, IoWifiOutline } from 'react-icons/io5'
 import { Button } from '../../components/Button'
 import { List, ListRow } from '../../components/List'
-import { Popup } from './Popup'
+import { Popup } from '.'
 
 const meta = {
   title: 'Catalog/Mobile/Popup',

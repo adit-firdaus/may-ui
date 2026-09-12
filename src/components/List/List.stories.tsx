@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { List, ListRow } from './List'
+import { List, ListRow } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/List',

@@ -5,7 +5,7 @@ import {
   IoRadioOutline,
   IoSearchOutline,
 } from 'react-icons/io5'
-import { EmptyState } from './EmptyState'
+import { EmptyState } from '.'
 import { Button } from '../Button'
 import { Card } from '../Card'
 

@@ -5,7 +5,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
-import './CapsuleTabs.css'
 
 /** A gentle puff — the chips sit close, so the pill stays inside its lane. */
 const PRESS_SCALE = 1.1

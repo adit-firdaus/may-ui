@@ -12,7 +12,6 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
 import { IoCloseCircle, IoSearch } from 'react-icons/io5'
 import type { MaySize } from '../../types'
-import './SearchField.css'
 
 export type SearchFieldSize = Exclude<MaySize, 'xs'>
 

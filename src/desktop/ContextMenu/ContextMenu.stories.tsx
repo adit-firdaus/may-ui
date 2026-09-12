@@ -11,11 +11,11 @@ import {
   IoTimeOutline,
   IoTrashOutline,
 } from 'react-icons/io5'
-import { ContextMenu } from './ContextMenu'
-import type { ContextMenuEntry, ContextMenuProps } from './ContextMenu'
-import { List, ListRow } from '../../components/List/List'
-import { Avatar } from '../../components/Avatar/Avatar'
-import { Text } from '../../components/Text/Text'
+import { ContextMenu } from '.'
+import type { ContextMenuEntry, ContextMenuProps } from '.'
+import { List, ListRow } from '../../components/List'
+import { Avatar } from '../../components/Avatar'
+import { Text } from '../../components/Text'
 
 const ICON = {
   open: <IoOpenOutline aria-hidden />,

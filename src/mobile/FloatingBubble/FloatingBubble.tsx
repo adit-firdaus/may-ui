@@ -17,7 +17,6 @@ import type { MaySize, MayTone } from '../../types'
  * unstyled button.
  */
 import { Fab } from '../../components/Fab'
-import './FloatingBubble.css'
 
 /** Which edge the bubble parks on. Logical, so it mirrors under RTL. */
 export type BubbleEdge = 'start' | 'end'

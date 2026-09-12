@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
 import type { MaySize } from '../../types'
-import './Checkbox.css'
 
 /** No `xs`: the box would fall under the 44px touch target it has to fill. */
 export type CheckboxSize = Exclude<MaySize, 'xs'>

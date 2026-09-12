@@ -2,7 +2,6 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { forwardRef, useEffect, useState } from 'react'
 import { cx } from '../../utils/cx'
 import type { MaySize } from '../../types'
-import './Kbd.css'
 
 /**
  * Apple's modifier glyphs. Writing "Cmd" on a Mac is the same mistake as

@@ -7,123 +7,112 @@ npm install @adit_firdaus/may-ui
 # or: bun add @adit_firdaus/may-ui
 ```
 
-`react` and `react-dom` (18+) are peer dependencies.
-[`react-icons`](https://react-icons.github.io/react-icons/) is a dependency —
-May UI draws its glyphs from Ionicons (`react-icons/io5`) and keeps it external
-so your bundler tree-shakes it per icon.
+`react` and `react-dom` 19 are peer dependencies. May UI has no stylesheet to
+import: each component renders its own React stylesheet resource, which React
+hoists and de-duplicates. `react-icons` supplies the Ionicons glyph set and is
+the only non-peer runtime dependency.
 
-## Set up the root
+## Render a component
 
-Import the stylesheet once, wrap your tree in `MayProvider`, and mount `MayHost`
-once for imperative surfaces (toasts, dialogs opened from code):
+Components carry their built-in tokens and styles without a provider:
 
 ```tsx
-import '@adit_firdaus/may-ui/styles.css'
-import { MayProvider, MayHost, Card, CardTitle, Stack, Text, Button } from '@adit_firdaus/may-ui'
+import { Button, Card, CardTitle } from '@adit_firdaus/may-ui'
+
+export function Promote() {
+  return (
+    <Card>
+      <CardTitle>Production deploy</CardTitle>
+      <Button>Promote</Button>
+    </Card>
+  )
+}
+```
+
+Add `MayProvider` when the app needs shared theme, component defaults, routing,
+platform overrides, a CSP nonce, or imperative toasts. The outer provider
+mounts the toast host automatically.
+
+```tsx
+import { MayProvider, Stack, Text, Button } from '@adit_firdaus/may-ui'
 
 export function App() {
   return (
-    <MayProvider theme="system">
-      <MayHost />
+    <MayProvider
+      theme={{ mode: 'system' }}
+      components={{ Button: { size: 'lg' } }}
+      host={{ position: 'top-end', max: 4 }}
+    >
       <Stack gap={4}>
-        <Card>
-          <CardTitle>Production deploy</CardTitle>
-          <Text tone="secondary">All 14 health checks passed.</Text>
-          <Button>Promote</Button>
-        </Card>
+        <Text>All 14 health checks passed.</Text>
+        <Button>Promote</Button>
       </Stack>
     </MayProvider>
   )
 }
 ```
 
-`theme` is `'system'` (default), `'light'` or `'dark'` — see [Theming](theming.md).
+Use `host={false}` on a secondary sibling React root so only one root renders
+the global toast queue.
 
 ## Routing
 
-Anything that renders an `href` — `TabBar`, `Breadcrumb` — uses a plain `<a>` by
-default, which in an SPA is a full page reload. Give the provider your router's
-link component once and every one of them picks it up:
+Anything that renders an `href` uses a plain `<a>` by default. Supply a router
+link once for the configured subtree:
 
 ```tsx
 import { Link } from '@tanstack/react-router'
 
-// May emits `href`; adapt it to whatever prop your router takes.
 const RouterLink = ({ href, ...props }) => <Link to={href} {...props} />
 
 <MayProvider linkComponent={RouterLink}>…</MayProvider>
 ```
 
-For a single control rather than a whole tree, `Button`, `IconButton` and `Fab`
-take `asChild` and render their presentation onto your element instead:
+For one control, `Button`, `IconButton`, and `Fab` support `asChild`:
 
 ```tsx
-<Button asChild variant="filled">
+<Button asChild>
   <Link to="/albums">Open albums</Link>
 </Button>
 ```
 
-That keeps the real anchor, so middle-click, cmd-click and open-in-new-tab all
-still work.
+## Cascade and Tailwind
 
-## The stylesheet is a cascade layer
-
-`styles.css` ships wrapped in `@layer may-ui`. Unlayered CSS beats every layered
-rule whatever its specificity, so this is what lets a utility or an override at
-your call site win against a component's own rule — which is the way round most
-people expect:
-
-```jsx
-<Skeleton className="h-7" />   /* 28px: your utility wins */
-```
-
-Plain CSS of your own needs nothing: unlayered always beats layered.
-
-**With Tailwind**, layer order decides, and layers rank in the order they are
-first declared. Declare the order yourself so it cannot depend on import order:
+May UI resources live in `@layer may-ui`. Unlayered application CSS wins over
+them. Tailwind users can declare layer order without importing a May UI asset:
 
 ```css
-@layer theme, base, may-ui, components, utilities;   /* declare order first */
+@layer theme, base, may-ui, components, utilities;
 @import 'tailwindcss';
-@import '@adit_firdaus/may-ui/styles.css' layer(may-ui);
 ```
 
-With `may-ui` ahead of `utilities`, every Tailwind utility wins on a May
-component. Move it after `utilities` if you would rather May won.
-
-## The three entry points
+## Entry points
 
 ```tsx
-import { Button, Card, Tabs } from '@adit_firdaus/may-ui'          // adaptive
+import { Button, Card, Tabs } from '@adit_firdaus/may-ui'
 import { Sidebar, CommandPalette } from '@adit_firdaus/may-ui/desktop'
 import { TabBar, CapsuleTabs } from '@adit_firdaus/may-ui/mobile'
 ```
 
-Start with the adaptive family — those components reshape at the breakpoint on
-their own. Reach into `/desktop` or `/mobile` for shapes that only make sense on
-one. Importing `@adit_firdaus/may-ui` never pulls the desktop or mobile code into
-your bundle. More in [Components](components.md).
+Start with adaptive components. Desktop and mobile families are separate
+tree-shakable entries for shapes that do not have an honest adaptive form.
 
-## Styling your own markup
+## Styling custom React UI
 
-Every colour, space, radius, shadow and duration is a `--may-*` custom property,
-so your own elements can sit inside the same system without importing anything:
+Use `useMayTokens()` when custom markup should share the resolved theme without
+authoring CSS:
 
 ```tsx
-<div style={{
-  background: 'var(--may-color-surface)',
-  padding: 'var(--may-space-4)',
-  borderRadius: 'var(--may-radius-lg)',
-  color: 'var(--may-color-text)',
-}} />
+const tokens = useMayTokens()
+
+return (
+  <div style={{
+    background: tokens.colorSurface,
+    color: tokens.colorText,
+    borderRadius: tokens.radiusCard,
+    padding: tokens.space4,
+  }} />
+)
 ```
 
-Style against the **semantic** tokens (`--may-color-text`, not `--may-label`) so
-your markup follows the theme. The full token map is in [Theming](theming.md).
-
-## Next
-
-- [Theming](theming.md) — pin light/dark, scope a region, re-point the accent.
-- [Motion](motion.md) — the spring tokens and the gesture layer.
-- [Storybook](https://adit-firdaus.github.io/may-ui/storybook/) — props for every
-  component.
+See [Theming](theming.md) for token overrides, nesting, and migration details.

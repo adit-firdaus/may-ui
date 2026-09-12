@@ -1,6 +1,5 @@
 import type { CSSProperties, ComponentPropsWithoutRef, ElementType, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
-import './Box.css'
 
 /**
  * A step on the 4px spacing scale in tokens.css. The gaps in the sequence are

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Sheet } from './Sheet'
+import { Sheet } from '.'
 import { Button } from '../Button'
 import { List, ListRow } from '../List'
 

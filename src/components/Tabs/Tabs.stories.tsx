@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Tab, TabList, TabPanel, Tabs } from './Tabs'
+import { Tab, TabList, TabPanel, Tabs } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Tabs',

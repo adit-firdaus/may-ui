@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { ButtonGroup } from './ButtonGroup'
+import { ButtonGroup } from '.'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 

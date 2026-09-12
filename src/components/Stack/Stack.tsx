@@ -2,7 +2,6 @@ import type { CSSProperties, HTMLAttributes } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
 import type { MaySpaceStep } from '../Box/Box'
-import './Stack.css'
 
 export type StackDirection = 'row' | 'column'
 export type StackAlign = 'start' | 'center' | 'end' | 'stretch' | 'baseline'

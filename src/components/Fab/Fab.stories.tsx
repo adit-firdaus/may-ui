@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoAdd, IoCreate } from 'react-icons/io5'
-import { Fab } from './Fab'
+import { Fab } from '.'
 import { List, ListRow } from '../List'
 
 const meta = {

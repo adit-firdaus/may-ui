@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoCopyOutline, IoShareOutline, IoTrashOutline } from 'react-icons/io5'
 import { useRef, useState } from 'react'
-import { ActionSheet } from './ActionSheet'
+import { ActionSheet } from '.'
 import { Button } from '../Button'
 
 const meta = {

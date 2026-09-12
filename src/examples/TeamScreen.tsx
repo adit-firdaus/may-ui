@@ -24,7 +24,7 @@ import { Tag } from '../components/Tag'
 import { Text } from '../components/Text'
 import { Tooltip } from '../components/Tooltip'
 import { VisuallyHidden } from '../components/VisuallyHidden'
-import { MayHost, toast } from '../components/Toast'
+import { toast } from '../components/Toast'
 
 /**
  * The members page every team admin has seen: who is here, what they can do,
@@ -36,8 +36,7 @@ import { MayHost, toast } from '../components/Toast'
  *    It narrows the *set*; the per-column filters inside the table narrow the
  *    *rows*, and keeping those two jobs on different controls is what stops an
  *    admin page turning into a wall of dropdowns.
- *  - `toast()` is imperative, so `<MayHost />` is mounted once at the bottom of
- *    the screen. Without it the calls are silent.
+ *  - `toast()` is imperative and lands in the host mounted by MayProvider.
  *  - Every destructive action lives behind a `Menu`, never in the row itself.
  */
 
@@ -389,8 +388,6 @@ export function TeamScreen() {
         </div>
       </Modal>
 
-      {/* One mount point for every imperative surface on the screen. */}
-      <MayHost />
     </div>
   )
 }

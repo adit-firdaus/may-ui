@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import type { MayTextStyle } from '../../types'
-import { Text } from './Text'
+import { Text } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Text',

@@ -1,7 +1,6 @@
 import type { CSSProperties, HTMLAttributes } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
-import './ScrollArea.css'
 
 export type ScrollAxis = 'vertical' | 'horizontal' | 'both'
 

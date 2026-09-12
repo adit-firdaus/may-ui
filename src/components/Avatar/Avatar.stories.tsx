@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Avatar, AvatarGroup } from './Avatar'
-import { List, ListRow } from '../List/List'
+import { Avatar, AvatarGroup } from '.'
+import { List, ListRow } from '../List'
 
 const meta = {
   title: 'Catalog/Adaptive/Avatar',

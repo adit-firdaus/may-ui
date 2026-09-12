@@ -5,9 +5,9 @@ import { useIsDesktop } from '../../hooks/useIsDesktop'
  * A value import: the host renders real `<Toast>` elements, so pulling the
  * component in as a value is what keeps Toast.css in the bundle beside it.
  */
-import { Toast, dismiss, setToastLimit, useToast } from '../Toast/Toast'
+import { Toast } from '../Toast'
+import { dismiss, registerToastHost, setToastLimit, useToast } from '../Toast/Toast'
 import type { ToastPosition, ToastRecord } from '../Toast/Toast'
-import './MayHost.css'
 
 export interface MayHostProps {
   /**
@@ -32,10 +32,7 @@ export interface MayHostProps {
 /**
  * The mount point for imperative surfaces. Render it once, near the root:
  *
- *   <MayProvider>
- *     <App />
- *     <MayHost />
- *   </MayProvider>
+ * MayProvider mounts this internal host once for the outermost configured tree.
  *
  * Today it owns the toast viewport. It exists as its own component — rather
  * than as a `<Toaster>` — because everything imperative eventually needs the
@@ -56,6 +53,8 @@ export function MayHost({
 }: MayHostProps) {
   const { toasts } = useToast()
   const isDesktop = useIsDesktop()
+
+  useEffect(() => registerToastHost(), [])
 
   // The store owns the cap: dropping the oldest has to happen when a toast is
   // queued, not when it is rendered.

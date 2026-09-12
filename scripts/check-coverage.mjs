@@ -26,7 +26,6 @@ const examplesDir = join(root, 'src/examples')
  */
 const EXEMPT = new Set([
   'MayProvider', // supplied by the Storybook decorator and the gallery root
-  'MayHost', // mounted once by the gallery; only the Overlays screen needs its own
   'VisuallyHidden', // invisible by definition
   'SafeArea', // a spacer; the DeviceFrame demonstrates the inset mechanism
   'ScrollArea', // used via data-slot on plain divs throughout

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoArchiveOutline, IoArrowUndoOutline, IoFlagOutline } from 'react-icons/io5'
-import { Tooltip } from './Tooltip'
+import { Tooltip } from '.'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 

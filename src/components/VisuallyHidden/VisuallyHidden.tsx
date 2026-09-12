@@ -1,7 +1,6 @@
 import type { HTMLAttributes, Ref } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
-import './VisuallyHidden.css'
 
 export interface VisuallyHiddenProps extends HTMLAttributes<HTMLElement> {
   /**

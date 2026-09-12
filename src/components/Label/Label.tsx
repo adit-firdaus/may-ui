@@ -6,8 +6,6 @@ import type { TextTone, TextWeight } from '../Text/Text'
 // Value import: Label renders with Text's `.may-text` classes, and a type-only
 // import is erased at compile time — Storybook then code-splits the scale away
 // and the label renders unstyled.
-import '../Text/Text.css'
-import './Label.css'
 
 export interface LabelProps extends Omit<LabelHTMLAttributes<HTMLLabelElement>, 'color'> {
   children?: ReactNode

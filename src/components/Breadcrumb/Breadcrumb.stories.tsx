@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoFolderOutline } from 'react-icons/io5'
-import { Breadcrumb } from './Breadcrumb'
+import { Breadcrumb } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Breadcrumb',

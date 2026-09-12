@@ -3,7 +3,6 @@ import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
-import './Tag.css'
 
 /** A chip is a hair larger than a badge and a hair smaller than a button. */
 export type TagSize = Exclude<MaySize, 'xs'>

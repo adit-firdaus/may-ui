@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoChevronForward } from 'react-icons/io5'
-import { Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle } from './Card'
+import { Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle } from '.'
 import { Button } from '../Button'
 import { List, ListRow } from '../List'
 

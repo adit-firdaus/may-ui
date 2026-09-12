@@ -134,7 +134,7 @@ for (const { name, Comp, family } of targets) {
   if (name === 'MayProvider' || name === 'MayHost') continue
   try {
     const node = CONTEXT[name] ? CONTEXT[name]() : h(Comp, PROPS[name] ?? {})
-    const html = renderToStaticMarkup(h(Adaptive.MayProvider, { theme: 'light' }, node))
+    const html = renderToStaticMarkup(h(Adaptive.MayProvider, { theme: { mode: 'light' } }, node))
     const body = html.replace(/^.*?may-root[^>]*>/, '')
     rendered.push({ name, family, html: body, hasSlot: /data-slot="/.test(body), empty: body.replace(/<\/div>$/, '').trim() === '' })
   } catch (err) {
@@ -143,7 +143,7 @@ for (const { name, Comp, family } of targets) {
 }
 
 console.log(`exports scanned: adaptive ${collect(Adaptive, 'a').length}, desktop ${collect(Desktop, 'd').length}, mobile ${collect(Mobile, 'm').length}`)
-console.log(`rendered: ${rendered.length}/${targets.length - 2}`)
+console.log(`rendered: ${rendered.length}/${targets.length - 1}`)
 
 if (failures.length) {
   console.log(`\nRENDER FAILURES (${failures.length}):`)
@@ -174,7 +174,7 @@ const renderFailed = failures.length + noSlot.length
 
 const html = (name, props) =>
   renderToStaticMarkup(
-    h(Adaptive.MayProvider, { theme: 'light' }, CONTEXT[name] ? CONTEXT[name]() : h(
+    h(Adaptive.MayProvider, { theme: { mode: 'light' } }, CONTEXT[name] ? CONTEXT[name]() : h(
       Adaptive[name] ?? Desktop[name] ?? Mobile[name],
       props ?? PROPS[name] ?? {},
     )),

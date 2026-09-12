@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { IoLocation, IoPerson } from 'react-icons/io5'
-import { Tag } from './Tag'
-import { Button } from '../Button/Button'
+import { Tag } from '.'
+import { Button } from '../Button'
 
 const meta = {
   title: 'Catalog/Adaptive/Tag',

@@ -11,7 +11,6 @@ import { IoCloseCircle, IoSearch } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize } from '../../types'
-import './SearchBar.css'
 
 export type SearchBarSize = Exclude<MaySize, 'xs'>
 

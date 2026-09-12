@@ -8,7 +8,6 @@ import { duration, resolveCurve, spring } from '../../motion/springs'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import { Badge } from '../../components/Badge'
 import type { MayTone } from '../../types'
-import './TabBar.css'
 
 /** A whisper of a puff — the glyph's own pop carries most of the press. */
 const PRESS_SCALE = 1.06

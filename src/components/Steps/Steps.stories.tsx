@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Steps } from './Steps'
+import { Steps } from '.'
 
 const SETUP = [
   { title: 'Apple ID', description: 'Sign in to restore your apps and data.' },

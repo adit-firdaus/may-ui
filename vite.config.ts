@@ -3,40 +3,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
 
-/**
- * Ship the stylesheet inside a cascade layer.
- *
- * Unlayered rules beat every layered rule, whatever their specificity. Tailwind
- * v4 puts utilities in `@layer utilities`, so an unlayered May UI won every
- * collision on its own components — a consumer's `<Skeleton className="h-7" />`
- * measured 44px instead of 28px, because `.may-skeleton`'s height outranked
- * `.h-7`. That is backwards: a utility at the call site is the more specific
- * intent. Inside a layer, a consumer's unlayered CSS and any later layer both
- * win, which is what people expect.
- *
- * Applied to the emitted asset rather than the source because component CSS is
- * imported from each `.tsx`, so there is no single authored file to wrap.
- */
-function cssLayer(name: string) {
-  return {
-    name: 'may-css-layer',
-    enforce: 'post' as const,
-    generateBundle(_options: unknown, bundle: Record<string, { type: string; source?: string | Uint8Array }>) {
-      for (const [fileName, file] of Object.entries(bundle)) {
-        if (file.type !== 'asset' || !fileName.endsWith('.css')) continue
-        const text = typeof file.source === 'string' ? file.source : new TextDecoder().decode(file.source)
-        if (!text.trim() || text.startsWith('@layer')) continue
-        file.source = `@layer ${name}{${text}}`
-      }
-    },
-  }
-}
-
 export default defineConfig({
   plugins: [
     react(),
     dts({ include: ['src'], exclude: ['src/**/*.stories.tsx'], rollupTypes: true }),
-    cssLayer('may-ui'),
   ],
   build: {
     lib: {
@@ -69,12 +39,8 @@ export default defineConfig({
       // icon against their own copy. Inlining it would ship every glyph we use
       // AND duplicate whatever they already import.
       external: [/^react$/, 'react-dom', 'react/jsx-runtime', /^react-icons/],
-      output: {
-        assetFileNames: 'mayui.css',
-        globals: { react: 'React', 'react-dom': 'ReactDOM' },
-      },
+      output: { globals: { react: 'React', 'react-dom': 'ReactDOM' } },
     },
-    cssCodeSplit: false,
     sourcemap: true,
   },
 })

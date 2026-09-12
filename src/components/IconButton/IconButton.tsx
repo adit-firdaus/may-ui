@@ -12,8 +12,6 @@ import type { ButtonVariant } from '../Button/Button'
  * code-splits those rules away from anything that only ever renders an
  * IconButton — which paints an unstyled square.
  */
-import '../Button/Button.css'
-import './IconButton.css'
 
 export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
   /**

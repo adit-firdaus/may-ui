@@ -1,6 +1,5 @@
 import type { CSSProperties, HTMLAttributes } from 'react'
 import { cx } from '../../utils/cx'
-import './Skeleton.css'
 
 export type SkeletonVariant = 'text' | 'block' | 'circle'
 

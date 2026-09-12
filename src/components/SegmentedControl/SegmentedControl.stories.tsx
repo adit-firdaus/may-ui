@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { SegmentedControl } from './SegmentedControl'
+import { SegmentedControl } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/SegmentedControl',

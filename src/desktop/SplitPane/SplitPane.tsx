@@ -3,7 +3,6 @@ import { Children, useCallback, useEffect, useLayoutEffect, useRef, useState } f
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { RUBBER_MAX, draggable, projectFlick, rubber } from '../../motion/gesture'
-import './SplitPane.css'
 
 /**
  * `horizontal` splits the box left/right, so the divider itself is vertical.

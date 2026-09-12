@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { AlertDialog } from './AlertDialog'
+import { AlertDialog } from '.'
 import { Button } from '../Button'
 import { List, ListRow } from '../List'
 

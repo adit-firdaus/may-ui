@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { IoSunny, IoSunnyOutline, IoVolumeHigh, IoVolumeLow } from 'react-icons/io5'
 import { List, ListRow } from '../List'
-import { Slider } from './Slider'
+import { Slider } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/Slider',

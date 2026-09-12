@@ -7,9 +7,9 @@ import {
   IoMoon,
 } from 'react-icons/io5'
 import { useState } from 'react'
-import { Statistic } from './Statistic'
-import { IconTile } from '../IconTile/IconTile'
-import { Button } from '../Button/Button'
+import { Statistic } from '.'
+import { IconTile } from '../IconTile'
+import { Button } from '../Button'
 
 const meta = {
   title: 'Catalog/Adaptive/Statistic',

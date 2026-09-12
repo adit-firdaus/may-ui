@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { IoAdd, IoRemove } from 'react-icons/io5'
 import type { MaySize } from '../../types'
-import './Stepper.css'
 
 export interface StepperProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {

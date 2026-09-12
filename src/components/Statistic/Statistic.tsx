@@ -1,7 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { IoCaretUp } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
-import './Statistic.css'
 
 /** Which way the metric moved. `flat` is not "no delta" — it is "unchanged". */
 export type StatisticDirection = 'up' | 'down' | 'flat'

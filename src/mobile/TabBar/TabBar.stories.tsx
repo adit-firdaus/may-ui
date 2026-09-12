@@ -22,7 +22,7 @@ import {
   IoToday,
   IoTodayOutline,
 } from 'react-icons/io5'
-import { TabBar } from './TabBar'
+import { TabBar } from '.'
 import { IconButton } from '../../components/IconButton'
 import { List, ListRow } from '../../components/List'
 

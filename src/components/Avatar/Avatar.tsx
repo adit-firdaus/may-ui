@@ -3,7 +3,6 @@ import { Children, cloneElement, isValidElement, useEffect, useState } from 'rea
 import { IoPerson } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import type { MaySize } from '../../types'
-import './Avatar.css'
 
 /** xs–xl. `md` is exactly one touch target; the rest are proportions of it. */
 export type AvatarSize = MaySize | 'xl'

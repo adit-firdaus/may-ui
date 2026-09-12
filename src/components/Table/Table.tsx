@@ -10,8 +10,6 @@ import { List, ListRow } from '../List/List'
 // The collapsed shape IS List's markup, so List's stylesheet has to arrive as a
 // value import: a type-only import is erased at compile time and Storybook then
 // code-splits those rules away, rendering the phone layout unstyled.
-import '../List/List.css'
-import './Table.css'
 
 export interface TableColumn<T> {
   /** Column identity, and the property read off the record when there is no `render`. */

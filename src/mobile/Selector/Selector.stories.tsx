@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { IoBedOutline, IoBriefcaseOutline, IoMoonOutline, IoPersonOutline } from 'react-icons/io5'
-import { Selector } from './Selector'
-import type { SelectorOption } from './Selector'
+import { Selector } from '.'
+import type { SelectorOption } from '.'
 
 const FOCUS_MODES: SelectorOption[] = [
   { label: 'Do Not Disturb', value: 'dnd', icon: <IoMoonOutline aria-hidden /> },

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Heading } from './Heading'
-import { Text } from '../Text/Text'
+import { Heading } from '.'
+import { Text } from '../Text'
 
 const meta = {
   title: 'Catalog/Adaptive/Heading',

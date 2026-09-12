@@ -10,7 +10,6 @@ import {
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MayTone } from '../../types'
-import './Alert.css'
 
 // `title` here is a node, not the DOM's tooltip string, so the native one goes.
 export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {

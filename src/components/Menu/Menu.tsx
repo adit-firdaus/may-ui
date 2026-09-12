@@ -5,7 +5,6 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { Popover } from '../Popover'
 import type { PopoverPlacement } from '../Popover'
-import './Menu.css'
 
 /** How long a type-ahead buffer survives between keystrokes, in ms. */
 const TYPEAHEAD_RESET = 700

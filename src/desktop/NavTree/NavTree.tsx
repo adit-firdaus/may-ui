@@ -4,7 +4,6 @@ import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
-import './NavTree.css'
 
 export interface NavTreeNode {
   /** Stable across renders — selection, expansion and focus are all keyed on it. */

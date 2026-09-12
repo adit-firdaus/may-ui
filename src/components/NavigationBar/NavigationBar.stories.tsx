@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useRef } from 'react'
-import { Button } from '../Button/Button'
-import { NavigationBar } from './NavigationBar'
-import type { NavigationBarProps } from './NavigationBar'
+import { Button } from '../Button'
+import { NavigationBar } from '.'
+import type { NavigationBarProps } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/NavigationBar',

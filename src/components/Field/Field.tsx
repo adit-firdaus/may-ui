@@ -2,7 +2,6 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { createContext, useContext, useMemo } from 'react'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
-import './Field.css'
 
 /**
  * What a control inherits from the `<Field>` wrapped around it.

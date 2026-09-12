@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Collapsible } from './Collapsible'
+import { Collapsible } from '.'
 import { Button } from '../Button'
 import { Card } from '../Card'
 

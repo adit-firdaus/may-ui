@@ -12,7 +12,6 @@ import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import './Popover.css'
 
 /** Which edge of the anchor the panel sits against. */
 export type PopoverSide = 'top' | 'bottom' | 'left' | 'right'

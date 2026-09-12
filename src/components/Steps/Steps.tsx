@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
-import './Steps.css'
 
 /** The marker disc lifts a little under the press. Subtle — it wears a halo. */
 const PRESS_SCALE = 1.12

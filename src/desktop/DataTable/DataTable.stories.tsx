@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useMemo, useState } from 'react'
 import { IoCloudOutline } from 'react-icons/io5'
-import { DataTable } from './DataTable'
-import type { DataTableColumn, DataTableProps } from './DataTable'
-import { EmptyState } from '../../components/EmptyState/EmptyState'
-import { Button } from '../../components/Button/Button'
-import { Tag } from '../../components/Tag/Tag'
+import { DataTable } from '.'
+import type { DataTableColumn, DataTableProps } from '.'
+import { EmptyState } from '../../components/EmptyState'
+import { Button } from '../../components/Button'
+import { Tag } from '../../components/Tag'
 
 interface Backup {
   id: string

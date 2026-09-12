@@ -5,7 +5,6 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import type { MayTone } from '../../types'
-import './NoticeBar.css'
 
 export interface NoticeBarProps extends HTMLAttributes<HTMLDivElement> {
   /** The notice. Plain text — a marquee duplicates this node, so keep it inert. */

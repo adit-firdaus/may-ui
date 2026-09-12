@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useEffect, useRef } from 'react'
 import { IoTrashOutline } from 'react-icons/io5'
-import { MayHost } from './MayHost'
-import { dismissAll, toast, useToast } from '../Toast/Toast'
-import type { ToastPosition } from '../Toast/Toast'
+import { MayHost } from '.'
+import { dismissAll, toast, useToast } from '../Toast'
+import type { ToastPosition } from '../Toast'
 import { Button } from '../Button'
 
 const meta = {

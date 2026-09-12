@@ -4,7 +4,6 @@ import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
-import './Collapsible.css'
 
 export interface CollapsibleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onToggle'> {
   /** Controlled open state. Leave undefined to let the component own it. */

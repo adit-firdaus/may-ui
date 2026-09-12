@@ -3,7 +3,6 @@ import { forwardRef, useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useFieldControl } from '../Field/Field'
 import type { MaySize } from '../../types'
-import './Input.css'
 
 /** No `xs`: a 32px text field is under the touch target and unreadable on a phone. */
 export type InputSize = Exclude<MaySize, 'xs'>

@@ -1,9 +1,12 @@
 import type { Decorator, Preview } from '@storybook/react'
 import { MayProvider } from '../src/components/MayProvider'
-import '../src/styles/index.css'
 
 const withMay: Decorator = (Story, context) => (
-  <MayProvider theme={context.globals.theme ?? 'light'} inline>
+  <MayProvider
+    theme={{ mode: context.globals.theme ?? 'light' }}
+    host={context.title === 'Catalog/Adaptive/MayHost' ? false : undefined}
+    inline
+  >
     <div style={{ padding: 24, minHeight: '100%' }}>
       <Story />
     </div>

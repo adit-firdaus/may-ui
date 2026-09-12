@@ -68,9 +68,9 @@ export interface SlidingThumbOptions {
 
 export interface SlidingThumbApi<T extends HTMLElement, I extends HTMLElement> {
   /** The positioned track the thumb is measured against and laid out in. */
-  trackRef: RefObject<T>
+  trackRef: RefObject<T | null>
   /** The 1px thumb element. */
-  thumbRef: RefObject<HTMLSpanElement>
+  thumbRef: RefObject<HTMLSpanElement | null>
   /** Ref callback for item `index`. Stable across renders. */
   registerItem: (index: number) => (node: I | null) => void
   /** Spread onto the track. Starts the gesture. */

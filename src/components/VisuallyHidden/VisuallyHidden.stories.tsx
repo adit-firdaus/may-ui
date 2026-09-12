@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IoCheckmark, IoCreateOutline } from 'react-icons/io5'
-import { VisuallyHidden } from './VisuallyHidden'
+import { VisuallyHidden } from '.'
 
 const meta = {
   title: 'Catalog/Adaptive/VisuallyHidden',

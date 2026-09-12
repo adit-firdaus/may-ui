@@ -16,7 +16,6 @@ import { Separator } from '../components/Separator'
 import { Text } from '../components/Text'
 import { Toolbar, ToolbarSpacer } from '../components/Toolbar'
 import { VisuallyHidden } from '../components/VisuallyHidden'
-import './SplitInboxScreen.css'
 
 /**
  * Mail's desktop shape: a message list beside the message it is showing.

@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
-import './Pagination.css'
 
 /** The key lifts a little under the press, the way a segmented thumb does. */
 const PRESS_SCALE = 1.14

@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
-import './SegmentedControl.css'
 
 /*
  * How much the thumb puffs while held — the primitive's own default, and the

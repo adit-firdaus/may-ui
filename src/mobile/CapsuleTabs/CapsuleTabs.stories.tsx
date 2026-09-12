@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { CapsuleTabs } from './CapsuleTabs'
+import { CapsuleTabs } from '.'
 import { List, ListRow } from '../../components/List'
 
 const meta = {

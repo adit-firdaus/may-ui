@@ -1,7 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { forwardRef } from 'react'
 import { cx } from '../../utils/cx'
-import './Separator.css'
 
 export type SeparatorOrientation = 'horizontal' | 'vertical'
 

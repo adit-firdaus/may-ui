@@ -4,7 +4,6 @@ import { cx } from '../../utils/cx'
 import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
-import './Button.css'
 
 /**
  * `filled` for the one primary action, `tinted` for secondary (a wash of the
