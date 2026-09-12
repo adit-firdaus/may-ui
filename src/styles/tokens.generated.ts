@@ -46,6 +46,19 @@ export interface MayTokens {
   readonly controlHSm: MayTokenValue
   readonly controlHXs: MayTokenValue
   readonly cyan: MayTokenValue
+  readonly durationFast: MayTokenValue
+  readonly durationFollow: MayTokenValue
+  readonly durationInstant: MayTokenValue
+  readonly durationSettle: MayTokenValue
+  readonly durationSheetIn: MayTokenValue
+  readonly durationSheetOut: MayTokenValue
+  readonly easeBack: MayTokenValue
+  readonly easeBounce: MayTokenValue
+  readonly easeElastic: MayTokenValue
+  readonly easeExpo: MayTokenValue
+  readonly easeOut: MayTokenValue
+  readonly easeSheet: MayTokenValue
+  readonly easeStandard: MayTokenValue
   readonly fillPrimary: MayTokenValue
   readonly fillQuaternary: MayTokenValue
   readonly fillSecondary: MayTokenValue
@@ -134,6 +147,14 @@ export interface MayTokens {
   readonly space5: MayTokenValue
   readonly space6: MayTokenValue
   readonly space8: MayTokenValue
+  readonly springBouncy: MayTokenValue
+  readonly springBouncyDuration: MayTokenValue
+  readonly springPlayful: MayTokenValue
+  readonly springPlayfulDuration: MayTokenValue
+  readonly springSmooth: MayTokenValue
+  readonly springSmoothDuration: MayTokenValue
+  readonly springSnappy: MayTokenValue
+  readonly springSnappyDuration: MayTokenValue
   readonly tabBarSpace: MayTokenValue
   readonly tabbarH: MayTokenValue
   readonly teal: MayTokenValue
@@ -233,6 +254,19 @@ export const mayTokenCssNames = {
   controlHSm: 'control-h-sm',
   controlHXs: 'control-h-xs',
   cyan: 'cyan',
+  durationFast: 'duration-fast',
+  durationFollow: 'duration-follow',
+  durationInstant: 'duration-instant',
+  durationSettle: 'duration-settle',
+  durationSheetIn: 'duration-sheet-in',
+  durationSheetOut: 'duration-sheet-out',
+  easeBack: 'ease-back',
+  easeBounce: 'ease-bounce',
+  easeElastic: 'ease-elastic',
+  easeExpo: 'ease-expo',
+  easeOut: 'ease-out',
+  easeSheet: 'ease-sheet',
+  easeStandard: 'ease-standard',
   fillPrimary: 'fill-primary',
   fillQuaternary: 'fill-quaternary',
   fillSecondary: 'fill-secondary',
@@ -321,6 +355,14 @@ export const mayTokenCssNames = {
   space5: 'space-5',
   space6: 'space-6',
   space8: 'space-8',
+  springBouncy: 'spring-bouncy',
+  springBouncyDuration: 'spring-bouncy-duration',
+  springPlayful: 'spring-playful',
+  springPlayfulDuration: 'spring-playful-duration',
+  springSmooth: 'spring-smooth',
+  springSmoothDuration: 'spring-smooth-duration',
+  springSnappy: 'spring-snappy',
+  springSnappyDuration: 'spring-snappy-duration',
   tabBarSpace: 'tab-bar-space',
   tabbarH: 'tabbar-h',
   teal: 'teal',
@@ -420,6 +462,19 @@ export const mayLightTokens = {
   controlHSm: "calc(var(--may-control-h) - 0.5rem)",
   controlHXs: "calc(var(--may-control-h) - 0.75rem)",
   cyan: "#32ade6",
+  durationFast: "150ms",
+  durationFollow: "90ms",
+  durationInstant: "80ms",
+  durationSettle: "340ms",
+  durationSheetIn: "500ms",
+  durationSheetOut: "300ms",
+  easeBack: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  easeBounce: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  easeElastic: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  easeExpo: "cubic-bezier(0.16, 1, 0.3, 1)",
+  easeOut: "cubic-bezier(0, 0, 0.2, 1)",
+  easeSheet: "cubic-bezier(0.32, 0.72, 0, 1)",
+  easeStandard: "cubic-bezier(0.25, 0.1, 0.25, 1)",
   fillPrimary: "rgba(120, 120, 128, 0.2)",
   fillQuaternary: "rgba(116, 116, 128, 0.08)",
   fillSecondary: "rgba(120, 120, 128, 0.16)",
@@ -508,6 +563,14 @@ export const mayLightTokens = {
   space5: "1.25rem",
   space6: "1.5rem",
   space8: "2rem",
+  springBouncy: "cubic-bezier(0.34, 1.4, 0.64, 1)",
+  springBouncyDuration: "767ms",
+  springPlayful: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  springPlayfulDuration: "987ms",
+  springSmooth: "cubic-bezier(0.32, 0.72, 0, 1)",
+  springSmoothDuration: "683ms",
+  springSnappy: "cubic-bezier(0.2, 0, 0.2, 1)",
+  springSnappyDuration: "475ms",
   tabBarSpace: "calc( var(--may-tabbar-h) + var(--may-inset-bottom) + var(--may-space-4) * 2 )",
   tabbarH: "3.25rem",
   teal: "#30b0c7",
@@ -607,6 +670,19 @@ export const mayDarkTokens = {
   controlHSm: "calc(var(--may-control-h) - 0.5rem)",
   controlHXs: "calc(var(--may-control-h) - 0.75rem)",
   cyan: "#64d2ff",
+  durationFast: "150ms",
+  durationFollow: "90ms",
+  durationInstant: "80ms",
+  durationSettle: "340ms",
+  durationSheetIn: "500ms",
+  durationSheetOut: "300ms",
+  easeBack: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  easeBounce: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  easeElastic: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  easeExpo: "cubic-bezier(0.16, 1, 0.3, 1)",
+  easeOut: "cubic-bezier(0, 0, 0.2, 1)",
+  easeSheet: "cubic-bezier(0.32, 0.72, 0, 1)",
+  easeStandard: "cubic-bezier(0.25, 0.1, 0.25, 1)",
   fillPrimary: "rgba(120, 120, 128, 0.36)",
   fillQuaternary: "rgba(116, 116, 128, 0.18)",
   fillSecondary: "rgba(120, 120, 128, 0.32)",
@@ -695,6 +771,14 @@ export const mayDarkTokens = {
   space5: "1.25rem",
   space6: "1.5rem",
   space8: "2rem",
+  springBouncy: "cubic-bezier(0.34, 1.4, 0.64, 1)",
+  springBouncyDuration: "767ms",
+  springPlayful: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  springPlayfulDuration: "987ms",
+  springSmooth: "cubic-bezier(0.32, 0.72, 0, 1)",
+  springSmoothDuration: "683ms",
+  springSnappy: "cubic-bezier(0.2, 0, 0.2, 1)",
+  springSnappyDuration: "475ms",
   tabBarSpace: "calc( var(--may-tabbar-h) + var(--may-inset-bottom) + var(--may-space-4) * 2 )",
   tabbarH: "3.25rem",
   teal: "#40c8e0",

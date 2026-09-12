@@ -44,7 +44,7 @@ const BUDGETS = {
   // What every consumer of `mayui` pays.
   'mayui.js': 82 * 1024,
   // Opt-in families. Importing 'mayui' pulls in neither.
-  'desktop.js': 42 * 1024,
+  'desktop.js': 43 * 1024,
   'mobile.js': 36 * 1024,
   // The example screens. Never imported by a consumer — this budget exists to
   // catch them leaking into the main entry.

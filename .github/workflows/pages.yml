@@ -1,5 +1,4 @@
-# Builds the live playground and deploys it to GitHub Pages:
-#   the examples gallery at the site root, Storybook under /storybook.
+# Builds the unified site and deploys it with Storybook under /storybook.
 name: Pages
 
 on:
@@ -27,19 +26,16 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Build the examples gallery
-        run: npm run examples:build
+      - name: Build the unified site
+        run: npm run site:build
       - name: Build Storybook
         run: npm run build-storybook
-      - name: Build the docs
-        run: npm run docs:build
-      - name: Assemble the site (gallery /, Storybook /storybook, docs /docs)
+      - name: Assemble the site (unified site /, Storybook /storybook)
         run: |
           rm -rf _site
-          mkdir -p _site/storybook _site/docs
+          mkdir -p _site/storybook
           cp -r examples/dist/. _site/
           cp -r storybook-static/. _site/storybook/
-          cp -r docs-site/. _site/docs/
           cp llms.txt _site/llms.txt
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

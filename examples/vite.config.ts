@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { copyFileSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -19,10 +19,20 @@ const { version } = JSON.parse(
 export default defineConfig(({ command }) => ({
   define: { __MAY_VERSION__: JSON.stringify(version) },
   root: __dirname,
-  // The gallery is deployed to GitHub Pages under the repo path. Only the
+  // The unified site is deployed to GitHub Pages under the repo path. Only the
   // production build takes the sub-path; the dev server stays at '/'.
   base: command === 'build' ? '/may-ui/' : '/',
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'may-site-clean-route-fallback',
+      closeBundle() {
+        if (command === 'build') {
+          copyFileSync(resolve(__dirname, 'dist/index.html'), resolve(__dirname, 'dist/404.html'))
+        }
+      },
+    },
+  ],
   resolve: {
     alias: { '@adit_firdaus/may-ui': resolve(__dirname, '../src') },
   },
@@ -43,5 +53,5 @@ export default defineConfig(({ command }) => ({
      */
     allowedHosts: ['.ts.net'],
   },
-  build: { outDir: 'dist', emptyOutDir: true },
+  build: { outDir: 'dist', emptyOutDir: true, manifest: true },
 }))

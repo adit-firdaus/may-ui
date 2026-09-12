@@ -14,7 +14,7 @@
 
 ## Live
 
-- [Examples gallery](https://adit-firdaus.github.io/may-ui/): composed app screens, adaptive phone→desktop
+- [Website and catalog](https://adit-firdaus.github.io/may-ui/): interactive components, provider configuration, docs, and composed patterns
 - [Storybook](https://adit-firdaus.github.io/may-ui/storybook/): every component with its props and states
 
 ## Contributing

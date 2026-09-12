@@ -2,10 +2,10 @@
   "name": "mayui-examples",
   "private": true,
   "type": "module",
-  "description": "Gallery of May UI example screens. Not published — it exists to browse the examples outside Storybook.",
+  "description": "The unified May UI documentation, component catalog, patterns, and provider playground.",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "npm --prefix .. run site",
+    "build": "npm --prefix .. run site:build",
+    "preview": "npm --prefix .. run site:preview"
   }
 }

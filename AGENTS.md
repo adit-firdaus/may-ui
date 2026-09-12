@@ -99,7 +99,7 @@ fix(pages): drop vite-plugin-dts from the Storybook build
 | `src/motion/` | The runtime motion layer — springs, gestures, `useSlidingThumb`, `sliding-thumb.ts` |
 | `src/styles/` | React style-resource runtime, `base.css`, and generated token/motion artifacts |
 | `scripts/` | Token/spring generators and the `check:*` gates |
-| `examples/` | The example-screen gallery (a Vite app that builds against `src`) |
+| `examples/` | Unified website, docs, catalog, patterns, and provider playground |
 | `.storybook/` | Storybook config (the component workshop) |
 
 ## Commands
@@ -107,9 +107,9 @@ fix(pages): drop vite-plugin-dts from the Storybook build
 ```bash
 npm run dev        # Vite playground
 npm run storybook  # component workshop
-npm run examples   # example-screen gallery
+npm run site       # unified website, catalog, patterns and playground
+npm run examples   # alias for npm run site
 npm run generate   # regenerate tokens.css + motion.css
 npm run build      # library build (four entries) + types
-npm run verify     # the gate: typecheck, smoke, tokens, contract, size, coverage
-npm run docs:build # render docs/*.md to docs-site/ (for the Pages site)
+npm run verify     # library gates plus unified site build and catalog checks
 ```

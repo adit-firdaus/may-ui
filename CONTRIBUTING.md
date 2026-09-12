@@ -8,7 +8,7 @@ Thanks for helping. This is the human guide; coding agents should read
 ```bash
 npm install
 npm run storybook    # the component workshop, on :6006
-npm run examples     # the example-screen gallery
+npm run site         # unified website, catalog, patterns and playground
 ```
 
 ## The gate
@@ -82,6 +82,6 @@ dropping the bullet.
 
 ## Docs
 
-Prose docs live in [`docs/`](docs/). The on-site render is built by
-`npm run docs:build` (into `docs-site/`) and deployed to the Pages site by CI —
-you don't need to build it locally to change a guide.
+Prose docs live in [`docs/`](docs/). The unified Vite site renders them at
+`/docs/*` and deploys them with the catalog; you don't need a separate docs
+build to change a guide.

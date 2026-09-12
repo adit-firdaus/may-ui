@@ -10,7 +10,7 @@ and a token layer you can theme.
 - **Light and dark** — follows the OS by default, pinnable per subtree
 - **Typed** — bundled `.d.ts` per entry, JSDoc on every prop
 
-**[Docs](docs/)** · **[Gallery](https://adit-firdaus.github.io/may-ui/)** · **[Storybook](https://adit-firdaus.github.io/may-ui/storybook/)** · **[Contributing](CONTRIBUTING.md)**
+**[Website & Catalog](https://adit-firdaus.github.io/may-ui/)** · **[Docs](https://adit-firdaus.github.io/may-ui/docs/getting-started)** · **[Storybook](https://adit-firdaus.github.io/may-ui/storybook/)** · **[Contributing](CONTRIBUTING.md)**
 
 ## Install
 
@@ -233,10 +233,10 @@ reads it live. Configure stack limits with `MayProvider host={{ max: 3 }}`.
 ## Example screens
 
 27 composed screens — full app shells, not isolated widgets — live under `@adit_firdaus/may-ui/examples`
-and in the gallery app:
+and in the unified website's Patterns section:
 
 ```bash
-npm run examples
+npm run site
 ```
 
 They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a demo screen into your bundle.
@@ -255,9 +255,11 @@ They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a dem
 ```bash
 npm run dev          # Vite playground
 npm run storybook    # component workshop
-npm run examples     # the example-screen gallery
+npm run site         # unified website, docs, catalog and playground
+npm run examples     # alias for npm run site
+npm run site:preview # preview the production Pages build
 npm run build        # library build (four entries) + types
-npm run verify       # typecheck, smoke, tokens, contract, size, coverage
+npm run verify       # library gates plus the unified site build and contract
 ```
 
 `npm run generate` regenerates `src/styles/tokens.css`,

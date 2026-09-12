@@ -5,7 +5,7 @@
  * [data-may-theme='dark'] and the prefers-color-scheme mirror, so the explicit
  * toggle and the OS setting can never disagree.
  */
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -391,7 +391,12 @@ const declarations = (source) =>
   )
 
 const rootStarts = [...css.matchAll(/:root\s*\{/g)].map((match) => match.index)
-const common = Object.assign({}, ...rootStarts.map((start) => declarations(blockAt(css, start))))
+const motionCss = readFileSync(resolve(here, '../src/styles/motion.css'), 'utf8')
+const common = Object.assign(
+  {},
+  ...rootStarts.map((start) => declarations(blockAt(css, start))),
+  declarations(motionCss),
+)
 const darkStart = css.indexOf("[data-may-theme='dark']")
 const darkValues = declarations(blockAt(css, darkStart))
 const lightValues = { ...common }

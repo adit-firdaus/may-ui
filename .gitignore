@@ -4,6 +4,7 @@ storybook-static/
 docs-site/
 _site/
 .worktrees/
+examples/src/generated/
 *.log
 .DS_Store
 

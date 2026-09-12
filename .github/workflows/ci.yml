@@ -1,5 +1,5 @@
-# Runs the full quality gate on every push and PR. `verify` is the same chain
-# the project uses locally: build + smoke + tokens + contract + size + coverage.
+# Runs the full quality gate on every push and PR: library build/contracts plus
+# the unified site's typecheck, production build, catalog, config, and budgets.
 name: CI
 
 on:

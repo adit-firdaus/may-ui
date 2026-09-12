@@ -15,8 +15,8 @@ physics, a token layer you can theme, and no runtime dependencies beyond React.
 
 ## See it running
 
-- **[Examples gallery](https://adit-firdaus.github.io/may-ui/)** — composed
-  app screens, adaptive from phone to desktop.
+- **[Unified website](https://adit-firdaus.github.io/may-ui/)** — docs,
+  interactive component catalog, provider playground, and composed patterns.
 - **[Storybook](https://adit-firdaus.github.io/may-ui/storybook/)** — every
   component with its props and states. This is the per-component reference.
 

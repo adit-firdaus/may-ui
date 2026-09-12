@@ -79,6 +79,7 @@ check('configuration hooks expose the effective resolved values', () => {
       'data-mode': theme.mode,
       'data-resolved': theme.resolvedMode,
       'data-primary': tokens.colorPrimary,
+      'data-fast-duration': tokens.durationFast,
       'data-size': config.components.Button?.size,
       'data-frozen': String(Object.isFrozen(config.components.Button)),
     })
@@ -96,6 +97,7 @@ check('configuration hooks expose the effective resolved values', () => {
   assert.match(html, /data-mode="dark"/)
   assert.match(html, /data-resolved="dark"/)
   assert.match(html, /data-primary="#48f"/)
+  assert.match(html, /data-fast-duration="150ms"/)
   assert.match(html, /data-size="lg"/)
   assert.match(html, /data-frozen="true"/)
 })

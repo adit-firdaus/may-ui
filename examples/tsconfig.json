@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "allowJs": true,
+    "checkJs": false,
+    "types": ["vite/client"],
+    "baseUrl": "..",
+    "paths": {
+      "@adit_firdaus/may-ui": ["src/index.ts"],
+      "@adit_firdaus/may-ui/desktop": ["src/desktop.ts"],
+      "@adit_firdaus/may-ui/mobile": ["src/mobile.ts"],
+      "@adit_firdaus/may-ui/examples": ["src/examples/index.ts"]
+    }
+  },
+  "include": ["src"]
+}
