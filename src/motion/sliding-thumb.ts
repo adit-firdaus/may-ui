@@ -18,7 +18,7 @@
 export const SETTLE_MS = 220
 export const SETTLE_EASE = 'cubic-bezier(.32,.72,0,1)'
 export const FOLLOW_MS = 90
-/** Colour and elevation move on their own, slower clock than the thumb does. */
+/** Decoration clock for consumers that animate independently of the thumb. */
 export const TINT_MS = 220
 export const PRESS_SCALE_X = 1.16
 export const PRESS_SCALE_Y = PRESS_SCALE_X * 1.1
@@ -126,9 +126,8 @@ export function applyThumb(
   const transition = instant
     ? 'transform 0s'
     : following
-      ? `transform ${reducedMotion ? 1 : FOLLOW_MS}ms linear, ` +
-        `box-shadow ${TINT_MS}ms ease`
-      : `transform ${d}ms ${easing}, box-shadow ${TINT_MS}ms ease`
+      ? `transform ${reducedMotion ? 1 : FOLLOW_MS}ms linear`
+      : `transform ${d}ms ${easing}`
 
   /*
    * Scaled about its own CENTRE, which takes an offset: the thumb is laid out

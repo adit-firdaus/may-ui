@@ -51,10 +51,9 @@
  * finger, worst at the ends. A pseudo-element is never measured, so the fill
  * can move while the geometry stays perfectly still.
  *
- * `inset` rather than `scale` because the squeeze has to read as the same few
- * pixels whatever the track is: a uniform scale on a 300x32 control pulls the
- * ends in by several pixels and the edges by a fraction of one, which reads as
- * the track being pinched rather than pressed.
+ * A transform scale keeps the squeeze on the compositor. Animating `inset`
+ * forced four layout/paint transitions per tap, which dropped frames on older
+ * mobile GPUs even though the thumb itself was compositor-driven.
  */
 .may-segmented::before {
   content: '';
@@ -73,18 +72,13 @@
    * negative past the leading end, positive past the trailing — and zero in
    * every state except an overdrag.
    */
-  transform: translateX(calc(var(--may-thumb-overdrag) * 0.25));
-  transition:
-    inset var(--may-thumb-settle) var(--may-ease-out),
-    transform var(--may-thumb-settle) var(--may-ease-out);
+  transform: translateX(calc(var(--may-thumb-overdrag) * 0.25)) scale(1);
+  transition: transform var(--may-thumb-settle) var(--may-ease-out);
 }
 
-/*
- * Held. The same 2px the track pads by, so at full squeeze the fill meets the
- * thumb's groove exactly and the thumb's own puff overhangs it.
- */
+/* Held. A small uniform squeeze keeps the feedback on the compositor. */
 .may-segmented[data-dragging='true']::before {
-  inset: 2px;
+  transform: translateX(calc(var(--may-thumb-overdrag) * 0.25)) scale(0.98);
 }
 
 /*
@@ -95,9 +89,7 @@
  * rubbery lag.
  */
 .may-segmented[data-following='true']::before {
-  transition:
-    inset var(--may-duration-follow) linear,
-    transform var(--may-duration-follow) linear;
+  transition: transform var(--may-duration-follow) linear;
 }
 
 .may-segmented--full { display: flex; width: 100%; }
@@ -166,9 +158,6 @@
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
-  transition:
-    color var(--may-duration-fast) var(--may-ease-out),
-    font-weight var(--may-duration-fast) var(--may-ease-out);
 }
 
 /*

@@ -7,6 +7,7 @@
  * quietly shipping.
  */
 import { builtCss as css } from './built-styles.mjs'
+import { readFileSync } from 'node:fs'
 
 /** Strip every @media (hover: hover) block, so what remains is unguarded. */
 function stripHoverGuards(source) {
@@ -32,6 +33,7 @@ function stripHoverGuards(source) {
 }
 
 const unguarded = stripHoverGuards(css)
+const thumbRuntime = readFileSync(new URL('../src/motion/sliding-thumb.ts', import.meta.url), 'utf8')
 
 /**
  * Every style rule in the sheet, as [selector, body].
@@ -95,6 +97,12 @@ const overreachingResets = rules(css)
   // A component rule names its own class; `may-root` is the scope, not a component.
   .filter((sel) => !/\.may-(?!root\b)[\w-]+/.test(sel))
   .filter((sel) => weight(sel) > 1)
+
+const ruleBody = (selector) => rules(css).find(([candidate]) => candidate === selector)?.[1] ?? ''
+const segmentedTrack = ruleBody('.may-segmented:before')
+const segmentedPressedTrack = ruleBody('.may-segmented[data-dragging=true]:before')
+const segmentedFollowingTrack = ruleBody('.may-segmented[data-following=true]:before')
+const segmentedLabel = ruleBody('.may-segmented .may-segmented__segment')
 
 
 const checks = [
@@ -183,6 +191,17 @@ const checks = [
   [
     'a linear() fallback exists for older browsers',
     /@supports not \(animation-timing-function: linear/.test(css),
+  ],
+  [
+    'sliding-thumb taps animate compositor-only transforms',
+    !/box-shadow\s+\$\{TINT_MS\}/.test(thumbRuntime) &&
+      /top:0;right:0;bottom:0;left:0/.test(segmentedTrack) &&
+      /transition:\s*transform\b/.test(segmentedTrack) &&
+      !/transition:[^;]*inset/.test(segmentedTrack) &&
+      /transform:/.test(segmentedPressedTrack) &&
+      !/inset:/.test(segmentedPressedTrack) &&
+      /transition:\s*transform\b/.test(segmentedFollowingTrack) &&
+      !/transition:/.test(segmentedLabel),
   ],
   [
     'element resets cannot out-specify the components they paint over',
