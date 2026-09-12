@@ -100,9 +100,39 @@ layout reads.
 **Files:**
 - Verify only
 
-- [ ] Commit with the repository's Conventional Commit format, fast-forward
+- [x] Commit with the repository's Conventional Commit format, fast-forward
 into `master`, rerun `npm run verify`, push, and watch GitHub Pages.
 
-- [ ] Repeat the public-build mobile trace and report that Motion is deployed.
+- [x] Repeat the public-build mobile trace and report that Motion is deployed.
 Ask the user to verify the physical Exynos phone because emulation cannot prove
 device-specific GPU frame pacing.
+
+### Task 6: Restore press scale and use back-out travel
+
+**Files:**
+- Modify: `scripts/check-provider.mjs`
+- Modify: `src/components/SegmentedControl/SegmentedControl.tsx`
+
+- [x] Add source contracts asserting that SegmentedControl imports Motion's
+`backOut`, defines `PRESS_SCALE` as `1.16`, publishes a `pressed` variant from
+the track with `whileTap`, reuses the scale for `whileDrag`, and configures the
+layout transition as a tween using `backOut`.
+
+- [x] Run `npm run check:provider`; expect the new press/easing assertions to
+fail against the spring transition and drag-only `1.08` scale.
+
+- [x] Change `LAYOUT_TRANSITION` to a 220 ms `backOut` tween. Add a short,
+separate scale transition and thumb variants for resting scale 1 and pressed
+scale 1.16.
+
+- [x] Render the track root as `motion.div` with `initial="resting"`,
+`animate="resting"`, and `whileTap="pressed"`. Attach the variants and scale
+transition to the thumb, and reuse `PRESS_SCALE` for `whileDrag`.
+
+- [x] Run `npm run check:provider`, then `npm run verify` and
+`npm run build-storybook`. Verify tap, drag, keyboard, disabled options, the
+1.16 held scale, back-out horizontal travel, reduced motion, and console output
+at 412 × 915.
+
+- [ ] Commit, fast-forward into `master`, rerun `npm run verify`, push, watch
+CI and Pages, then verify the public SegmentedControl route.

@@ -1,12 +1,18 @@
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { useRef, useState } from 'react'
-import { LayoutGroup, MotionConfig, motion, useDragControls } from 'motion/react'
+import { LayoutGroup, MotionConfig, backOut, motion, useDragControls } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import { cx } from '../../utils/cx'
 import type { MaySize } from '../../types'
 import { useAutoId } from '../../utils/useId'
 
-const LAYOUT_TRANSITION = { type: 'spring', duration: 0.22, bounce: 0.15 } as const
+const PRESS_SCALE = 1.16
+const LAYOUT_TRANSITION = { type: 'tween', duration: 0.22, ease: backOut } as const
+const SCALE_TRANSITION = { type: 'tween', duration: 0.14, ease: 'easeOut' } as const
+const THUMB_VARIANTS = {
+  resting: { scale: 1 },
+  pressed: { scale: PRESS_SCALE },
+} as const
 
 interface SegmentBounds {
   index: number
@@ -128,7 +134,7 @@ export function SegmentedControl<T extends string = string>({
   return (
     <MotionConfig reducedMotion="user">
       <LayoutGroup id={id}>
-        <div
+        <motion.div
           {...rest}
           ref={trackRef}
           role="tablist"
@@ -137,6 +143,9 @@ export function SegmentedControl<T extends string = string>({
           data-dragging={dragging ? 'true' : undefined}
           className={cx('may-segmented', fullWidth && 'may-segmented--full', className)}
           onKeyDown={onKeyDown}
+          initial="resting"
+          animate="resting"
+          whileTap="pressed"
         >
           <motion.span
             className="may-segmented__track"
@@ -161,7 +170,8 @@ export function SegmentedControl<T extends string = string>({
                 <motion.span
                   layoutId={`may-segmented-thumb-${id}`}
                   className="may-segmented__thumb"
-                  transition={{ layout: LAYOUT_TRANSITION }}
+                  variants={THUMB_VARIANTS}
+                  transition={{ layout: LAYOUT_TRANSITION, scale: SCALE_TRANSITION }}
                   drag="x"
                   dragControls={dragControls}
                   dragListener={false}
@@ -169,7 +179,7 @@ export function SegmentedControl<T extends string = string>({
                   dragElastic={0.12}
                   dragMomentum={false}
                   dragSnapToOrigin
-                  whileDrag={{ scale: 1.08 }}
+                  whileDrag={{ scale: PRESS_SCALE }}
                   onDragStart={() => setDragging(true)}
                   onDrag={previewDrag}
                   onDragEnd={finishDrag}
@@ -179,7 +189,7 @@ export function SegmentedControl<T extends string = string>({
               <span className="may-segmented__label">{option.label}</span>
             </button>
           ))}
-        </div>
+        </motion.div>
       </LayoutGroup>
     </MotionConfig>
   )
