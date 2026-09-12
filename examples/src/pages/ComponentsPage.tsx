@@ -5,9 +5,11 @@ import {
   Input,
   SegmentedControl,
   Select,
+  Sheet,
   Tag,
   Text,
 } from '@adit_firdaus/may-ui'
+import { Sidebar, SidebarItem, SidebarSection } from '@adit_firdaus/may-ui/desktop'
 import catalogData from '../generated/catalog.json'
 import type { CatalogControl, CatalogEntry } from '../site-types'
 import { decodeState, encodeState, generateReactCode, stableStringify } from '../lib/config-codec.mjs'
@@ -19,6 +21,7 @@ import { CodeBlock } from '../CodeBlock'
 
 const catalog = catalogData as CatalogEntry[]
 const families = ['all', 'adaptive', 'desktop', 'mobile'] as const
+type Family = (typeof families)[number]
 
 const readLocalProps = (encoded: string | null) => {
   if (!encoded) return {}
@@ -28,14 +31,99 @@ const readLocalProps = (encoded: string | null) => {
   } catch { return {} }
 }
 
+function CatalogNavigation({
+  query,
+  family,
+  category,
+  capability,
+  categories,
+  filtered,
+  activeSlug,
+  onQueryChange,
+  onFamilyChange,
+  onCategoryChange,
+  onCapabilityChange,
+  onNavigate,
+}: {
+  query: string
+  family: Family
+  category: string
+  capability: string
+  categories: string[]
+  filtered: CatalogEntry[]
+  onQueryChange: (value: string) => void
+  onFamilyChange: (value: Family) => void
+  onCategoryChange: (value: string) => void
+  onCapabilityChange: (value: string) => void
+  activeSlug: string
+  onNavigate?: (slug: string) => void
+}) {
+  return (
+    <div
+      className="site-catalog-navigation"
+      onClick={(event) => {
+        const anchor = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#component-"]')
+        if (anchor) onNavigate?.(anchor.hash.replace('#component-', ''))
+      }}
+    >
+      <Input value={query} onChange={(event) => onQueryChange(event.currentTarget.value)} placeholder="Search components…" aria-label="Search components" />
+      <Select
+        value={family}
+        onChange={(event) => onFamilyChange(event.currentTarget.value as Family)}
+        options={families.map((value) => ({ label: value[0].toUpperCase() + value.slice(1), value }))}
+        aria-label="Component family"
+      />
+      <Select value={category} onChange={(event) => onCategoryChange(event.currentTarget.value)} options={[{ label: 'All categories', value: 'all' }, ...categories.map((value) => ({ label: value, value }))]} aria-label="Category" />
+      <Select value={capability} onChange={(event) => onCapabilityChange(event.currentTarget.value)} options={[
+        { label: 'All capabilities', value: 'all' },
+        { label: 'Provider configurable', value: 'configurable' },
+        { label: 'Interactive controls', value: 'interactive' },
+        { label: 'Stateful', value: 'stateful' },
+        { label: 'Data driven', value: 'data' },
+      ]} aria-label="Capability" />
+      <SidebarItem
+        active={family === 'all' && category === 'all'}
+        badge={catalog.length}
+        onClick={() => { onFamilyChange('all'); onCategoryChange('all') }}
+      >
+        All components
+      </SidebarItem>
+      {families.slice(1).map((familyName) => {
+        const familyItems = filtered.filter((item) => item.family === familyName)
+        if (!familyItems.length) return null
+        const familyCategories = [...new Set(catalog.filter((item) => item.family === familyName).map((item) => item.category))].sort()
+        return (
+          <SidebarSection key={familyName} title={`${familyName} · ${familyItems.length}`} collapsible>
+            {familyCategories.map((categoryName) => (
+              <SidebarItem
+                key={`${familyName}-${categoryName}`}
+                active={family === familyName && category === categoryName}
+                badge={catalog.filter((item) => item.family === familyName && item.category === categoryName).length}
+                onClick={() => { onFamilyChange(familyName); onCategoryChange(categoryName) }}
+              >
+                {categoryName}
+              </SidebarItem>
+            ))}
+            <div className="site-catalog-navigation__components">
+              {familyItems.map((item) => <SidebarItem key={item.slug} href={`#component-${item.slug}`} active={activeSlug === item.slug}>{item.name}</SidebarItem>)}
+            </div>
+          </SidebarSection>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function ComponentsPage({ slug }: { slug?: string }) {
   const route = useRoute()
   const { config } = useSiteConfig()
   const [query, setQuery] = useState('')
-  const [family, setFamily] = useState<(typeof families)[number]>('all')
+  const [family, setFamily] = useState<Family>('all')
   const [category, setCategory] = useState('all')
   const [capability, setCapability] = useState('all')
   const [width, setWidth] = useState('wide')
+  const [mobileCatalogNav, setMobileCatalogNav] = useState(false)
+  const [activeSlug, setActiveSlug] = useState('')
   const [localProps, setLocalProps] = useState<Record<string, unknown>>(() => readLocalProps(route.search.get('props')))
   const entry = catalog.find((item) => item.slug === slug)
 
@@ -44,6 +132,12 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
     const reset = () => setLocalProps({})
     window.addEventListener('may-site:reset', reset)
     return () => window.removeEventListener('may-site:reset', reset)
+  }, [])
+  useEffect(() => {
+    const readHash = () => setActiveSlug(window.location.hash.replace(/^#component-/, ''))
+    readHash()
+    window.addEventListener('hashchange', readHash)
+    return () => window.removeEventListener('hashchange', readHash)
   }, [])
   useEffect(() => {
     const search = new URLSearchParams(window.location.search)
@@ -63,39 +157,72 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
       capability === 'data' && item.props.some((prop) => ['items', 'options', 'data', 'columns'].includes(prop.name))) &&
     `${item.name} ${item.description}`.toLowerCase().includes(query.toLowerCase()),
   )
+  const grouped = families.slice(1).map((familyName) => ({
+    family: familyName,
+    categories: categories.map((categoryName) => ({
+      category: categoryName,
+      items: filtered.filter((item) => item.family === familyName && item.category === categoryName),
+    })).filter((group) => group.items.length),
+  })).filter((group) => group.categories.length)
 
   if (!entry && slug) return <EmptyState title="Component not found" action={<Button asChild><SiteLink href="/components">Back to catalog</SiteLink></Button>} />
 
-  if (!entry) return (
-    <main className="site-catalog-index">
-      <header className="site-page-heading">
-        <Text variant="caption-1" tone="tint" weight="semibold">COMPONENT CATALOG</Text>
-        <h1 tabIndex={-1}>Every building block.</h1>
-        <Text tone="secondary">Search 91 adaptive, desktop, and mobile components. Open any entry for live controls, API, and copy-ready React.</Text>
-      </header>
-      <div className="site-catalog-tools">
-        <Input value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Search components…" aria-label="Search components" />
-        <SegmentedControl options={families.map((value) => ({ label: value[0].toUpperCase() + value.slice(1), value }))} value={family} onValueChange={setFamily} aria-label="Component family" />
-        <Select value={category} onChange={(event) => setCategory(event.currentTarget.value)} options={[{ label: 'All categories', value: 'all' }, ...categories.map((value) => ({ label: value, value }))]} aria-label="Category" />
-        <Select value={capability} onChange={(event) => setCapability(event.currentTarget.value)} options={[
-          { label: 'All capabilities', value: 'all' },
-          { label: 'Provider configurable', value: 'configurable' },
-          { label: 'Interactive controls', value: 'interactive' },
-          { label: 'Stateful', value: 'stateful' },
-          { label: 'Data driven', value: 'data' },
-        ]} aria-label="Capability" />
-      </div>
-      <div className="site-catalog-grid">
-        {filtered.map((item) => (
-          <SiteLink className="site-catalog-card" href={`/components/${item.slug}`} key={item.slug}>
-            <div className="site-catalog-card__meta"><Tag size="sm">{item.family}</Tag><span>{item.category}</span></div>
-            <h2>{item.name}</h2><p>{item.description}</p>
-            <span className="site-catalog-card__arrow">View component →</span>
-          </SiteLink>
-        ))}
-      </div>
-    </main>
-  )
+  if (!entry) {
+    const resetFilters = () => { setQuery(''); setFamily('all'); setCategory('all'); setCapability('all') }
+    const navigationProps = {
+      query, family, category, capability, categories, filtered, activeSlug,
+      onQueryChange: setQuery,
+      onFamilyChange: setFamily,
+      onCategoryChange: setCategory,
+      onCapabilityChange: setCapability,
+    }
+    return (
+      <main className="site-catalog-shell">
+        <Sidebar
+          className="site-catalog-sidebar"
+          aria-label="Component catalog"
+          header={<div><Text weight="semibold">Catalog</Text><Text variant="caption-1" tone="secondary">{filtered.length} of {catalog.length}</Text></div>}
+        >
+          <CatalogNavigation {...navigationProps} onNavigate={setActiveSlug} />
+        </Sidebar>
+        <div className="site-catalog-index">
+          <header className="site-page-heading">
+            <Text variant="caption-1" tone="tint" weight="semibold">COMPONENT CATALOG</Text>
+            <h1 tabIndex={-1}>Every building block.</h1>
+            <Text tone="secondary">{filtered.length} of {catalog.length} components · adaptive, desktop, and mobile previews in one place.</Text>
+          </header>
+          <div className="site-catalog-mobile-toolbar">
+            <Button variant="gray" onClick={() => setMobileCatalogNav(true)}>Browse catalog</Button>
+            <Text variant="footnote" tone="secondary">{filtered.length} shown</Text>
+          </div>
+          {grouped.length ? grouped.map((familyGroup) => (
+            <section className="site-catalog-family" key={familyGroup.family}>
+              <h2>{familyGroup.family}</h2>
+              {familyGroup.categories.map((categoryGroup) => (
+                <section className="site-catalog-category" key={categoryGroup.category}>
+                  <div className="site-catalog-category__heading"><h3>{categoryGroup.category}</h3><span>{categoryGroup.items.length}</span></div>
+                  <div className="site-catalog-grid">
+                    {categoryGroup.items.map((item) => (
+                      <article className="site-catalog-card" id={`component-${item.slug}`} key={item.slug}>
+                        <div className="site-catalog-card__meta"><Tag size="sm">{item.family}</Tag><span>{item.category}</span></div>
+                        <div className={`site-catalog-card__preview site-preview-family-${item.family}`}><PreviewRenderer entry={item} /></div>
+                        <h4>{item.name}</h4>
+                        <p>{item.description}</p>
+                        <SiteLink className="site-catalog-card__arrow" href={`/components/${item.slug}`}>Open workbench →</SiteLink>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </section>
+          )) : <EmptyState title="No components found" description="Try another search or clear the catalog filters." action={<Button onClick={resetFilters}>Clear filters</Button>} />}
+        </div>
+        <Sheet open={mobileCatalogNav} onClose={() => setMobileCatalogNav(false)} title="Component catalog" side="start" size="lg">
+          <CatalogNavigation {...navigationProps} onNavigate={(nextSlug) => { setActiveSlug(nextSlug); setMobileCatalogNav(false) }} />
+        </Sheet>
+      </main>
+    )
+  }
 
   const globalDefaults = (config.components as Record<string, Record<string, unknown>> | undefined)?.[entry.name] ?? {}
   const codeConfig = stableStringify(config) === stableStringify(DEFAULT_SITE_CONFIG) ? {} : config

@@ -55,6 +55,19 @@ check('catalog slugs and controls are valid', () => {
   }
 })
 
+check('catalog index renders every component in a responsive app shell', () => {
+  const source = readFileSync(resolve(root, 'examples/src/pages/ComponentsPage.tsx'), 'utf8')
+  assert.match(source, /<Sidebar/)
+  assert.match(source, /<Sheet/)
+  assert.match(source, /title="Component catalog"/)
+  assert.match(source, /id={`component-\${item\.slug}`}/)
+  assert.match(source, /<PreviewRenderer entry={item}/)
+  assert.match(source, /<article[^>]+site-catalog-card/)
+  assert.doesNotMatch(source, /<SiteLink className="site-catalog-card"/)
+  assert.match(source, /active={activeSlug === item\.slug}/)
+  assert.match(source, /of \{catalog\.length\} components/)
+})
+
 check('configuration codec preserves unicode, false, and zero', () => {
   const state = {
     theme: { mode: 'dark', tokens: { fontSans: 'Mây Sans', space4: 0 } },
