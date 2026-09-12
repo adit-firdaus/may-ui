@@ -3,6 +3,7 @@ dist/
 storybook-static/
 docs-site/
 _site/
+.worktrees/
 *.log
 .DS_Store
 
