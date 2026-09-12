@@ -1,19 +1,6 @@
-/*
- * The thumb is laid out once at 1px wide and positioned entirely with
- * translate + scale, so selection changes never touch layout. Animating
- * left/width instead would force a reflow on every frame of the slide.
- */
+/* Motion projects a real-sized thumb between segments using transforms. */
 
 .may-segmented {
-  /*
-   * Fallbacks for the two variables `useSlidingThumb` writes on this track once
-   * it is live: `--may-thumb-overdrag` is the signed rubber-banded distance past
-   * an end, and `--may-thumb-settle` is the thumb's own settle duration. Both
-   * are declared here so the first frame — before the hook's write lands — and
-   * the token audit both have a value.
-   */
-  --may-thumb-overdrag: 0px;
-  --may-thumb-settle: var(--may-duration-fast);
   position: relative;
   display: inline-flex;
   /*
@@ -41,55 +28,12 @@
   -webkit-touch-callout: none;
 }
 
-/*
- * The track's fill, and it squeezes under the press the way iOS's does.
- *
- * It is a PSEUDO-ELEMENT rather than the track's own background, and that is
- * load-bearing: the gesture measures segment rects to decide what the pointer
- * is over, and a transform on the track itself would scale those rects out
- * from under the hit test -- the thumb would land a few pixels off its own
- * finger, worst at the ends. A pseudo-element is never measured, so the fill
- * can move while the geometry stays perfectly still.
- *
- * A transform scale keeps the squeeze on the compositor. Animating `inset`
- * forced four layout/paint transitions per tap, which dropped frames on older
- * mobile GPUs even though the thumb itself was compositor-driven.
- */
-.may-segmented::before {
-  content: '';
+.may-segmented__track {
   position: absolute;
   inset: 0;
-  /* Behind the thumb and the labels, but inside the track's own stacking
-   * context -- `isolation: isolate` above is what keeps this from falling
-   * through to whatever the control is sitting on. */
   z-index: -1;
   border-radius: inherit;
   background: var(--may-color-fill-tertiary);
-  /*
-   * The fill slides a QUARTER of the thumb's overdrag: whatever it travels it
-   * uncovers at the end it is leaving, and past roughly a sixth of the thumb's
-   * give that bare strip is more conspicuous than the motion it sells. Signed —
-   * negative past the leading end, positive past the trailing — and zero in
-   * every state except an overdrag.
-   */
-  transform: translateX(calc(var(--may-thumb-overdrag) * 0.25)) scale(1);
-  transition: transform var(--may-thumb-settle) var(--may-ease-out);
-}
-
-/* Held. A small uniform squeeze keeps the feedback on the compositor. */
-.may-segmented[data-dragging='true']::before {
-  transform: translateX(calc(var(--may-thumb-overdrag) * 0.25)) scale(0.98);
-}
-
-/*
- * Once the finger is actually moving, the fill tracks it instead of easing
- * toward it -- the same switch the thumb makes, on the same 90ms linear
- * timing, so the two lag by the same amount and stay stuck together. Easing
- * each frame toward a target that moves every frame is what turns a shift into
- * rubbery lag.
- */
-.may-segmented[data-following='true']::before {
-  transition: transform var(--may-duration-follow) linear;
 }
 
 .may-segmented--full { display: flex; width: 100%; }
@@ -97,14 +41,8 @@
 
 .may-segmented__thumb {
   position: absolute;
-  inset-block: 2px;
-  inset-inline-start: 0;
-  width: 1px;
+  inset: 0;
   z-index: 0;
-  transform-origin: 0 50%;
-  /* Authored value is a fallback only: `position()` overwrites this every time
-   * it moves, with the horizontal half divided by the scale. See the comment
-   * there -- a plain radius on a scaleX'd 1px box renders as a shear. */
   border-radius: var(--may-radius-full);
   /*
    * The brand as a FILL, not as a surface. --may-color-primary is the fill half
@@ -158,6 +96,11 @@
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.may-segmented__label {
+  position: relative;
+  z-index: 1;
 }
 
 /*

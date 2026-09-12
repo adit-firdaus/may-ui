@@ -5,7 +5,7 @@ and a token layer you can theme.
 
 - **74 components** across three families — adaptive, desktop-only, mobile-only
 - **No borders** — surfaces separate by value, translucent fill and hairline separators
-- **Real springs** — damped-oscillator curves sampled into CSS `linear()`, no runtime JS
+- **Real springs** — damped-oscillator CSS curves plus Motion layout projection
 - **Token-first** — every colour, space, radius, shadow and duration is a `--may-*` property
 - **Light and dark** — follows the OS by default, pinnable per subtree
 - **Typed** — bundled `.d.ts` per entry, JSDoc on every prop
@@ -19,8 +19,9 @@ npm install @adit_firdaus/may-ui
 ```
 
 `react` and `react-dom` 19 are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
-is a dependency — May UI draws its glyphs from Ionicons (`react-icons/io5`), and it stays
-external so your bundler tree-shakes it per icon.
+supplies Ionicons, while [`motion`](https://motion.dev/docs/react) projects
+SegmentedControl's real-sized selection thumb. Both stay external to May UI's
+build so your bundler tree-shakes the features it uses.
 
 ## Use
 

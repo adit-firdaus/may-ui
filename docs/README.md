@@ -1,7 +1,8 @@
 # May UI documentation
 
 Apple's design language as a React library — iOS/macOS shapes, real spring
-physics, a token layer you can theme, and no runtime dependencies beyond React.
+physics, a token layer you can theme, and Motion layout projection where it
+improves hardware behavior.
 
 ## Guides
 

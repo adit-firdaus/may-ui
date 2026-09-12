@@ -70,6 +70,22 @@ check('the provider-first hooks are public', () => {
   assert.equal(May.MayHost, undefined)
 })
 
+check('SegmentedControl uses a real-sized Motion layout thumb', () => {
+  const source = readFileSync(resolve(root, 'src/components/SegmentedControl/SegmentedControl.tsx'), 'utf8')
+  const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
+  const vite = readFileSync(resolve(root, 'vite.config.ts'), 'utf8')
+  assert.match(source, /LayoutGroup, MotionConfig, motion, useDragControls/)
+  assert.match(source, /from 'motion\/react'/)
+  assert.doesNotMatch(source, /from ['"]\.\.\/\.\.\/motion\/useSlidingThumb['"]/)
+  assert.match(source, /layoutId={`may-segmented-thumb-\${id}`}/)
+  assert.match(source, /drag="x"/)
+  assert.match(source, /dragConstraints={trackRef}/)
+  assert.match(source, /dragMomentum={false}/)
+  assert.match(source, /boundsRef/)
+  assert.equal(pkg.dependencies.motion, '^13.2.0')
+  assert.match(vite, /\^motion\(\?:\\\/\|\$\)/)
+})
+
 check('configuration hooks expose the effective resolved values', () => {
   function Probe() {
     const config = May.useMayConfig()

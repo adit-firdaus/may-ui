@@ -9,8 +9,8 @@ npm install @adit_firdaus/may-ui
 
 `react` and `react-dom` 19 are peer dependencies. May UI has no stylesheet to
 import: each component renders its own React stylesheet resource, which React
-hoists and de-duplicates. `react-icons` supplies the Ionicons glyph set and is
-the only non-peer runtime dependency.
+hoists and de-duplicates. `react-icons` supplies the Ionicons glyph set, and
+`motion` drives SegmentedControl's layout-projected selection thumb.
 
 ## Render a component
 

@@ -1,22 +1,18 @@
-import type { KeyboardEvent } from 'react'
-import { useState } from 'react'
+import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
+import { useRef, useState } from 'react'
+import { LayoutGroup, MotionConfig, motion, useDragControls } from 'motion/react'
+import type { PanInfo } from 'motion/react'
 import { cx } from '../../utils/cx'
-import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
+import { useAutoId } from '../../utils/useId'
 
-/*
- * How much the thumb puffs while held — the primitive's own default, and the
- * value ss-ui uses. It does overhang the track's 2px inset, which is the point:
- * a thumb that grows within its own groove reads as inflating, one that grows
- * past it reads as lifting off.
- */
-const PRESS_SCALE = 1.16
+const LAYOUT_TRANSITION = { type: 'spring', duration: 0.22, bounce: 0.15 } as const
 
-/*
- * The sheet curve gives the shared sliding-thumb clock a physical arrival
- * without making this component own a second duration.
- */
-const SETTLE_EASING = 'var(--may-ease-sheet)'
+interface SegmentBounds {
+  index: number
+  left: number
+  right: number
+}
 
 export interface SegmentedOption<T extends string = string> {
   label: string
@@ -47,10 +43,9 @@ export interface SegmentedControlProps<T extends string = string> {
  * iOS's segmented control.
  *
  * The thumb **slides** between segments and can be dragged, which is the part
- * that reads as iOS — both reference implementations cross-fade an indicator
- * between segments instead. The whole gesture — slide, press squish, elastic
- * overdrag, select-on-release — lives in `useSlidingThumb`; this component owns
- * the selection, the keyboard, and the track fill that squeezes under the press.
+ * that reads as iOS. Motion projects the real-sized thumb between buttons and
+ * owns the constrained drag, while this component keeps selection and keyboard
+ * policy in React.
  */
 export function SegmentedControl<T extends string = string>({
   options = [],
@@ -63,7 +58,14 @@ export function SegmentedControl<T extends string = string>({
   ...rest
 }: SegmentedControlProps<T>) {
   const [internal, setInternal] = useState<T | undefined>(defaultValue ?? options[0]?.value)
+  const [dragging, setDragging] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null)
   const current = value ?? internal
+  const id = useAutoId()
+  const trackRef = useRef<HTMLDivElement>(null)
+  const boundsRef = useRef<SegmentBounds[]>([])
+  const hitRef = useRef(-1)
+  const dragControls = useDragControls()
 
   const selectedIndex = Math.max(
     0,
@@ -76,18 +78,37 @@ export function SegmentedControl<T extends string = string>({
     onValueChange?.(next)
   }
 
-  const { trackRef, thumbRef, registerItem, onPointerDown } = useSlidingThumb<
-    HTMLDivElement,
-    HTMLButtonElement
-  >({
-    itemCount: options.length,
-    selectedIndex,
-    onSelect: (index) => commit(options[index]!.value),
-    isDisabled: (index) => Boolean(options[index]?.disabled),
-    roundEnds: true,
-    pressScale: PRESS_SCALE,
-    easing: SETTLE_EASING,
-  })
+  const cacheBounds = () => {
+    boundsRef.current = [...(trackRef.current?.querySelectorAll<HTMLButtonElement>('.may-segmented__segment') ?? [])]
+      .map((segment, index) => {
+        const rect = segment.getBoundingClientRect()
+        return { index, left: rect.left, right: rect.right }
+      })
+  }
+
+  const hitAt = (x: number) => boundsRef.current.find(({ left, right }) => x >= left && x <= right)?.index ?? -1
+
+  const startDrag = (event: ReactPointerEvent<HTMLButtonElement>, index: number) => {
+    if (index !== selectedIndex || options[index]?.disabled) return
+    cacheBounds()
+    hitRef.current = index
+    setPreviewIndex(index)
+    dragControls.start(event)
+  }
+
+  const previewDrag = (_event: PointerEvent, info: PanInfo) => {
+    const next = hitAt(info.point.x)
+    if (next < 0 || options[next]?.disabled || next === hitRef.current) return
+    hitRef.current = next
+    setPreviewIndex(next)
+  }
+
+  const finishDrag = () => {
+    const landed = hitRef.current
+    setDragging(false)
+    setPreviewIndex(null)
+    if (landed >= 0 && !options[landed]?.disabled) commit(options[landed]!.value)
+  }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const delta = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
@@ -105,32 +126,61 @@ export function SegmentedControl<T extends string = string>({
   }
 
   return (
-    <div
-      {...rest}
-      ref={trackRef}
-      role="tablist"
-      data-slot="segmented"
-      data-size={size}
-      className={cx('may-segmented', fullWidth && 'may-segmented--full', className)}
-      onPointerDown={onPointerDown}
-      onKeyDown={onKeyDown}
-    >
-      <span ref={thumbRef} className="may-segmented__thumb" aria-hidden />
-      {options.map((option, index) => (
-        <button
-          key={option.value}
-          ref={registerItem(index)}
-          type="button"
-          role="tab"
-          aria-selected={option.value === current}
-          tabIndex={option.value === current ? 0 : -1}
-          disabled={option.disabled}
-          onClick={() => commit(option.value)}
-          className="may-segmented__segment"
+    <MotionConfig reducedMotion="user">
+      <LayoutGroup id={id}>
+        <div
+          {...rest}
+          ref={trackRef}
+          role="tablist"
+          data-slot="segmented"
+          data-size={size}
+          data-dragging={dragging ? 'true' : undefined}
+          className={cx('may-segmented', fullWidth && 'may-segmented--full', className)}
+          onKeyDown={onKeyDown}
         >
-          {option.label}
-        </button>
-      ))}
-    </div>
+          <motion.span
+            className="may-segmented__track"
+            animate={{ scale: dragging ? 0.98 : 1 }}
+            transition={LAYOUT_TRANSITION}
+            aria-hidden
+          />
+          {options.map((option, index) => (
+            <button
+              key={option.value}
+              type="button"
+              role="tab"
+              aria-selected={option.value === current}
+              tabIndex={option.value === current ? 0 : -1}
+              disabled={option.disabled}
+              data-hit={dragging && previewIndex === index ? 'true' : undefined}
+              onPointerDown={(event) => startDrag(event, index)}
+              onClick={() => commit(option.value)}
+              className="may-segmented__segment"
+            >
+              {index === selectedIndex && (
+                <motion.span
+                  layoutId={`may-segmented-thumb-${id}`}
+                  className="may-segmented__thumb"
+                  transition={{ layout: LAYOUT_TRANSITION }}
+                  drag="x"
+                  dragControls={dragControls}
+                  dragListener={false}
+                  dragConstraints={trackRef}
+                  dragElastic={0.12}
+                  dragMomentum={false}
+                  dragSnapToOrigin
+                  whileDrag={{ scale: 1.08 }}
+                  onDragStart={() => setDragging(true)}
+                  onDrag={previewDrag}
+                  onDragEnd={finishDrag}
+                  aria-hidden
+                />
+              )}
+              <span className="may-segmented__label">{option.label}</span>
+            </button>
+          ))}
+        </div>
+      </LayoutGroup>
+    </MotionConfig>
   )
 }

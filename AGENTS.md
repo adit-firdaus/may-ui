@@ -7,8 +7,9 @@ the rest. Humans want [`CONTRIBUTING.md`](CONTRIBUTING.md).
 ## What this is
 
 May UI is an Apple-native React design system — iOS/macOS shapes, real spring
-physics compiled to CSS `linear()`, a `--may-*` token layer, and **no runtime
-dependencies** beyond React and `react-icons`. Components ship in three families:
+physics compiled to CSS `linear()`, a `--may-*` token layer, and two focused
+runtime dependencies: `react-icons` for glyphs and `motion` for
+SegmentedControl layout projection. Components ship in three families:
 adaptive (`src/components`), desktop-only (`src/desktop`), mobile-only
 (`src/mobile`). The full tour is in [`README.md`](README.md).
 
@@ -56,10 +57,9 @@ Adding a component: follow [README → "Adding a component"](README.md#adding-a-
 
 Take the smallest change that actually works. Question whether the task needs to
 exist at all (YAGNI). Prefer the standard library and native platform features
-over new dependencies; prefer editing existing code over adding more. The
-library's zero-runtime-dependency promise is a constraint, not an aspiration —
-do not add a runtime dependency without a very good reason and a smaller
-alternative ruled out.
+over new dependencies; prefer editing existing code over adding more. Runtime
+dependencies remain exceptional: add one only for a measured user-facing need
+after a smaller alternative has been ruled out.
 
 ## Commits
 

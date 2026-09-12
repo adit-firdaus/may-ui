@@ -113,18 +113,17 @@ console.log(`\n  ${noCssAssets ? 'ok  ' : 'FAIL'} no emitted CSS assets`)
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 const deps = Object.keys(pkg.dependencies ?? {})
 /*
- * react-icons is the one sanctioned runtime dependency: the icon set is a
- * deliberate design decision, and it is externalised in the build so the
- * consumer's bundler tree-shakes it per icon. Anything else appearing here is
- * an accident and should fail.
+ * Both sanctioned runtime dependencies are deliberate and externalised: icons
+ * supply the glyph system, while Motion projects SegmentedControl's real-sized
+ * selection thumb. Anything else appearing here is an accident and fails.
  */
-const ALLOWED_DEPS = new Set(['react-icons'])
+const ALLOWED_DEPS = new Set(['motion', 'react-icons'])
 const depsOk = deps.every((d) => ALLOWED_DEPS.has(d))
 if (!depsOk) failed = true
 console.log(
   `\n  ${depsOk ? 'ok  ' : 'FAIL'} runtime dependencies: ${deps.length === 0 ? 'none' : deps.join(', ')}`,
 )
-console.log('       (react-icons is external and tree-shaken per icon by the consumer;')
+console.log('       (motion and react-icons are external and consumer-tree-shaken;')
 console.log('        easing-utils is a devDependency, compiled in at build time)')
 
 process.exit(failed ? 1 : 0)
