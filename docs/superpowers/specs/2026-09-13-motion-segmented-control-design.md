@@ -43,14 +43,23 @@ layout transforms for users requesting reduced motion.
 
 Buttons retain their existing tab roles and roving tab index. Click and arrow
 key commits keep the existing controlled/uncontrolled data flow. A selection
-render moves the namespaced Motion thumb to the new button. Disabled options are
-never selected.
+render moves the namespaced Motion thumb to the new button. The track publishes
+a Motion press variant so any enabled segment press puffs the blue thumb from
+1 to 1.16 and release settles it back to 1, restoring the feedback removed by
+the initial Motion rewrite. Disabled options are never selected.
+
+The layout projection is a 220 ms tween using Motion's `backOut` easing. That
+curve applies to the horizontal selection travel and gives the thumb a small
+arrival overshoot. The scale response uses its own short ease-out transition so
+horizontal travel and press feedback do not borrow one timing function.
 
 ## Drag Selection
 
 The selected segment starts Motion drag through `useDragControls`; unselected
 buttons remain ordinary tap targets. The thumb drags on the x axis within the
-track ref, with low elasticity, no momentum, and snap-to-origin behavior.
+track ref, with low elasticity, no momentum, and snap-to-origin behavior. Drag
+keeps direct pointer tracking and the 1.16 held scale; `backOut` applies only to
+selection layout settling, never to live pointer following.
 
 At drag start, read segment rectangles once into a ref. `onDrag` compares
 Motion's pointer point with those cached numeric bounds and updates preview state
@@ -75,6 +84,7 @@ Add framework-free gates that assert:
 
 - SegmentedControl imports Motion and no longer imports `useSlidingThumb`;
 - the thumb uses a namespaced `layoutId` and a real-sized layout box;
+- tap and drag publish the 1.16 press scale, while layout uses `backOut`;
 - Motion drag is constrained, momentum-free, and uses cached segment bounds;
 - ARIA, controlled, uncontrolled, disabled, and keyboard contracts remain;
 - `motion` is declared and externalized;
