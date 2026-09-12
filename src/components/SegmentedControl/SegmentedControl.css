@@ -42,7 +42,10 @@
 .may-segmented__thumb {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   border-radius: var(--may-radius-full);
   /*
    * The brand as a FILL, not as a surface. --may-color-primary is the fill half
@@ -50,9 +53,20 @@
    * is the only colour guaranteed to carry on top of it.
    */
   background: var(--may-color-primary);
+  color: var(--may-color-on-primary);
+  font-weight: 600;
   /* The lightest rung there is. The thumb sits ON the track rather than over
    * the page, so anything heavier reads as a second surface. */
   box-shadow: var(--may-shadow-2xs);
+  pointer-events: none;
+}
+
+.may-segmented__thumb-label {
+  max-width: 100%;
+  overflow: hidden;
+  padding-inline: var(--may-space-1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /*
@@ -62,7 +76,6 @@
  */
 .may-segmented[data-dragging='true'] .may-segmented__thumb {
   box-shadow: var(--may-shadow-xs);
-  pointer-events: none;
 }
 
 /*
@@ -118,8 +131,21 @@
 }
 
 .may-segmented__segment[aria-selected='true'] {
+  z-index: 2;
   color: var(--may-color-on-primary);
   font-weight: 600;
+}
+
+.may-segmented__segment[aria-selected='true'] > .may-segmented__label {
+  opacity: 0;
+}
+
+.may-segmented[data-dragging='true'] .may-segmented__segment[aria-selected='true'] > .may-segmented__label {
+  opacity: 1;
+}
+
+.may-segmented[data-dragging='true'] .may-segmented__segment[data-hit='true'] > .may-segmented__label {
+  opacity: 0;
 }
 
 .may-segmented__segment:disabled { opacity: 0.35; cursor: not-allowed; }

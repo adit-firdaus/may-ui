@@ -72,6 +72,7 @@ check('the provider-first hooks are public', () => {
 
 check('SegmentedControl uses a real-sized Motion layout thumb', () => {
   const source = readFileSync(resolve(root, 'src/components/SegmentedControl/SegmentedControl.tsx'), 'utf8')
+  const css = readFileSync(resolve(root, 'src/components/SegmentedControl/SegmentedControl.css'), 'utf8')
   const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
   const vite = readFileSync(resolve(root, 'vite.config.ts'), 'utf8')
   assert.match(source, /LayoutGroup, MotionConfig, backOut, motion, useDragControls/)
@@ -88,6 +89,10 @@ check('SegmentedControl uses a real-sized Motion layout thumb', () => {
   assert.match(source, /whileTap="pressed"/)
   assert.match(source, /pressed: { scale: PRESS_SCALE }/)
   assert.match(source, /whileDrag={{ scale: PRESS_SCALE }}/)
+  assert.match(source, /may-segmented__thumb-label[\s\S]*?options\[previewIndex \?\? selectedIndex\]/)
+  assert.match(css, /may-segmented__thumb\s*{[^}]*z-index: 2[^}]*pointer-events: none/s)
+  assert.match(css, /aria-selected='true'[^}]*may-segmented__label[^}]*opacity: 0/s)
+  assert.match(css, /data-dragging='true'[^}]*aria-selected='true'[^}]*may-segmented__label[^}]*opacity: 1/s)
   assert.equal(pkg.dependencies.motion, '^13.2.0')
   assert.match(vite, /\^motion\(\?:\\\/\|\$\)/)
 })

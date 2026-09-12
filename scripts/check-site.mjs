@@ -174,6 +174,21 @@ check('site never imports the removed library stylesheet', () => {
   }
 })
 
+check('mobile pattern chrome stays compact and unobstructed', () => {
+  const app = readFileSync(resolve(root, 'examples/src/App.tsx'), 'utf8')
+  const patterns = readFileSync(resolve(root, 'examples/src/pages/PatternsPage.tsx'), 'utf8')
+  const css = readFileSync(resolve(root, 'examples/src/site.css'), 'utf8')
+
+  assert.match(app, /aria-label="Reset May UI configuration"[^>]*>Reset<\/button>/)
+  assert.match(patterns, /className="site-pattern-controls"/)
+  assert.doesNotMatch(css, /site-search-button span/)
+  assert.match(css, /site-search-button \.may-button__label/)
+  assert.match(css, /site-pattern-rail[^}]*align-items: center/s)
+  assert.match(css, /site-pattern-rail a[^}]*flex: 0 0 auto[^}]*white-space: nowrap/s)
+  assert.match(css, /site-pattern-controls[^}]*width: 100%/s)
+  assert.match(css, /site-pattern-stage[^}]*padding-inline: 0/s)
+})
+
 if (failures.length) {
   console.log(`\n${failures.length} site contract check(s) failed`)
   process.exit(1)

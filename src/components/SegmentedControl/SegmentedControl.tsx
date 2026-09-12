@@ -184,7 +184,11 @@ export function SegmentedControl<T extends string = string>({
                   onDrag={previewDrag}
                   onDragEnd={finishDrag}
                   aria-hidden
-                />
+                >
+                  <span className="may-segmented__thumb-label">
+                    {options[previewIndex ?? selectedIndex]?.label}
+                  </span>
+                </motion.span>
               )}
               <span className="may-segmented__label">{option.label}</span>
             </button>

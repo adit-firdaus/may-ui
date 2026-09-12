@@ -197,7 +197,8 @@ const assertions = [
   ['SegmentedControl is a tablist with a selected tab', () => {
     const s = html('SegmentedControl')
     return /role="tablist"/.test(s) && /aria-selected="true"/.test(s) &&
-      /<button[^>]*aria-selected="true"[^>]*>[\s\S]*?may-segmented__thumb/.test(s)
+      /<button[^>]*aria-selected="true"[^>]*>[\s\S]*?may-segmented__thumb/.test(s) &&
+      /may-segmented__thumb-label[^>]*>One<\/span>/.test(s)
   }],
   ['Progress exposes progressbar semantics', () => /role="progressbar"/.test(html('Progress'))],
   ['IconButton keeps its accessible name', () => /aria-label="Close"/.test(html('IconButton'))],

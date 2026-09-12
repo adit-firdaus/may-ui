@@ -25,7 +25,7 @@ export default function PatternsPage({ slug }: { slug?: string }) {
       <main className="site-pattern-main">
         <header className="site-pattern-toolbar">
           <div><Text variant="caption-1" tone="tint" weight="semibold">LIVE PATTERN</Text><h1 tabIndex={-1}>{selected.name}</h1></div>
-          <Stack direction="row" gap={2} wrap>
+          <Stack className="site-pattern-controls" direction="row" gap={2} wrap>
             {selected.frame && <Select value={device} onChange={(event) => setDevice(event.currentTarget.value as typeof device)} options={[{ label: 'Phone', value: 'phone' }, { label: 'Large phone', value: 'phone-large' }, { label: 'Tablet', value: 'tablet' }]} aria-label="Device" />}
             <SegmentedControl options={[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]} value={theme} onValueChange={setTheme} aria-label="Pattern theme" />
           </Stack>

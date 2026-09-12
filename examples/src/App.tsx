@@ -138,7 +138,7 @@ function ConfiguredSite() {
   const { config, dirty, reset } = useSiteConfig()
   return (
     <>
-      {dirty && <button className="site-recovery" onClick={reset}>Reset May UI configuration</button>}
+      {dirty && <button className="site-recovery" onClick={reset} aria-label="Reset May UI configuration" title="Reset May UI configuration">Reset</button>}
       <MayProvider {...config} linkComponent={SiteLink}><SiteApp /></MayProvider>
     </>
   )
