@@ -68,6 +68,29 @@ check('catalog index renders every component in a responsive app shell', () => {
   assert.match(source, /of \{catalog\.length\} components/)
 })
 
+check('catalog windows live previews and shares a quick thumb clock', () => {
+  const catalogSource = readFileSync(resolve(root, 'examples/src/pages/ComponentsPage.tsx'), 'utf8')
+  const siteCss = readFileSync(resolve(root, 'examples/src/site.css'), 'utf8')
+  const thumbSource = readFileSync(resolve(root, 'src/motion/sliding-thumb.ts'), 'utf8')
+  const segmentedSource = readFileSync(resolve(root, 'src/components/SegmentedControl/SegmentedControl.tsx'), 'utf8')
+
+  assert.match(catalogSource, /useDeferredValue/)
+  assert.equal((catalogSource.match(/new IntersectionObserver/g) ?? []).length, 1)
+  assert.match(catalogSource, /rootMargin: '1000px 0px'/)
+  assert.match(catalogSource, /visiblePreviews\.has\(item\.slug\)/)
+  assert.match(catalogSource, /site-catalog-card__placeholder/)
+  assert.match(catalogSource, /const isDesktop = useIsDesktop\(\)/)
+  assert.match(catalogSource, /\{isDesktop && \(\s*<Sidebar/s)
+  assert.match(siteCss, /--site-catalog-card-height:/)
+  assert.match(siteCss, /height: var\(--site-catalog-card-height\)/)
+  assert.match(siteCss, /contain-intrinsic-size: auto var\(--site-catalog-card-height\)/)
+  assert.match(siteCss, /site-catalog-card__meta \.may-tag[^}]*animation: none/s)
+  assert.match(siteCss, /site-route:has\(\.site-loading\) \+ \.site-footer[^}]*display: none/s)
+  assert.match(siteCss, /@media \(max-width: 1023px\)[\s\S]*site-catalog-sidebar \{ display: none; \}/)
+  assert.match(thumbSource, /export const SETTLE_MS = 220/)
+  assert.doesNotMatch(segmentedSource, /const SETTLE_MS|settleMs:/)
+})
+
 check('configuration codec preserves unicode, false, and zero', () => {
   const state = {
     theme: { mode: 'dark', tokens: { fontSans: 'Mây Sans', space4: 0 } },

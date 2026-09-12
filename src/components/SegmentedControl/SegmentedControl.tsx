@@ -13,13 +13,10 @@ import type { MaySize } from '../../types'
 const PRESS_SCALE = 1.16
 
 /*
- * The sheet curve, which is what ss-ui settles on, and 340ms — the same clock
- * `--may-duration-settle` carries for the rest of the system. Both were tuned
- * by watching the control rather than guessed; the git history has the walk
- * from 340 down to 220 and back if the numbers ever look arbitrary.
+ * The sheet curve gives the shared sliding-thumb clock a physical arrival
+ * without making this component own a second duration.
  */
 const SETTLE_EASING = 'var(--may-ease-sheet)'
-const SETTLE_MS = 340
 
 export interface SegmentedOption<T extends string = string> {
   label: string
@@ -90,7 +87,6 @@ export function SegmentedControl<T extends string = string>({
     roundEnds: true,
     pressScale: PRESS_SCALE,
     easing: SETTLE_EASING,
-    settleMs: SETTLE_MS,
   })
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {

@@ -6,8 +6,8 @@
  * Drives SegmentedControl, CapsuleTabs and the TabBar indicator.
  *
  * Constants here are measured, not guessed:
- *   SETTLE_MS 340   — 200ms is too abrupt to read as physical; past ~500ms it
- *                     starts to feel heavy rather than lively.
+ *   SETTLE_MS 220   — quick enough to answer selection immediately while the
+ *                     curve still carries a physical arrival.
  *   FOLLOW_MS 90    — while a finger is down the thumb tracks it almost
  *                     exactly; any easing here reads as lag.
  *   PRESS_SCALE     — non-uniform on purpose. Puffing 1.1x more vertically
@@ -15,7 +15,7 @@
  *                     track rather than simply getting bigger.
  */
 
-export const SETTLE_MS = 340
+export const SETTLE_MS = 220
 export const SETTLE_EASE = 'cubic-bezier(.32,.72,0,1)'
 export const FOLLOW_MS = 90
 /** Colour and elevation move on their own, slower clock than the thumb does. */

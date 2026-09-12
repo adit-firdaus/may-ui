@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   EmptyState,
@@ -8,6 +8,7 @@ import {
   Sheet,
   Tag,
   Text,
+  useIsDesktop,
 } from '@adit_firdaus/may-ui'
 import { Sidebar, SidebarItem, SidebarSection } from '@adit_firdaus/may-ui/desktop'
 import catalogData from '../generated/catalog.json'
@@ -117,6 +118,7 @@ function CatalogNavigation({
 export default function ComponentsPage({ slug }: { slug?: string }) {
   const route = useRoute()
   const { config } = useSiteConfig()
+  const isDesktop = useIsDesktop()
   const [query, setQuery] = useState('')
   const [family, setFamily] = useState<Family>('all')
   const [category, setCategory] = useState('all')
@@ -124,8 +126,10 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
   const [width, setWidth] = useState('wide')
   const [mobileCatalogNav, setMobileCatalogNav] = useState(false)
   const [activeSlug, setActiveSlug] = useState('')
+  const [visiblePreviews, setVisiblePreviews] = useState<Set<string>>(() => new Set())
   const [localProps, setLocalProps] = useState<Record<string, unknown>>(() => readLocalProps(route.search.get('props')))
   const entry = catalog.find((item) => item.slug === slug)
+  const deferredQuery = useDeferredValue(query)
 
   useEffect(() => setLocalProps(readLocalProps(new URLSearchParams(window.location.search).get('props'))), [slug])
   useEffect(() => {
@@ -147,7 +151,7 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
   }, [localProps])
 
   const categories = useMemo(() => [...new Set(catalog.map((item) => item.category))].sort(), [])
-  const filtered = catalog.filter((item) =>
+  const filtered = useMemo(() => catalog.filter((item) =>
     (family === 'all' || item.family === family) &&
     (category === 'all' || item.category === category) &&
     (capability === 'all' ||
@@ -155,15 +159,49 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
       capability === 'interactive' && item.controls.length > 0 ||
       capability === 'stateful' && item.controls.some((control) => control.kind === 'boolean') ||
       capability === 'data' && item.props.some((prop) => ['items', 'options', 'data', 'columns'].includes(prop.name))) &&
-    `${item.name} ${item.description}`.toLowerCase().includes(query.toLowerCase()),
-  )
-  const grouped = families.slice(1).map((familyName) => ({
+    `${item.name} ${item.description}`.toLowerCase().includes(deferredQuery.toLowerCase()),
+  ), [family, category, capability, deferredQuery])
+  const grouped = useMemo(() => families.slice(1).map((familyName) => ({
     family: familyName,
     categories: categories.map((categoryName) => ({
       category: categoryName,
       items: filtered.filter((item) => item.family === familyName && item.category === categoryName),
     })).filter((group) => group.items.length),
-  })).filter((group) => group.categories.length)
+  })).filter((group) => group.categories.length), [categories, filtered])
+
+  useEffect(() => {
+    if (entry) return
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-catalog-slug]')]
+    const currentSlugs = new Set(filtered.map((item) => item.slug))
+    setVisiblePreviews((current) => {
+      const next = new Set([...current].filter((itemSlug) => currentSlugs.has(itemSlug)))
+      return next.size === current.size ? current : next
+    })
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisiblePreviews(currentSlugs)
+      return
+    }
+    const observer = new IntersectionObserver((entries) => {
+      setVisiblePreviews((current) => {
+        const next = new Set(current)
+        let changed = false
+        for (const observed of entries) {
+          const card = observed.target as HTMLElement
+          const itemSlug = card.dataset.catalogSlug
+          if (!itemSlug) continue
+          if (observed.isIntersecting) {
+            if (!next.has(itemSlug)) { next.add(itemSlug); changed = true }
+          } else if (next.has(itemSlug) && !card.contains(document.activeElement)) {
+            next.delete(itemSlug)
+            changed = true
+          }
+        }
+        return changed ? next : current
+      })
+    }, { rootMargin: '1000px 0px' })
+    cards.forEach((card) => observer.observe(card))
+    return () => observer.disconnect()
+  }, [entry, filtered])
 
   if (!entry && slug) return <EmptyState title="Component not found" action={<Button asChild><SiteLink href="/components">Back to catalog</SiteLink></Button>} />
 
@@ -178,13 +216,15 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
     }
     return (
       <main className="site-catalog-shell">
-        <Sidebar
-          className="site-catalog-sidebar"
-          aria-label="Component catalog"
-          header={<div><Text weight="semibold">Catalog</Text><Text variant="caption-1" tone="secondary">{filtered.length} of {catalog.length}</Text></div>}
-        >
-          <CatalogNavigation {...navigationProps} onNavigate={setActiveSlug} />
-        </Sidebar>
+        {isDesktop && (
+          <Sidebar
+            className="site-catalog-sidebar"
+            aria-label="Component catalog"
+            header={<div><Text weight="semibold">Catalog</Text><Text variant="caption-1" tone="secondary">{filtered.length} of {catalog.length}</Text></div>}
+          >
+            <CatalogNavigation {...navigationProps} onNavigate={setActiveSlug} />
+          </Sidebar>
+        )}
         <div className="site-catalog-index">
           <header className="site-page-heading">
             <Text variant="caption-1" tone="tint" weight="semibold">COMPONENT CATALOG</Text>
@@ -203,9 +243,13 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
                   <div className="site-catalog-category__heading"><h3>{categoryGroup.category}</h3><span>{categoryGroup.items.length}</span></div>
                   <div className="site-catalog-grid">
                     {categoryGroup.items.map((item) => (
-                      <article className="site-catalog-card" id={`component-${item.slug}`} key={item.slug}>
+                      <article className="site-catalog-card" data-catalog-slug={item.slug} id={`component-${item.slug}`} key={item.slug}>
                         <div className="site-catalog-card__meta"><Tag size="sm">{item.family}</Tag><span>{item.category}</span></div>
-                        <div className={`site-catalog-card__preview site-preview-family-${item.family}`}><PreviewRenderer entry={item} /></div>
+                        <div className={`site-catalog-card__preview site-preview-family-${item.family}`}>
+                          {visiblePreviews.has(item.slug)
+                            ? <PreviewRenderer entry={item} />
+                            : <span className="site-catalog-card__placeholder" aria-hidden="true">{item.name} preview</span>}
+                        </div>
                         <h4>{item.name}</h4>
                         <p>{item.description}</p>
                         <SiteLink className="site-catalog-card__arrow" href={`/components/${item.slug}`}>Open workbench →</SiteLink>
@@ -217,7 +261,7 @@ export default function ComponentsPage({ slug }: { slug?: string }) {
             </section>
           )) : <EmptyState title="No components found" description="Try another search or clear the catalog filters." action={<Button onClick={resetFilters}>Clear filters</Button>} />}
         </div>
-        <Sheet open={mobileCatalogNav} onClose={() => setMobileCatalogNav(false)} title="Component catalog" side="start" size="lg">
+        <Sheet open={!isDesktop && mobileCatalogNav} onClose={() => setMobileCatalogNav(false)} title="Component catalog" side="start" size="lg">
           <CatalogNavigation {...navigationProps} onNavigate={(nextSlug) => { setActiveSlug(nextSlug); setMobileCatalogNav(false) }} />
         </Sheet>
       </main>
