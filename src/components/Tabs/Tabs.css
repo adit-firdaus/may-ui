@@ -333,8 +333,10 @@
 .may-tabs__panel {
   min-width: 0;
   flex: 1 1 auto;
-  /* Content, not chrome: it stays selectable, and enters with a short lift
-   * so a tab change reads as a move rather than a repaint. */
+  /* Content, not chrome: it stays selectable, and enters on a fade alone.
+   * It used to lift a few pixels as well, but a panel is the whole body of
+   * the view — sliding it makes the page look like it is settling its height
+   * on every tab change, which is exactly what a tab change should not do. */
   animation: may-tab-panel-in var(--may-duration-settle) var(--may-ease-out) both;
 }
 
@@ -347,6 +349,5 @@
 @keyframes may-tab-panel-in {
   from {
     opacity: 0;
-    transform: translateY(var(--may-space-1));
   }
 }
