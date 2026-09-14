@@ -51,6 +51,14 @@ export interface ListRowProps extends Omit<HTMLAttributes<HTMLElement>, 'title' 
   subtitle?: ReactNode
   /** Leading element — typically an `IconTile` or an `Avatar`. */
   leading?: ReactNode
+  /**
+   * Where the leading mark and the trailing value sit against a row whose text
+   * runs to several lines. `center` is the iOS default and right for a row of
+   * one or two lines; `top` is for a row carrying a paragraph, where a centred
+   * mark floats halfway down and stops reading as the subject's mark.
+   * @default 'center'
+   */
+  align?: 'center' | 'top'
   /** Trailing value, shown muted before the chevron. */
   detail?: ReactNode
   /** Trailing control such as a `Switch`. Suppresses the chevron. */
@@ -79,6 +87,7 @@ export function ListRow({
   accessory,
   onClick,
   chevron,
+  align = 'center',
   destructive = false,
   disabled = false,
   className,
@@ -105,6 +114,7 @@ export function ListRow({
 
   const shared = {
     'data-slot': 'list-row',
+    'data-align': align === 'center' ? undefined : align,
     'data-destructive': destructive ? ('true' as const) : undefined,
     className: cx('may-list-row', interactive && 'may-hoverable', className),
     role: 'listitem',
