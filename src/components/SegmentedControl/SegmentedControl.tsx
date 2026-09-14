@@ -7,6 +7,16 @@ import type { MaySize } from '../../types'
 import { useAutoId } from '../../utils/useId'
 
 const PRESS_SCALE = 1.16
+/*
+ * How far the pointer must travel before a press becomes a drag. Below this a
+ * press is a TAP, and a tap must not pick the thumb up: `snapToCursor` would
+ * teleport it under the finger, and the offset that puts it there lives on the
+ * draggable span, which React throws away when selection moves the thumb into
+ * another segment. The layout projection then animates from the old segment,
+ * so the thumb visibly snaps back to where it started and crosses the control
+ * a second time. Keyboard selection never had this because it never drags.
+ */
+const DRAG_SLOP = 4
 const LAYOUT_TRANSITION = { type: 'tween', duration: 0.22, ease: backOut } as const
 const SCALE_TRANSITION = { type: 'tween', duration: 0.14, ease: 'easeOut' } as const
 const THUMB_VARIANTS = {
@@ -71,6 +81,8 @@ export function SegmentedControl<T extends string = string>({
   const trackRef = useRef<HTMLDivElement>(null)
   const boundsRef = useRef<SegmentBounds[]>([])
   const hitRef = useRef(-1)
+  /** A press that has not yet travelled far enough to become a drag. */
+  const pressRef = useRef<{ index: number; x: number; y: number } | null>(null)
   const dragControls = useDragControls()
 
   const selectedIndex = Math.max(
@@ -94,12 +106,25 @@ export function SegmentedControl<T extends string = string>({
 
   const hitAt = (x: number) => boundsRef.current.find(({ left, right }) => x >= left && x <= right)?.index ?? -1
 
-  const startDrag = (event: ReactPointerEvent<HTMLButtonElement>, index: number) => {
+  const pressSegment = (event: ReactPointerEvent<HTMLButtonElement>, index: number) => {
     if (options[index]?.disabled) return
     cacheBounds()
     hitRef.current = index
-    setPreviewIndex(index)
+    pressRef.current = { index, x: event.clientX, y: event.clientY }
+  }
+
+  /** Promotes a press to a drag once it has travelled, and never before. */
+  const trackPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const press = pressRef.current
+    if (!press) return
+    if (Math.hypot(event.clientX - press.x, event.clientY - press.y) < DRAG_SLOP) return
+    pressRef.current = null
+    setPreviewIndex(press.index)
     dragControls.start(event, { snapToCursor: true })
+  }
+
+  const endPress = () => {
+    pressRef.current = null
   }
 
   const previewDrag = (_event: PointerEvent, info: PanInfo) => {
@@ -143,6 +168,9 @@ export function SegmentedControl<T extends string = string>({
           data-dragging={dragging ? 'true' : undefined}
           className={cx('may-segmented', fullWidth && 'may-segmented--full', className)}
           onKeyDown={onKeyDown}
+          onPointerMove={trackPointerMove}
+          onPointerUp={endPress}
+          onPointerCancel={endPress}
           initial="resting"
           animate="resting"
           whileTap="pressed"
@@ -162,7 +190,7 @@ export function SegmentedControl<T extends string = string>({
               tabIndex={option.value === current ? 0 : -1}
               disabled={option.disabled}
               data-hit={dragging && previewIndex === index ? 'true' : undefined}
-              onPointerDown={(event) => startDrag(event, index)}
+              onPointerDown={(event) => pressSegment(event, index)}
               onClick={() => commit(option.value)}
               className="may-segmented__segment"
             >
