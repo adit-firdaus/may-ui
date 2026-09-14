@@ -122,7 +122,13 @@ export function Alert({
               aria-label={dismissLabel}
               className="may-alert__dismiss may-pressable may-hoverable"
             >
-              <IoClose aria-hidden focusable="false" />
+              {/* xmark — the chip behind it is smaller than the button, so the
+                  glyph stays iOS-sized while the tap target stays a full 44pt.
+                  Same affordance as Toast and Modal: a close control in this
+                  system is a chip, not a bare glyph. */}
+              <span className="may-alert__dismiss-chip" aria-hidden>
+                <IoClose focusable="false" />
+              </span>
             </button>
           )}
         </div>
