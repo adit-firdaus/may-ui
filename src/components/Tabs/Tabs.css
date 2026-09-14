@@ -144,6 +144,18 @@
   background: color-mix(in srgb, var(--may-color-primary) 15%, transparent);
 }
 
+/*
+ * ...and the tab has to carry that same capsule. The shared `.may-hoverable`
+ * highlight paints on the tab itself, so it is cut by the TAB's radius, not
+ * the indicator's: with the tab left at the default `md`, a hovered tab was a
+ * 10px rounded rectangle sitting next to a selected tab that was a full
+ * capsule — the same footprint drawn as two different shapes. The underline
+ * variant keeps `md`, where there is no capsule to agree with.
+ */
+.may-tabs[data-variant='pill'] .may-tabs__tab {
+  border-radius: var(--may-radius-full);
+}
+
 /* The strip's own hairline, drawn outside the box model so switching variants
  * never moves a tab by a pixel. */
 .may-tabs[data-variant='underline'] .may-tabs__track::before {
