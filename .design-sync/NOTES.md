@@ -47,6 +47,109 @@ what is here now — do not use it as a reference for anything.
 
 ## Findings
 
+### `[GENERAL]` `.design-sync/conventions.md` is stale after the 2026-09-14 provider breaking change
+
+Authored 2026-09-10, before `825e915`. Validated against the fresh build on 2026-09-14 —
+these claims no longer verify and will make the design agent emit code that fails at
+runtime or does nothing:
+
+- `<MayHost />` (§1, §10) — `MayHost` is no longer a public export (confirmed absent from
+  `dist/index.d.ts`'s exported symbols; only the `MayHostConfig` *type* remains, referenced
+  by `MayProvider`'s `host` prop). Mounting hosts is now automatic/internal, configured via
+  `<MayProvider host={{...}}>`, not a separate component to render.
+- `<MayProvider theme="system">` (§1, §10) — `theme` is no longer a bare string. It's now
+  `MayThemeConfig`: `{ mode?: 'light'|'dark'|'system', tokens?, light?, dark? }`. The
+  correct form is `<MayProvider theme={{ mode: 'system' }}>`.
+- `accent` prop (§1) — removed entirely (`BREAKING CHANGE: ... accent ... removed`). There
+  is no tint override at the provider level anymore.
+- `useMayTheme() → { theme, resolvedTheme, setTheme }` (§1) — wrong on three counts: it
+  returns `{ mode, resolvedMode }` (not `theme`/`resolvedTheme`), and `setTheme` doesn't
+  exist (`BREAKING CHANGE: ... the mutable theme setter ... removed` — theme is now
+  provider-config-only, no imperative setter).
+- §9 ("Where the truth lives") points at `_ds/<folder>/styles.css` / `_ds_bundle.css` as
+  where "every token definition and component rule" lives. This DS is CSS-in-JS now (see
+  the cssEntry finding above) — there is no static stylesheet with that content anymore;
+  styles ship as per-component `<style href precedence>` tags injected by each component
+  plus one foundation stylesheet from `MayProvider`. This section needs rewriting to point
+  at the real source: `src/styles/tokens.css` (generated, token values) and each
+  component's own `.tsx`/`.css` pair in the repo, or simply say styles are runtime-injected
+  and not statically inspectable.
+
+Not yet re-validated: the rest of the file (layout primitives, icon guidance, typography
+tokens, motion tokens, native-feel rules, Field wrapping) — none of those areas were
+touched by the breaking change and they weren't re-checked line by line, but nothing in
+this sync's grading surfaced a regression in them either.
+
+**This file is human-owned — the sync does not auto-rewrite it.** Fix these five points
+by hand (or ask an agent to, pointing at this note) before the next sync's README stitch,
+so the design agent stops being told to mount a component that doesn't exist.
+
+### `[GENERAL]` 2026-09-14: the "move styling and defaults into React" breaking change
+required `cfg.provider` — the decorator-bundle path is now broken
+
+The library's `825e915 feat(provider)!: move styling and defaults into React` (React 19
+required; `styles.css`, the mutable theme setter, and the public `MayHost` export all
+removed; every component's `index.ts` now wraps its export in `withMayStyles`, which
+renders a `<>{sheets.map(...)}</>` Fragment internally) exposed a **pre-existing bug in
+the design-sync converter itself**, not in this repo: `lib/source-storybook.mjs`'s
+`bundlePreviewDecorators` react shim declares its proxy base object as
+`{jsx,jsxs,jsxDEV,Fragment:undefined}` and the proxy's `get`/`getOwnPropertyDescriptor`
+traps both check `k in o` — which is true for `Fragment` (the key exists, just with
+value `undefined`), so the fallback to the real `window.React.Fragment` never fires.
+Any JSX Fragment shorthand (`<>...</>`) compiled into the decorator bundle from SOURCE
+(not shimmed to `window.MayUI`) then crashes with "Element type is invalid... got:
+undefined. Check the render method of `MayStyles`." — **every single preview**, because
+every preview is wrapped by the decorator (`window.__dsDecorate`).
+
+Compounding factor unique to this repo: `.storybook/preview.tsx` imports `MayProvider`
+via `'../src/components/MayProvider'` (a relative path two levels deep), and the
+decorator bundle's `dsShim` only shims exact matches on `pkgRoot`, `pkgRoot/src`, or
+`pkgRoot/src/index` (`lib/source-storybook.mjs` lines ~262-268) — so `MayProvider` (and
+its whole transitive source tree, including `styles/runtime.tsx`'s `MayStyles`) got
+recompiled FROM SOURCE inside the decorator bundle instead of shimmed to the real,
+correctly-behaving `window.MayUI.MayProvider`. That recompiled copy is what tripped the
+Fragment bug — and even with the Fragment bug fixed, a source-recompiled MayProvider
+would use different Context object identities than the real bundle's, silently making
+its theming/defaults inert for the actual rendered components.
+
+**Fix applied**: set `cfg.provider` explicitly —
+```json
+"provider": { "component": "MayProvider", "props": { "inline": true, "theme": { "mode": "light" } } }
+```
+This skips decorator auto-detection entirely (`(decorator auto-detect skipped — cfg.provider is set)`
+in the build log) and wraps every preview in the REAL compiled `MayProvider` from
+`window.MayUI` — sidestepping both bugs at once. Confirmed via the `MayProvider` →
+`Nested Configuration` story (theming/nesting) and the full 73/73 clean render check.
+
+**If this ever needs decorator-bundling again** (e.g. a future DS needs per-story
+`context.globals` that `cfg.provider`'s static props can't express): the converter bug
+is real and independent of this repo — the fix is `.design-sync/overrides/source-storybook.mjs`
+forking `bundlePreviewDecorators`'s `reactGlobal` plugin to drop the `Fragment:undefined`
+key (or change the `get` trap to `(k in o && o[k] !== undefined) ? o[k] : (g||{})[k]`) —
+`window.React.Fragment` is already picked up by `ownKeys`'s `Object.keys(window.React)`
+merge, so the placeholder key serves no purpose and only shadows the real value.
+
+### `[GENERAL]` `cfg.cssEntry` removed — this DS is CSS-in-JS as of 0.2.0
+
+The same breaking change removed `dist/mayui.css` entirely; styles now ship as inline
+`<style href precedence>` tags injected per-component by `withMayStyles`/`MayStyles`
+(React 19 "Hoistable" resources) plus one foundation stylesheet from `MayProvider`. The
+converter's `[CSS_RUNTIME]` self-styling fallback is correct here — do not chase it, and
+do not re-add `cfg.cssEntry` unless the library ships a static stylesheet again.
+
+### `[GRID_OVERFLOW]` Slider needs `cardMode: "column"` (new as of 0.2.0)
+
+`Slider` → `Tones` renders wider than its grid cell as of this sync (wasn't flagged
+before). Added `cfg.overrides.Slider.cardMode = "column"`.
+
+### `[RENDER_THIN]` CommandPalette — expected, not a regression
+
+`cfg.overrides.CommandPalette` is `cardMode: "single", primaryStory: "Open"` — its
+single-story product card renders the palette as a viewport-fixed overlay, so the
+in-flow root height is legitimately 0px. This is the same documented gap as the
+"compare harness cannot see viewport-fixed overlays" finding below, just surfaced via
+the render-check this time instead of the compare oracle. Not actionable.
+
 ### `[GENERAL]` The reference storybook needs `STORYBOOK_BASE=./`
 
 **Build the reference with `STORYBOOK_BASE=./` or every story fails.**
@@ -112,6 +215,14 @@ checkmark in the leading slot, with `menuitemcheckbox` semantics) has NO story
 that opens the menu, so no story exercises it and this oracle cannot see it. If
 that state matters, add a story that renders the menu open — the gap is in the
 stories, not in the component.
+
+A FOURTH flavour, found on `FloatingBubble` during the 2026-09-14 re-grade:
+storybook's tight crop can simply cut the viewport-fixed element out of frame
+rather than leaving the reference fully blank — the reference still shows real
+(in-flow) content, just not the fixed-position piece. Distinguish it from a
+real mismatch by checking the raw preview PNG alone: if the fixed element
+renders correctly there (right position, right state), it's this crop gap, not
+a regression — grade `match`.
 
 What *does* cover them: `package-validate.mjs`'s render check (73/73 previews render
 cleanly, and that renders the real preview html including open overlays), and

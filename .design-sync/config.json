@@ -1,17 +1,23 @@
 {
-  "projectId": "395ba6af-772e-4469-b2d6-7af4a0f3ebe6",
+  "projectId": "83bc26d8-ff7e-4668-a036-2ad377aa6dd3",
   "shape": "storybook",
   "storybookConfigDir": ".storybook",
   "pkg": "mayui",
   "globalName": "MayUI",
   "entry": "dist/mayui.js",
-  "cssEntry": "dist/mayui.css",
   "buildCmd": "npm run build",
   "storybookStatic": ".design-sync/sb-reference",
   "titleMap": {
     "Overview": null
   },
   "readmeHeader": ".design-sync/conventions.md",
+  "provider": {
+    "component": "MayProvider",
+    "props": {
+      "inline": true,
+      "theme": { "mode": "light" }
+    }
+  },
   "extraEntries": [
     "./dist/desktop.js",
     "./dist/mobile.js",
@@ -58,6 +64,9 @@
       "cardMode": "column"
     },
     "DataTable": {
+      "cardMode": "column"
+    },
+    "Slider": {
       "cardMode": "column"
     }
   }
