@@ -67,8 +67,8 @@ export function NavigationBar({
   ...rest
 }: NavigationBarProps) {
   const rootRef = useRef<HTMLElement>(null)
-  /** The uncollapsed large title. Its height is the scroll distance. */
-  const largeTitleRef = useRef<HTMLHeadingElement>(null)
+  /** The uncollapsed large title block. Its height is the scroll distance. */
+  const largeTitleRef = useRef<HTMLDivElement>(null)
   const backPress = usePressFeedback()
 
   useEffect(() => {
@@ -192,9 +192,16 @@ export function NavigationBar({
 
       {largeTitle && (
         <div className="may-nav-bar__large">
-          <h1 ref={largeTitleRef} className="may-nav-bar__large-title">
-            {title}
-          </h1>
+          {/*
+           * Measured here rather than on the heading, so a subtitle counts
+           * toward the distance the title has to travel. `offsetHeight` is a
+           * layout height and ignores the transform below it, which is what
+           * keeps the collapse from chasing its own shrinking box.
+           */}
+          <div ref={largeTitleRef} className="may-nav-bar__large-group">
+            <h1 className="may-nav-bar__large-title">{title}</h1>
+            {subtitle && <p className="may-nav-bar__large-subtitle">{subtitle}</p>}
+          </div>
         </div>
       )}
     </header>

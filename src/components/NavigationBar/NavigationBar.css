@@ -276,6 +276,38 @@
   padding-block-end: var(--may-space-2);
 }
 
+/*
+ * Title and subtitle collapse as one: the transform and the fade sit on the
+ * group so the two lines leave together, keeping their own spacing all the
+ * way out instead of sliding apart.
+ */
+.may-nav-bar__large-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--may-space-1);
+  min-width: 0;
+  /* Shrinks toward its own baseline and leading edge, so it converges on the
+   * inline title rather than drifting toward the middle of the bar. */
+  transform-origin: 0 100%;
+  transform: scale(calc(1 - var(--may-nav-progress) * 0.14));
+  opacity: calc(1 - var(--may-nav-progress) * 1.5);
+}
+
+[dir='rtl'] .may-nav-bar__large-group {
+  transform-origin: 100% 100%;
+}
+
+.may-nav-bar__large-subtitle {
+  margin: 0;
+  font-size: var(--may-text-subheadline);
+  line-height: var(--may-text-subheadline-leading);
+  letter-spacing: var(--may-text-subheadline-tracking);
+  color: var(--may-color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .may-nav-bar__large-title {
   margin: 0;
   font-size: var(--may-text-large-title);
@@ -286,15 +318,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* Shrinks toward its own baseline and leading edge, so it converges on the
-   * inline title rather than drifting toward the middle of the bar. */
-  transform-origin: 0 100%;
-  transform: scale(calc(1 - var(--may-nav-progress) * 0.14));
-  opacity: calc(1 - var(--may-nav-progress) * 1.5);
-}
-
-[dir='rtl'] .may-nav-bar__large-title {
-  transform-origin: 100% 100%;
 }
 
 /* -------------------------------- safe area ------------------------------- */
