@@ -16,9 +16,21 @@
   padding: var(--may-space-5);
   padding-block-start: calc(var(--may-space-5) + var(--may-inset-top));
   padding-block-end: calc(var(--may-space-5) + var(--may-inset-bottom));
+  /* A phone has no room to spare, so the inset above is as tight as it can
+   * safely be. Once there is width, holding the panel that close to the edges
+   * makes a dialog read as a takeover rather than as something laid over the
+   * page — so the margin grows with the screen. */
   background: var(--may-color-scrim);
   animation: may-modal-scrim-in var(--may-duration-fast) var(--may-ease-out);
   transition: opacity var(--may-duration-fast) var(--may-ease-out);
+}
+
+@media (min-width: 700px) {
+  .may-modal__scrim {
+    padding: var(--may-space-10);
+    padding-block-start: calc(var(--may-space-10) + var(--may-inset-top));
+    padding-block-end: calc(var(--may-space-10) + var(--may-inset-bottom));
+  }
 }
 
 .may-modal {
