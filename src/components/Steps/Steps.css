@@ -155,8 +155,8 @@ button.may-steps__body:disabled {
   line-height: 1;
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--may-color-primary) 18%, transparent);
   transition:
-    background-color var(--may-duration-settle) var(--may-ease-out),
-    color var(--may-duration-settle) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
+    color var(--may-duration-color) var(--may-ease-out),
     box-shadow var(--may-duration-settle) var(--may-spring-bouncy);
 }
 
@@ -217,7 +217,7 @@ button.may-steps__body:disabled {
 .may-steps__title {
   color: var(--may-color-text-secondary);
   font-weight: 500;
-  transition: color var(--may-duration-settle) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-steps__step[data-status='complete'] .may-steps__title {

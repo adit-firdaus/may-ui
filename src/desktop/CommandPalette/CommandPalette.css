@@ -164,7 +164,7 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 /*

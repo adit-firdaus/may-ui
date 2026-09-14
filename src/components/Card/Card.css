@@ -81,7 +81,7 @@ button.may-card {
   appearance: none;
   transition:
     box-shadow var(--may-duration-settle) var(--may-ease-out),
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     transform var(--may-duration-settle) var(--may-spring-bouncy);
 }
 

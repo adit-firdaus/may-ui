@@ -79,7 +79,7 @@
   letter-spacing: inherit;
   text-align: inherit;
   cursor: pointer;
-  transition: color var(--may-duration-fast) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {

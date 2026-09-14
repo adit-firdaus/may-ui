@@ -26,7 +26,7 @@
   /* Fixes orphans where supported, without touching the metrics. */
   text-wrap: pretty;
   /* The only thing that moves at rest: a theme flip, or a tone change. */
-  transition: color var(--may-duration-fast) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 /* -------------------------------- variants -------------------------------- */

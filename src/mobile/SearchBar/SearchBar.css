@@ -53,7 +53,7 @@
   cursor: text;
   box-shadow: 0 0 0 0 transparent;
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     box-shadow var(--may-duration-settle) var(--may-spring-snappy);
 }
 
@@ -122,7 +122,7 @@
   transition:
     inset-inline-start var(--may-duration-settle) var(--may-spring-snappy),
     transform var(--may-duration-settle) var(--may-spring-snappy),
-    color var(--may-duration-fast) var(--may-ease-out);
+    color var(--may-duration-color) var(--may-ease-out);
 }
 
 /* Centring by half the element's own width has to flip with the writing mode. */
@@ -243,7 +243,7 @@
   background: transparent;
   color: var(--may-color-text-tertiary);
   cursor: pointer;
-  transition: color var(--may-duration-fast) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-search-bar__clear > svg {
@@ -293,7 +293,7 @@
   letter-spacing: var(--may-text-body-tracking);
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--may-duration-fast) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-search-bar[data-size='sm'] .may-search-bar__cancel {

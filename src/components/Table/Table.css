@@ -213,7 +213,7 @@
   letter-spacing: var(--may-table-tracking);
   color: var(--may-color-text);
   background-color: var(--may-table-row-bg, transparent);
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-table__cell[data-align='center'],

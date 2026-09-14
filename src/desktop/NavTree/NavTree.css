@@ -78,8 +78,8 @@
   text-align: start;
   cursor: pointer;
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
-    color var(--may-duration-fast) var(--may-ease-out);
+    background-color var(--may-duration-color) var(--may-ease-out),
+    color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-navtree__row:disabled {

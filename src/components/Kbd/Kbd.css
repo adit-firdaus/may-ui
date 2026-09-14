@@ -27,8 +27,8 @@
   /* Release rides the bouncy spring, exactly as .may-pressable does. */
   transition:
     transform var(--may-duration-settle) var(--may-spring-bouncy),
-    background-color var(--may-duration-fast) var(--may-ease-out),
-    color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
+    color var(--may-duration-color) var(--may-ease-out),
     box-shadow var(--may-duration-fast) var(--may-ease-out);
 }
 
@@ -43,7 +43,7 @@
   box-shadow: none;
   transition:
     transform var(--may-duration-instant) var(--may-ease-out),
-    background-color var(--may-duration-instant) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     box-shadow var(--may-duration-instant) var(--may-ease-out);
 }
 

@@ -53,7 +53,7 @@
   font-family: inherit;
   cursor: pointer;
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     opacity var(--may-duration-fast) var(--may-ease-out),
     transform var(--may-duration-settle) var(--may-spring-bouncy);
 }
@@ -90,7 +90,7 @@
   inset: 0;
   border-radius: inherit;
   background-color: transparent;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
   pointer-events: none;
 }
 

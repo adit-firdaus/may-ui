@@ -49,7 +49,7 @@
   color: var(--may-color-text);
   font: inherit;
   text-align: start;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 button.may-list-row { cursor: pointer; }

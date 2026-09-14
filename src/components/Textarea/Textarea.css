@@ -19,7 +19,7 @@
   cursor: text;
   box-shadow: 0 0 0 0 transparent;
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     box-shadow var(--may-duration-settle) var(--may-spring-snappy);
 }
 

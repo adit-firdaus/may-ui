@@ -46,6 +46,7 @@ export interface MayTokens {
   readonly controlHSm: MayTokenValue
   readonly controlHXs: MayTokenValue
   readonly cyan: MayTokenValue
+  readonly durationColor: MayTokenValue
   readonly durationFast: MayTokenValue
   readonly durationFollow: MayTokenValue
   readonly durationInstant: MayTokenValue
@@ -254,6 +255,7 @@ export const mayTokenCssNames = {
   controlHSm: 'control-h-sm',
   controlHXs: 'control-h-xs',
   cyan: 'cyan',
+  durationColor: 'duration-color',
   durationFast: 'duration-fast',
   durationFollow: 'duration-follow',
   durationInstant: 'duration-instant',
@@ -462,6 +464,7 @@ export const mayLightTokens = {
   controlHSm: "calc(var(--may-control-h) - 0.5rem)",
   controlHXs: "calc(var(--may-control-h) - 0.75rem)",
   cyan: "#32ade6",
+  durationColor: "0ms",
   durationFast: "150ms",
   durationFollow: "90ms",
   durationInstant: "80ms",
@@ -670,6 +673,7 @@ export const mayDarkTokens = {
   controlHSm: "calc(var(--may-control-h) - 0.5rem)",
   controlHXs: "calc(var(--may-control-h) - 0.75rem)",
   cyan: "#64d2ff",
+  durationColor: "0ms",
   durationFast: "150ms",
   durationFollow: "90ms",
   durationInstant: "80ms",

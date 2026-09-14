@@ -117,7 +117,7 @@
   text-align: start;
   overflow: hidden;
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     opacity var(--may-duration-fast) var(--may-ease-out),
     min-height var(--may-duration-settle) var(--may-spring-smooth),
     margin-block-end var(--may-duration-settle) var(--may-spring-smooth);
@@ -225,8 +225,8 @@ button.may-sidebar-section__header {
   cursor: pointer;
   overflow: hidden;
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
-    color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
+    color var(--may-duration-color) var(--may-ease-out),
     padding-inline var(--may-duration-settle) var(--may-spring-smooth);
 }
 
@@ -364,7 +364,7 @@ button.may-sidebar-section__header {
   background: transparent;
   color: var(--may-color-text-secondary);
   cursor: pointer;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-sidebar-toggle__icon {

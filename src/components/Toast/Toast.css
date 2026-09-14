@@ -213,7 +213,7 @@
   height: var(--may-control-h-xs);
   border-radius: var(--may-radius-full);
   background: var(--may-color-fill-tertiary);
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-toast__close-chip > svg {

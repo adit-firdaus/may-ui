@@ -75,7 +75,7 @@
   /* The horizontal drag belongs to the switch; vertical panning still belongs
    * to whatever list the switch is sitting in. */
   touch-action: pan-y;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-switch__input:checked + .may-switch__track {

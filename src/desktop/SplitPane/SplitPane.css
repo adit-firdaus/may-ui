@@ -89,7 +89,7 @@
   background: var(--may-color-separator);
   /* Above both panes, so the widened hit area is reachable over their content. */
   z-index: var(--may-z-base);
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 /*
@@ -127,7 +127,7 @@
   position: absolute;
   inset: 0;
   background: transparent;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-splitpane[data-orientation='horizontal'] > .may-splitpane__divider::before {

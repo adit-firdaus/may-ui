@@ -129,7 +129,7 @@
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--may-duration-fast) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 /* Weight as well as colour: a tint alone is not a state. */

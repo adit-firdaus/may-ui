@@ -149,7 +149,7 @@
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: color var(--may-duration-fast) var(--may-ease-out);
+  transition: color var(--may-duration-color) var(--may-ease-out);
 }
 
 .may-tab-bar__item[aria-current='page'] {

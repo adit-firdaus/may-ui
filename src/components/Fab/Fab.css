@@ -31,7 +31,7 @@
   transition:
     transform var(--may-duration-settle) var(--may-spring-bouncy),
     box-shadow var(--may-duration-settle) var(--may-spring-bouncy),
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     opacity var(--may-duration-fast) var(--may-ease-out);
   /*
    * A FAB should arrive, not appear -- but on `ease-out`, like the rest of the

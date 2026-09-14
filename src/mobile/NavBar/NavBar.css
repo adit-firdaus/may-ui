@@ -133,7 +133,7 @@
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color var(--may-duration-fast) var(--may-ease-out);
+  transition: background-color var(--may-duration-color) var(--may-ease-out);
 }
 
 /* No :hover rule of its own — the button carries `.may-hoverable`, whose one

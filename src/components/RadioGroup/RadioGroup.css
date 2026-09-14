@@ -70,7 +70,7 @@
   background: var(--may-color-fill-tertiary);
   transform: scale(1);
   transition:
-    background-color var(--may-duration-fast) var(--may-ease-out),
+    background-color var(--may-duration-color) var(--may-ease-out),
     transform var(--may-duration-settle) var(--may-spring-bouncy);
 }
 

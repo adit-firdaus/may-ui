@@ -28,6 +28,14 @@
   /* Durations. Named for intent; the springs carry their own above. */
   --may-duration-instant: 80ms;   /* press-down: must beat the eye           */
   --may-duration-fast: 150ms;
+  /*
+   * Colour does not animate. A hover wash, a selected fill, a pressed tint —
+   * they land the moment the state changes, because an easing curve on a
+   * colour reads as lag rather than as motion. Shape still moves: scale,
+   * translate and the springs above are untouched. Give this a duration if a
+   * theme wants the fade back.
+   */
+  --may-duration-color: 0ms;
   --may-duration-settle: 340ms;   /* "200ms is too abrupt, 500ms feels heavy" */
   --may-duration-sheet-in: 500ms;
   --may-duration-sheet-out: 300ms;
