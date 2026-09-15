@@ -4,25 +4,28 @@ May UI is Apple's design language as a React library. Surfaces separate by **val
 not by strokes** — there are no borders anywhere in this system, and adding one is the
 fastest way to make a design stop looking like iOS.
 
-### 1. Wrap the tree in `MayProvider`, and mount `MayHost` once
+### 1. Wrap the tree in `MayProvider`
 
 `MayProvider` renders the `.may-root` element carrying every design token and the base
-layer. Outside it components fall back to unstyled browser defaults — no colours, no
-spacing, no type scale. `MayHost` is the single mount point for imperative surfaces
-(toasts); mount it once, near the root.
+layer, and injects each component's styles as it mounts. Outside it components fall back
+to unstyled browser defaults — no colours, no spacing, no type scale. Imperative surfaces
+(toasts) mount automatically inside the provider — there is nothing separate to render.
 
 ```jsx
 import { IoWifi, IoCellular } from react-icons/io5
 
-<MayProvider theme="system">   {/* "system" | "light" | "dark" */}
-  <MayHost />
+<MayProvider theme={{ mode: 'system' }}>   {/* mode: 'system' | 'light' | 'dark' */}
   <YourApp />
 </MayProvider>
 ```
 
-Dark mode needs no extra work: `theme="system"` follows the OS, `theme="dark"` pins it.
-Read or change it with `useMayTheme()` → `{ theme, resolvedTheme, setTheme }`.
-`accent` on the provider re-points the tint.
+Dark mode needs no extra work: `mode: 'system'` follows the OS, `mode: 'dark'` pins it.
+`theme` also takes `tokens` / `light` / `dark` for token overrides (see §3 for the token
+names). Read the resolved theme with `useMayTheme()` → `{ mode, resolvedMode }` — it is
+read-only; there is no imperative setter, so drive theme changes by changing the `theme`
+prop you pass in. To configure or disable the toast host, use the `host` prop
+(`host={{ position: 'top' }}`, or `host={false}` to opt out) — there is no separate host
+component or provider-level tint override to reach for.
 
 ### 2. Three import paths — pick by shape, not by preference
 
@@ -161,17 +164,18 @@ wiring. Passing `error` marks the control invalid — never set `invalid` yourse
 
 ### 9. Where the truth lives
 
-`_ds/<folder>/styles.css` and the `_ds_bundle.css` it imports hold every token
-definition and component rule. Each component's `.prompt.md` and `.d.ts` under
-`components/<group>/<Name>/` are the authoritative prop contracts.
+Styles are runtime-injected per component (CSS-in-JS), not a static stylesheet you can
+read — `styles.css` in the bound copy is a generated stub, not the source of truth. The
+token **names** you can rely on are the ones listed in §3 above; each component's
+`.prompt.md` and `.d.ts` under `components/<group>/<Name>/` are the authoritative prop
+contracts.
 
 ### 10. An idiomatic screen
 
 ```jsx
 import { IoWifi, IoCellular } from 'react-icons/io5'
 
-<MayProvider theme="system">
-  <MayHost />
+<MayProvider theme={{ mode: 'system' }}>
   <NavigationBar title="Settings" largeTitle />
   <Stack gap={4} style={{ padding: 'var(--may-space-4)' }}>
     <SegmentedControl

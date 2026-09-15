@@ -80,9 +80,48 @@ tokens, motion tokens, native-feel rules, Field wrapping) — none of those area
 touched by the breaking change and they weren't re-checked line by line, but nothing in
 this sync's grading surfaced a regression in them either.
 
-**This file is human-owned — the sync does not auto-rewrite it.** Fix these five points
-by hand (or ask an agent to, pointing at this note) before the next sync's README stitch,
-so the design agent stops being told to mount a component that doesn't exist.
+**Fixed on disk 2026-09-15** (user asked for the corrections to be applied directly, so
+this sync's exception is: the five points above were edited in place in
+`.design-sync/conventions.md` — §1 dropped the `MayHost` mount and rewrote the
+`theme`/`accent`/`useMayTheme()` guidance to the current API, §9 now says styles are
+runtime-injected rather than pointing at a static stylesheet, §10's example dropped
+`<MayHost />` and fixed the `theme` prop shape). Ordinarily this file is human-owned and
+the sync does not auto-rewrite it — treat this as the exception, not the rule, for future
+drift.
+
+**The fix has NOT yet reached the uploaded project.** The rebuild meant to stitch it into
+`README.md` (this sync's mandatory post-authoring rebuild) failed immediately —
+`node_modules/` and `dist/` had both disappeared from the repo between builds, evidently
+from unrelated concurrent activity on this same checkout (see the "concurrent repo
+activity" finding below). The uploaded project's `README.md` still carries the STALE
+pre-fix conventions text. `.design-sync/conventions.md` on disk is correct; the next
+sync's normal rebuild will pick it up and re-stitch the README automatically — no special
+action needed beyond running the next sync.
+
+### `[GENERAL]` Concurrent repo activity during the 2026-09-14/15 re-sync
+
+While this sync's fan-out grading ran over several hours, something else committed to
+this same checkout: `049de86` (List `align` prop) and `33a6851` (Modal scrim inset at
+desktop widths) landed after this sync's baseline (`3db072f`), and this sync's own
+uncommitted `.design-sync/NOTES.md` + `config.json` edits were swept into an unrelated
+commit (`0df3db2`) neither authored nor timed by this sync. `node_modules/` and `dist/`
+were also removed from the repo at some point in the same window. Everything points at an
+autonomous process actively developing May UI in this same directory, independent of
+design-sync.
+
+**Consequence:** `Modal` and `List` were graded and uploaded against the pre-`33a6851`/
+pre-`049de86` build — both changes are small (a responsive scrim inset; a new opt-in
+`align` prop with no effect on existing rows), so the risk of a real visual regression
+slipping through is low, but they are technically graded against stale source. Confirmed
+via `git log` timestamps and `git show`, not assumed. Not fixed this sync (see the choice
+below) — the next sync's normal diff will pick up both as `changed` and re-verify them
+against current source.
+
+**If this repo is under active concurrent development going forward:** re-syncs sharing
+a live dev checkout should expect source to move mid-run. Consider syncing from a
+dedicated clone or worktree instead of the primary checkout when a long fan-out grading
+pass is anticipated, so a concurrent commit can't invalidate in-flight grades or delete
+`node_modules`/`dist` out from under a background build.
 
 ### `[GENERAL]` 2026-09-14: the "move styling and defaults into React" breaking change
 required `cfg.provider` — the decorator-bundle path is now broken
