@@ -487,14 +487,22 @@ const checks = [
   [
     'the focus ring is a solid colour, not a wash',
     (() => {
+      /*
+       * Keyed on the token, not the property: base.css and four controls drew
+       * the ring with `outline`, and five text fields with a `box-shadow`
+       * spread. Both were 28-45% washes, so checking one property would have
+       * cleared half of them.
+       */
       const offenders = []
       for (const match of css.matchAll(/([^{}]*)\{([^}]*)\}/g)) {
-        const selectors = match[1].split(',').filter((one) => /:focus(-visible)?\b/.test(one))
+        const selectors = match[1].split(',').filter((one) => /:focus(-visible|-within)?\b/.test(one))
         if (!selectors.length) continue
-        const outline = match[2].match(/(?:^|;)\s*outline\s*:([^;]*)/)
-        if (!outline) continue
-        if (!/color-mix|\btransparent\b|rgba?\(|\/\s*0?\.\d/.test(outline[1])) continue
-        offenders.push(`${selectors[0].trim().slice(-40)} {${outline[1].trim()}}`)
+        for (const declaration of match[2].split(';')) {
+          if (!/\b(outline|box-shadow)\s*:/.test(declaration)) continue
+          if (!/--may-color-(ring|danger)/.test(declaration)) continue
+          if (!/color-mix|\btransparent\b|rgba?\(|\/\s*0?\.\d/.test(declaration)) continue
+          offenders.push(`${selectors[0].trim().slice(-40)} {${declaration.trim().slice(0, 60)}}`)
+        }
       }
       return (
         offenders.length === 0 ||

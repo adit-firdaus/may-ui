@@ -67,7 +67,7 @@
  * user has neither of those cues.
  */
 .may-search-bar__field:has(:focus-visible) {
-  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-ring) 28%, transparent);
+  box-shadow: 0 0 0 3px var(--may-color-ring);
 }
 
 @media (hover: hover) and (pointer: fine) {

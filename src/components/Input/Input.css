@@ -36,39 +36,36 @@
  */
 .may-input:focus-within {
   background: var(--may-color-fill-quaternary);
-  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-ring) 30%, transparent);
+  box-shadow: 0 0 0 3px var(--may-color-ring);
 }
 
 .may-input[data-invalid='true'] {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
+  box-shadow: 0 0 0 2px var(--may-color-danger);
 }
 
 .may-input[data-invalid='true']:focus-within {
-  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-danger) 40%, transparent);
+  box-shadow:
+    0 0 0 2px var(--may-color-danger),
+    0 0 0 5px var(--may-color-ring);
 }
 
 /*
- * Touch drops the ring.
+ * The ring is drawn on every pointer, and it is solid.
  *
- * On a phone the field you are typing into is already obvious -- the keyboard
- * is up and the caret is in it -- so a 4px halo adds nothing and reads as a
- * stray artefact instead. The background shift stays, which is all the
- * confirmation a tap needs; the ring is still drawn on pointer-fine devices,
- * where a keyboard user genuinely needs to see where focus went.
+ * It was a 30% halo, suppressed entirely under `(pointer: coarse)` on the
+ * grounds that a phone's keyboard and caret already say where focus is.
+ * Measured with transitions disabled, that left 1.46:1 where a pointer is
+ * fine and, where it is not, only a 1.05:1 background shift that moves the
+ * field *closer* to the page — no focus cue at all. The premise was that
+ * keyboard implies `pointer: fine`; an iPad with a Magic Keyboard is coarse.
  *
- * The invalid ring is re-stated rather than dropped: that one is not a focus
- * cue, it is an error, and it has to survive.
+ * `:has(:focus-visible)` looks like the way to keep the split, and is not: a
+ * text input matches `:focus-visible` on a mouse click too, because the UA
+ * matches it wherever typing is expected. Verified with a real click. CSS
+ * therefore cannot tell a tap from a Tab here, so the choice is a ring for
+ * both or for neither, and neither fails 2.4.7. A phone now shows the same
+ * 3:1 ring as every other control in the system.
  */
-@media (hover: none) and (pointer: coarse) {
-  .may-input:focus-within {
-    box-shadow: none;
-  }
-
-  .may-input[data-invalid='true'],
-  .may-input[data-invalid='true']:focus-within {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
-  }
-}
 
 .may-input[data-disabled='true'] {
   opacity: 0.4;

@@ -106,6 +106,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **Text fields have a real focus indicator.** `Input`, `Textarea`, `Combobox`,
+  `SearchField` and mobile `SearchBar` drew a 28-30% halo, and `Input`
+  suppressed it entirely under `(pointer: coarse)`. Measured with transitions
+  disabled, that left 1.46:1 where a pointer is fine and, where it is not,
+  only a 1.05:1 background shift that moves the field *closer* to the page —
+  no cue at all. The suppression assumed keyboard implies `pointer: fine`; an
+  iPad with a Magic Keyboard is coarse. `:has(:focus-visible)` cannot keep the
+  split, because a text input matches `:focus-visible` on a mouse click too,
+  so the ring is now solid on every pointer. The error ring is solid as well
+  (3.18:1 at worst), and a field that is both invalid and focused draws both
+  rings concentrically rather than trading one for the other.
+
 - **The focus ring is now legible.** It was the tint at 45% opacity, in
   `base.css` and hand-rolled again in Checkbox, Radio, Select and Switch —
   five copies of the same wash. Composited over the surfaces it sits on (the

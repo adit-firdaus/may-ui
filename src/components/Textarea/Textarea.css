@@ -29,15 +29,17 @@
 
 .may-textarea:focus-within {
   background: var(--may-color-fill-quaternary);
-  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-ring) 30%, transparent);
+  box-shadow: 0 0 0 3px var(--may-color-ring);
 }
 
 .may-textarea[data-invalid='true'] {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--may-color-danger) 45%, transparent);
+  box-shadow: 0 0 0 2px var(--may-color-danger);
 }
 
 .may-textarea[data-invalid='true']:focus-within {
-  box-shadow: 0 0 0 var(--may-space-1) color-mix(in srgb, var(--may-color-danger) 40%, transparent);
+  box-shadow:
+    0 0 0 2px var(--may-color-danger),
+    0 0 0 5px var(--may-color-ring);
 }
 
 .may-textarea[data-disabled='true'] {
