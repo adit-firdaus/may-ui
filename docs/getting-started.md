@@ -124,6 +124,34 @@ when the state lives in a router or a store:
 `defaultOpen` sets the starting state, and `onOpenChange` fires either way.
 `AlertDialog` closes itself once `onConfirm` has run.
 
+### One place `trigger` does not belong
+
+Overlays render inline, right beside the control that opened them — none of them
+portal. That is what lets a Sheet be written inside the Card whose button opens
+it, and it means a `trigger` inside an **ARIA-structured container** puts the
+overlay's scrim somewhere the container's role does not allow:
+
+```tsx
+// Wrong: the scrim becomes a non-listitem child of role="list",
+// which axe reports as aria-required-children.
+<List>
+  <AlertDialog trigger={<ListRow title="Sign Out" />} … />
+</List>
+```
+
+Keep the overlay outside the container and drive it with `open` instead:
+
+```tsx
+<List>
+  <ListRow title="Sign Out" onClick={() => setSignOutOpen(true)} />
+</List>
+<AlertDialog open={signOutOpen} onCancel={() => setSignOutOpen(false)} … />
+```
+
+The same applies inside `role="tablist"`, `role="radiogroup"` and `role="menu"`.
+Anywhere the parent accepts ordinary flow content — a Card, a Stack, a toolbar,
+a page — `trigger` is the shorter and better answer.
+
 ## Form libraries
 
 Every control forwards its `ref` to the real DOM element — `Input` to the

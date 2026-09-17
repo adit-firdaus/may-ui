@@ -23,6 +23,12 @@ export interface PopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   /**
    * The control that opens it. A React element is cloned, so the state lands
    * on the button you styled and your own onClick still runs.
+   *
+   * Popups render inline rather than through a portal, so do not put a trigger
+   * inside an ARIA-structured container — a `role="list"`, `tablist`,
+   * `radiogroup` or `menu`. The scrim would become a child the container's
+   * role does not allow, which axe reports as aria-required-children. Drive it
+   * with `visible` from outside instead.
    */
   trigger?: ReactNode
   /** Called when it closes. Optional: an uncontrolled popup closes itself. */

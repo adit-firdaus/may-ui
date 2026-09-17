@@ -25,7 +25,15 @@ export interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   defaultOpen?: boolean
   /** Fires on every change, controlled or not. */
   onOpenChange?: (open: boolean) => void
-  /** The control that opens it. A React element is cloned; your onClick still runs. */
+  /**
+   * The control that opens it. A React element is cloned; your onClick still runs.
+   *
+   * Overlays render inline rather than through a portal, so do not put a
+   * trigger inside an ARIA-structured container — a `role="list"`, `tablist`,
+   * `radiogroup` or `menu`. The scrim would become a child the container's
+   * role does not allow, which axe reports as aria-required-children. Drive it
+   * with `open` from outside instead.
+   */
   trigger?: ReactNode
   /** The question, phrased as one. "Delete this album?" */
   title: ReactNode
