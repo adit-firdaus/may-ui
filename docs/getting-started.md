@@ -208,6 +208,14 @@ That builds and prerenders: verified against Next.js 15.1, where the static
 output carries `.may-root`, the button's classes and its CSS, hoisted by
 React's own style resources with no stylesheet import.
 
+`<StrictMode>` is fine, and Next.js turns it on by default. Its double-invoked
+effects are the usual way a subscribe/unsubscribe pair gets corrupted, so the
+overlay machinery was checked under it specifically: a `Popover` inside a
+`Sheet` still takes one Escape to close the popover and a second to close the
+sheet, and `inert` and the scroll lock are both released cleanly, with nothing
+logged. The layer stack releases by identity rather than popping, which is what
+makes a repeated effect harmless.
+
 `MayProvider` holds React context, so put it in your root layout and let the
 tree below it be server components. The provider itself becomes a client
 boundary — that is what the directive is for — and a server component may
