@@ -52,8 +52,23 @@ export function App() {
 }
 ```
 
-Use `host={false}` on a secondary sibling React root so only one root renders
-the global toast queue.
+### More than one React root
+
+Widgets embedded in a host page, or a micro-frontend, often mount several React
+roots side by side. Two things to know, both verified on a real two-root page.
+
+Pass `host={false}` to every provider but one. The toast queue is module-level
+and each mounted host renders **all** of it, so two hosting providers show every
+toast twice — once per root. A `toast()` call from a hostless root still
+arrives; it is rendered by whichever root owns the host. Forgetting this warns
+in development rather than leaving you to explain the duplicate.
+
+Overlays already do the right thing and need nothing. A modal in one root marks
+the other root `inert`, so a button in the neighbouring widget is genuinely
+unfocusable while the dialog is up, and Escape closes the topmost layer on the
+page whichever root opened it. The stack is shared on purpose: Escape is a
+document-level key, so "topmost in the document" is the only answer that is
+right from both roots.
 
 ## Routing
 
