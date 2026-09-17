@@ -180,6 +180,38 @@ const html = (name, props) =>
     )),
   )
 
+/*
+ * What a <form> would collect.
+ *
+ * Three of these controls are not native inputs — Slider, Stepper and
+ * Combobox paint their own thing and carry a hidden input so the value still
+ * submits, and Combobox emits one per value so `getAll` returns the list.
+ * Nothing asserted that, so deleting a hidden input would break submission
+ * in every consumer's form while the component still looked and behaved
+ * correctly on screen, in Storybook, and under axe.
+ *
+ * The markup is the contract: a named input with a value is what FormData
+ * reads. Assert on the emitted elements rather than in a DOM — the check is
+ * then true without a browser, and this repo installs no jsdom.
+ *
+ * Textarea and Select are left out rather than forgotten: both put the value
+ * in a child node instead of a `value` attribute, so this reader cannot see
+ * it, and both extend their native element's own props, so `name` reaching
+ * the element is a type guarantee rather than something to check.
+ */
+const submitted = (element) => {
+  const markup = renderToStaticMarkup(h(Adaptive.MayProvider, null, element))
+  return [...markup.matchAll(/<(?:input|select|textarea)\b[^>]*?name="([^"]+)"[^>]*?>/g)].map(
+    (match) => {
+      const tag = match[0]
+      const value = tag.match(/value="([^"]*)"/)
+      // An unchecked box submits nothing, which is the behaviour to preserve.
+      if (/type="(?:checkbox|radio)"/.test(tag) && !/\bchecked\b/.test(tag)) return null
+      return `${match[1]}=${value ? value[1] : ''}`
+    },
+  )
+}
+
 const assertions = [
   ['Sheet announces itself as a modal dialog', () => /role="dialog"[^>]*aria-modal="true"|aria-modal="true"[^>]*role="dialog"/.test(html('Sheet'))],
   ['Modal announces itself as a modal dialog', () => /aria-modal="true"/.test(html('Modal'))],
@@ -352,6 +384,44 @@ const assertions = [
   ['Text renders the element it is told to', () =>
     /<a [^>]*href="\/x"[^>]*class="[^"]*may-text/.test(
       renderToStaticMarkup(h(Adaptive.MayProvider, {}, h(Adaptive.Text, { as: 'a', href: '/x' }, 'link'))))],
+  ['named form controls submit their value', () => {
+    const cases = [
+      [h(Adaptive.Input, { name: 'a', defaultValue: 'v' }), ['a=v']],
+      [h(Adaptive.Checkbox, { name: 'd', value: 'v', defaultChecked: true }), ['d=v']],
+      [h(Adaptive.Checkbox, { name: 'd', value: 'v' }), [null]],
+      [h(Adaptive.Switch, { name: 'e', defaultChecked: true }), ['e=']],
+      [h(Adaptive.Slider, { name: 'g', defaultValue: 7 }), ['g=7']],
+      [h(Adaptive.Stepper, { name: 'h', defaultValue: 7 }), ['h=7']],
+      [h(Adaptive.Combobox, { name: 'i', options: OPTS, defaultValue: 'one' }), ['i=one']],
+      // One hidden input per value, so FormData.getAll returns the whole list.
+      [
+        h(Adaptive.Combobox, {
+          name: 'j', multiple: true, options: OPTS, defaultValue: ['one', 'two'],
+        }),
+        ['j=one', 'j=two'],
+      ],
+      // Every radio shares the group name; only the selected one is checked.
+      [
+        h(
+          Adaptive.RadioGroup,
+          { name: 'k', defaultValue: 'two' },
+          h(Adaptive.Radio, { value: 'one', label: 'One' }),
+          h(Adaptive.Radio, { value: 'two', label: 'Two' }),
+        ),
+        [null, 'k=two'],
+      ],
+    ]
+    const wrong = cases
+      .map(([element, expected], index) => {
+        const actual = submitted(element)
+        const same =
+          actual.length === expected.length && actual.every((entry, i) => entry === expected[i])
+        return same ? null : `case ${index}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`
+      })
+      .filter(Boolean)
+    if (wrong.length) console.log('       ' + wrong.join('\n       '))
+    return wrong.length === 0
+  }],
 ]
 
 let failed = 0
