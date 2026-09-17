@@ -3,7 +3,7 @@
 Apple's design language as a React library — iOS 26 / macOS shapes, real spring physics,
 and a token layer you can theme.
 
-- **74 components** across three families — adaptive, desktop-only, mobile-only
+- **75 components** across three families — adaptive, desktop-only, mobile-only
 - **No borders** — surfaces separate by value, translucent fill and hairline separators
 - **Real springs** — damped-oscillator CSS curves plus Motion layout projection
 - **Token-first** — every colour, space, radius, shadow and duration is a `--may-*` property
@@ -240,7 +240,7 @@ your input; `useFieldContext()` exposes the whole field state for custom layouts
 | Layout | `Box`, `Stack`, `Grid`, `Separator`, `SafeArea`, `ScrollArea` |
 | Typography | `Heading`, `Text`, `Label`, `Kbd` |
 | Actions | `Button`, `IconButton`, `ButtonGroup`, `Fab`, `Toolbar`, `ToolbarSpacer` |
-| Forms | `Field`, `Input`, `Textarea`, `Select`, `Checkbox`, `Radio`, `RadioGroup`, `Switch`, `Slider`, `Stepper`, `SearchField`, `SegmentedControl` |
+| Forms | `Field`, `Input`, `Textarea`, `Select`, `Combobox`, `Checkbox`, `Radio`, `RadioGroup`, `Switch`, `Slider`, `Stepper`, `SearchField`, `SegmentedControl` |
 | Data display | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardBody`, `CardFooter`, `Badge`, `Tag`, `Avatar`, `AvatarGroup`, `IconTile`, `Table`, `List`, `ListRow`, `Descriptions`, `DescriptionItem`, `Statistic`, `EmptyState` |
 | Feedback | `Alert`, `NoticeBar`, `Progress`, `CircularProgress`, `Spinner`, `Skeleton`, `Toast`, `toast`, `useToast` |
 | Navigation | `Tabs`, `TabList`, `Tab`, `TabPanel`, `NavigationBar`, `Breadcrumb`, `Pagination`, `Steps`, `Accordion`, `AccordionItem`, `Collapsible` |

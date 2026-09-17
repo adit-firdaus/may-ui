@@ -13,6 +13,7 @@ import { Input } from '../components/Input'
 import { Radio, RadioGroup } from '../components/RadioGroup'
 import { SearchField } from '../components/SearchField'
 import { Select } from '../components/Select'
+import { Combobox } from '../components/Combobox'
 import { Slider } from '../components/Slider'
 import { Stack } from '../components/Stack'
 import { Stepper } from '../components/Stepper'
@@ -25,6 +26,18 @@ import { Toolbar } from '../components/Toolbar'
 const RELEASE_NOTES = `Processes RAW captures up to 4× faster on iPhone 15 Pro.
 Adds a live histogram to the capture screen, in both the grid and the loupe.
 Fixes a crash when importing a session that was still syncing from iCloud Drive.`
+
+const LOCALISATIONS = [
+  { value: 'en-US', label: 'English (U.S.)', group: 'Primary' },
+  { value: 'en-GB', label: 'English (U.K.)', group: 'Primary' },
+  { value: 'ja', label: '日本語', description: 'Japanese' },
+  { value: 'de', label: 'Deutsch', description: 'German' },
+  { value: 'fr', label: 'Français', description: 'French' },
+  { value: 'es-MX', label: 'Español (México)', description: 'Spanish' },
+  { value: 'ko', label: '한국어', description: 'Korean' },
+  { value: 'zh-Hans', label: '简体中文', description: 'Simplified Chinese' },
+  { value: 'ar', label: 'العربية', description: 'Arabic — right-to-left' },
+]
 
 const CATEGORIES = [
   { label: 'Photo & Video', value: 'photo-video' },
@@ -171,6 +184,22 @@ export function FormShowcaseScreen() {
               description="Decides where the app is browsed, and which charts it can appear on."
             >
               <Select fullWidth options={CATEGORIES} defaultValue="photo-video" />
+            </Field>
+
+            {/* Select is the native picker and the right answer for a dozen
+              * fixed categories. Localisations are a long list nobody scrolls,
+              * so this one searches and holds several at once. */}
+            <Field
+              label="Localisations"
+              description="Type to narrow. The App Store lists these on the product page."
+            >
+              <Combobox
+                fullWidth
+                multiple
+                placeholder="Add a language"
+                defaultValue={['en-US', 'ja']}
+                options={LOCALISATIONS}
+              />
             </Field>
 
             {/* The Checkbox carries the label and the Field carries the sentence

@@ -8,6 +8,12 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`Combobox`.** A searchable, optionally multi-select picker: grouped rows,
+  two-line rows, `renderOption` to replace a row's insides while keeping its
+  semantics, and one hidden input per value so `FormData.getAll` works.
+  `Select` stays a real `<select>` — it is the right answer whenever the
+  native picker is — but it cannot search, cannot hold several values legibly
+  and cannot draw a row, so long lists had no component here at all.
 - **Overlays own their open state.** `Modal`, `Sheet`, `AlertDialog`,
   `ActionSheet` and `CommandPalette` take `trigger`, `defaultOpen` and
   `onOpenChange`, so showing a dialog no longer costs a `useState` and two

@@ -98,7 +98,9 @@ console.log(
 )
 
 const STYLE_BUDGETS = {
-  'mayui.js': 25 * 1024,
+  // Raised from 25k when Combobox landed: a 61st component's sheet is growth,
+  // not bloat. The number to watch is the per-component average, not the total.
+  'mayui.js': 27 * 1024,
   'desktop.js': 11 * 1024,
   'mobile.js': 11 * 1024,
   'examples.js': 33 * 1024,

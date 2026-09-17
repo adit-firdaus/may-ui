@@ -296,6 +296,35 @@ const assertions = [
       new RegExp(`<(input|select|textarea)[^>]*name="${n}"`).test(html),
     )
   }],
+  /*
+   * A multi-value field is read with FormData.getAll, so it has to emit one
+   * input per value. Joining them into a single comma-separated string would
+   * make every consumer parse it back out, and would break any value
+   * containing a comma.
+   */
+  ['Combobox submits one input per selected value', () => {
+    const s = renderToStaticMarkup(
+      h(Adaptive.MayProvider, {}, h('form', {}, h(Adaptive.Combobox, {
+        name: 'langs',
+        multiple: true,
+        defaultValue: ['swift', 'ts'],
+        options: [{ value: 'swift', label: 'Swift' }, { value: 'ts', label: 'TypeScript' }],
+      }))),
+    )
+    return (
+      /<input[^>]*type="hidden"[^>]*name="langs"[^>]*value="swift"/.test(s) &&
+      /<input[^>]*type="hidden"[^>]*name="langs"[^>]*value="ts"/.test(s)
+    )
+  }],
+  ['Combobox is a combobox over a listbox', () => {
+    const s = renderToStaticMarkup(
+      h(Adaptive.MayProvider, {}, h(Adaptive.Combobox, {
+        'aria-label': 'Language',
+        options: [{ value: 'swift', label: 'Swift' }],
+      })),
+    )
+    return /role="combobox"/.test(s) && /aria-expanded="false"/.test(s)
+  }],
   ['Text renders the element it is told to', () =>
     /<a [^>]*href="\/x"[^>]*class="[^"]*may-text/.test(
       renderToStaticMarkup(h(Adaptive.MayProvider, {}, h(Adaptive.Text, { as: 'a', href: '/x' }, 'link'))))],
