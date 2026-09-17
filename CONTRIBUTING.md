@@ -93,6 +93,39 @@ should be refused with `ERR_PACKAGE_PATH_NOT_EXPORTED` rather than resolving.
 edit them by hand — change `scripts/gen-tokens.mjs` / `scripts/gen-springs.mjs`
 and run `npm run generate`.
 
+### The failure mode to know about
+
+`tokens.generated.ts` is built by matching `--may-name: value;` out of the CSS
+the same script just emitted, so the typed values can disagree with the
+stylesheet while both look fine. It has happened twice. Once the parser read
+`motion.css` flat and took the `@supports not (animation-timing-function:
+linear(0, 1))` fallback, so every spring and ease exported a legacy
+`cubic-bezier` while the CSS animated correctly. Once a COMMENT in the
+generator mentioned a token by name and became its value, because the parser
+did not strip comments first.
+
+Both are invisible on screen — components paint from the CSS, and only
+`useMayTokens()` is wrong. `check:tokens` now asserts that values look like
+CSS values and `check:contract` that the springs are `linear()`, but the
+direct check is worth running by hand after any change to the generator's
+parsing. In a browser with the library loaded:
+
+```js
+const { mayLightTokens, mayTokenCssNames } = await import('/src/styles/tokens.generated.ts')
+const host = document.querySelector('.may-root')
+const wrong = Object.entries(mayTokenCssNames)
+  .map(([key, cssName]) => [key, String(mayLightTokens[key]).trim(),
+    getComputedStyle(host).getPropertyValue(`--may-${cssName}`).trim()])
+  // the browser substitutes an inner var()/env(); those are equivalent, not wrong
+  .filter(([, declared, computed]) => !/var\(|env\(/.test(declared) && declared !== computed)
+console.log(wrong.length, wrong.slice(0, 5))
+```
+
+Zero is the expected answer: 164 of the 211 tokens hold a literal value, and
+they match in both themes. The other 47 are semantic aliases that stay
+`var(--may-primitive)` on purpose, so a consumer's override of the primitive
+still reaches anything painted with them.
+
 ## Adding a component
 
 1. `src/components/<Name>/` with `<Name>.tsx`, `<Name>.css`, `<Name>.stories.tsx`,

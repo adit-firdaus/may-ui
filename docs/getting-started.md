@@ -284,6 +284,30 @@ return (
 )
 ```
 
+### Somewhere that does not resolve `var()`
+
+A semantic token's value is the alias, not the colour: `tokens.colorTint` is
+the string `var(--may-blue)`. That is deliberate — it means a consumer's
+override of `blue` still reaches everything painted with `colorTint` — and it
+works anywhere CSS does, including the inline styles above.
+
+It does **not** work where CSS variables are never resolved: a canvas, a chart
+library that parses colours itself, `<meta name="theme-color">`. Canvas is the
+one to watch, because it fails silently — assigning `var(--may-blue)` to
+`fillStyle` is ignored and the previous colour stays, so the shape is drawn in
+whatever was set before rather than throwing.
+
+Read it back through the DOM in those places:
+
+```tsx
+const ref = useRef<HTMLCanvasElement>(null)
+const tint = getComputedStyle(ref.current!).getPropertyValue('--may-color-tint').trim()
+ctx.fillStyle = tint // '#007aff', and it follows the theme and any override
+```
+
+Primitives are literals already — `tokens.blue` is `#007aff` — so they work
+directly, but they skip the semantic layer a theme override goes through.
+
 See [Theming](theming.md) for token overrides, nesting, and migration details.
 
 ## Building your own components on the same seams
