@@ -2,6 +2,7 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
 import { Children, createContext, isValidElement, useContext } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
+import type { MayInset } from '../../types'
 
 /**
  * Position of a row inside the grid, handed down so each row knows whether it
@@ -20,7 +21,7 @@ export interface DescriptionsProps extends HTMLAttributes<HTMLDListElement> {
   /** Muted explanatory text below the card. */
   footer?: ReactNode
   /** `inset` is the grouped card; `plain` is full-bleed. @default 'inset' */
-  variant?: 'inset' | 'plain'
+  variant?: MayInset
   /**
    * `inline` is the Settings row — label left, value right. `stacked` puts the
    * label above the value, the way Contacts shows a phone number.

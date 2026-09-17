@@ -3,6 +3,7 @@ import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import type { MayInset } from '../../types'
 
 export interface ListProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode
@@ -15,7 +16,7 @@ export interface ListProps extends HTMLAttributes<HTMLDivElement> {
    * full-bleed with no card, for edge-to-edge lists.
    * @default 'inset'
    */
-  variant?: 'inset' | 'plain'
+  variant?: MayInset
 }
 
 /**

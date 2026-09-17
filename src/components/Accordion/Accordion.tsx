@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { Collapsible } from '../Collapsible/Collapsible'
+import type { MayInset } from '../../types'
 // The rows are Collapsible's markup wearing this component's classes, so its
 // stylesheet must be a value import — a type-only one is erased at compile and
 // Storybook then code-splits the rules away, leaving the panel unstyled.
@@ -32,7 +33,7 @@ export interface AccordionProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   /** In `single` mode, whether the open item can be closed by tapping it. @default true */
   collapsible?: boolean
   /** `inset` is the grouped card; `plain` is full-bleed. @default 'inset' */
-  variant?: 'inset' | 'plain'
+  variant?: MayInset
   /** Section header above the card, in the iOS grouped style. */
   header?: ReactNode
   /** Muted explanatory text below the card. */

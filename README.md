@@ -174,8 +174,16 @@ Everything collapses under `prefers-reduced-motion`.
 
 ## Shared vocabulary
 
-- **`tone`** — `tint` · `neutral` · `success` · `warning` · `danger`
+- **`tone`** — `tint` · `neutral` · `success` · `warning` · `danger`. Typography
+  takes `TextTone` instead, which is Apple's label ramp — `default` ·
+  `secondary` · `tertiary` — plus `tint` for a link. A different axis, not a
+  subset: one is status, the other is hierarchy.
 - **`size`** — `sm` · `md` · `lg` (`Avatar` adds `xl`; `Modal` and `Sheet` add `full`)
+- **`variant`** — deliberately per-component, because it answers "which of this
+  component's looks" and that differs. `Button` means emphasis
+  (`filled` · `tinted` · `gray` · `plain`); `List`, `Accordion` and
+  `Descriptions` mean container inset (`MayInset`); `Text` and `Label` mean the
+  type style (`MayTextStyle`). Read the component's own type.
 - **`asChild`** — render a component's presentation onto your own element
 - **`trigger` / `defaultOpen` / `onOpenChange`** — an overlay that owns its state
 

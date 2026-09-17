@@ -78,6 +78,10 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   host, so the build preserves modules instead, which took it to 6.8 kB. The
   whole-library figure barely moved, which is the control: a sharp drop there
   would mean exports being shaken away.
+- `MayInset` names the `'inset' | 'plain'` pair that `List`, `Accordion` and
+  `Descriptions` each spelled out inline. Same values, so no consumer's type
+  narrows; `variant` stays per-component everywhere else, because it answers
+  "which of this component's looks" and that genuinely differs.
 - `size` is one vocabulary. Seventeen components share `Exclude<MaySize, 'xs'>`;
   `Avatar` extends it with `'xl'` and `Modal`/`Sheet` with `'full'`. No runtime
   values changed.
