@@ -278,6 +278,38 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * A component that takes className takes the rest too.
+   *
+   * Eight components accepted `className` and forwarded nothing else, so
+   * `data-testid` for an e2e run, an `id`, or an extra `aria-*` were all
+   * refused — while Modal's own prop comment called that set "the things every
+   * other component already allows". The claim is what made it invisible.
+   */
+  [
+    'a component that styles itself also forwards the rest',
+    (() => {
+      /*
+       * MayHost is deliberately not exported, and the provider's `host` prop
+       * takes MayHostConfig — a closed subset with no DOM props — so there is
+       * no route by which a consumer could pass anything to forward.
+       */
+      const EXEMPT = new Set(['MayHost'])
+      const offenders = sources()
+        .filter((file) => /\/(components|desktop|mobile)\//.test(file))
+        .filter((file) => {
+          const name = file.split('/').pop().replace(/\.tsx?$/, '')
+          if (EXEMPT.has(name)) return false
+          const body = readFileSync(file, 'utf8')
+          return body.includes('className') && !body.includes('...rest')
+        })
+        .map((file) => file.split('/').pop())
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       takes className but forwards no rest: ${offenders.join(', ')}`), false)
+      )
+    })(),
+  ],
   [
     'overlay dismissal goes through the shared layer stack',
     rogueKeydown.length === 0 ||
