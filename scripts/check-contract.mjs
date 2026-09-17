@@ -7,7 +7,7 @@
  * quietly shipping.
  */
 import { builtCss as css } from './built-styles.mjs'
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const srcRoot = new URL('../src/', import.meta.url).pathname
@@ -286,6 +286,31 @@ const checks = [
    * refused — while Modal's own prop comment called that set "the things every
    * other component already allows". The claim is what made it invisible.
    */
+  /*
+   * No component sizes its icons behind a width guard.
+   *
+   * react-icons emits `width="1em"` as an ATTRIBUTE, so
+   * `svg:not([width])` never matches one and a rule written that way silently
+   * does nothing — the glyph keeps whatever size it came with and the CSS looks
+   * correct while having no effect. The one such rule in base.css is the other
+   * side of the same fact: a floor for raw unclassed svgs, which react-icons
+   * cannot match, and it lives outside the component sheets this checks.
+   */
+  [
+    'no component sizes an icon behind a :not([width]) guard',
+    (() => {
+      const offenders = sources()
+        .filter((file) => /\/(components|desktop|mobile)\//.test(file))
+        .map((file) => file.replace(/\.tsx?$/, '.css'))
+        .filter((file) => existsSync(file))
+        .filter((file) => /:not\(\[width\]\)/.test(readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')))
+        .map((file) => file.split('/').pop())
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       width-guarded icon rule in: ${offenders.join(', ')}`), false)
+      )
+    })(),
+  ],
   [
     'a component that styles itself also forwards the rest',
     (() => {

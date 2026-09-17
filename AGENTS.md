@@ -51,8 +51,15 @@ without having run the gate.
   barrel imports CSS with `?inline`, creates a `mayStyleSheet`, and exports the
   implementation through `withMayStyles`; `.tsx` files never side-effect-import CSS.
 - **Glyphs come from `react-icons/io5`**, sized in CSS against
-  `.may-<component>__icon > svg` — never with a `:not([width])` guard, which
-  react-icons defeats.
+  `.may-<component>__icon > svg`. Never size a component's icon behind a
+  `:not([width])` guard: react-icons emits `width="1em"` as an *attribute*, so
+  the guard never matches and the rule silently does nothing. `check:contract`
+  rejects one in a component sheet.
+
+  The single `:not([width]):not([height]):not([class])` rule in `base.css` is
+  the other side of that fact, not an exception to it — a sizing floor for a raw
+  unclassed `<svg>` a screen puts in its own markup, which react-icons can never
+  match. Leave it alone.
 - **Tone sets variables, variant consumes them** — a new tone never touches
   variant CSS and vice versa. Copy the pattern in `Button.css`.
 
