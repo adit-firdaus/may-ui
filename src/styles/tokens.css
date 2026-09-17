@@ -60,6 +60,7 @@
   --may-scrollbar-thumb: rgba(60, 60, 67, 0.28);
   --may-scrollbar-thumb-hover: rgba(60, 60, 67, 0.42);
   --may-on-color: #ffffff;
+  --may-knob: #ffffff;
   --may-shadow-color: 0, 0, 0;
   --may-shadow-a1: 0.03;
   --may-shadow-a2: 0.04;
@@ -176,6 +177,7 @@
   --may-scrollbar-thumb: rgba(235, 235, 245, 0.28);
   --may-scrollbar-thumb-hover: rgba(235, 235, 245, 0.42);
   --may-on-color: #ffffff;
+  --may-knob: #ffffff;
   --may-shadow-color: 0, 0, 0;
   --may-shadow-a1: 0.2;
   --may-shadow-a2: 0.24;
@@ -302,6 +304,7 @@
   --may-scrollbar-thumb: rgba(60, 60, 67, 0.28);
   --may-scrollbar-thumb-hover: rgba(60, 60, 67, 0.42);
   --may-on-color: #ffffff;
+  --may-knob: #ffffff;
   --may-shadow-color: 0, 0, 0;
   --may-shadow-a1: 0.03;
   --may-shadow-a2: 0.04;
@@ -419,6 +422,7 @@
     --may-scrollbar-thumb: rgba(235, 235, 245, 0.28);
     --may-scrollbar-thumb-hover: rgba(235, 235, 245, 0.42);
     --may-on-color: #ffffff;
+    --may-knob: #ffffff;
     --may-shadow-color: 0, 0, 0;
     --may-shadow-a1: 0.2;
     --may-shadow-a2: 0.24;
@@ -517,6 +521,7 @@
   }
 
   [data-may-theme='dark'] {
+    --may-on-color: #1c1c1e;
     --may-label-secondary: rgba(235, 235, 245, 0.85);
     --may-label-tertiary: rgba(235, 235, 245, 0.8);
     --may-separator: rgba(235, 235, 245, 0.5);
@@ -528,6 +533,7 @@
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-may-theme='light']) {
+      --may-on-color: #1c1c1e;
       --may-label-secondary: rgba(235, 235, 245, 0.85);
       --may-label-tertiary: rgba(235, 235, 245, 0.8);
       --may-separator: rgba(235, 235, 245, 0.5);

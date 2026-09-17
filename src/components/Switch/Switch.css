@@ -95,7 +95,7 @@
   height: var(--may-switch-thumb);
   border-radius: var(--may-radius-full);
   /* White in both themes, the way the iOS knob stays white on a dark track. */
-  background: var(--may-on-color);
+  background: var(--may-knob);
   box-shadow: var(--may-shadow-sm);
   transform: translateX(calc(var(--may-switch-x) * var(--may-switch-dir)));
   transition:

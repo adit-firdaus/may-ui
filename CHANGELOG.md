@@ -8,6 +8,13 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`--may-knob`**, the white of a physical knob. `Slider`'s and `Switch`'s
+  knobs read `--may-on-color` only because it happened to be white — their own
+  comments say they want white, "the way the iOS knob stays white on a dark
+  track". Now that dark's contrast tier darkens `--may-on-color` for text on a
+  bright fill, the two jobs need separate names, or Increase Contrast would
+  turn both knobs near-black.
+
 - **`@media (prefers-contrast: more)` support.** Apple's own palette sits below
   WCAG AA in several of Apple's own pairings, so the default keeps Apple's
   values and the platform's Increase Contrast setting swaps in AA-safe
@@ -105,6 +112,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   Return must not land on it.
 
 ### Fixed
+
+- **Dark mode passes the contrast tier too.** The `prefers-contrast: more`
+  audit had only ever been run in light. Run in dark it reported violations in
+  all three catalogues, and they shared one pairing: white on `#5EA9FF` at
+  2.44:1. Dark's AA blues go *lighter*, which is right for brand-as-text on a
+  dark surface and wrong for the same value used as a fill, because
+  `--may-color-tint` and `--may-color-primary` both read `--may-blue`. Against
+  the four AA primitives white runs 1.71-2.82:1 while `#1C1C1E` runs
+  6.03-9.93:1 — and white already failed on the dark *defaults* (2.02:1 on
+  systemGreen), so the tier worsened a shortfall it did not create. Dark's tier
+  now flips `--may-on-color` with the rest. Both modes, all three families,
+  zero violations.
 
 - **Every target you press is at least 24x24.** Measured across 382 stories and
   885 rendered targets, with transitions and transforms disabled so a mid-flight

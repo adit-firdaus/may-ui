@@ -56,6 +56,7 @@ const light = {
   'scrollbar-thumb': 'rgba(60, 60, 67, 0.28)',
   'scrollbar-thumb-hover': 'rgba(60, 60, 67, 0.42)',
   'on-color': '#ffffff',
+  knob: '#ffffff',
   'shadow-color': '0, 0, 0',
   'shadow-a1': '0.03',
   'shadow-a2': '0.04',
@@ -110,6 +111,7 @@ const dark = {
   'scrollbar-thumb': 'rgba(235, 235, 245, 0.28)',
   'scrollbar-thumb-hover': 'rgba(235, 235, 245, 0.42)',
   'on-color': '#ffffff',
+  knob: '#ffffff',
   'shadow-color': '0, 0, 0',
   'shadow-a1': '0.2',
   'shadow-a2': '0.24',
@@ -148,7 +150,21 @@ const lightAA = {
   orange: '#8a4b00',
 }
 
+/*
+ * Dark's AA blues go LIGHTER, which is right for brand-as-text on a dark
+ * surface and wrong for the same value used as a fill: --may-color-tint and
+ * --may-color-primary both read --may-blue, so lifting the primitive put
+ * white on #5ea9ff at 2.44:1. Measured against these four primitives, white
+ * runs 1.71-2.82:1 and #1c1c1e runs 6.03-9.93:1 — and white already failed
+ * on the dark DEFAULTS (2.02-3.65:1), so the tier worsened a shortfall it
+ * did not create. So on-color flips with them.
+ *
+ * Only the text flips. A Slider's and a Switch's knob are white because they
+ * are knobs, the way iOS keeps them white on a dark track; they read
+ * --may-knob, which does not move.
+ */
 const darkAA = {
+  'on-color': '#1c1c1e',
   'label-secondary': 'rgba(235, 235, 245, 0.85)',
   'label-tertiary': 'rgba(235, 235, 245, 0.8)',
   separator: 'rgba(235, 235, 245, 0.5)',

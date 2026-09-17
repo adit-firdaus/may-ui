@@ -321,15 +321,30 @@ The default palette is Apple's. Several of Apple's own pairings sit below AA's
 
 | pairing | measured |
 |---|---|
-| white on systemBlue (`#007AFF`) — a filled button | 4.01:1 |
-| systemBlue as text on a tertiary fill — a tinted button | 3.14:1 |
-| secondaryLabel over a grouped background | 3.28:1 |
+| white on systemBlue (`#007AFF`) — a filled button, light | 4.01:1 |
+| systemBlue as text on a tertiary fill — a tinted button, light | 3.14:1 |
+| secondaryLabel over a grouped background, light | 3.28:1 |
+| white on systemBlue (`#0A84FF`) — a filled button, dark | 3.65:1 |
+| white on systemGreen (`#30D158`) — a success fill, dark | 2.02:1 |
 
 Matching Apple is the point of this library, so the default keeps those values
 instead of quietly drifting off-brand. `@media (prefers-contrast: more)` — what
 Apple's own **Increase Contrast** setting sets — swaps in AA-safe primitives, at
 which point all three families report **zero** violations. A reader who needs
 the contrast gets it from the OS; nobody has to wire anything.
+
+Audited in **both modes**: light and dark, all three catalogues, axe-core
+4.10.2 against `wcag2a wcag2aa wcag21a wcag21aa`. Dark needed one thing light
+did not. Its AA blues go *lighter*, which is right for brand-as-text on a dark
+surface and wrong for the same value used as a fill — `--may-color-tint` and
+`--may-color-primary` both read `--may-blue`, so lifting the primitive put
+white text on `#5EA9FF` at 2.44:1. Against those four AA primitives white runs
+1.71–2.82:1 while `#1C1C1E` runs 6.03–9.93:1, so in dark the contrast tier
+flips `--may-on-color` along with them.
+
+Only the text flips. A `Slider`'s and a `Switch`'s knob are white because they
+are knobs, the way iOS keeps them white on a dark track, so they read
+`--may-knob` — a separate primitive that the tier never moves.
 
 **One known false positive.** Running axe over the mobile catalogue may report
 `may-capsule-tabs__label` and `__count` at roughly 1.1:1 — white text on a light

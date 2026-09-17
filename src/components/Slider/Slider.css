@@ -124,7 +124,7 @@
    * --may-color-surface would turn it near-black and lose the knob against
    * the rail.
    */
-  background: var(--may-on-color);
+  background: var(--may-knob);
   box-shadow: var(--may-shadow-sm);
   cursor: grab;
   touch-action: none;

@@ -92,6 +92,7 @@ export interface MayTokens {
   readonly insetRight: MayTokenValue
   readonly insetTop: MayTokenValue
   readonly keyboardInset: MayTokenValue
+  readonly knob: MayTokenValue
   readonly label: MayTokenValue
   readonly labelQuaternary: MayTokenValue
   readonly labelSecondary: MayTokenValue
@@ -302,6 +303,7 @@ export const mayTokenCssNames = {
   insetRight: 'inset-right',
   insetTop: 'inset-top',
   keyboardInset: 'keyboard-inset',
+  knob: 'knob',
   label: 'label',
   labelQuaternary: 'label-quaternary',
   labelSecondary: 'label-secondary',
@@ -512,6 +514,7 @@ export const mayLightTokens = {
   insetRight: "env(safe-area-inset-right, 0px)",
   insetTop: "env(safe-area-inset-top, 0px)",
   keyboardInset: "0px",
+  knob: "#ffffff",
   label: "#000000",
   labelQuaternary: "rgba(60, 60, 67, 0.18)",
   labelSecondary: "rgba(60, 60, 67, 0.6)",
@@ -722,6 +725,7 @@ export const mayDarkTokens = {
   insetRight: "env(safe-area-inset-right, 0px)",
   insetTop: "env(safe-area-inset-top, 0px)",
   keyboardInset: "0px",
+  knob: "#ffffff",
   label: "#ffffff",
   labelQuaternary: "rgba(235, 235, 245, 0.16)",
   labelSecondary: "rgba(235, 235, 245, 0.6)",
