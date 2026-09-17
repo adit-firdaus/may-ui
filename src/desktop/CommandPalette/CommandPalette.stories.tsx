@@ -178,3 +178,26 @@ export const QuickOpen: Story = {
     label: 'Projects',
   },
 }
+
+/**
+ * Zero props beyond the data. The palette owns its open state and its own
+ * hotkey, so mounting it is the entire integration — press ⌘K (or ⌃K).
+ */
+export const Uncontrolled: Story = {
+  render: () => (
+    <CommandPalette
+      groups={[
+        {
+          id: 'actions',
+          heading: 'Actions',
+          items: [
+            { id: 'new', label: 'New File' },
+            { id: 'open', label: 'Open Recent' },
+            { id: 'pref', label: 'Preferences' },
+          ],
+        },
+      ]}
+      onSelect={() => {}}
+    />
+  ),
+}

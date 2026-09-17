@@ -4,7 +4,7 @@ import type {
   ReactNode,
   RefObject,
 } from 'react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
@@ -12,7 +12,7 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
-import { useExitDelay, useOverlay } from '../../overlay'
+import { overlayTrigger, useExitDelay, useOpenState, useOverlay } from '../../overlay'
 import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /** Matches the exit transition in ActionSheet.css. */
@@ -29,8 +29,16 @@ export interface ActionSheetAction {
 }
 
 export interface ActionSheetProps {
-  open: boolean
-  onClose: () => void
+  /** Controlled state. Omit it and the sheet owns its own. */
+  open?: boolean
+  /** Starting state when uncontrolled. @default false */
+  defaultOpen?: boolean
+  /** Fires on every change, controlled or not. */
+  onOpenChange?: (open: boolean) => void
+  /** The control that opens it. A React element is cloned; your onClick still runs. */
+  trigger?: ReactNode
+  /** Called when it closes. Optional: an uncontrolled sheet closes itself. */
+  onClose?: () => void
   /**
    * The rows. Named `items` to match every other list-taking component —
    * Menu, Breadcrumb, Steps, TabBar, CapsuleTabs, CommandPalette, ContextMenu.
@@ -79,7 +87,10 @@ interface Placement {
  * anywhere else already cancel — so the desktop shape drops it.
  */
 export function ActionSheet({
-  open,
+  open: openProp,
+  defaultOpen,
+  onOpenChange,
+  trigger,
   onClose,
   items,
   actions = [],
@@ -90,6 +101,11 @@ export function ActionSheet({
   className,
 }: ActionSheetProps) {
   const id = useAutoId()
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
+  const close = useCallback(() => {
+    setOpen(false)
+    onClose?.()
+  }, [setOpen, onClose])
   // `items` wins; `actions` is the deprecated spelling of the same list.
   const list = items ?? actions
   const isDesktop = useIsDesktop()
@@ -128,7 +144,7 @@ export function ActionSheet({
    */
   const { panelRef } = useOverlay<HTMLDivElement>({
     open: mounted,
-    onClose,
+    onClose: close,
     modal: !menu,
     initialFocus: () => rows()[0] ?? null,
   })
@@ -231,15 +247,27 @@ export function ActionSheet({
   }
 
   const onScrimDown = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) onClose()
+    if (event.target === event.currentTarget) close()
   }
-
-  if (!mounted) return null
 
   const presentation = menu ? 'menu' : 'sheet'
   const labelledBy = title ? `${id}-title` : undefined
 
+  const triggerNode =
+    trigger === undefined
+      ? null
+      : overlayTrigger(trigger, {
+          open,
+          onToggle: () => setOpen(!open),
+          haspopup: menu ? 'menu' : 'dialog',
+          controls: mounted ? `${id}-panel` : undefined,
+          className: 'may-overlay__trigger may-pressable may-hoverable',
+        })
+
   return (
+    <>
+      {triggerNode}
+      {mounted && (
     <div
       className="may-action-sheet__scrim"
       data-slot="scrim"
@@ -250,6 +278,7 @@ export function ActionSheet({
     >
       <div
         ref={panelRef}
+        id={`${id}-panel`}
         role={menu ? 'menu' : 'dialog'}
         aria-modal={menu ? undefined : 'true'}
         aria-labelledby={labelledBy}
@@ -283,7 +312,7 @@ export function ActionSheet({
               key={`${action.label}-${index}`}
               action={action}
               menu={menu}
-              onClose={onClose}
+              onClose={close}
             />
           ))}
         </div>
@@ -296,11 +325,13 @@ export function ActionSheet({
          */}
         {!menu && (
           <div className="may-action-sheet__group may-action-sheet__group--cancel">
-            <CancelRow label={cancelLabel} onClose={onClose} />
+            <CancelRow label={cancelLabel} onClose={close} />
           </div>
         )}
       </div>
     </div>
+      )}
+    </>
   )
 }
 

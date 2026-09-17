@@ -1,5 +1,5 @@
 import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -7,7 +7,7 @@ import { useAutoId } from '../../utils/useId'
 import { Button } from '../Button'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
-import { useExitDelay, useOverlay } from '../../overlay'
+import { overlayTrigger, useExitDelay, useOpenState, useOverlay } from '../../overlay'
 
 /** Matches the exit animation in AlertDialog.css. */
 const EXIT_MS = 150
@@ -19,7 +19,14 @@ const EXIT_MS = 150
  * not the HTML tooltip attribute.
  */
 export interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  open: boolean
+  /** Controlled state. Omit it and the dialog owns its own. */
+  open?: boolean
+  /** Starting state when uncontrolled. @default false */
+  defaultOpen?: boolean
+  /** Fires on every change, controlled or not. */
+  onOpenChange?: (open: boolean) => void
+  /** The control that opens it. A React element is cloned; your onClick still runs. */
+  trigger?: ReactNode
   /** The question, phrased as one. "Delete this album?" */
   title: ReactNode
   /** The consequence. One or two sentences at most. */
@@ -30,8 +37,13 @@ export interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   cancelLabel?: string
   /** Paints the confirm button destructive and opens with Cancel focused. */
   destructive?: boolean
+  /**
+   * Required: an alert that asks a question has to do something with the
+   * answer. It also closes the dialog, so a confirm needs no second callback.
+   */
   onConfirm: () => void
-  onCancel: () => void
+  /** Optional — an uncontrolled dialog cancels by closing itself. */
+  onCancel?: () => void
   /** Extra content between the description and the actions. Use sparingly. */
   children?: ReactNode
   className?: string
@@ -49,7 +61,10 @@ export interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, '
  * phone with the confirming action on top, two equal halves on desktop.
  */
 export function AlertDialog({
-  open,
+  open: openProp,
+  defaultOpen,
+  onOpenChange,
+  trigger,
   title,
   description,
   confirmLabel = 'OK',
@@ -64,6 +79,17 @@ export function AlertDialog({
   const confirmRef = useRef<HTMLButtonElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
   const id = useAutoId()
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
+  const cancel = useCallback(() => {
+    setOpen(false)
+    onCancel?.()
+  }, [setOpen, onCancel])
+  /* Confirming closes too: leaving the dialog up after its own action is the
+   * bug every consumer had to fix by hand. */
+  const confirm = useCallback(() => {
+    setOpen(false)
+    onConfirm()
+  }, [setOpen, onConfirm])
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
@@ -79,7 +105,7 @@ export function AlertDialog({
    */
   const { panelRef } = useOverlay<HTMLDivElement>({
     open: mounted,
-    onClose: onCancel,
+    onClose: cancel,
     initialFocus: () => (destructive ? cancelRef.current : confirmRef.current),
   })
 
@@ -103,11 +129,22 @@ export function AlertDialog({
     panelRef.current?.focus()
   }
 
+  const triggerNode =
+    trigger === undefined
+      ? null
+      : overlayTrigger(trigger, {
+          open,
+          onToggle: () => setOpen(!open),
+          controls: mounted ? `${id}-panel` : undefined,
+          className: 'may-overlay__trigger may-pressable may-hoverable',
+        })
+
   // Stays mounted for the length of its exit, so a dismissal animates instead
   // of blinking off the screen next to an entrance that springs.
-  if (!mounted) return null
-
   return (
+    <>
+      {triggerNode}
+      {mounted && (
     <div
       className="may-alert-dialog__scrim"
       data-slot="scrim"
@@ -116,6 +153,7 @@ export function AlertDialog({
     >
       <div
         ref={panelRef}
+        id={`${id}-panel`}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={`${id}-title`}
@@ -149,19 +187,21 @@ export function AlertDialog({
          * action lands on top — one CSS property instead of two trees.
          */}
         <div className="may-alert-dialog__actions">
-          <Button ref={cancelRef} variant="gray" onClick={onCancel}>
+          <Button ref={cancelRef} variant="gray" onClick={cancel}>
             {cancelLabel}
           </Button>
           <Button
             ref={confirmRef}
             tone={destructive ? 'danger' : 'tint'}
             variant="filled"
-            onClick={onConfirm}
+            onClick={confirm}
           >
             {confirmLabel}
           </Button>
         </div>
       </div>
     </div>
+      )}
+    </>
   )
 }

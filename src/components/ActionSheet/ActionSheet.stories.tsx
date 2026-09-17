@@ -133,3 +133,19 @@ export const CommandsOnly: Story = {
     )
   },
 }
+
+
+/** Zero state. */
+export const Uncontrolled: Story = {
+  render: () => (
+    <ActionSheet
+      trigger={<Button data-testid="actionsheet-trigger">Share</Button>}
+      title="Share"
+      items={[
+        { label: 'Copy Link', onSelect: () => {} },
+        { label: 'AirDrop', onSelect: () => {} },
+        { label: 'Delete', destructive: true, onSelect: () => {} },
+      ]}
+    />
+  ),
+}

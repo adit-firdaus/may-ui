@@ -135,3 +135,18 @@ export const LongLabels: Story = {
     )
   },
 }
+
+
+/** Zero state. Confirm closes the dialog itself. */
+export const Uncontrolled: Story = {
+  render: () => (
+    <AlertDialog
+      trigger={<Button data-testid="alert-trigger" tone="danger">Delete</Button>}
+      title="Delete this album?"
+      description="This cannot be undone."
+      destructive
+      confirmLabel="Delete"
+      onConfirm={() => {}}
+    />
+  ),
+}

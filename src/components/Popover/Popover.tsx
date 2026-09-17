@@ -5,14 +5,13 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { FOCUSABLE, useDismissLayer, useExitDelay } from '../../overlay'
+import { FOCUSABLE, useDismissLayer, useExitDelay, useOpenState } from '../../overlay'
 
 /** Which edge of the anchor the panel sits against. */
 export type PopoverSide = 'top' | 'bottom' | 'left' | 'right'
@@ -225,8 +224,7 @@ export function Popover({
   surfaceClassName,
   'aria-label': ariaLabel,
 }: PopoverProps) {
-  const [uncontrolled, setUncontrolled] = useState(defaultOpen)
-  const open = openProp ?? uncontrolled
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
 
@@ -238,14 +236,6 @@ export function Popover({
   const wasOpen = useRef(open)
   const surfaceId = useAutoId()
   const { pressProps } = usePressFeedback()
-
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (openProp === undefined) setUncontrolled(next)
-      onOpenChange?.(next)
-    },
-    [openProp, onOpenChange],
-  )
 
   /* ------------------------------- placement ------------------------------ */
 

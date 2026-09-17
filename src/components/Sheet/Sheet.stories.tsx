@@ -141,3 +141,15 @@ export const NestedDismissal: Story = {
     )
   },
 }
+
+
+/** Zero state: the sheet owns its open flag and the trigger flips it. */
+export const Uncontrolled: Story = {
+  render: () => (
+    <Sheet trigger={<Button data-testid="sheet-trigger">Open sheet</Button>} title="Uncontrolled">
+      <List>
+        <ListRow title="No useState in this story" />
+      </List>
+    </Sheet>
+  ),
+}

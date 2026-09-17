@@ -1,4 +1,5 @@
 import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import { useCallback } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import type { MayFooterLayout } from '../../types'
@@ -6,7 +7,7 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
-import { useExitDelay, useOverlay } from '../../overlay'
+import { overlayTrigger, useExitDelay, useOpenState, useOverlay } from '../../overlay'
 
 /** Matches the exit animation in Modal.css. */
 const EXIT_MS = 150
@@ -18,8 +19,22 @@ const EXIT_MS = 150
  * not the HTML tooltip attribute.
  */
 export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  open: boolean
-  onClose: () => void
+  /**
+   * Controlled state. Omit it and the modal owns its own, which is what makes
+   * `trigger` enough on its own.
+   */
+  open?: boolean
+  /** Starting state when uncontrolled. @default false */
+  defaultOpen?: boolean
+  /** Fires on every change, controlled or not. */
+  onOpenChange?: (open: boolean) => void
+  /**
+   * The control that opens it. A React element is cloned so the state lands on
+   * the button you styled, and your own `onClick` still runs.
+   */
+  trigger?: ReactNode
+  /** Called when the modal closes. Optional: an uncontrolled modal closes itself. */
+  onClose?: () => void
   children?: ReactNode
   title?: ReactNode
   description?: ReactNode
@@ -60,7 +75,10 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
  * scales past its resting size and settles rather than simply appearing.
  */
 export function Modal({
-  open,
+  open: openProp,
+  defaultOpen,
+  onOpenChange,
+  trigger,
   onClose,
   children,
   title,
@@ -76,6 +94,13 @@ export function Modal({
   ...rest
 }: ModalProps) {
   const id = useAutoId()
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
+  /* Both paths, so a controlled caller's `onClose` still fires and an
+   * uncontrolled one actually shuts. */
+  const close = useCallback(() => {
+    setOpen(false)
+    onClose?.()
+  }, [setOpen, onClose])
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
@@ -94,14 +119,14 @@ export function Modal({
    */
   const { panelRef } = useOverlay<HTMLDivElement>({
     open: mounted,
-    onClose,
+    onClose: close,
     closeOnEscape,
   })
 
   const onScrimDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return
     if (closeOnScrimClick) {
-      onClose()
+      close()
       return
     }
     // A click on the scrim of a modal that refuses to close would otherwise
@@ -109,11 +134,22 @@ export function Modal({
     panelRef.current?.focus()
   }
 
+  const triggerNode =
+    trigger === undefined
+      ? null
+      : overlayTrigger(trigger, {
+          open,
+          onToggle: () => setOpen(!open),
+          controls: mounted ? `${id}-panel` : undefined,
+          className: 'may-overlay__trigger may-pressable may-hoverable',
+        })
+
   // Stays mounted for the length of its exit, so a dismissal animates instead
   // of blinking off the screen next to an entrance that springs.
-  if (!mounted) return null
-
   return (
+    <>
+      {triggerNode}
+      {mounted && (
     <div
       className="may-modal__scrim"
       data-slot="scrim"
@@ -122,6 +158,7 @@ export function Modal({
     >
       <div
         ref={panelRef}
+        id={`${id}-panel`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? `${id}-title` : undefined}
@@ -180,5 +217,7 @@ export function Modal({
         )}
       </div>
     </div>
+      )}
+    </>
   )
 }

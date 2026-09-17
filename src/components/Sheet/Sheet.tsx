@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import type { MayFooterLayout } from '../../types'
@@ -7,7 +7,7 @@ import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
 import { clampWithRubber, draggable, projectFlick } from '../../motion/gesture'
-import { useExitDelay, useOverlay } from '../../overlay'
+import { overlayTrigger, useExitDelay, useOpenState, useOverlay } from '../../overlay'
 
 /** Matches the exit transition in Sheet.css. */
 const EXIT_MS = 150
@@ -19,8 +19,16 @@ const EXIT_MS = 150
  * not the HTML tooltip attribute.
  */
 export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  open: boolean
-  onClose: () => void
+  /** Controlled state. Omit it and the sheet owns its own. */
+  open?: boolean
+  /** Starting state when uncontrolled. @default false */
+  defaultOpen?: boolean
+  /** Fires on every change, controlled or not. */
+  onOpenChange?: (open: boolean) => void
+  /** The control that opens it. A React element is cloned; your onClick still runs. */
+  trigger?: ReactNode
+  /** Called when the sheet closes. Optional: an uncontrolled sheet closes itself. */
+  onClose?: () => void
   children?: ReactNode
   title?: ReactNode
   description?: ReactNode
@@ -69,7 +77,10 @@ const DISMISS_VELOCITY = 0.5
  * velocity, so a short fast swipe dismisses the way it does natively.
  */
 export function Sheet({
-  open,
+  open: openProp,
+  defaultOpen,
+  onOpenChange,
+  trigger,
   onClose,
   children,
   title,
@@ -85,6 +96,11 @@ export function Sheet({
   ...rest
 }: SheetProps) {
   const id = useAutoId()
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
+  const close = useCallback(() => {
+    setOpen(false)
+    onClose?.()
+  }, [setOpen, onClose])
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
@@ -107,7 +123,7 @@ export function Sheet({
    */
   const { panelRef } = useOverlay<HTMLDivElement>({
     open: mounted,
-    onClose,
+    onClose: close,
   })
 
   /* Drag-to-dismiss. The phone sheet only — a centred dialog has no edge to
@@ -137,14 +153,10 @@ export function Sheet({
         const projected = dy + projectFlick(vy)
         const dismiss = projected > height * DISMISS_RATIO || vy > DISMISS_VELOCITY
         panel.style.transform = ''
-        if (dismiss) onClose()
+        if (dismiss) close()
       },
     })
-  }, [open, isDesktop, dismissible, reducedMotion, onClose])
-
-  // Stays mounted for the length of its exit, so a dismissal animates instead
-  // of blinking off the screen next to an entrance that rises.
-  if (!mounted) return null
+  }, [open, isDesktop, dismissible, reducedMotion, close])
 
   /*
    * A drawer is a drawer at every width: reshaping an edge drawer into a
@@ -153,7 +165,22 @@ export function Sheet({
    */
   const presentation = side !== 'bottom' ? 'drawer' : isDesktop ? 'dialog' : 'sheet'
 
+  const triggerNode =
+    trigger === undefined
+      ? null
+      : overlayTrigger(trigger, {
+          open,
+          onToggle: () => setOpen(!open),
+          controls: mounted ? `${id}-panel` : undefined,
+          className: 'may-overlay__trigger may-pressable may-hoverable',
+        })
+
+  // Stays mounted for the length of its exit, so a dismissal animates instead
+  // of blinking off the screen next to an entrance that rises.
   return (
+    <>
+      {triggerNode}
+      {mounted && (
     <div
       className="may-sheet__scrim"
       data-slot="scrim"
@@ -161,11 +188,12 @@ export function Sheet({
       data-presentation={presentation}
       data-side={side}
       onMouseDown={(event) => {
-        if (closeOnScrimClick && event.target === event.currentTarget) onClose()
+        if (closeOnScrimClick && event.target === event.currentTarget) close()
       }}
     >
       <div
         ref={panelRef}
+        id={`${id}-panel`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? `${id}-title` : undefined}
@@ -209,5 +237,7 @@ export function Sheet({
         )}
       </div>
     </div>
+      )}
+    </>
   )
 }

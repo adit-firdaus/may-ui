@@ -1,2 +1,5 @@
 export { FOCUSABLE, useDismissLayer, useOverlay } from './useOverlay'
 export { useExitDelay } from './useExitDelay'
+export { useOpenState } from './useOpenState'
+export type { OpenState, OpenStateOptions } from './useOpenState'
+export { overlayTrigger } from './trigger'

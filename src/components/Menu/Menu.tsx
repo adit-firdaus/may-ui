@@ -1,10 +1,11 @@
 import { IoCheckmark } from 'react-icons/io5'
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { Popover } from '../Popover'
 import type { PopoverPlacement } from '../Popover'
+import { useOpenState } from '../../overlay'
 
 /** How long a type-ahead buffer survives between keystrokes, in ms. */
 const TYPEAHEAD_RESET = 700
@@ -78,8 +79,7 @@ export function Menu({
   className,
   'aria-label': ariaLabel,
 }: MenuProps) {
-  const [uncontrolled, setUncontrolled] = useState(defaultOpen)
-  const open = openProp ?? uncontrolled
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
   const [active, setActive] = useState(-1)
 
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([])
@@ -88,14 +88,6 @@ export function Menu({
   itemsRef.current = items
   const query = useRef('')
   const lastKeyAt = useRef(0)
-
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (openProp === undefined) setUncontrolled(next)
-      onOpenChange?.(next)
-    },
-    [openProp, onOpenChange],
-  )
 
   /*
    * Opening starts on the first item the user can actually reach.

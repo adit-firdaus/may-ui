@@ -7,7 +7,7 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
-import { useExitDelay, useOverlay } from '../../overlay'
+import { overlayTrigger, useExitDelay, useOpenState, useOverlay } from '../../overlay'
 import { Kbd } from '../../components/Kbd'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
 
@@ -38,8 +38,17 @@ export interface CommandGroup {
 }
 
 export interface CommandPaletteProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  /**
+   * Controlled state. Omit it and the palette owns its own — which, with the
+   * default hotkey, means it needs nothing from the consumer at all.
+   */
+  open?: boolean
+  /** Starting state when uncontrolled. @default false */
+  defaultOpen?: boolean
+  /** Fires on every change, controlled or not. */
+  onOpenChange?: (open: boolean) => void
+  /** An optional control that opens it, beside the hotkey. */
+  trigger?: ReactNode
   groups: CommandGroup[]
   /** Fired before the item's own `onSelect`. */
   onSelect?: (item: CommandItem) => void
@@ -289,8 +298,10 @@ function CommandRow({ match, id, active, onActivate, onHover }: CommandRowProps)
  * highlights the characters that earned each hit.
  */
 export function CommandPalette({
-  open,
+  open: openProp,
+  defaultOpen,
   onOpenChange,
+  trigger,
   groups,
   onSelect,
   query: queryProp,
@@ -307,6 +318,7 @@ export function CommandPalette({
   className,
 }: CommandPaletteProps) {
   const id = useAutoId()
+  const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -339,12 +351,12 @@ export function CommandPalette({
       // A toggle, not an opener. Every launcher on the platform dismisses on
       // the same chord that summoned it, and a palette that only opens leaves
       // you hunting for Escape.
-      onOpenChange(!openRef.current)
+      setOpen(!openRef.current)
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [hotkey, onOpenChange])
+  }, [hotkey, setOpen])
 
   /* ------------------------------ open lifecycle --------------------------- */
 
@@ -355,8 +367,14 @@ export function CommandPalette({
    * inert, which contains both.
    */
   const { panelRef } = useOverlay<HTMLDivElement>({
-    open,
-    onClose: () => onOpenChange(false),
+    /*
+     * `mounted`, not `open`: the panel is rendered a render later than the flag
+     * flips, so an effect keyed on `open` runs while panelRef is still null and
+     * silently applies neither the inert boundary nor the initial focus. This
+     * only showed up once the palette could start closed.
+     */
+    open: mounted,
+    onClose: () => setOpen(false),
     initialFocus: () => inputRef.current,
   })
 
@@ -467,7 +485,7 @@ export function CommandPalette({
     if (item.disabled) return
     onSelect?.(item)
     item.onSelect?.()
-    onOpenChange(false)
+    setOpen(false)
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
@@ -502,21 +520,33 @@ export function CommandPalette({
 
   // Stays mounted for the length of its exit, so a dismissal animates instead
   // of blinking off the screen next to an entrance that springs.
-  if (!mounted) return null
-
   const listId = `${id}-list`
 
+  const triggerNode =
+    trigger === undefined
+      ? null
+      : overlayTrigger(trigger, {
+          open,
+          onToggle: () => setOpen(!open),
+          controls: mounted ? `${id}-panel` : undefined,
+          className: 'may-overlay__trigger may-pressable may-hoverable',
+        })
+
   return (
+    <>
+      {triggerNode}
+      {mounted && (
     <div
       className="may-command__scrim"
       data-slot="scrim"
       data-state={open ? 'open' : 'closed'}
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onOpenChange(false)
+        if (event.target === event.currentTarget) setOpen(false)
       }}
     >
       <div
         ref={panelRef}
+        id={`${id}-panel`}
         role="dialog"
         aria-modal="true"
         aria-label={label}
@@ -615,5 +645,7 @@ export function CommandPalette({
         )}
       </div>
     </div>
+      )}
+    </>
   )
 }

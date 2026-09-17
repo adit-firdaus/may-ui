@@ -361,3 +361,39 @@
   background-repeat: no-repeat;
   background-attachment: local, local, scroll, scroll;
 }
+
+/* ------------------------------------------------------------------
+ * Overlay trigger fallback
+ *
+ * Every overlay that takes a `trigger` clones a React element it is handed, so
+ * the state lands on the control the consumer already styled and this rule
+ * never applies. It exists for the other case — a bare string or number —
+ * where the alternative is an unstyled browser button inside a system that
+ * has no unstyled anything.
+ *
+ * One rule in the foundation rather than the same block copied into five
+ * component sheets: the fallback is cross-overlay by nature, and a trigger
+ * that looked different depending on which surface it opened would be worse
+ * than one that is slightly generic.
+ * ------------------------------------------------------------------ */
+
+.may-root .may-overlay__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--may-control-h);
+  padding-inline: var(--may-space-3);
+  border: 0;
+  border-radius: var(--may-radius-sm);
+  background: var(--may-color-fill-tertiary);
+  color: var(--may-color-tint);
+  font: inherit;
+  font-weight: var(--may-text-headline-weight);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .may-root .may-overlay__trigger:hover {
+    background: var(--may-color-fill-quaternary);
+  }
+}

@@ -1,9 +1,10 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useAutoId } from '../../utils/useId'
+import { useOpenState } from '../../overlay'
 
 export interface CollapsibleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onToggle'> {
   /** Controlled open state. Leave undefined to let the component own it. */
@@ -51,8 +52,7 @@ export function Collapsible({
   id,
   ...rest
 }: CollapsibleProps) {
-  const [internal, setInternal] = useState(defaultOpen)
-  const isOpen = open ?? internal
+  const { open: isOpen, setOpen } = useOpenState({ open, defaultOpen, onOpenChange })
   const autoId = useAutoId(id)
   const panelId = `${autoId}-panel`
   const triggerId = `${autoId}-trigger`
@@ -60,10 +60,8 @@ export function Collapsible({
 
   const toggle = useCallback(() => {
     if (disabled) return
-    const next = !isOpen
-    if (open === undefined) setInternal(next)
-    onOpenChange?.(next)
-  }, [disabled, isOpen, open, onOpenChange])
+    setOpen(!isOpen)
+  }, [disabled, isOpen, setOpen])
 
   return (
     <div

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Modal } from '.'
 import { Button } from '../Button'
 import { List, ListRow } from '../List'
+import { Text } from '../Text'
 
 const meta = {
   title: 'Catalog/Adaptive/Modal',
@@ -162,4 +163,22 @@ export const RequiresAChoice: Story = {
       </>
     )
   },
+}
+
+/**
+ * Zero state. The modal owns its own open flag and the trigger it was handed
+ * flips it, so this story has no `useState` and no handlers at all — which is
+ * the whole point of `trigger`.
+ */
+export const Uncontrolled: Story = {
+  render: () => (
+    <Modal
+      trigger={<Button data-testid="modal-trigger">Settings</Button>}
+      title="Settings"
+      description="Nothing here needed a state hook."
+      footer={<Button variant="filled">Done</Button>}
+    >
+      <Text>The modal manages itself. Pass `open` and it stops.</Text>
+    </Modal>
+  ),
 }
