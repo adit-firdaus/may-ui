@@ -10,7 +10,7 @@
  */
 
 import type { ComponentType, ReactNode } from 'react'
-import { mayStyleSheet, withMayStyles } from '../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../styles/runtime'
 import deviceFrameCss from './DeviceFrame.css?inline'
 import photosCss from './PhotosScreen.css?inline'
 import splitInboxCss from './SplitInboxScreen.css?inline'
@@ -23,27 +23,27 @@ import { SplitInboxScreen as SplitInboxScreenBase } from './SplitInboxScreen'
 import { CatalogAdaptive as CatalogAdaptiveBase } from './CatalogAdaptive'
 import { CatalogMobile as CatalogMobileBase } from './CatalogMobile'
 
-export const DeviceFrame = withMayStyles(
+export const DeviceFrame = /*#__PURE__*/ mayStyled(
   'DeviceFrame',
   DeviceFrameBase,
   [mayStyleSheet('DeviceFrame', deviceFrameCss)],
 )
-export const PhotosScreen = withMayStyles(
+export const PhotosScreen = /*#__PURE__*/ mayStyled(
   'PhotosScreen',
   PhotosScreenBase,
   [mayStyleSheet('PhotosScreen', photosCss)],
 )
-export const SplitInboxScreen = withMayStyles(
+export const SplitInboxScreen = /*#__PURE__*/ mayStyled(
   'SplitInboxScreen',
   SplitInboxScreenBase,
   [mayStyleSheet('SplitInboxScreen', splitInboxCss)],
 )
-export const CatalogAdaptive = withMayStyles(
+export const CatalogAdaptive = /*#__PURE__*/ mayStyled(
   'CatalogAdaptive',
   CatalogAdaptiveBase,
   [mayStyleSheet('CatalogAdaptive', catalogAdaptiveCss)],
 )
-export const CatalogMobile = withMayStyles(
+export const CatalogMobile = /*#__PURE__*/ mayStyled(
   'CatalogMobile',
   CatalogMobileBase,
   [mayStyleSheet('CatalogMobile', catalogMobileCss)],

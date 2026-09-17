@@ -1,9 +1,6 @@
 import componentCss from './Alert.css?inline'
 import { Alert as AlertBase } from './Alert'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Alert', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Alert = withMayStyles('Alert', AlertBase, componentStyles)
+export const Alert = /*#__PURE__*/ mayStyled('Alert', AlertBase, componentCss)
 export type { AlertProps } from './Alert'

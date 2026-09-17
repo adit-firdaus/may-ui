@@ -1,11 +1,8 @@
 import componentCss from './CapsuleTabs.css?inline'
 import { CapsuleTabs as CapsuleTabsBase } from './CapsuleTabs'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('CapsuleTabs', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const CapsuleTabs = withMayStyles('CapsuleTabs', CapsuleTabsBase, componentStyles)
+export const CapsuleTabs = /*#__PURE__*/ mayStyled('CapsuleTabs', CapsuleTabsBase, componentCss)
 export type {
   CapsuleTabsProps,
   CapsuleTab,

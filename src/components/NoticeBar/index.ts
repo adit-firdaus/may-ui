@@ -1,9 +1,6 @@
 import componentCss from './NoticeBar.css?inline'
 import { NoticeBar as NoticeBarBase } from './NoticeBar'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('NoticeBar', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const NoticeBar = withMayStyles('NoticeBar', NoticeBarBase, componentStyles)
+export const NoticeBar = /*#__PURE__*/ mayStyled('NoticeBar', NoticeBarBase, componentCss)
 export type { NoticeBarProps } from './NoticeBar'

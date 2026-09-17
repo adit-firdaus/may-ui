@@ -1,9 +1,6 @@
 import componentCss from './Stepper.css?inline'
 import { Stepper as StepperBase } from './Stepper'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Stepper', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Stepper = withMayStyles('Stepper', StepperBase, componentStyles)
+export const Stepper = /*#__PURE__*/ mayStyled('Stepper', StepperBase, componentCss)
 export type { StepperProps } from './Stepper'

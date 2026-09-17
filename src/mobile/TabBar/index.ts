@@ -1,11 +1,11 @@
 import componentCss from './TabBar.css?inline'
 import badgeCss from '../../components/Badge/Badge.css?inline'
 import { TabBar as TabBarBase } from './TabBar'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('TabBar', componentCss)
-const badgeStyle = mayStyleSheet('Badge', badgeCss)
+const componentStyle = /*#__PURE__*/ mayStyleSheet('TabBar', componentCss)
+const badgeStyle = /*#__PURE__*/ mayStyleSheet('Badge', badgeCss)
 const componentStyles = [badgeStyle, componentStyle] as const
 
-export const TabBar = withMayStyles('TabBar', TabBarBase, componentStyles)
+export const TabBar = /*#__PURE__*/ mayStyled('TabBar', TabBarBase, componentStyles)
 export type { TabBarProps, TabBarItem } from './TabBar'

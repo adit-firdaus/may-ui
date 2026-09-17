@@ -65,11 +65,29 @@ const mergeDefined = (
   return merged
 }
 
-export function withMayStyles<T>(
+/**
+ * Wrap a component so it carries its own CSS and the provider's defaults.
+ *
+ * Takes the component's CSS directly in the common case, or an explicit sheet
+ * list for the components that also need another's CSS — `Toast` draws button
+ * chrome, and several surfaces borrow a shared sheet. `mayStyleSheet` stays
+ * exported for those, and for the barrels that wrap several components against
+ * one sheet.
+ *
+ * Call sites annotate this `/*#__PURE__*\/`. Without it the top-level call in
+ * every barrel is retained — `Object.defineProperty` below is a real side
+ * effect on the returned value, so no bundler can prove the call droppable —
+ * and importing one component pulled in the CSS and implementation of all 74.
+ */
+export function mayStyled<T>(name: string, Component: T, css: string): T
+export function mayStyled<T>(name: string, Component: T, sheets: readonly MayStyleSheet[]): T
+export function mayStyled<T>(
   name: string,
   Component: T,
-  sheets: readonly MayStyleSheet[],
+  style: string | readonly MayStyleSheet[],
 ): T {
+  const sheets = typeof style === 'string' ? [mayStyleSheet(name, style)] : style
+
   function MayStyledComponent(props: Record<string, unknown>) {
     const defaults = useMayComponentDefaults(name)
     return createElement(
@@ -80,6 +98,7 @@ export function withMayStyles<T>(
     )
   }
   MayStyledComponent.displayName = `MayStyled(${name})`
+  // Read back by MayProvider, which collects sheets for a host it renders itself.
   Object.defineProperty(MayStyledComponent, '__mayStyles', {
     value: Object.freeze([mayFoundationStyle, ...sheets]),
   })

@@ -1,9 +1,6 @@
 import componentCss from './EmptyState.css?inline'
 import { EmptyState as EmptyStateBase } from './EmptyState'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('EmptyState', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const EmptyState = withMayStyles('EmptyState', EmptyStateBase, componentStyles)
+export const EmptyState = /*#__PURE__*/ mayStyled('EmptyState', EmptyStateBase, componentCss)
 export type { EmptyStateProps } from './EmptyState'

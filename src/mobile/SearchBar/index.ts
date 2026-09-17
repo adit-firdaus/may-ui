@@ -1,9 +1,6 @@
 import componentCss from './SearchBar.css?inline'
 import { SearchBar as SearchBarBase } from './SearchBar'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('SearchBar', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const SearchBar = withMayStyles('SearchBar', SearchBarBase, componentStyles)
+export const SearchBar = /*#__PURE__*/ mayStyled('SearchBar', SearchBarBase, componentCss)
 export type { SearchBarProps, SearchBarSize, SearchBarCancel } from './SearchBar'

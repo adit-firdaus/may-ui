@@ -1,10 +1,10 @@
 import componentCss from './RadioGroup.css?inline'
 import { RadioGroup as RadioGroupBase, Radio as RadioBase } from './RadioGroup'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('RadioGroup', componentCss)
+const componentStyle = /*#__PURE__*/ mayStyleSheet('RadioGroup', componentCss)
 const componentStyles = [componentStyle] as const
 
-export const RadioGroup = withMayStyles('RadioGroup', RadioGroupBase, componentStyles)
-export const Radio = withMayStyles('Radio', RadioBase, componentStyles)
+export const RadioGroup = /*#__PURE__*/ mayStyled('RadioGroup', RadioGroupBase, componentStyles)
+export const Radio = /*#__PURE__*/ mayStyled('Radio', RadioBase, componentStyles)
 export type { RadioGroupProps, RadioProps, RadioSize } from './RadioGroup'

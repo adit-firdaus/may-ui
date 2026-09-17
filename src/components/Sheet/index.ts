@@ -1,9 +1,6 @@
 import componentCss from './Sheet.css?inline'
 import { Sheet as SheetBase } from './Sheet'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Sheet', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Sheet = withMayStyles('Sheet', SheetBase, componentStyles)
+export const Sheet = /*#__PURE__*/ mayStyled('Sheet', SheetBase, componentCss)
 export type { SheetProps } from './Sheet'

@@ -1,14 +1,14 @@
 import componentCss from './Sidebar.css?inline'
 import { Sidebar as SidebarBase, SidebarSection as SidebarSectionBase, SidebarItem as SidebarItemBase, SidebarToggle as SidebarToggleBase } from './Sidebar'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Sidebar', componentCss)
+const componentStyle = /*#__PURE__*/ mayStyleSheet('Sidebar', componentCss)
 const componentStyles = [componentStyle] as const
 
-export const Sidebar = withMayStyles('Sidebar', SidebarBase, componentStyles)
-export const SidebarSection = withMayStyles('SidebarSection', SidebarSectionBase, componentStyles)
-export const SidebarItem = withMayStyles('SidebarItem', SidebarItemBase, componentStyles)
-export const SidebarToggle = withMayStyles('SidebarToggle', SidebarToggleBase, componentStyles)
+export const Sidebar = /*#__PURE__*/ mayStyled('Sidebar', SidebarBase, componentStyles)
+export const SidebarSection = /*#__PURE__*/ mayStyled('SidebarSection', SidebarSectionBase, componentStyles)
+export const SidebarItem = /*#__PURE__*/ mayStyled('SidebarItem', SidebarItemBase, componentStyles)
+export const SidebarToggle = /*#__PURE__*/ mayStyled('SidebarToggle', SidebarToggleBase, componentStyles)
 export type {
   SidebarProps,
   SidebarSectionProps,

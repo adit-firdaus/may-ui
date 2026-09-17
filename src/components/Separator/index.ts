@@ -1,9 +1,6 @@
 import componentCss from './Separator.css?inline'
 import { Separator as SeparatorBase } from './Separator'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Separator', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Separator = withMayStyles('Separator', SeparatorBase, componentStyles)
+export const Separator = /*#__PURE__*/ mayStyled('Separator', SeparatorBase, componentCss)
 export type { SeparatorProps, SeparatorOrientation } from './Separator'

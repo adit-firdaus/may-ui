@@ -1,9 +1,6 @@
 import componentCss from './SafeArea.css?inline'
 import { SafeArea as SafeAreaBase } from './SafeArea'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('SafeArea', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const SafeArea = withMayStyles('SafeArea', SafeAreaBase, componentStyles)
+export const SafeArea = /*#__PURE__*/ mayStyled('SafeArea', SafeAreaBase, componentCss)
 export type { SafeAreaProps, SafeAreaEdge } from './SafeArea'

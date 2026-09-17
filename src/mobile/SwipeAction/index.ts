@@ -1,9 +1,6 @@
 import componentCss from './SwipeAction.css?inline'
 import { SwipeAction as SwipeActionBase } from './SwipeAction'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('SwipeAction', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const SwipeAction = withMayStyles('SwipeAction', SwipeActionBase, componentStyles)
+export const SwipeAction = /*#__PURE__*/ mayStyled('SwipeAction', SwipeActionBase, componentCss)
 export type { SwipeActionProps, SwipeActionItem, SwipeSide } from './SwipeAction'

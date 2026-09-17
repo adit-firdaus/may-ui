@@ -1,9 +1,6 @@
 import componentCss from './SearchField.css?inline'
 import { SearchField as SearchFieldBase } from './SearchField'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('SearchField', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const SearchField = withMayStyles('SearchField', SearchFieldBase, componentStyles)
+export const SearchField = /*#__PURE__*/ mayStyled('SearchField', SearchFieldBase, componentCss)
 export type { SearchFieldProps, SearchFieldSize } from './SearchField'

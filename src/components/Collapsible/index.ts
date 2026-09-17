@@ -1,9 +1,6 @@
 import componentCss from './Collapsible.css?inline'
 import { Collapsible as CollapsibleBase } from './Collapsible'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Collapsible', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Collapsible = withMayStyles('Collapsible', CollapsibleBase, componentStyles)
+export const Collapsible = /*#__PURE__*/ mayStyled('Collapsible', CollapsibleBase, componentCss)
 export type { CollapsibleProps } from './Collapsible'

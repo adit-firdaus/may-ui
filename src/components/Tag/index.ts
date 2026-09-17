@@ -1,9 +1,6 @@
 import componentCss from './Tag.css?inline'
 import { Tag as TagBase } from './Tag'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Tag', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Tag = withMayStyles('Tag', TagBase, componentStyles)
+export const Tag = /*#__PURE__*/ mayStyled('Tag', TagBase, componentCss)
 export type { TagProps, TagSize } from './Tag'

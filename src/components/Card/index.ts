@@ -1,16 +1,16 @@
 import componentCss from './Card.css?inline'
 import { Card as CardBase, CardHeader as CardHeaderBase, CardTitle as CardTitleBase, CardDescription as CardDescriptionBase, CardBody as CardBodyBase, CardFooter as CardFooterBase } from './Card'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Card', componentCss)
+const componentStyle = /*#__PURE__*/ mayStyleSheet('Card', componentCss)
 const componentStyles = [componentStyle] as const
 
-export const Card = withMayStyles('Card', CardBase, componentStyles)
-export const CardHeader = withMayStyles('CardHeader', CardHeaderBase, componentStyles)
-export const CardTitle = withMayStyles('CardTitle', CardTitleBase, componentStyles)
-export const CardDescription = withMayStyles('CardDescription', CardDescriptionBase, componentStyles)
-export const CardBody = withMayStyles('CardBody', CardBodyBase, componentStyles)
-export const CardFooter = withMayStyles('CardFooter', CardFooterBase, componentStyles)
+export const Card = /*#__PURE__*/ mayStyled('Card', CardBase, componentStyles)
+export const CardHeader = /*#__PURE__*/ mayStyled('CardHeader', CardHeaderBase, componentStyles)
+export const CardTitle = /*#__PURE__*/ mayStyled('CardTitle', CardTitleBase, componentStyles)
+export const CardDescription = /*#__PURE__*/ mayStyled('CardDescription', CardDescriptionBase, componentStyles)
+export const CardBody = /*#__PURE__*/ mayStyled('CardBody', CardBodyBase, componentStyles)
+export const CardFooter = /*#__PURE__*/ mayStyled('CardFooter', CardFooterBase, componentStyles)
 export type {
   CardProps,
   CardVariant,

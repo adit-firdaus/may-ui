@@ -1,9 +1,6 @@
 import componentCss from './Breadcrumb.css?inline'
 import { Breadcrumb as BreadcrumbBase } from './Breadcrumb'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Breadcrumb', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Breadcrumb = withMayStyles('Breadcrumb', BreadcrumbBase, componentStyles)
+export const Breadcrumb = /*#__PURE__*/ mayStyled('Breadcrumb', BreadcrumbBase, componentCss)
 export type { BreadcrumbProps, BreadcrumbItem, BreadcrumbSize } from './Breadcrumb'

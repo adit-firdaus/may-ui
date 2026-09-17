@@ -1,13 +1,13 @@
 import componentCss from './ContextMenu.css?inline'
 import kbdCss from '../../components/Kbd/Kbd.css?inline'
 import { ContextMenu as ContextMenuBase } from './ContextMenu'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('ContextMenu', componentCss)
-const kbdStyle = mayStyleSheet('Kbd', kbdCss)
+const componentStyle = /*#__PURE__*/ mayStyleSheet('ContextMenu', componentCss)
+const kbdStyle = /*#__PURE__*/ mayStyleSheet('Kbd', kbdCss)
 const componentStyles = [kbdStyle, componentStyle] as const
 
-export const ContextMenu = withMayStyles('ContextMenu', ContextMenuBase, componentStyles)
+export const ContextMenu = /*#__PURE__*/ mayStyled('ContextMenu', ContextMenuBase, componentStyles)
 export type {
   ContextMenuProps,
   ContextMenuEntry,

@@ -1,9 +1,6 @@
 import componentCss from './VisuallyHidden.css?inline'
 import { VisuallyHidden as VisuallyHiddenBase } from './VisuallyHidden'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('VisuallyHidden', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const VisuallyHidden = withMayStyles('VisuallyHidden', VisuallyHiddenBase, componentStyles)
+export const VisuallyHidden = /*#__PURE__*/ mayStyled('VisuallyHidden', VisuallyHiddenBase, componentCss)
 export type { VisuallyHiddenProps } from './VisuallyHidden'

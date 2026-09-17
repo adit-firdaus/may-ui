@@ -1,9 +1,6 @@
 import componentCss from './Checkbox.css?inline'
 import { Checkbox as CheckboxBase } from './Checkbox'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Checkbox', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Checkbox = withMayStyles('Checkbox', CheckboxBase, componentStyles)
+export const Checkbox = /*#__PURE__*/ mayStyled('Checkbox', CheckboxBase, componentCss)
 export type { CheckboxProps, CheckboxSize } from './Checkbox'

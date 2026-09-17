@@ -1,9 +1,6 @@
 import componentCss from './Tooltip.css?inline'
 import { Tooltip as TooltipBase } from './Tooltip'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Tooltip', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Tooltip = withMayStyles('Tooltip', TooltipBase, componentStyles)
+export const Tooltip = /*#__PURE__*/ mayStyled('Tooltip', TooltipBase, componentCss)
 export type { TooltipProps } from './Tooltip'

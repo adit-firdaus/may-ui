@@ -1,9 +1,6 @@
 import componentCss from './Textarea.css?inline'
 import { Textarea as TextareaBase } from './Textarea'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Textarea', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Textarea = withMayStyles('Textarea', TextareaBase, componentStyles)
+export const Textarea = /*#__PURE__*/ mayStyled('Textarea', TextareaBase, componentCss)
 export type { TextareaProps, TextareaSize } from './Textarea'

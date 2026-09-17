@@ -1,11 +1,8 @@
 import componentCss from './Selector.css?inline'
 import { Selector as SelectorBase } from './Selector'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Selector', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Selector = withMayStyles('Selector', SelectorBase, componentStyles)
+export const Selector = /*#__PURE__*/ mayStyled('Selector', SelectorBase, componentCss)
 export type {
   SelectorProps,
   SelectorOption,

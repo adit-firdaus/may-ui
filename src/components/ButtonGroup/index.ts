@@ -1,9 +1,6 @@
 import componentCss from './ButtonGroup.css?inline'
 import { ButtonGroup as ButtonGroupBase } from './ButtonGroup'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('ButtonGroup', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const ButtonGroup = withMayStyles('ButtonGroup', ButtonGroupBase, componentStyles)
+export const ButtonGroup = /*#__PURE__*/ mayStyled('ButtonGroup', ButtonGroupBase, componentCss)
 export type { ButtonGroupProps } from './ButtonGroup'

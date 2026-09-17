@@ -1,9 +1,6 @@
 import componentCss from './AlertDialog.css?inline'
 import { AlertDialog as AlertDialogBase } from './AlertDialog'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('AlertDialog', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const AlertDialog = withMayStyles('AlertDialog', AlertDialogBase, componentStyles)
+export const AlertDialog = /*#__PURE__*/ mayStyled('AlertDialog', AlertDialogBase, componentCss)
 export type { AlertDialogProps } from './AlertDialog'

@@ -1,9 +1,6 @@
 import componentCss from './Input.css?inline'
 import { Input as InputBase } from './Input'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Input', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Input = withMayStyles('Input', InputBase, componentStyles)
+export const Input = /*#__PURE__*/ mayStyled('Input', InputBase, componentCss)
 export type { InputProps, InputSize } from './Input'

@@ -1,9 +1,6 @@
 import componentCss from './Fab.css?inline'
 import { Fab as FabBase } from './Fab'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Fab', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Fab = withMayStyles('Fab', FabBase, componentStyles)
+export const Fab = /*#__PURE__*/ mayStyled('Fab', FabBase, componentCss)
 export type { FabProps } from './Fab'

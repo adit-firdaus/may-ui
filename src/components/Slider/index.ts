@@ -1,9 +1,6 @@
 import componentCss from './Slider.css?inline'
 import { Slider as SliderBase } from './Slider'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Slider', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Slider = withMayStyles('Slider', SliderBase, componentStyles)
+export const Slider = /*#__PURE__*/ mayStyled('Slider', SliderBase, componentCss)
 export type { SliderProps } from './Slider'

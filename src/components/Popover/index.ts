@@ -1,11 +1,8 @@
 import componentCss from './Popover.css?inline'
 import { Popover as PopoverBase } from './Popover'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Popover', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Popover = withMayStyles('Popover', PopoverBase, componentStyles)
+export const Popover = /*#__PURE__*/ mayStyled('Popover', PopoverBase, componentCss)
 export type {
   PopoverProps,
   PopoverPlacement,

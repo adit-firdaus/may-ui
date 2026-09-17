@@ -1,9 +1,6 @@
 import componentCss from './Statistic.css?inline'
 import { Statistic as StatisticBase } from './Statistic'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('Statistic', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const Statistic = withMayStyles('Statistic', StatisticBase, componentStyles)
+export const Statistic = /*#__PURE__*/ mayStyled('Statistic', StatisticBase, componentCss)
 export type { StatisticProps, StatisticDirection, StatisticSize } from './Statistic'

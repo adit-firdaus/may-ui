@@ -5,14 +5,14 @@ import inputCss from '../../components/Input/Input.css?inline'
 import selectCss from '../../components/Select/Select.css?inline'
 import paginationCss from '../../components/Pagination/Pagination.css?inline'
 import { DataTable as DataTableBase } from './DataTable'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled, mayStyleSheet } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('DataTable', componentCss)
-const tableStyle = mayStyleSheet('Table', tableCss)
-const checkboxStyle = mayStyleSheet('Checkbox', checkboxCss)
-const inputStyle = mayStyleSheet('Input', inputCss)
-const selectStyle = mayStyleSheet('Select', selectCss)
-const paginationStyle = mayStyleSheet('Pagination', paginationCss)
+const componentStyle = /*#__PURE__*/ mayStyleSheet('DataTable', componentCss)
+const tableStyle = /*#__PURE__*/ mayStyleSheet('Table', tableCss)
+const checkboxStyle = /*#__PURE__*/ mayStyleSheet('Checkbox', checkboxCss)
+const inputStyle = /*#__PURE__*/ mayStyleSheet('Input', inputCss)
+const selectStyle = /*#__PURE__*/ mayStyleSheet('Select', selectCss)
+const paginationStyle = /*#__PURE__*/ mayStyleSheet('Pagination', paginationCss)
 const componentStyles = [
   tableStyle,
   checkboxStyle,
@@ -22,7 +22,7 @@ const componentStyles = [
   componentStyle,
 ] as const
 
-export const DataTable = withMayStyles('DataTable', DataTableBase, componentStyles)
+export const DataTable = /*#__PURE__*/ mayStyled('DataTable', DataTableBase, componentStyles)
 export type {
   DataTableProps,
   DataTableColumn,

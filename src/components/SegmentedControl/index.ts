@@ -1,9 +1,6 @@
 import componentCss from './SegmentedControl.css?inline'
 import { SegmentedControl as SegmentedControlBase } from './SegmentedControl'
-import { mayStyleSheet, withMayStyles } from '../../styles/runtime'
+import { mayStyled } from '../../styles/runtime'
 
-const componentStyle = mayStyleSheet('SegmentedControl', componentCss)
-const componentStyles = [componentStyle] as const
-
-export const SegmentedControl = withMayStyles('SegmentedControl', SegmentedControlBase, componentStyles)
+export const SegmentedControl = /*#__PURE__*/ mayStyled('SegmentedControl', SegmentedControlBase, componentCss)
 export type { SegmentedControlProps, SegmentedOption } from './SegmentedControl'
