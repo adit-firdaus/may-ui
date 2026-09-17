@@ -47,7 +47,10 @@ without having run the gate.
   duration. If a value you need has no token, add it to the generator.
 - **No borders on controls.** Surfaces separate by value (fill + hairline), not
   by strokes. The contract check will reject a visible `border: … solid …`.
-- **Class names are BEM**: `may-<component>__element--modifier`. The component
+- **Class names are BEM**: `may-<component>__element--modifier`. Enforced by
+  `check:contract`, because the style runtime keys a component's sheet by its
+  name and a class that does not carry its block is one nobody can find from
+  the component that owns it. The component
   barrel imports CSS with `?inline`, creates a `mayStyleSheet`, and exports the
   implementation through `withMayStyles`; `.tsx` files never side-effect-import CSS.
 - **Glyphs come from `react-icons/io5`**, sized in CSS against
@@ -62,6 +65,9 @@ without having run the gate.
   match. Leave it alone.
 - **Tone sets variables, variant consumes them** — a new tone never touches
   variant CSS and vice versa. Copy the pattern in `Button.css`.
+  `check:contract` rejects a `[data-tone]` rule that paints directly: the
+  separation is what keeps a new tone at five custom properties instead of a
+  new rule in every variant.
 
 Adding a component: follow [README → "Adding a component"](README.md#adding-a-component).
 

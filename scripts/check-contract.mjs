@@ -296,6 +296,54 @@ const checks = [
    * side of the same fact: a floor for raw unclassed svgs, which react-icons
    * cannot match, and it lives outside the component sheets this checks.
    */
+  /*
+   * Tone sets variables; variant consumes them.
+   *
+   * The separation is what lets a new tone be five custom properties instead
+   * of a new rule in every variant, and a new variant one rule instead of one
+   * per tone. The moment a [data-tone] rule paints directly, the two axes are
+   * multiplied together again and the next tone costs five rules per variant.
+   * Button.css is the reference.
+   */
+  [
+    'tone rules set variables rather than painting',
+    (() => {
+      const PAINT = /^(background|background-color|color|box-shadow|border-color|fill|stroke)\s*:/
+      const offenders = []
+      for (const match of css.matchAll(/([^{}]*\[data-tone=[^{}]*)\{([^}]*)\}/g)) {
+        const paints = match[2]
+          .split(';')
+          .map((decl) => decl.trim())
+          .filter((decl) => PAINT.test(decl))
+        if (paints.length) offenders.push(match[1].trim().slice(-48))
+      }
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       paints inside a tone rule: ${[...new Set(offenders)].join(', ')}`), false)
+      )
+    })(),
+  ],
+  /*
+   * Class names are BEM: may-<block>__<element>--<modifier>.
+   *
+   * Not taste — the style runtime keys a component's sheet by its name, and a
+   * class that does not carry its block is a class no one can find from the
+   * component that owns it.
+   */
+  [
+    'every class name is may-block__element--modifier',
+    (() => {
+      const shape = /^may-[a-z0-9]+(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$/
+      const names = new Set(
+        [...css.matchAll(/\.(may-[a-zA-Z0-9_-]+)/g)].map((match) => match[1]),
+      )
+      const offenders = [...names].filter((name) => !shape.test(name))
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       not BEM: ${offenders.join(', ')}`), false)
+      )
+    })(),
+  ],
   [
     'no component sizes an icon behind a :not([width]) guard',
     (() => {
