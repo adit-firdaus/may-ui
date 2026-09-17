@@ -122,6 +122,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **A theme token value can no longer carry a second CSS declaration.**
+  Overrides land as inline custom properties on the root, which keeps a
+  consumer's value out of stylesheet text — but an inline style is still a
+  declaration list, so a `;` in a value split it. Measured in a browser:
+  `blue: 'red; background: rgb(1,2,3); --may-label: rgb(4,5,6)'` parsed as
+  **eleven** declarations, painting a background and overriding the label token
+  for the whole subtree. No script can run that way, but a theme is the sort of
+  thing an app reads from a CMS, a URL or a saved preference — and this
+  package's own examples site drives provider config from the URL. Values
+  containing `;`, `{` or `}` are dropped with a development warning; `calc()`
+  and `rgba()` are unaffected.
+
 - **A bright fill's foreground no longer follows the theme.** `NoticeBar`,
   `Button`, `Badge`, `Fab` and mobile `SwipeAction` each set a warning fill's
   text to `--may-label` — which is near-black in light and **white in dark**, so

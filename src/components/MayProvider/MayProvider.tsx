@@ -49,12 +49,39 @@ const mergeTokens = <T extends object>(parent: T, local: T | undefined): T => {
   return merged as T
 }
 
+/*
+ * A token value cannot carry a second declaration.
+ *
+ * Overrides land as inline custom properties on the root, which is what keeps
+ * a consumer's value out of stylesheet TEXT. But an inline style is still a
+ * declaration list, so a `;` in the value splits it: measured in a browser,
+ * `blue: 'red; background: rgb(1,2,3); --may-label: rgb(4,5,6)'` parsed as
+ * ELEVEN declarations, painting a background and overriding the label token
+ * for the whole subtree. No script runs — CSS cannot — but a theme is exactly
+ * the sort of thing an app reads from a CMS, a URL or a saved preference, and
+ * this package's own examples site drives provider config from the URL.
+ *
+ * `;` `{` and `}` are never part of a CSS value, so dropping the whole value
+ * loses nothing legitimate and fails visibly rather than silently applying
+ * half of it.
+ */
+const UNSAFE_IN_A_VALUE = /[;{}]/
+
 const tokenVariables = (theme: Required<Pick<MayThemeConfig, 'tokens' | 'light' | 'dark'>>) => {
   const variables: Record<string, string | number> = {}
   for (const [mode, tokens] of Object.entries(theme)) {
     const infix = mode === 'tokens' ? '' : `${mode}-`
     for (const [name, value] of Object.entries(tokens)) {
       if (value === undefined) continue
+      if (typeof value === 'string' && UNSAFE_IN_A_VALUE.test(value)) {
+        if (isDevelopment) {
+          console.warn(
+            `MayProvider: ignoring the token "${name}" because its value contains ; { or }, ` +
+              'which would inject further CSS declarations onto the root element.',
+          )
+        }
+        continue
+      }
       variables[`--may-user-${infix}${mayTokenCssNames[name as keyof typeof mayTokenCssNames]}`] = value
     }
   }

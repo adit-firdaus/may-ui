@@ -390,6 +390,43 @@ check('every entry is marked a client module', () => {
   assert.equal(/^['"]use client['"]/.test(leaf), false, 'leaf modules should not carry it')
 })
 
+/*
+ * A token override cannot smuggle a second CSS declaration in.
+ *
+ * Overrides land as inline custom properties on the root, which keeps a
+ * consumer's value out of stylesheet text — but an inline style is still a
+ * declaration list, so a `;` in a value splits it. Measured in a browser
+ * before the guard: `blue: 'red; background: rgb(1,2,3); --may-label:
+ * rgb(4,5,6)'` parsed as ELEVEN declarations, painting a background and
+ * overriding the label token for the whole subtree. No script runs, but a
+ * theme is the sort of thing an app reads from a CMS, a URL or a saved
+ * preference, and this package's own examples site drives provider config
+ * from the URL.
+ *
+ * The legitimate half matters as much: `calc()` and `rgba()` carry commas,
+ * spaces and parentheses and must still get through.
+ */
+check('a token value cannot carry a second declaration', () => {
+  const styleOf = (tokens) => {
+    const markup = renderToStaticMarkup(h(May.MayProvider, { theme: { tokens } }, h(May.Button, {}, 'x')))
+    return (markup.match(/<div[^>]*class="may-root[^"]*"[^>]*style="([^"]*)"/) ?? [, ''])[1]
+  }
+
+  for (const value of [
+    'red; background: rgb(1, 2, 3)',
+    'red;\n--may-label: red',
+    '}; body { display: none } /*',
+    'red}',
+  ]) {
+    assert.equal(styleOf({ blue: value }), '', `emitted a style for ${JSON.stringify(value)}`)
+  }
+
+  // and the values a consumer actually writes still arrive
+  assert.match(styleOf({ blue: '#ff0000' }), /--may-user-blue:#ff0000/)
+  assert.match(styleOf({ blue: 'rgba(1, 2, 3, 0.5)' }), /--may-user-blue:rgba\(1, 2, 3, 0\.5\)/)
+  assert.match(styleOf({ controlH: 'calc(2rem + 4px)' }), /--may-user-control-h:calc\(2rem \+ 4px\)/)
+})
+
 check('ESM and CJS export the same names from every entry', () => {
   const require = createRequire(import.meta.url)
   const entries = [
