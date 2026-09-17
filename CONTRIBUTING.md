@@ -37,6 +37,19 @@ arbitrary props, or declares a stateful prop with no uncontrolled counterpart. A
 regression fails the build. There are **no unit tests** — the verify chain plus a
 look in Storybook is how you show a change works.
 
+### Type assertions
+
+`src/api.typetest.tsx` holds negative assertions — a handful of
+`@ts-expect-error` lines proving the types REFUSE what they should. The gate
+typechecking `src` only proves the library compiles; a union that quietly
+widened to `string`, or a generic that stopped threading its element's props,
+would keep compiling and keep passing everything else here.
+
+The directive fails in both directions, which is the point: if the error goes
+away, TypeScript reports the `@ts-expect-error` itself as unused. Add one when
+a prop's shape is load-bearing. The file is reachable from no entry, so it is
+never bundled.
+
 ### Checking a real consumer
 
 The gate bundles with esbuild, which catches weight but not *resolution*. The
