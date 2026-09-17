@@ -76,3 +76,29 @@ export const InAField: Story = {
     </Column>
   ),
 }
+
+/**
+ * Dates, times and months are native inputs.
+ *
+ * There is no `DatePicker` in this package on purpose. `type="date"` already
+ * gets the platform's own picker — Apple's wheel on a phone, the system
+ * calendar on a Mac — plus `min`/`max`/`step` constraint validation,
+ * `valueAsDate`, `showPicker()`, full keyboard editing and the locale's own
+ * field order, none of which a hand-built calendar inherits. The wrapper only
+ * supplies the fill, the radius and the 44px target.
+ */
+export const DatesAndTimes: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: 'var(--may-space-4)', width: 320 }}>
+      <Field label="Starts" description="Constrained to this decade.">
+        <Input type="date" defaultValue="2026-09-18" min="2020-01-01" max="2029-12-31" fullWidth />
+      </Field>
+      <Field label="At">
+        <Input type="time" defaultValue="09:30" step={900} fullWidth />
+      </Field>
+      <Field label="Billing month">
+        <Input type="month" defaultValue="2026-09" fullWidth />
+      </Field>
+    </div>
+  ),
+}

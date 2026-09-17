@@ -58,6 +58,25 @@ Reach for `Combobox` when `Select` physically cannot do it:
 A `<select>` cannot search, cannot show several values legibly, and cannot draw
 a row. Everything else is a reason to stay with it.
 
+## Dates: there is no DatePicker, on purpose
+
+`<Input type="date">` already works, and it is the better component:
+
+```tsx
+<Field label="Starts">
+  <Input type="date" min="2020-01-01" max="2029-12-31" fullWidth />
+</Field>
+```
+
+It gets the platform's own picker — Apple's wheel on a phone, the system
+calendar on a Mac — and with it `min`/`max`/`step` constraint validation,
+`valueAsDate`, `showPicker()`, keyboard editing, and the reader's own locale
+field order. A hand-built calendar inherits none of that and has to re-earn all
+of it. `type="time"` and `type="month"` work the same way.
+
+Reach for a custom calendar only when you need something the native control has
+no concept of, such as a range with two highlighted endpoints in one grid.
+
 ## Table: select-all, sortable headers, bespoke cells
 
 `Table` is prop-driven, but the props are not limited to strings — `header` is a
