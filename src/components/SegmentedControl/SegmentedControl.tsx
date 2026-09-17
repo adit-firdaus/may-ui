@@ -1,4 +1,4 @@
-import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
+import type { HTMLAttributes, KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { useRef, useState } from 'react'
 import { LayoutGroup, MotionConfig, backOut, motion, useDragControls } from 'motion/react'
 import type { PanInfo } from 'motion/react'
@@ -41,7 +41,18 @@ export interface SegmentedOption<T extends string = string> {
  * `options` typed `'id' | 'en'`, `onValueChange` hands back `'id' | 'en'`
  * rather than `string`, and the cast every typed call site needed disappears.
  */
-export interface SegmentedControlProps<T extends string = string> {
+export interface SegmentedControlProps<T extends string = string>
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    /*
+     * Motion claims these four on the element this spreads onto: its own
+     * `onDrag*` carry a PanInfo second argument and its `onAnimationStart`
+     * takes a variant name, so the DOM signatures are not assignable. The
+     * thumb drag is this component's own gesture anyway — a consumer's
+     * `onDrag` would fight it.
+     */
+    'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart' | 'children'
+  > {
   options: SegmentedOption<T>[]
   /** Controlled value. */
   value?: T
@@ -51,8 +62,6 @@ export interface SegmentedControlProps<T extends string = string> {
   /** @default 'md' */
   size?: Exclude<MaySize, 'xs'>
   fullWidth?: boolean
-  className?: string
-  'aria-label'?: string
 }
 
 /**
