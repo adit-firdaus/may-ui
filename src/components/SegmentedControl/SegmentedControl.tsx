@@ -64,6 +64,30 @@ export interface SegmentedControlProps<T extends string = string>
   fullWidth?: boolean
 }
 
+/*
+ * Why `role="tablist"` here when TabBar refuses it.
+ *
+ * TabBar's own note states the test: `role="tab"` promises an associated
+ * `tabpanel` and arrow-key movement inside one widget. A tab bar swaps whole
+ * screens, so it claims neither and is a `<nav>` of links instead.
+ *
+ * This control meets the second half outright — arrows move selection within
+ * the widget, which is the behaviour a screen-reader user is promised. It does
+ * not render the panel, because it takes no children: the content it switches
+ * is the caller's, sitting beside it. So the pairing is the caller's to
+ * declare, and it can, since this forwards DOM attributes:
+ *
+ *     <SegmentedControl aria-controls="gallery" … />
+ *     <div id="gallery" role="tabpanel">…</div>
+ *
+ * `radiogroup` was weighed and not taken. It describes a value picker more
+ * exactly, and this is usually one — every screen in `src/examples` uses it as
+ * a filter or a view mode. But the role is a consumer contract: it is what a
+ * `getByRole` in their test suite matches, `aria-selected` keys ten CSS rules
+ * and three gate assertions, and the tab pattern is what comparable systems
+ * ship for this shape. Trading that for a more exact word is not worth a
+ * breaking change, and axe reports no violation either way.
+ */
 /**
  * iOS's segmented control.
  *

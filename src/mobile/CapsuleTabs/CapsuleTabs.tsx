@@ -10,6 +10,13 @@ import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect
 /** A gentle puff — the chips sit close, so the pill stays inside its lane. */
 const PRESS_SCALE = 1.1
 
+/*
+ * `role="tablist"`, for the reasons set out at the top of SegmentedControl —
+ * arrow keys move selection inside this one widget, and the panel, if there is
+ * one, belongs to the caller and is theirs to name with `aria-controls`. Note
+ * the chips are App Store search filters more often than they are tabs; see
+ * that note for why `radiogroup` was still not worth the breaking change.
+ */
 export interface CapsuleTab<T extends string = string> {
   /** Identity of the tab — what `onValueChange` reports. */
   value: T
