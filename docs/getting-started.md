@@ -285,3 +285,41 @@ return (
 ```
 
 See [Theming](theming.md) for token overrides, nesting, and migration details.
+
+## Building your own components on the same seams
+
+Two hooks exist so a component you write behaves like one of May's rather than
+merely looking like it. Both were exported and undocumented, which made them
+impossible to find.
+
+**`useLinkComponent()`** — the element the provider says to render an `href`
+with. Reach for it instead of a literal `<a>` in anything navigational, and
+your component routes client-side in a TanStack Router / React Router / Next
+app for the same reason `Breadcrumb` and `TabBar` do. It defaults to `'a'`, so
+there is nothing to configure for a consumer who has not set `linkComponent`.
+
+```tsx
+function MyNavItem({ href, children }) {
+  const Link = useLinkComponent()
+  return href ? <Link href={href}>{children}</Link> : <button>{children}</button>
+}
+```
+
+**`useKeyboardInset(enabled?)`** — measures how much of the layout viewport the
+on-screen keyboard is covering and publishes it as `--may-keyboard-inset` on
+the document element. It returns nothing; the value is a CSS variable, which is
+what lets a footer stay above the keys without re-rendering on every frame of
+the animation. iOS is the reason it exists: Android resizes the viewport when
+the keyboard opens and iOS draws the keys over it. `Sheet` is the only
+component that calls it, and only while open, since the listeners are not free.
+
+```tsx
+useKeyboardInset(open)          // enable the measurement while your panel is up
+// then, in your CSS:
+// .my-footer { padding-bottom: var(--may-keyboard-inset); }
+```
+
+`usePressFeedback()`, `useReducedMotion()`, `useIsDesktop()` and `usePlatform()`
+are public for the same reason: the press physics, the motion opt-out and the
+adaptive breakpoint are decisions the system has already made, and a component
+that re-decides them is the one that feels out of place.

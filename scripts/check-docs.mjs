@@ -77,6 +77,48 @@ for (const [label, actual] of Object.entries(counted)) {
   }
 }
 
+/*
+ * Every public export is mentioned somewhere a consumer reads.
+ *
+ * An undocumented export is still API: it is semver-bound, a consumer cannot
+ * discover it, and nobody can safely change it. Two were in that state —
+ * `useLinkComponent` and `useKeyboardInset`, both of them precisely the seam
+ * someone needs to write a component that behaves like one of May's rather
+ * than merely looking like it.
+ *
+ * Mentioned is a low bar on purpose. It is not a promise of prose, only that
+ * adding an export makes someone write the name down once.
+ */
+const READERS = [...DOCS, 'docs/theming.md', 'docs/motion.md', 'CHANGELOG.md', 'llms.txt']
+const prose = READERS.map((file) => {
+  try {
+    return read(file)
+  } catch {
+    return ''
+  }
+}).join('\n')
+
+const entries = { '.': 'mayui', './desktop': 'desktop', './mobile': 'mobile' }
+const undocumented = []
+for (const [subpath, file] of Object.entries(entries)) {
+  let exported
+  try {
+    exported = Object.keys(await import(resolve(root, `dist/${file}.js`)))
+  } catch {
+    continue
+  }
+  for (const name of exported) {
+    checked++
+    if (new RegExp(`\\b${name}\\b`).test(prose)) continue
+    undocumented.push(`${name} (${subpath})`)
+  }
+}
+if (undocumented.length) {
+  console.error(`  FAIL ${undocumented.length} export(s) are documented nowhere:`)
+  undocumented.forEach((name) => console.error(`       ${name}`))
+  failed = true
+}
+
 if (failed) {
   console.error(`
        A command was renamed and the docs were not, a doc describes
