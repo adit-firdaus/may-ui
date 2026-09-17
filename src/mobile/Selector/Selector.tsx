@@ -31,8 +31,8 @@ export type SelectorColumns = number | 'auto'
  * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
  * an extra `aria-*`, as the rest of the package allows. `onChange` and
  * `defaultValue` are omitted because this component redefines both: the
- * handler reports a value and its option rather than a DOM event, and the
- * default is a value or a list of them.
+ * deprecated handler reports a value and its option rather than a DOM event,
+ * and the default is a value or a list of them.
  */
 interface SelectorBaseProps<T extends string = string>
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
@@ -58,6 +58,8 @@ interface SelectorSingleProps<T extends string = string> {
   multiple?: false
   value?: T
   defaultValue?: T
+  onValueChange?: (value: T, option: SelectorOption<T>) => void
+  /** @deprecated Use `onValueChange`. Kept so no existing caller breaks. */
   onChange?: (value: T, option: SelectorOption<T>) => void
 }
 
@@ -65,6 +67,8 @@ interface SelectorMultipleProps<T extends string = string> {
   multiple: true
   value?: T[]
   defaultValue?: T[]
+  onValueChange?: (value: T[], option: SelectorOption<T>) => void
+  /** @deprecated Use `onValueChange`. Kept so no existing caller breaks. */
   onChange?: (value: T[], option: SelectorOption<T>) => void
 }
 
@@ -112,6 +116,7 @@ export function Selector<T extends string = string>(props: SelectorProps<T>) {
     value: _value,
     defaultValue: _defaultValue,
     onChange: _onChange,
+    onValueChange: _onValueChange,
     'aria-label': _ariaLabel,
     ...rest
   } = props
@@ -127,10 +132,11 @@ export function Selector<T extends string = string>(props: SelectorProps<T>) {
 
   const emit = (next: T[], option: SelectorOption<T>) => {
     if (!controlled) setInternal(next)
-    if (props.multiple) props.onChange?.(next, option)
+    /* New name wins; the old one still fires. */
+    if (props.multiple) (props.onValueChange ?? props.onChange)?.(next, option)
     // Single mode always emits a real option's value: `choose` returns early
     // when nothing is selected, so `next[0]` is present by construction.
-    else if (next[0] !== undefined) props.onChange?.(next[0], option)
+    else if (next[0] !== undefined) (props.onValueChange ?? props.onChange)?.(next[0], option)
   }
 
   const choose = (option: SelectorOption<T>) => {

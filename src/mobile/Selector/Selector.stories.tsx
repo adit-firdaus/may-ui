@@ -60,7 +60,7 @@ export const Default: Story = {
         <Selector
           options={FOCUS_MODES}
           value={focus}
-          onChange={setFocus}
+          onValueChange={setFocus}
           aria-label="Focus mode"
         />
       </Panel>
