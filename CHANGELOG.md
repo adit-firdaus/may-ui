@@ -113,6 +113,14 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`Sidebar` and mobile `NavBar` now honour `linkComponent`.** Both rendered a
+  literal `<a>` for their `href`, ignoring the provider's link element that
+  `Breadcrumb` and `TabBar` already used — so in a TanStack Router / React
+  Router / Next app a sidebar click was a full page reload while a breadcrumb
+  in the same app routed client-side. Measured before the fix: two of the four
+  navigational surfaces routed, two did not. All four do now, and all four
+  still render a plain `<a>` when nobody opts in.
+
 - **Next.js App Router now works at all.** No entry carried a `'use client'`
   directive, so a server component — the App Router default — could not build
   against this package. Reproduced with Next.js 15.1: `import { Button } from

@@ -422,6 +422,42 @@ const assertions = [
     if (wrong.length) console.log('       ' + wrong.join('\n       '))
     return wrong.length === 0
   }],
+  /*
+   * Every navigational surface renders through the provider's link element.
+   *
+   * useLinkComponent's own note calls it "the component every navigational
+   * surface renders an href with", and two of the four ignored it: Sidebar's
+   * item and NavBar's back button rendered a literal `<a>`. Inside a TanStack
+   * Router / React Router / Next app that is a full page reload, so a sidebar
+   * click stopped the SPA being one while Breadcrumb and TabBar in the same
+   * app routed correctly — the confusing kind of wrong, because it half
+   * worked. Measured before the fix: Breadcrumb and TabBar routed, the other
+   * two did not.
+   *
+   * A component is only in this list because it takes an href; the check is
+   * here so the next one that does cannot quietly render its own anchor.
+   */
+  ['every href goes through the provider link element', () => {
+    const RouterLink = (props) => h('a', { ...props, 'data-router': 'true' })
+    const cases = {
+      SidebarItem: h(Desktop.Sidebar, null, h(Desktop.SidebarItem, { href: '/x', label: 'Files' })),
+      NavBarBack: h(Mobile.NavBar, { title: 'Files', backHref: '/x' }),
+      Breadcrumb: h(Adaptive.Breadcrumb, { items: [{ label: 'Home', href: '/' }, { label: 'Files' }] }),
+      TabBar: h(Mobile.TabBar, { items: [{ label: 'A', value: 'a', icon: null, href: '/a' }] }),
+    }
+    const wrong = []
+    for (const [name, element] of Object.entries(cases)) {
+      const routed = renderToStaticMarkup(h(Adaptive.MayProvider, { linkComponent: RouterLink }, element))
+      const anchors = routed.match(/<a\b[^>]*>/g) || []
+      if (!anchors.length) { wrong.push(`${name}: rendered no anchor at all`); continue }
+      if (!anchors.some((tag) => tag.includes('data-router'))) wrong.push(`${name}: rendered a literal <a>`)
+      // and it must still be a plain anchor when nobody opts in
+      const plain = renderToStaticMarkup(h(Adaptive.MayProvider, null, element))
+      if (!/<a\b/.test(plain)) wrong.push(`${name}: no <a> by default`)
+    }
+    if (wrong.length) console.log('       ' + wrong.join('\n       '))
+    return wrong.length === 0
+  }],
 ]
 
 let failed = 0

@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
+import { useLinkComponent } from '../../hooks/link'
 import { useAutoId } from '../../utils/useId'
 
 /* ------------------------------------------------------------------ *
@@ -265,6 +266,7 @@ export function SidebarItem({
 }: SidebarItemProps) {
   const { collapsed, showTooltip, hideTooltip } = useContext(SidebarContext)
   const { pressProps } = usePressFeedback(disabled)
+  const Link = useLinkComponent()
 
   const raise = (target: HTMLElement) => {
     if (collapsed) showTooltip(children, target)
@@ -306,7 +308,15 @@ export function SidebarItem({
 
   if (href) {
     return (
-      <a
+      /*
+       * The provider's link element, not a literal `<a>`. useLinkComponent's
+       * own note says it is what "every navigational surface renders an href
+       * with", and this one did not: inside a TanStack Router / React Router /
+       * Next app a plain anchor is a full page reload, so a sidebar click
+       * stopped the SPA being one while Breadcrumb and TabBar routed
+       * correctly. Defaults to 'a', so nothing moves until a consumer opts in.
+       */
+      <Link
         {...(rest as HTMLAttributes<HTMLAnchorElement>)}
         {...shared}
         // An anchor has no `disabled`, and dropping the href alone leaves it in
@@ -316,7 +326,7 @@ export function SidebarItem({
         tabIndex={disabled ? -1 : undefined}
       >
         {content}
-      </a>
+      </Link>
     )
   }
 

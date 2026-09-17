@@ -4,6 +4,7 @@ import { IoChevronBack } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
+import { useLinkComponent } from '../../hooks/link'
 
 export interface NavBarProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
   /** Centre title. Truncates rather than wrapping — a nav bar is one line tall. */
@@ -168,6 +169,7 @@ interface BackButtonProps {
  */
 function BackButton({ onBack, href, label, ariaLabel }: BackButtonProps) {
   const { pressProps } = usePressFeedback()
+  const Link = useLinkComponent()
 
   const content = (
     <>
@@ -185,9 +187,10 @@ function BackButton({ onBack, href, label, ariaLabel }: BackButtonProps) {
 
   if (href !== undefined) {
     return (
-      <a {...shared} href={href} onClick={onBack}>
+      /* The provider's link element — see the note in Sidebar's item. */
+      <Link {...shared} href={href} onClick={onBack}>
         {content}
-      </a>
+      </Link>
     )
   }
 
