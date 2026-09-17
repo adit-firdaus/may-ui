@@ -248,12 +248,34 @@ check('only the outer provider mounts the imperative host', () => {
   assert.equal(count(disabled, /data-slot="may-host"/g), 0)
 })
 
-await checkAsync('the provider nonce reaches streamed React style resources', async () => {
+/*
+ * EVERY style resource carries the nonce, not just one.
+ *
+ * A component sheet without it is blocked by a strict `style-src 'nonce-…'`
+ * and that component renders unstyled, so one nonced tag out of several is
+ * not a pass. It used to assert a single match.
+ *
+ * Note the option shape. React's `nonce` render option takes a string OR
+ * `{ script, style }`, and the STRING form applies to scripts alone —
+ * measured: with `nonce: 'nonce-123'` not one style tag is nonced, while
+ * React's warning says only to "provide the same style nonce value as a
+ * render option". The obvious reading of that warning is the one that does
+ * not work, which is why getting-started.md spells the object form out.
+ */
+await checkAsync('the provider nonce reaches every streamed style resource', async () => {
   const html = await renderStream(
-    h(May.MayProvider, { styleNonce: 'nonce-123' }, h(May.Button, {}, 'Nonce')),
+    h(
+      May.MayProvider,
+      { styleNonce: 'nonce-123', theme: { tokens: { blue: '#123456' } } },
+      h(May.Button, {}, 'Nonce'),
+      h(May.Combobox, { options: [{ label: 'A', value: 'a' }] }),
+    ),
     { nonce: { style: 'nonce-123' } },
   )
-  assert.match(html, /<style[^>]+nonce="nonce-123"/)
+  const styles = html.match(/<style[^>]*>/g) ?? []
+  assert.ok(styles.length >= 2, `expected several style tags, saw ${styles.length}`)
+  const bare = styles.filter((tag) => !tag.includes('nonce="nonce-123"'))
+  assert.deepEqual(bare, [], `style tags without the nonce: ${bare.join(' ')}`)
 })
 
 await checkAsync('imperative toast warns when no provider host is mounted', async () => {

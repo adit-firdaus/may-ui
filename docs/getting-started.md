@@ -219,6 +219,32 @@ joins the client graph, so four is sufficient, and `exports` lists no other
 path: a deep import throws `ERR_PACKAGE_PATH_NOT_EXPORTED` rather than
 quietly bypassing it.
 
+## Content-Security-Policy
+
+Components render their CSS as React style resources, so under a strict
+`style-src 'nonce-…'` the nonce has to reach them or every rule is blocked and
+the app renders unstyled. Two things are needed, and one of them is easy to get
+wrong.
+
+```tsx
+<MayProvider styleNonce={nonce}>…</MayProvider>
+```
+
+```tsx
+renderToPipeableStream(app, { nonce: { style: nonce } })
+```
+
+**The render option must be the object form.** React's `nonce` option accepts a
+string or `{ script, style }`, and the string applies to **scripts only** —
+measured, `nonce: nonce` leaves every May UI style tag bare. React does warn,
+but it says to "provide the same style nonce value as a render option", and the
+obvious reading of that sentence is the form that does not work. Pass
+`{ style: nonce }` (add `script` too if you need it) and every style resource
+carries the attribute; `check:provider` asserts that for all of them.
+
+The same nonce covers the provider's own token overrides, so a `theme={{ … }}`
+needs nothing extra.
+
 ## Cascade and Tailwind
 
 May UI resources live in `@layer may-ui`. Unlayered application CSS wins over
