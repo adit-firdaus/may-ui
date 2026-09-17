@@ -61,6 +61,7 @@
   --may-scrollbar-thumb-hover: rgba(60, 60, 67, 0.42);
   --may-on-color: #ffffff;
   --may-knob: #ffffff;
+  --may-on-bright: #1c1c1e;
   --may-shadow-color: 0, 0, 0;
   --may-shadow-a1: 0.03;
   --may-shadow-a2: 0.04;
@@ -110,7 +111,16 @@
   --may-color-on-destructive: var(--may-on-color);
 
   --may-color-success: var(--may-green);
+  --may-color-on-success: var(--may-on-color);
   --may-color-warning: var(--may-orange);
+  /*
+   * The foreground for a bright fill, which is NOT --may-label: a label
+   * follows the theme, so the rule that put near-black on orange in light
+   * put white on orange in dark (2.06:1, measured) while its own comment
+   * said the label wins because white fails. Five components picked this
+   * pair by hand; now they read it.
+   */
+  --may-color-on-warning: var(--may-on-bright);
   /*
    * There is no `tone="info"`, and there is not meant to be: this
    * resolves to the same blue as --may-color-tint, so `tone="tint"` IS
@@ -189,6 +199,7 @@
   --may-scrollbar-thumb-hover: rgba(235, 235, 245, 0.42);
   --may-on-color: #ffffff;
   --may-knob: #ffffff;
+  --may-on-bright: #1c1c1e;
   --may-shadow-color: 0, 0, 0;
   --may-shadow-a1: 0.2;
   --may-shadow-a2: 0.24;
@@ -238,7 +249,16 @@
   --may-color-on-destructive: var(--may-on-color);
 
   --may-color-success: var(--may-green);
+  --may-color-on-success: var(--may-on-color);
   --may-color-warning: var(--may-orange);
+  /*
+   * The foreground for a bright fill, which is NOT --may-label: a label
+   * follows the theme, so the rule that put near-black on orange in light
+   * put white on orange in dark (2.06:1, measured) while its own comment
+   * said the label wins because white fails. Five components picked this
+   * pair by hand; now they read it.
+   */
+  --may-color-on-warning: var(--may-on-bright);
   /*
    * There is no `tone="info"`, and there is not meant to be: this
    * resolves to the same blue as --may-color-tint, so `tone="tint"` IS
@@ -327,6 +347,7 @@
   --may-scrollbar-thumb-hover: rgba(60, 60, 67, 0.42);
   --may-on-color: #ffffff;
   --may-knob: #ffffff;
+  --may-on-bright: #1c1c1e;
   --may-shadow-color: 0, 0, 0;
   --may-shadow-a1: 0.03;
   --may-shadow-a2: 0.04;
@@ -376,7 +397,16 @@
   --may-color-on-destructive: var(--may-on-color);
 
   --may-color-success: var(--may-green);
+  --may-color-on-success: var(--may-on-color);
   --may-color-warning: var(--may-orange);
+  /*
+   * The foreground for a bright fill, which is NOT --may-label: a label
+   * follows the theme, so the rule that put near-black on orange in light
+   * put white on orange in dark (2.06:1, measured) while its own comment
+   * said the label wins because white fails. Five components picked this
+   * pair by hand; now they read it.
+   */
+  --may-color-on-warning: var(--may-on-bright);
   /*
    * There is no `tone="info"`, and there is not meant to be: this
    * resolves to the same blue as --may-color-tint, so `tone="tint"` IS
@@ -456,6 +486,7 @@
     --may-scrollbar-thumb-hover: rgba(235, 235, 245, 0.42);
     --may-on-color: #ffffff;
     --may-knob: #ffffff;
+    --may-on-bright: #1c1c1e;
     --may-shadow-color: 0, 0, 0;
     --may-shadow-a1: 0.2;
     --may-shadow-a2: 0.24;
@@ -505,7 +536,16 @@
     --may-color-on-destructive: var(--may-on-color);
 
     --may-color-success: var(--may-green);
+    --may-color-on-success: var(--may-on-color);
     --may-color-warning: var(--may-orange);
+    /*
+     * The foreground for a bright fill, which is NOT --may-label: a label
+     * follows the theme, so the rule that put near-black on orange in light
+     * put white on orange in dark (2.06:1, measured) while its own comment
+     * said the label wins because white fails. Five components picked this
+     * pair by hand; now they read it.
+     */
+    --may-color-on-warning: var(--may-on-bright);
     /*
      * There is no `tone="info"`, and there is not meant to be: this
      * resolves to the same blue as --may-color-tint, so `tone="tint"` IS
@@ -555,12 +595,13 @@
 @media (prefers-contrast: more) {
   :root,
   [data-may-theme='light'] {
+    --may-on-bright: #ffffff;
     --may-label-secondary: rgba(60, 60, 67, 0.85);
     --may-label-tertiary: rgba(60, 60, 67, 0.8);
     --may-separator: rgba(60, 60, 67, 0.5);
     --may-blue: #0040dd;
     --may-red: #b3001f;
-    --may-green: #0a7c2f;
+    --may-green: #076023;
     --may-orange: #8a4b00;
   }
 

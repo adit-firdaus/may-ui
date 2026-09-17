@@ -333,8 +333,12 @@ Apple's own **Increase Contrast** setting sets — swaps in AA-safe primitives, 
 which point all three families report **zero** violations. A reader who needs
 the contrast gets it from the OS; nobody has to wire anything.
 
-Audited in **both modes**: light and dark, all three catalogues, axe-core
-4.10.2 against `wcag2a wcag2aa wcag21a wcag21aa`. Dark needed one thing light
+Audited in **both modes** and on **composed screens**, not just component
+catalogues: 25 example screens plus all three catalogues in light and dark —
+31 surfaces, axe-core 4.10.2 against `wcag2a wcag2aa wcag21a wcag21aa`, zero
+violations under the contrast tier. The screens matter because composition is
+where structure breaks; across all 25, no `heading-order`, `landmark-*`,
+`duplicate-id`, `region` or form-label rule ever fired. Dark needed one thing light
 did not. Its AA blues go *lighter*, which is right for brand-as-text on a dark
 surface and wrong for the same value used as a fill — `--may-color-tint` and
 `--may-color-primary` both read `--may-blue`, so lifting the primitive put
@@ -345,6 +349,19 @@ flips `--may-on-color` along with them.
 Only the text flips. A `Slider`'s and a `Switch`'s knob are white because they
 are knobs, the way iOS keeps them white on a dark track, so they read
 `--may-knob` — a separate primitive that the tier never moves.
+
+The screens found two more of the same shape. A bright fill's foreground was
+`--may-label`, which follows the theme — so the rule that correctly put
+near-black on orange in light put **white** on orange in dark, 2.06:1, while
+its own comment said the label wins because white fails. Five components picked
+that pair by hand; they read `--may-color-on-warning` and
+`--may-color-on-success` now, and the warning token resolves through
+`--may-on-bright`, which is theme-independent and inverts only under the tier.
+And the AA green was chosen for white-on-fill (5.33:1) without checking the
+other direction: the same token is the *text* on a 14% wash of itself in a
+success `Tag`, cell or plain `Button`, where it measured 4.39:1 on white and
+3.74:1 over a selected row. Blue, red and orange all clear every one of those;
+green was the only outlier, and is darker now — worst case 5.29:1.
 
 **One known false positive.** Running axe over the mobile catalogue may report
 `may-capsule-tabs__label` and `__count` at roughly 1.1:1 — white text on a light

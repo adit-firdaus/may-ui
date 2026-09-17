@@ -26,6 +26,8 @@ export interface MayTokens {
   readonly colorInfo: MayTokenValue
   readonly colorOnDestructive: MayTokenValue
   readonly colorOnPrimary: MayTokenValue
+  readonly colorOnSuccess: MayTokenValue
+  readonly colorOnWarning: MayTokenValue
   readonly colorPrimary: MayTokenValue
   readonly colorRing: MayTokenValue
   readonly colorScrim: MayTokenValue
@@ -101,6 +103,7 @@ export interface MayTokens {
   readonly mint: MayTokenValue
   readonly navBarSpace: MayTokenValue
   readonly navbarH: MayTokenValue
+  readonly onBright: MayTokenValue
   readonly onColor: MayTokenValue
   readonly orange: MayTokenValue
   readonly pink: MayTokenValue
@@ -237,6 +240,8 @@ export const mayTokenCssNames = {
   colorInfo: 'color-info',
   colorOnDestructive: 'color-on-destructive',
   colorOnPrimary: 'color-on-primary',
+  colorOnSuccess: 'color-on-success',
+  colorOnWarning: 'color-on-warning',
   colorPrimary: 'color-primary',
   colorRing: 'color-ring',
   colorScrim: 'color-scrim',
@@ -312,6 +317,7 @@ export const mayTokenCssNames = {
   mint: 'mint',
   navBarSpace: 'nav-bar-space',
   navbarH: 'navbar-h',
+  onBright: 'on-bright',
   onColor: 'on-color',
   orange: 'orange',
   pink: 'pink',
@@ -448,6 +454,8 @@ export const mayLightTokens = {
   colorInfo: "var(--may-blue)",
   colorOnDestructive: "var(--may-on-color)",
   colorOnPrimary: "var(--may-on-color)",
+  colorOnSuccess: "var(--may-on-color)",
+  colorOnWarning: "var(--may-on-bright)",
   colorPrimary: "var(--may-blue)",
   colorRing: "var(--may-color-tint)",
   colorScrim: "var(--may-scrim)",
@@ -515,7 +523,7 @@ export const mayLightTokens = {
   insetTop: "env(safe-area-inset-top, 0px)",
   keyboardInset: "0px",
   knob: "#ffffff",
-  label: "#000000",
+  label: "a label * follows the theme, so the rule that put near-black on orange in light * put white on orange in dark (2.06:1, measured) while its own comment * said the label wins because white fails. Five components picked this * pair by hand",
   labelQuaternary: "rgba(60, 60, 67, 0.18)",
   labelSecondary: "rgba(60, 60, 67, 0.6)",
   labelTertiary: "rgba(60, 60, 67, 0.3)",
@@ -523,6 +531,7 @@ export const mayLightTokens = {
   mint: "#00c7be",
   navBarSpace: "calc(var(--may-navbar-h) + var(--may-inset-top))",
   navbarH: "2.75rem",
+  onBright: "#1c1c1e",
   onColor: "#ffffff",
   orange: "#ff9500",
   pink: "#ff2d55",
@@ -659,6 +668,8 @@ export const mayDarkTokens = {
   colorInfo: "var(--may-blue)",
   colorOnDestructive: "var(--may-on-color)",
   colorOnPrimary: "var(--may-on-color)",
+  colorOnSuccess: "var(--may-on-color)",
+  colorOnWarning: "var(--may-on-bright)",
   colorPrimary: "var(--may-blue)",
   colorRing: "var(--may-color-tint)",
   colorScrim: "var(--may-scrim)",
@@ -726,7 +737,7 @@ export const mayDarkTokens = {
   insetTop: "env(safe-area-inset-top, 0px)",
   keyboardInset: "0px",
   knob: "#ffffff",
-  label: "#ffffff",
+  label: "a label * follows the theme, so the rule that put near-black on orange in light * put white on orange in dark (2.06:1, measured) while its own comment * said the label wins because white fails. Five components picked this * pair by hand",
   labelQuaternary: "rgba(235, 235, 245, 0.16)",
   labelSecondary: "rgba(235, 235, 245, 0.6)",
   labelTertiary: "rgba(235, 235, 245, 0.3)",
@@ -734,6 +745,7 @@ export const mayDarkTokens = {
   mint: "#63e6e2",
   navBarSpace: "calc(var(--may-navbar-h) + var(--may-inset-top))",
   navbarH: "2.75rem",
+  onBright: "#1c1c1e",
   onColor: "#ffffff",
   orange: "#ff9f0a",
   pink: "#ff375f",

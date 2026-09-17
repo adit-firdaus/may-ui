@@ -57,6 +57,17 @@ const light = {
   'scrollbar-thumb-hover': 'rgba(60, 60, 67, 0.42)',
   'on-color': '#ffffff',
   knob: '#ffffff',
+  /*
+   * The colour that reads on a BRIGHT fill, in either theme.
+   *
+   * Not --may-label: a label follows the theme, so the same rule that
+   * correctly put near-black on orange in light put WHITE on orange in dark —
+   * 2.06:1, measured — while its comment said the label wins "because white
+   * fails". A bright fill is bright regardless of theme, so its foreground
+   * must not follow one. The contrast tier flips this in LIGHT only, where
+   * the AA orange and green go dark.
+   */
+  'on-bright': '#1c1c1e',
   'shadow-color': '0, 0, 0',
   'shadow-a1': '0.03',
   'shadow-a2': '0.04',
@@ -112,6 +123,17 @@ const dark = {
   'scrollbar-thumb-hover': 'rgba(235, 235, 245, 0.42)',
   'on-color': '#ffffff',
   knob: '#ffffff',
+  /*
+   * The colour that reads on a BRIGHT fill, in either theme.
+   *
+   * Not --may-label: a label follows the theme, so the same rule that
+   * correctly put near-black on orange in light put WHITE on orange in dark —
+   * 2.06:1, measured — while its comment said the label wins "because white
+   * fails". A bright fill is bright regardless of theme, so its foreground
+   * must not follow one. The contrast tier flips this in LIGHT only, where
+   * the AA orange and green go dark.
+   */
+  'on-bright': '#1c1c1e',
   'shadow-color': '0, 0, 0',
   'shadow-a1': '0.2',
   'shadow-a2': '0.24',
@@ -129,7 +151,7 @@ const emit = (map, indent) =>
     )
     .join('\n')
 
-const themed = "  /* ---------------------------------------------------------------- *\n   * Semantic colour and elevation — the tier components consume.\n   *\n   * Declared in EVERY theme scope on purpose. These are aliases, and an alias\n   * is substituted where it is declared: if they lived only on :root they\n   * would resolve against the light primitives and a scoped dark subtree\n   * would inherit light values while its own primitives sat unused.\n   * ---------------------------------------------------------------- */\n\n  --may-color-bg: var(--may-bg-grouped);\n  --may-color-surface: var(--may-bg-elevated);\n  --may-color-surface-nested: var(--may-bg-nested);\n\n  --may-color-text: var(--may-label);\n  --may-color-text-secondary: var(--may-label-secondary);\n  --may-color-text-tertiary: var(--may-label-tertiary);\n  --may-color-text-quaternary: var(--may-label-quaternary);\n\n  --may-color-fill: var(--may-fill-primary);\n  --may-color-fill-secondary: var(--may-fill-secondary);\n  --may-color-fill-tertiary: var(--may-fill-tertiary);\n  --may-color-fill-quaternary: var(--may-fill-quaternary);\n\n  --may-color-separator: var(--may-separator);\n  /* Vocabulary for a consumer, not something a component reads: the same\n   * hairline with no alpha, for drawing one over a translucent surface\n   * where a translucent separator would double up. */\n  --may-color-separator-opaque: var(--may-separator-opaque);\n\n  /* Brand as text vs brand as fill — see the header note. */\n  --may-color-tint: var(--may-blue);\n  --may-color-primary: var(--may-blue);\n  --may-color-on-primary: var(--may-on-color);\n\n  /* Destructive, likewise split. */\n  --may-color-danger: var(--may-red);\n  --may-color-destructive: var(--may-red);\n  --may-color-on-destructive: var(--may-on-color);\n\n  --may-color-success: var(--may-green);\n  --may-color-warning: var(--may-orange);\n  /*\n   * There is no `tone=\"info\"`, and there is not meant to be: this\n   * resolves to the same blue as --may-color-tint, so `tone=\"tint\"` IS\n   * the informational tone. The name is kept because an informational\n   * message in a consumer's own CSS reads better against it than against\n   * a token called `tint`, and because success/warning/danger without it\n   * looks like an omission. No component reads it.\n   */\n  --may-color-info: var(--may-blue);\n\n  /* One highlight rule for every selectable row in the system. */\n  --may-color-highlight: var(--may-fill-quaternary);\n  --may-color-highlight-strong: var(--may-fill-tertiary);\n\n  --may-color-scrim: var(--may-scrim);\n  --may-color-ring: var(--may-color-tint);\n\n  /* Elevation. No hairline rings: surfaces separate by value, and only\n   * genuinely floating layers cast a shadow at all. The dark scope redefines\n   * every alpha, so these must re-resolve with it. */\n  --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));\n  --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));\n  --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));\n  --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));\n  --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));\n  --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));\n  --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));\n  --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));"
+const themed = "  /* ---------------------------------------------------------------- *\n   * Semantic colour and elevation — the tier components consume.\n   *\n   * Declared in EVERY theme scope on purpose. These are aliases, and an alias\n   * is substituted where it is declared: if they lived only on :root they\n   * would resolve against the light primitives and a scoped dark subtree\n   * would inherit light values while its own primitives sat unused.\n   * ---------------------------------------------------------------- */\n\n  --may-color-bg: var(--may-bg-grouped);\n  --may-color-surface: var(--may-bg-elevated);\n  --may-color-surface-nested: var(--may-bg-nested);\n\n  --may-color-text: var(--may-label);\n  --may-color-text-secondary: var(--may-label-secondary);\n  --may-color-text-tertiary: var(--may-label-tertiary);\n  --may-color-text-quaternary: var(--may-label-quaternary);\n\n  --may-color-fill: var(--may-fill-primary);\n  --may-color-fill-secondary: var(--may-fill-secondary);\n  --may-color-fill-tertiary: var(--may-fill-tertiary);\n  --may-color-fill-quaternary: var(--may-fill-quaternary);\n\n  --may-color-separator: var(--may-separator);\n  /* Vocabulary for a consumer, not something a component reads: the same\n   * hairline with no alpha, for drawing one over a translucent surface\n   * where a translucent separator would double up. */\n  --may-color-separator-opaque: var(--may-separator-opaque);\n\n  /* Brand as text vs brand as fill — see the header note. */\n  --may-color-tint: var(--may-blue);\n  --may-color-primary: var(--may-blue);\n  --may-color-on-primary: var(--may-on-color);\n\n  /* Destructive, likewise split. */\n  --may-color-danger: var(--may-red);\n  --may-color-destructive: var(--may-red);\n  --may-color-on-destructive: var(--may-on-color);\n\n  --may-color-success: var(--may-green);\n  --may-color-on-success: var(--may-on-color);\n  --may-color-warning: var(--may-orange);\n  /*\n   * The foreground for a bright fill, which is NOT --may-label: a label\n   * follows the theme, so the rule that put near-black on orange in light\n   * put white on orange in dark (2.06:1, measured) while its own comment\n   * said the label wins because white fails. Five components picked this\n   * pair by hand; now they read it.\n   */\n  --may-color-on-warning: var(--may-on-bright);\n  /*\n   * There is no `tone=\"info\"`, and there is not meant to be: this\n   * resolves to the same blue as --may-color-tint, so `tone=\"tint\"` IS\n   * the informational tone. The name is kept because an informational\n   * message in a consumer's own CSS reads better against it than against\n   * a token called `tint`, and because success/warning/danger without it\n   * looks like an omission. No component reads it.\n   */\n  --may-color-info: var(--may-blue);\n\n  /* One highlight rule for every selectable row in the system. */\n  --may-color-highlight: var(--may-fill-quaternary);\n  --may-color-highlight-strong: var(--may-fill-tertiary);\n\n  --may-color-scrim: var(--may-scrim);\n  --may-color-ring: var(--may-color-tint);\n\n  /* Elevation. No hairline rings: surfaces separate by value, and only\n   * genuinely floating layers cast a shadow at all. The dark scope redefines\n   * every alpha, so these must re-resolve with it. */\n  --may-shadow-2xs: 0 1px 1px 0 rgba(var(--may-shadow-color), var(--may-shadow-a1));\n  --may-shadow-xs: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));\n  --may-shadow-sm: 0 1px 2px 0 rgba(var(--may-shadow-color), var(--may-shadow-a2));\n  --may-shadow: 0 2px 6px -1px rgba(var(--may-shadow-color), var(--may-shadow-a3));\n  --may-shadow-md: 0 4px 12px -2px rgba(var(--may-shadow-color), var(--may-shadow-a4));\n  --may-shadow-lg: 0 12px 32px -6px rgba(var(--may-shadow-color), var(--may-shadow-a5));\n  --may-shadow-xl: 0 20px 48px -10px rgba(var(--may-shadow-color), var(--may-shadow-a6));\n  --may-shadow-2xl: 0 28px 64px -14px rgba(var(--may-shadow-color), var(--may-shadow-a7));"
 
 
 /*
@@ -141,12 +163,22 @@ const themed = "  /* -----------------------------------------------------------
  * variants, not values invented here.
  */
 const lightAA = {
+  'on-bright': '#ffffff',
   'label-secondary': 'rgba(60, 60, 67, 0.85)',
   'label-tertiary': 'rgba(60, 60, 67, 0.8)',
   separator: 'rgba(60, 60, 67, 0.5)',
   blue: '#0040dd',
   red: '#b3001f',
-  green: '#0a7c2f',
+  /*
+   * Darker than the obvious AA green, because this value is used two ways.
+   * #0a7c2f clears 4.5:1 as a FILL under white text (5.33) and was picked on
+   * that basis, but the same token is the TEXT colour on a 14% wash of
+   * itself — a success Tag, a success cell, a plain success Button — and
+   * there it measured 4.39:1 on white, 3.88 at a heavier wash and 3.74 over a
+   * selected row. Blue, red and orange all clear every one of those; green
+   * was the only outlier. This clears 4.5 in all of them, worst case 5.29.
+   */
+  green: '#076023',
   orange: '#8a4b00',
 }
 

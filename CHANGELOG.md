@@ -8,6 +8,10 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`--may-color-on-warning`, `--may-color-on-success`, `--may-on-bright`** —
+  the foreground for a bright fill, named once instead of chosen by hand in
+  five component sheets.
+
 - **`FieldContextValue.labelId`** — the id of the Field's `<label>`, for a
   control that cannot be the target of `htmlFor`. `<label for>` only names
   labelable elements, so a `role="group"` or `role="radiogroup"` needs
@@ -117,6 +121,27 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   Return must not land on it.
 
 ### Fixed
+
+- **A bright fill's foreground no longer follows the theme.** `NoticeBar`,
+  `Button`, `Badge`, `Fab` and mobile `SwipeAction` each set a warning fill's
+  text to `--may-label` — which is near-black in light and **white in dark**, so
+  the rule put white on orange at 2.06:1 while its own comment said the label
+  wins because white fails. Under the light contrast tier, where the AA orange
+  goes dark, near-black on it measured 3.09:1. All five read the new
+  `--may-color-on-warning` / `--may-color-on-success` now, and the warning one
+  resolves through `--may-on-bright`, which is theme-independent and inverts
+  only under the tier.
+- **The AA green was too light to be read on its own wash.** It was chosen for
+  white-on-fill (5.33:1), but the same token is the text colour on a 14% wash
+  of itself — a success `Tag`, a success cell, a plain success `Button` — where
+  it measured 4.39:1 on white and 3.74:1 over a selected row. Blue, red and
+  orange clear every such case; green was the only outlier. Now `#076023`,
+  worst case 5.29:1.
+- **Accessibility is now audited on composed screens, not only catalogues.** 25
+  example screens plus all three catalogues in light and dark — 31 surfaces,
+  zero violations under the contrast tier. Composition is where structure
+  breaks, and across all 25 screens no `heading-order`, `landmark-*`,
+  `duplicate-id`, `region` or form-label rule fired.
 
 - **A `<Field>` now reaches every control inside it.** The promise was that
   passing `error` to the Field marks the control invalid; measured, it held for

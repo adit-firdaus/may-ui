@@ -45,12 +45,19 @@
 }
 .may-notice[data-tone='success'] {
   --may-notice-bg: var(--may-color-success);
-  --may-notice-fg: var(--may-on-color);
+  --may-notice-fg: var(--may-color-on-success);
 }
-/* Orange is light enough that white on it fails contrast; the label wins. */
+/*
+ * Orange is light enough that white on it fails, so the foreground is the
+ * bright-fill token rather than the label. --may-label follows the THEME, and
+ * in dark it is white — so the old rule put white on orange there, 2.06:1,
+ * while this comment said the label wins because white fails. The token also
+ * inverts to white under the contrast tier in light, where the AA orange is
+ * dark and near-black on it measures 3.09:1.
+ */
 .may-notice[data-tone='warning'] {
   --may-notice-bg: var(--may-color-warning);
-  --may-notice-fg: var(--may-label);
+  --may-notice-fg: var(--may-color-on-warning);
 }
 .may-notice[data-tone='danger'] {
   --may-notice-bg: var(--may-color-destructive);

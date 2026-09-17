@@ -54,12 +54,12 @@
 }
 .may-button[data-tone='success'] {
   --may-btn-solid: var(--may-color-success);
-  --may-btn-on-solid: var(--may-on-color);
+  --may-btn-on-solid: var(--may-color-on-success);
   --may-btn-text: var(--may-color-success);
 }
 .may-button[data-tone='warning'] {
   --may-btn-solid: var(--may-color-warning);
-  --may-btn-on-solid: var(--may-label);
+  --may-btn-on-solid: var(--may-color-on-warning);
   --may-btn-text: var(--may-color-warning);
 }
 

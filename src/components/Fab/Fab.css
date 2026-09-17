@@ -81,11 +81,11 @@
 }
 .may-fab[data-tone='success'] {
   --may-fab-solid: var(--may-color-success);
-  --may-fab-on-solid: var(--may-on-color);
+  --may-fab-on-solid: var(--may-color-on-success);
 }
 .may-fab[data-tone='warning'] {
   --may-fab-solid: var(--may-color-warning);
-  --may-fab-on-solid: var(--may-label);
+  --may-fab-on-solid: var(--may-color-on-warning);
 }
 
 /* ---------------------------------- sizes --------------------------------- */

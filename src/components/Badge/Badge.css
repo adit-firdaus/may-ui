@@ -47,13 +47,13 @@
 }
 .may-badge[data-tone='success'] {
   --may-badge-solid: var(--may-color-success);
-  --may-badge-on-solid: var(--may-on-color);
+  --may-badge-on-solid: var(--may-color-on-success);
   --may-badge-text: var(--may-color-success);
 }
 .may-badge[data-tone='warning'] {
   --may-badge-solid: var(--may-color-warning);
   /* Orange is light enough that white text on it fails contrast; the label colour wins. */
-  --may-badge-on-solid: var(--may-label);
+  --may-badge-on-solid: var(--may-color-on-warning);
   --may-badge-text: var(--may-color-warning);
 }
 

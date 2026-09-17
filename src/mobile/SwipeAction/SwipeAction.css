@@ -169,11 +169,11 @@
 }
 .may-swipe__action[data-tone='success'] {
   --may-swipe-fill: var(--may-color-success);
-  --may-swipe-on: var(--may-on-color);
+  --may-swipe-on: var(--may-color-on-success);
 }
 .may-swipe__action[data-tone='warning'] {
   --may-swipe-fill: var(--may-color-warning);
-  --may-swipe-on: var(--may-label);
+  --may-swipe-on: var(--may-color-on-warning);
 }
 
 /* -------------------------------- contents -------------------------------- */
