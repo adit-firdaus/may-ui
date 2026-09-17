@@ -3,7 +3,7 @@
  * reads is defined somewhere in the same file, and no token is defined twice
  * with conflicting intent outside a theme block.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { builtCss as css } from './built-styles.mjs'
 
 const defined = new Set([...css.matchAll(/(--may-[\w-]+)\s*:/g)].map((m) => m[1]))
@@ -84,5 +84,50 @@ if (typedButUndeclared.length === 0 && declaredButUntyped.length === 0) {
   console.log('\n       Run `npm run generate` — gen:springs before gen:tokens.')
 }
 
+/*
+ * A semantic alias no component reads.
+ *
+ * The primitives note above is advisory — a ramp step with no reader is
+ * harmless. The semantic tier is different: it is the vocabulary a component
+ * is supposed to consume, so an alias nothing reads is either dead surface or
+ * a component that forgot to use it. Two exist on purpose and are commented
+ * as such in the generator; a third would be a question worth asking.
+ *
+ * Read from the component sheets rather than the built CSS, because the built
+ * CSS contains the declarations themselves and every token would look used.
+ */
+const CONSUMER_ONLY = new Set([
+  // Resolves to the same blue as --may-color-tint, so `tone="tint"` is the
+  // informational tone; the name exists for a consumer's own CSS.
+  '--may-color-info',
+  // The hairline with no alpha, for drawing one over a translucent surface.
+  '--may-color-separator-opaque',
+])
+
+const componentCss = readdirSync(new URL('../src', import.meta.url), { recursive: true })
+  .filter((entry) => typeof entry === 'string' && entry.endsWith('.css') && !entry.startsWith('styles/'))
+  .map((entry) => readFileSync(new URL(`../src/${entry}`, import.meta.url), 'utf8'))
+  .join('\n')
+
+const semanticAliases = [...new Set(
+  [...foundation.matchAll(/^\s*(--may-color-[\w-]+)\s*:/gm)].map((match) => match[1]),
+)]
+const unreadAliases = semanticAliases
+  .filter((name) => !CONSUMER_ONLY.has(name))
+  .filter((name) => !componentCss.includes(`var(${name})`))
+  .sort()
+
+if (unreadAliases.length === 0) {
+  console.log(`ok   every semantic alias is read by a component (${CONSUMER_ONLY.size} consumer-only, by design)`)
+} else {
+  console.log('\nSEMANTIC ALIAS NO COMPONENT READS:')
+  unreadAliases.forEach((name) => console.log('  ' + name))
+  console.log(`
+       Either a component should be consuming it, or it is vocabulary for a
+       consumer alone — in which case say so where it is generated and add it
+       to CONSUMER_ONLY here.
+`)
+}
+
 const tokenParityFailed = typedButUndeclared.length + declaredButUntyped.length
-process.exit(undefinedTokens.length + tokenParityFailed ? 1 : 0)
+process.exit(undefinedTokens.length + tokenParityFailed + unreadAliases.length ? 1 : 0)
