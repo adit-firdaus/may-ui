@@ -153,8 +153,10 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: calc(var(--may-control-h) * 0.5);
-  height: calc(var(--may-control-h) * 0.5);
+  /* Half the control height reads right and lands on 22px — just under the
+   * WCAG 2.5.8 floor, so the floor wins when it has to. */
+  width: max(calc(var(--may-control-h) * 0.5), var(--may-target-min));
+  height: max(calc(var(--may-control-h) * 0.5), var(--may-target-min));
   padding: 0;
   border: 0;
   border-radius: var(--may-radius-full);

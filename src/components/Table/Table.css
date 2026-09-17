@@ -285,6 +285,9 @@
  */
 .may-table__activator {
   display: inline-flex;
+  /* Styleless, but still a target: the row owns the padding, so the button was
+   * only as tall as its own text — 20px, under the WCAG 2.5.8 floor. */
+  min-height: var(--may-target-min);
   align-items: center;
   gap: var(--may-space-2);
   width: 100%;

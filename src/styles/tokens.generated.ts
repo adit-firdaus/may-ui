@@ -158,6 +158,7 @@ export interface MayTokens {
   readonly springSnappyDuration: MayTokenValue
   readonly tabBarSpace: MayTokenValue
   readonly tabbarH: MayTokenValue
+  readonly targetMin: MayTokenValue
   readonly teal: MayTokenValue
   readonly textBody: MayTokenValue
   readonly textBodyLeading: MayTokenValue
@@ -367,6 +368,7 @@ export const mayTokenCssNames = {
   springSnappyDuration: 'spring-snappy-duration',
   tabBarSpace: 'tab-bar-space',
   tabbarH: 'tabbar-h',
+  targetMin: 'target-min',
   teal: 'teal',
   textBody: 'text-body',
   textBodyLeading: 'text-body-leading',
@@ -576,6 +578,7 @@ export const mayLightTokens = {
   springSnappyDuration: "475ms",
   tabBarSpace: "calc( var(--may-tabbar-h) + var(--may-inset-bottom) + var(--may-space-4) * 2 )",
   tabbarH: "3.25rem",
+  targetMin: "1.5rem",
   teal: "#30b0c7",
   textBody: "1.0625rem",
   textBodyLeading: "1.375rem",
@@ -785,6 +788,7 @@ export const mayDarkTokens = {
   springSnappyDuration: "475ms",
   tabBarSpace: "calc( var(--may-tabbar-h) + var(--may-inset-bottom) + var(--may-space-4) * 2 )",
   tabbarH: "3.25rem",
+  targetMin: "1.5rem",
   teal: "#40c8e0",
   textBody: "1.0625rem",
   textBodyLeading: "1.375rem",

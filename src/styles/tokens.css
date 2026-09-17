@@ -550,6 +550,15 @@
   --may-control-h-md: var(--may-control-h);
   --may-control-h-lg: calc(var(--may-control-h) + 0.5rem);
 
+  /*
+   * The floor for anything you press, for the controls that are not a
+   * full-height rung: a table's column sorter is as tall as its own label,
+   * which measured 18px. WCAG 2.5.8 asks 24x24, so that is what this names.
+   * Reach for --may-control-h first — 44px is Apple's number and the right
+   * one for a standalone control. This is the minimum, not the target.
+   */
+  --may-target-min: 1.5rem;                        /* 24px — WCAG 2.5.8 */
+
   /* Radius derives from element scale, not per-file taste. */
   --may-radius-xs: 6px;
   --may-radius-sm: 8px;

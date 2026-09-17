@@ -144,6 +144,10 @@
 .may-search__clear-slot {
   display: flex;
   align-items: center;
+  /* Stretched, so the button inside can reach the pill height. The slot
+   * is itself a flex child of a centred row, so without this it collapsed
+   * to the glyph and capped the target at 32x18 however the button asked. */
+  align-self: stretch;
   flex: 0 0 auto;
   width: 0;
   overflow: hidden;
@@ -167,11 +171,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Narrower than the 44px minimum by necessity — it lives inside a 36-52px
-   * pill. It is full-height for the vertical reach, and the field itself
-   * remains the large target. */
+  /*
+   * Narrower than the 44px minimum by necessity — it lives inside a 36-52px
+   * pill, and the field itself remains the large target. The vertical reach
+   * comes from filling the pill, which `height: 100%` did not do: the parent
+   * is a centred flex row, so it collapsed to the glyph and measured 32x18.
+   * `align-self: stretch` is the flexbox way to say it, and delivers the
+   * 36-52px the comment always claimed.
+   */
   width: var(--may-control-h-xs);
-  height: 100%;
+  align-self: stretch;
   flex: 0 0 auto;
   padding: 0;
   border: 0;
@@ -211,6 +220,8 @@
 }
 
 .may-search__cancel {
+  /* A text button, so its height came from the label alone: 22px. */
+  min-height: var(--may-target-min);
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;

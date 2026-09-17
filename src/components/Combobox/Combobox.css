@@ -132,6 +132,9 @@
 .may-combobox__tag-remove,
 .may-combobox__clear {
   display: inline-flex;
+  /* Sized by its glyph alone, this measured 13x13. */
+  min-width: var(--may-target-min);
+  min-height: var(--may-target-min);
   align-items: center;
   justify-content: center;
   padding: 0;

@@ -106,6 +106,27 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **Every target you press is at least 24x24.** Measured across 382 stories and
+  885 rendered targets, with transitions and transforms disabled so a mid-flight
+  scale could not be mistaken for a size. Eight were under the WCAG 2.5.8
+  minimum: `DataTable`'s column sorter (18px tall — the header cell owns the
+  padding, so only the label was clickable), `Table`'s row activator (20px),
+  `Tag`'s remove button (19px and 22px on the two smaller tags), `NoticeBar`'s
+  close (22px), `Combobox`'s clear (13x13, sized by its glyph alone),
+  `SearchField`'s cancel (22px tall), and the clear button in `SearchField` and
+  mobile `SearchBar` — which claimed in a comment to be "full-height for the
+  vertical reach" and measured 32x18, because `height: 100%` inside a centred
+  flex row collapses to the glyph. That one now fills the pill properly, 36 to
+  52px. `SplitPane`'s divider stays a hairline on purpose: a pseudo-element
+  already extends its hit area 8px each side and it has no neighbour to crowd.
+
+### Added
+
+- **`--may-target-min`** (24px), the floor for anything you press. Reach for
+  `--may-control-h` first — 44px is Apple's number and the right one for a
+  standalone control. This is for the parts that are a fraction of a control:
+  a tag's remove button, a table's column sorter.
+
 - **Text fields have a real focus indicator.** `Input`, `Textarea`, `Combobox`,
   `SearchField` and mobile `SearchBar` drew a 28-30% halo, and `Input`
   suppressed it entirely under `(pointer: coarse)`. Measured with transitions

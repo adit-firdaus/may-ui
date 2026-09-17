@@ -117,8 +117,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: calc(var(--may-tag-h) * 0.6);
-  height: calc(var(--may-tag-h) * 0.6);
+  /*
+   * 0.6 of the tag reads right, and on the two smaller tags it measured
+   * 19px and 22px — under the WCAG 2.5.8 floor for something you press. The
+   * floor is a minimum, not a size: the glyph inside is sized separately and
+   * the rest button is transparent at rest, so only the hover fill grows, and
+   * 24px still fits inside the 32px small tag.
+   */
+  width: max(calc(var(--may-tag-h) * 0.6), var(--may-target-min));
+  height: max(calc(var(--may-tag-h) * 0.6), var(--may-target-min));
   padding: 0;
   border: 0;
   border-radius: var(--may-radius-full);

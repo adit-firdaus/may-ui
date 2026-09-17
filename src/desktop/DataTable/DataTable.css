@@ -65,8 +65,15 @@
  * cell so there is no dead strip between the label and the edge — a 20px sort
  * hotspot is the difference between a table you sort and one you fight.
  */
+/*
+ * The sorter is as tall as its own label — measured 18px, inside a header cell
+ * 60px tall whose padding belongs to the cell, not the button. So the thing
+ * you aim at was two thirds of the WCAG 2.5.8 minimum while looking like the
+ * whole cell. The floor costs no layout where the header is already taller.
+ */
 .may-datatable__sorter {
   display: inline-flex;
+  min-height: var(--may-target-min);
   align-items: center;
   gap: var(--may-space-1);
   max-width: 100%;
