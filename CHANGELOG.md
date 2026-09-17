@@ -28,6 +28,12 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   `Select` stays a real `<select>` — it is the right answer whenever the
   native picker is — but it cannot search, cannot hold several values legibly
   and cannot draw a row, so long lists had no component here at all.
+- **Mobile `Popup` owns its state too.** It was the last controlled-only
+  surface in the package: `visible` was required. It takes `defaultVisible`,
+  `onVisibleChange` and `trigger` now, all passed straight through to `Sheet`
+  rather than copied — Popup is a prop-shape adapter, and a second
+  controlled/uncontrolled branch is how the two would end up disagreeing about
+  what `visible` means.
 - **Overlays own their open state.** `Modal`, `Sheet`, `AlertDialog`,
   `ActionSheet` and `CommandPalette` take `trigger`, `defaultOpen` and
   `onOpenChange`, so showing a dialog no longer costs a `useState` and two

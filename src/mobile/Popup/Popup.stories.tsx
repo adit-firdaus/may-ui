@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { IoBookmarkOutline, IoCopyOutline, IoPrintOutline, IoWifiOutline } from 'react-icons/io5'
 import { Button } from '../../components/Button'
 import { List, ListRow } from '../../components/List'
+import { Text } from '../../components/Text'
 import { Popup } from '.'
 
 const meta = {
@@ -173,4 +174,17 @@ export const Committed: Story = {
       </Screen>
     )
   },
+}
+
+/**
+ * Zero state. `visible` is optional now, so a trigger is the whole
+ * integration — the controlled/uncontrolled branch lives in `Sheet`, which
+ * Popup is a prop-shape adapter over, rather than being copied here.
+ */
+export const Uncontrolled: Story = {
+  render: () => (
+    <Popup trigger={<Button data-testid="popup-trigger">Open popup</Button>} title="Uncontrolled">
+      <Text>No useState in this story.</Text>
+    </Popup>
+  ),
 }

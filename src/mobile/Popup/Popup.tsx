@@ -8,8 +8,19 @@ import { Sheet } from '../../components/Sheet'
 
 export interface PopupProps {
   /** Phone-shaped naming for what `Sheet` calls `open`. */
-  visible: boolean
-  onClose: () => void
+  /** Controlled state. Omit it and the popup owns its own. */
+  visible?: boolean
+  /** Starting state when uncontrolled. @default false */
+  defaultVisible?: boolean
+  /** Fires on every change, controlled or not. */
+  onVisibleChange?: (visible: boolean) => void
+  /**
+   * The control that opens it. A React element is cloned, so the state lands
+   * on the button you styled and your own onClick still runs.
+   */
+  trigger?: ReactNode
+  /** Called when it closes. Optional: an uncontrolled popup closes itself. */
+  onClose?: () => void
   children?: ReactNode
   /**
    * Which edge the panel is attached to.
@@ -76,6 +87,9 @@ const toLength = (value: number | string) => (typeof value === 'number' ? `${val
  */
 export function Popup({
   visible,
+  defaultVisible,
+  onVisibleChange,
+  trigger,
   onClose,
   children,
   position = 'bottom',
@@ -105,8 +119,16 @@ export function Popup({
       className="may-popup-host"
       style={height !== undefined ? ({ '--may-popup-h': toLength(height) } as CSSProperties) : undefined}
     >
+      {/*
+        * Straight through to Sheet, which owns the controlled/uncontrolled
+        * branch already. Popup adding a second copy of it is how the two
+        * would end up disagreeing about what `visible` means.
+        */}
       <Sheet
         open={visible}
+        defaultOpen={defaultVisible}
+        onOpenChange={onVisibleChange}
+        trigger={trigger}
         onClose={onClose}
         title={title}
         grabber={grabber && draggable}
