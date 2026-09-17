@@ -10,8 +10,30 @@ import { useOpenState } from '../../overlay'
 /** How long a type-ahead buffer survives between keystrokes, in ms. */
 const TYPEAHEAD_RESET = 700
 
+/**
+ * The text a row can be matched and keyed by, if it has any.
+ *
+ * `label` was a string precisely because type-ahead needed one; widening it
+ * moved that requirement to `textValue` rather than removing it.
+ */
+const itemText = (item: MenuItem): string =>
+  item.textValue ?? (typeof item.label === 'string' ? item.label : '')
+
 export interface MenuItem {
-  label: string
+  /**
+   * The row's content. Any node — a badge beside the text, a two-line row, an
+   * avatar — not just a string, which is what every other item-driven
+   * component in the package already allows.
+   */
+  label: ReactNode
+  /**
+   * What type-ahead matches against, and the row's stable key.
+   *
+   * Only needed when `label` is not a string: type-ahead has to compare text,
+   * and a ReactNode has none to compare. A row with neither is simply skipped
+   * by type-ahead rather than breaking it.
+   */
+  textValue?: string
   onSelect?: () => void
   /** Leading glyph. A bare `<svg>` is scaled to the row by CSS. */
   icon?: ReactNode
@@ -164,7 +186,8 @@ export function Menu({
       const index = (from + step + items.length) % items.length
       const item = items[index]!
       if (item.disabled) continue
-      if (item.label.toLowerCase().startsWith(term)) {
+      const text = itemText(item)
+      if (text && text.toLowerCase().startsWith(term)) {
         setActive(index)
         return
       }
@@ -237,7 +260,7 @@ export function Menu({
       >
         {items.map((item, index) => (
           <MenuItemRow
-            key={`${item.label}-${index}`}
+            key={itemText(item) || index}
             item={item}
             tabbable={index === tabbable}
             register={(node) => {

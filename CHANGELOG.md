@@ -16,6 +16,12 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   and zero violations of every other WCAG 2.1 A/AA rule in all three families.
   The exact values are documented in the README and reachable through
   `theme={{ light, dark }}` if you need AA by default.
+- **`Menu` rows take any node.** `label` was the one item descriptor in the
+  package still forced to a string, because type-ahead needs text to compare.
+  It is `ReactNode` now, with `textValue` carrying the text for type-ahead and
+  the row key — needed only when the label is not already a string. Selector,
+  Steps, Breadcrumb, TabBar and CapsuleTabs already allowed nodes, so no
+  `renderItem` prop was added to any of them.
 - **`Combobox`.** A searchable, optionally multi-select picker: grouped rows,
   two-line rows, `renderOption` to replace a row's insides while keeping its
   semantics, and one hidden input per value so `FormData.getAll` works.

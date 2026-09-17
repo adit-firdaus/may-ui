@@ -10,6 +10,8 @@ import { Menu } from '.'
 import type { MenuItem } from '.'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
+import { Badge } from '../Badge'
+import { Text } from '../Text'
 
 const mailActions: MenuItem[] = [
   { label: 'Reply', icon: <IoArrowUndoOutline aria-hidden />, shortcut: '⌘R', onSelect: () => {} },
@@ -113,4 +115,43 @@ export const Controlled: Story = {
       </div>
     )
   },
+}
+
+/**
+ * A rich row. `label` takes any node, so a badge or a second line rides inside
+ * the row without a render prop — but type-ahead has no text to compare in a
+ * node, so those rows carry `textValue`. Type "s" with the menu open: it jumps
+ * to Shared, skipping the rows that gave it nothing to match.
+ */
+export const RichLabels: Story = {
+  render: () => (
+    <Menu
+      trigger={<Button variant="tinted">Move to…</Button>}
+      items={[
+        {
+          label: (
+            <span style={{ display: 'flex', gap: 'var(--may-space-2)', alignItems: 'baseline' }}>
+              <span>Recents</span>
+              <Badge tone="neutral" count={12} />
+            </span>
+          ),
+          textValue: 'Recents',
+          onSelect: () => {},
+        },
+        {
+          label: (
+            <span style={{ display: 'grid' }}>
+              <span>Shared</span>
+              <Text variant="caption-1" tone="secondary">
+                3 people
+              </Text>
+            </span>
+          ),
+          textValue: 'Shared',
+          onSelect: () => {},
+        },
+        { label: 'Archive', onSelect: () => {} },
+      ]}
+    />
+  ),
 }
