@@ -713,6 +713,53 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * The reduced-motion guard does not depend on a provider.
+   *
+   * Only MayProvider renders `.may-root`, and a provider is optional — the
+   * getting-started page opens by showing components used without one. The
+   * guard was written `.may-root *`, so in exactly that arrangement it could
+   * not match: a bare Button has no `.may-root` ancestor, and every animation
+   * and transition ran at full duration under `prefers-reduced-motion:
+   * reduce`, while the README said everything collapses. Only
+   * `.may-pressable` was honoured, and only because it carried no prefix.
+   *
+   * Matching on the class instead covers both arrangements. The check is that
+   * the guard never goes back to depending on the provider.
+   */
+  [
+    'the reduced-motion guard matches without a provider',
+    (() => {
+      // Balance the braces: the built CSS is minified, so a regex anchored on
+      // a newline before the closing brace finds nothing and reports a false
+      // failure against a correct sheet.
+      const at = css.indexOf('prefers-reduced-motion')
+      if (at === -1) {
+        console.log('\n       no prefers-reduced-motion block in the built CSS at all')
+        return false
+      }
+      let depth = 0
+      let end = at
+      for (let i = css.indexOf('{', at); i < css.length; i++) {
+        if (css[i] === '{') depth++
+        else if (css[i] === '}' && --depth === 0) { end = i; break }
+      }
+      const body = css.slice(css.indexOf('{', at) + 1, end)
+      const problems = []
+      if (!/\[class\^=["']?may-/.test(body)) problems.push('does not match on the class')
+      // every selector that neutralises a duration must reach a provider-less tree
+      for (const rule of body.split('}')) {
+        if (!/animation-duration|transition-duration/.test(rule)) continue
+        const selector = rule.split('{')[0]
+        if (/\bmay-root\b/.test(selector) && !/\[class/.test(selector)) {
+          problems.push(`a duration rule is scoped to .may-root: ${selector.trim().slice(0, 60)}`)
+        }
+      }
+      return (
+        problems.length === 0 || (console.log(`\n       reduced motion: ${problems.join('; ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0

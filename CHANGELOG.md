@@ -122,6 +122,17 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`prefers-reduced-motion` is honoured without a provider.** The guard was
+  written `.may-root *`, and only `MayProvider` renders `.may-root` — but a
+  provider is optional, and the getting-started page opens by showing
+  components used without one. In exactly that arrangement the selector could
+  not match: a bare `Button` has no `.may-root` ancestor, so every animation
+  and transition ran at full duration under `prefers-reduced-motion: reduce`,
+  while the README said everything collapses. Only `.may-pressable` was
+  honoured, and only because it carried no prefix. The guard matches on the
+  class now, with a word-boundary test so a consumer's own `maybe-thing` is
+  not caught by it.
+
 - **`placement="…-start"` and `"…-end"` follow the inline axis.** `types.ts`
   defines that vocabulary as logical — "start and end rather than left and
   right, so a mirrored layout needs no second set of values" — but

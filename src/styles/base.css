@@ -291,9 +291,27 @@
  * ------------------------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
-  .may-root *,
-  .may-root *::before,
-  .may-root *::after {
+  /*
+   * Matched on the CLASS, not on `.may-root`.
+   *
+   * Only MayProvider renders `.may-root`, and a provider is optional — the
+   * docs open by showing components used without one. So this guard, written
+   * as `.may-root *`, could not match in exactly the arrangement the docs
+   * teach first: a bare Button has no `.may-root` ancestor, and every
+   * animation and transition ran at full duration under `prefers-reduced-
+   * motion: reduce`. Only `.may-pressable` below was honoured, because it
+   * happened to carry no prefix.
+   *
+   * The two attribute selectors are a word-boundary match on `may-`, so a
+   * consumer's own `maybe-thing` is not caught by it. `.may-root` matches
+   * `[class^='may-']`, so the provider case is still covered.
+   */
+  :is([class^='may-'], [class*=' may-']),
+  :is([class^='may-'], [class*=' may-'])::before,
+  :is([class^='may-'], [class*=' may-'])::after,
+  :is([class^='may-'], [class*=' may-']) *,
+  :is([class^='may-'], [class*=' may-']) *::before,
+  :is([class^='may-'], [class*=' may-']) *::after {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
