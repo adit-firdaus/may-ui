@@ -182,6 +182,13 @@ Passing `error` to the `Field` is what marks the control invalid — it flips
 `aria-invalid`, swaps the description for the message and points
 `aria-describedby` at it, so the visual and announced states cannot drift apart.
 
+That holds for all ten controls, including the ones that are not a single
+input. `Slider`'s thumb is a `<button>`, which `<label for>` can name; `Stepper`
+and `RadioGroup` are a `role="group"` and a `role="radiogroup"`, which it
+cannot, so they adopt the Field's label with `aria-labelledby` instead. Either
+way the label you can see is the control's accessible name, and you never type
+an `id`, an `aria-invalid` or an `aria-describedby` yourself.
+
 ## Next.js App Router
 
 Every entry ships with a `'use client'` directive, so importing from this

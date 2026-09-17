@@ -114,9 +114,20 @@ export function Combobox({
   'aria-describedby': describedBy,
   ...rest
 }: ComboboxProps) {
-  const autoId = useAutoId(id)
+  /*
+   * Resolve the Field FIRST, then derive.
+   *
+   * It was the other way round: `useAutoId(id)` always returns an id, and
+   * handing that to `useFieldControl` meant `own.id ?? field?.id` could never
+   * reach the Field's — so a `<Field label="…">` around a Combobox emitted a
+   * `<label for>` naming an id the input did not have, and the visible label
+   * was not the input's accessible name. FieldContextValue says a control
+   * must adopt the Field's id verbatim; this now does, and the row and list
+   * ids still derive from whatever it ends up being.
+   */
+  const field = useFieldControl({ id, invalid, disabled, 'aria-describedby': describedBy })
+  const autoId = useAutoId(field.id)
   const listId = `${autoId}-list`
-  const field = useFieldControl({ id: autoId, invalid, disabled, 'aria-describedby': describedBy })
   const isDisabled = field.disabled ?? false
 
   const [uncontrolled, setUncontrolled] = useState(() => asArray(defaultValue))
@@ -310,7 +321,7 @@ export function Combobox({
 
         <input
           ref={inputRef}
-          id={field.id}
+          id={autoId}
           className="may-combobox__input"
           role="combobox"
           type="text"

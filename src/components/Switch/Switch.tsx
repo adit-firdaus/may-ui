@@ -190,6 +190,9 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
         className="may-switch__input may-sr-only"
         disabled={isDisabled}
         required={field.required}
+        /* Checkbox sets this; this did not, so a <Field error> around a Switch
+         * showed the message and announced nothing wrong with the control. */
+        aria-invalid={field.invalid || undefined}
         aria-describedby={field['aria-describedby']}
         onChange={handleChange}
         {...(checked !== undefined ? { checked } : { defaultChecked })}

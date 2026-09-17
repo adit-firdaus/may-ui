@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
+import { useFieldControl } from '../Field/Field'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { IoAdd, IoRemove } from 'react-icons/io5'
 import type { MaySize } from '../../types'
@@ -29,6 +30,8 @@ export interface StepperProps
   /** @default 'md' */
   size?: Exclude<MaySize, 'xs'>
   disabled?: boolean
+  /** Mark invalid explicitly. A surrounding `<Field error>` sets this for you. */
+  invalid?: boolean
   /** Announced when the value changes, and used for nothing visible. */
   formatValue?: (value: number) => string
   /** @default 'Decrease' */
@@ -159,8 +162,20 @@ export function Stepper({
   decrementLabel = 'Decrease',
   incrementLabel = 'Increase',
   className,
+  id,
+  invalid,
+  'aria-describedby': describedBy,
   ...rest
 }: StepperProps) {
+  /*
+   * A <Field> around a Stepper used to reach it with nothing at all: its
+   * `<label for>` pointed at an id that existed nowhere in the markup, and
+   * neither aria-invalid nor the aria-describedby naming the error was set.
+   * The group takes `aria-labelledby` rather than the id, because `for` does
+   * not bind to a div — see FieldContextValue.labelId.
+   */
+  const field = useFieldControl({ id, invalid, disabled, 'aria-describedby': describedBy })
+  const isDisabled = Boolean(field.disabled)
   const [internal, setInternal] = useState(() =>
     quantize(defaultValue ?? (Number.isFinite(min) ? min : 0), min, max, step),
   )
@@ -243,16 +258,20 @@ export function Stepper({
   return (
     <div
       {...rest}
+      id={field.id}
       role="group"
+      aria-labelledby={field.labelId}
+      aria-invalid={field.invalid || undefined}
+      aria-describedby={field['aria-describedby']}
       data-slot="stepper"
       data-size={size}
-      data-disabled={disabled ? 'true' : undefined}
+      data-disabled={isDisabled ? 'true' : undefined}
       className={cx('may-stepper', className)}
     >
       <StepperHalf
         action="decrement"
         label={decrementLabel}
-        disabled={disabled}
+        disabled={isDisabled}
         atLimit={!canDecrement}
         onPress={() => press(-1)}
         onRelease={stop}
@@ -261,7 +280,7 @@ export function Stepper({
       <StepperHalf
         action="increment"
         label={incrementLabel}
-        disabled={disabled}
+        disabled={isDisabled}
         atLimit={!canIncrement}
         onPress={() => press(1)}
         onRelease={stop}

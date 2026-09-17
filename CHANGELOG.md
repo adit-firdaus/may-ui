@@ -8,6 +8,11 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`FieldContextValue.labelId`** — the id of the Field's `<label>`, for a
+  control that cannot be the target of `htmlFor`. `<label for>` only names
+  labelable elements, so a `role="group"` or `role="radiogroup"` needs
+  `aria-labelledby` instead.
+
 - **`--may-knob`**, the white of a physical knob. `Slider`'s and `Switch`'s
   knobs read `--may-on-color` only because it happened to be white — their own
   comments say they want white, "the way the iOS knob stays white on a dark
@@ -112,6 +117,20 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   Return must not land on it.
 
 ### Fixed
+
+- **A `<Field>` now reaches every control inside it.** The promise was that
+  passing `error` to the Field marks the control invalid; measured, it held for
+  five of ten. `Slider` and `Stepper` never called `useFieldControl`, so their
+  Field emitted a `<label for>` naming an id that existed nowhere in the markup
+  and set neither `aria-invalid` nor `aria-describedby` — the label and error
+  were drawn on screen and invisible to a screen reader. `Stepper` and
+  `RadioGroup` are divs, which `for` cannot bind to at any id, so they adopt
+  the label with `aria-labelledby` via the new `labelId` on the Field context;
+  `RadioGroup`'s comment previously told you to repeat the label as an
+  `aria-label` instead. `Combobox` passed its own generated id to
+  `useFieldControl`, so `own.id ?? field.id` could never reach the Field's.
+  `Switch` alone never set `aria-invalid`. All ten are named, marked and
+  described now, and a bare control still generates its own id.
 
 - **`Sidebar` and mobile `NavBar` now honour `linkComponent`.** Both rendered a
   literal `<a>` for their `href`, ignoring the provider's link element that

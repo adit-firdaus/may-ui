@@ -48,11 +48,13 @@ export interface RadioGroupProps
  * roving comes free: the radios share a `name`, which is all the browser needs
  * to treat them as one tab stop and move the selection with the arrow keys.
  *
- * A surrounding `<Field>` supplies `disabled`, `invalid` and the id of its
- * message. It deliberately does **not** supply the group's id: `<label for>`
- * only names labelable elements, and a `role="radiogroup"` div is not one — so
- * give the group an `aria-label` (or a heading it points `aria-labelledby` at)
- * when it needs a name of its own.
+ * A surrounding `<Field>` supplies `disabled`, `invalid`, the id of its
+ * message, and the group's NAME. Not the group's id: `<label for>` only names
+ * labelable elements and a `role="radiogroup"` div is not one, so the Field's
+ * label is adopted with `aria-labelledby` instead. Before that the label a
+ * consumer could plainly see was not the group's accessible name at all, and
+ * the advice here was to repeat it as an `aria-label` — which is the sort of
+ * thing nobody does. An explicit `aria-label` or `aria-labelledby` still wins.
  */
 export function RadioGroup({
   children,
@@ -94,6 +96,7 @@ export function RadioGroup({
       <div
         {...rest}
         role="radiogroup"
+        aria-labelledby={rest['aria-labelledby'] ?? (rest['aria-label'] ? undefined : field.labelId)}
         data-slot="radio-group"
         data-size={size}
         data-orientation={orientation}

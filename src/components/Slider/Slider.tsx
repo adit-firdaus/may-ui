@@ -1,6 +1,7 @@
 import type { CSSProperties, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
+import { useFieldControl } from '../Field/Field'
 import { draggable } from '../../motion/gesture'
 import type { MayTone } from '../../types'
 
@@ -27,6 +28,8 @@ export interface SliderProps
   /** Granularity of both the drag and the arrow keys. @default 1 */
   step?: number
   disabled?: boolean
+  /** Mark invalid explicitly. A surrounding `<Field error>` sets this for you. */
+  invalid?: boolean
   /** Show the current value at the trailing edge. */
   showValue?: boolean
   /** Formats `showValue` and the value announced to assistive tech. */
@@ -90,8 +93,24 @@ export function Slider({
   style,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
+  id,
+  invalid,
+  'aria-describedby': describedBy,
   ...rest
 }: SliderProps) {
+  /*
+   * The thumb is the control, so everything a surrounding <Field> knows lands
+   * on the thumb and not on the wrapper.
+   *
+   * Without this a <Field label="Level" error="Too loud"> around a Slider
+   * emitted a `<label for>` pointing at NO element — measured: the id existed
+   * nowhere in the markup — and neither aria-invalid nor the aria-describedby
+   * naming the error was set anywhere. The visible label and error were
+   * therefore invisible to assistive tech, while the docs promised that
+   * passing `error` to the Field is what marks the control invalid.
+   */
+  const field = useFieldControl({ id, invalid, disabled, 'aria-describedby': describedBy })
+  const isDisabled = Boolean(field.disabled)
   const [internal, setInternal] = useState(() => quantize(defaultValue ?? min, min, max, step))
   const [dragging, setDragging] = useState(false)
 
@@ -118,7 +137,7 @@ export function Slider({
    * The drag effect must not re-run while a finger is down: `draggable` keeps
    * its active flag in a closure, so tearing it down mid-gesture would leave
    * the rest of the drag reporting nothing. Everything that changes per value
-   * is therefore read through a ref, and the effect depends only on `disabled`.
+   * is therefore read through a ref, and the effect depends only on `isDisabled`.
    */
   const latest = useRef({ min, max, step, commit })
   useEffect(() => {
@@ -127,7 +146,7 @@ export function Slider({
 
   useEffect(() => {
     const track = trackRef.current
-    if (!track || disabled) return
+    if (!track || isDisabled) return
 
     /** Where the finger sat relative to the thumb's centre when the drag began. */
     let grabOffset = 0
@@ -192,7 +211,7 @@ export function Slider({
       track.removeEventListener('pointerdown', onDown)
       stop()
     }
-  }, [disabled])
+  }, [isDisabled])
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     // A tenth of the range is the coarse increment, unless the step is coarser.
@@ -264,7 +283,7 @@ export function Slider({
       data-slot="slider"
       data-tone={tone}
       data-dragging={dragging ? 'true' : undefined}
-      data-disabled={disabled ? 'true' : undefined}
+      data-disabled={isDisabled ? 'true' : undefined}
       className={cx('may-slider', className)}
       style={{ ...style, '--may-slider-pct': pct } as CSSProperties}
     >
@@ -302,12 +321,15 @@ export function Slider({
          */}
         <button
           ref={thumbRef}
+          id={field.id}
           type="button"
           role="slider"
           className="may-slider__thumb"
-          disabled={disabled}
+          disabled={isDisabled}
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
+          aria-invalid={field.invalid || undefined}
+          aria-describedby={field['aria-describedby']}
           aria-orientation="horizontal"
           aria-valuemin={min}
           aria-valuemax={max}

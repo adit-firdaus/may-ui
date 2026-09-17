@@ -458,6 +458,58 @@ const assertions = [
     if (wrong.length) console.log('       ' + wrong.join('\n       '))
     return wrong.length === 0
   }],
+  /*
+   * A <Field> reaches every control inside it.
+   *
+   * The docs promise that passing `error` to the Field is what marks the
+   * control invalid — "it flips aria-invalid, swaps the description for the
+   * message and points aria-describedby at it, so the visual and announced
+   * states cannot drift apart". Measured, it was true of five controls out of
+   * ten. Slider and Stepper never called useFieldControl at all, so their
+   * Field emitted a `<label for>` naming an id that existed NOWHERE in the
+   * markup and set neither attribute; RadioGroup and Stepper are divs, which
+   * `for` cannot bind to at any id; Combobox handed its own generated id to
+   * useFieldControl, so `own.id ?? field.id` could never reach the Field's;
+   * and Switch alone never set aria-invalid.
+   *
+   * Every one of those is invisible on screen — the label and the error are
+   * drawn either way — and axe does not report a dangling `for`. So this
+   * checks the three things a screen reader actually uses: that the control
+   * has an accessible name from the Field's label, by `for` or by
+   * `aria-labelledby`; that it is marked invalid; and that its description
+   * points at the error.
+   */
+  ['a Field names and marks every control inside it', () => {
+    const LABELABLE = ['input', 'select', 'textarea', 'button', 'meter', 'output', 'progress']
+    const cases = {
+      Input: h(Adaptive.Input, {}),
+      Textarea: h(Adaptive.Textarea, {}),
+      Select: h(Adaptive.Select, { options: OPTS }),
+      Checkbox: h(Adaptive.Checkbox, {}),
+      Switch: h(Adaptive.Switch, {}),
+      Slider: h(Adaptive.Slider, { defaultValue: 40 }),
+      Stepper: h(Adaptive.Stepper, { defaultValue: 2 }),
+      RadioGroup: h(Adaptive.RadioGroup, { defaultValue: 'one' }, h(Adaptive.Radio, { value: 'one', label: 'One' })),
+      Combobox: h(Adaptive.Combobox, { options: OPTS }),
+      SearchField: h(Adaptive.SearchField, {}),
+    }
+    const wrong = []
+    for (const [name, control] of Object.entries(cases)) {
+      const markup = renderToStaticMarkup(
+        h(Adaptive.MayProvider, null, h(Adaptive.Field, { label: 'Level', error: 'Too loud' }, control)),
+      )
+      const labelFor = (markup.match(/<label[^>]*for="([^"]*)"/) || [, ''])[1]
+      const labelId = (markup.match(/<label[^>]*id="([^"]*)"/) || [, ''])[1]
+      const target = markup.match(new RegExp('<(\\w+)[^>]*\\bid="' + labelFor.replace(/\$/g, '\\$') + '"'))
+      const namedByFor = Boolean(target) && LABELABLE.includes(target[1])
+      const namedByLabelledby = Boolean(labelId) && markup.includes(`aria-labelledby="${labelId}"`)
+      if (!namedByFor && !namedByLabelledby) wrong.push(`${name}: the Field's label names nothing`)
+      if (!/aria-invalid="true"/.test(markup)) wrong.push(`${name}: not marked invalid`)
+      if (!/aria-describedby="[^"]*-error"/.test(markup)) wrong.push(`${name}: nothing points at the error`)
+    }
+    if (wrong.length) console.log('       ' + wrong.join('\n       '))
+    return wrong.length === 0
+  }],
 ]
 
 let failed = 0

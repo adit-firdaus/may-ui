@@ -13,6 +13,18 @@ import { useAutoId } from '../../utils/useId'
 export interface FieldContextValue {
   /** The id the label points at. Controls must adopt it verbatim. */
   id: string
+  /**
+   * id of the label element, for a control that cannot be the target of
+   * `htmlFor`.
+   *
+   * `for` only binds to a labelable element — input, select, textarea,
+   * button and a few others. `Stepper` is a `role="group"` and `RadioGroup` a
+   * `role="radiogroup"`, both divs, so the Field's `<label for>` pointed at an
+   * element that could not accept it and the visible label was not the
+   * control's accessible name at all. Those two adopt this with
+   * `aria-labelledby` instead. Present whenever the Field renders a label.
+   */
+  labelId?: string
   /** id of the one visible message, for `aria-describedby`. */
   describedBy?: string
   /** True while `error` is set. Controls never decide this for themselves. */
@@ -57,6 +69,7 @@ export function useFieldControl(own: FieldControlOwnProps = {}) {
 
   return {
     id: own.id ?? field?.id,
+    labelId: field?.labelId,
     invalid: own.invalid ?? field?.invalid ?? false,
     required: own.required ?? field?.required,
     disabled: own.disabled ?? field?.disabled,
@@ -113,10 +126,11 @@ export function Field({
 
   const message = invalid ? error : description
   const messageId = invalid ? `${controlId}-error` : description ? `${controlId}-description` : undefined
+  const labelId = label != null ? `${controlId}-label` : undefined
 
   const context = useMemo<FieldContextValue>(
-    () => ({ id: controlId, describedBy: messageId, invalid, required, disabled }),
-    [controlId, messageId, invalid, required, disabled],
+    () => ({ id: controlId, labelId, describedBy: messageId, invalid, required, disabled }),
+    [controlId, labelId, messageId, invalid, required, disabled],
   )
 
   return (
@@ -128,7 +142,7 @@ export function Field({
       className={cx('may-field', className)}
     >
       {label != null && (
-        <label className="may-field__label" htmlFor={controlId}>
+        <label id={labelId} className="may-field__label" htmlFor={controlId}>
           {label}
           {required && (
             <span className="may-field__required" aria-hidden>
