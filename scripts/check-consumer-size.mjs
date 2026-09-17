@@ -112,12 +112,47 @@ const bundled = await build({
   logLevel: 'silent',
 })
 
-const contributed = Object.values(bundled.metafile.outputs).flatMap((out) =>
-  Object.entries(out.inputs ?? {})
-    .filter(([file, info]) => /node_modules\/(motion|framer-motion)\//.test(file) && info.bytesInOutput > 0)
-    .map(([file, info]) => `${file} (${info.bytesInOutput}B)`),
+/** Bytes a dependency contributes to a built output, by path pattern. */
+const contributionOf = (meta, pattern) =>
+  Object.values(meta.outputs).flatMap((out) =>
+    Object.entries(out.inputs ?? {})
+      .filter(([file, info]) => pattern.test(file) && info.bytesInOutput > 0)
+      .map(([file, info]) => ({ file, bytes: info.bytesInOutput })),
+  )
+
+const pulled = contributionOf(bundled.metafile, /node_modules\/(motion|framer-motion)\//).map(
+  ({ file, bytes }) => `${file} (${bytes}B)`,
 )
-const pulled = contributed
+
+/*
+ * The icons shake too, and the same README sentence covers them.
+ *
+ * `react-icons/io5` is one barrel module holding every Ionicon, so the whole
+ * claim rests on the bundler shaking it. Button names no icon at all, which
+ * makes it the clean zero case; the whole library pulls the shared icon
+ * runtime plus the subset it actually uses, and the ceiling is what would
+ * catch the barrel stopping shaking — an unshaken io5 is hundreds of
+ * kilobytes, not single digits.
+ */
+const iconsInButton = contributionOf(bundled.metafile, /node_modules\/react-icons\//)
+
+const everything = await build({
+  stdin: {
+    contents: `import * as M from ${JSON.stringify(entry)}\nconsole.log(M)\n`,
+    resolveDir: root,
+    loader: 'js',
+  },
+  bundle: true,
+  minify: true,
+  format: 'esm',
+  write: false,
+  metafile: true,
+  external: ['react', 'react-dom', 'react/jsx-runtime'],
+  logLevel: 'silent',
+})
+const iconsInAll = contributionOf(everything.metafile, /node_modules\/react-icons\//)
+const iconBytes = iconsInAll.reduce((total, { bytes }) => total + bytes, 0)
+const ICON_CEILING = 16 * 1024
 
 console.log('')
 if (pulled.length === 0) {
@@ -130,6 +165,30 @@ if (pulled.length === 0) {
        motion is imported by SegmentedControl alone. If it reaches a Button
        bundle, something outside that component now depends on it and every
        consumer pays for it.
+`)
+}
+
+if (iconsInButton.length === 0) {
+  console.log('  ok   no icon module contributes bytes to a Button-only bundle')
+} else {
+  failed = true
+  console.error(
+    `  FAIL ${iconsInButton.length} icon module(s) reach a Button-only bundle, which names no icon`,
+  )
+}
+
+if (iconBytes <= ICON_CEILING) {
+  console.log(
+    `  ok   the whole library's icons cost ${iconBytes} B / ${ICON_CEILING} ceiling ` +
+      `(${iconsInAll.length} modules)`,
+  )
+} else {
+  failed = true
+  console.error(`  FAIL the icons cost ${iconBytes} B, over the ${ICON_CEILING} ceiling`)
+  console.error(`
+       react-icons/io5 is one barrel holding every Ionicon. A number this
+       large means the bundler has stopped shaking it and every consumer is
+       paying for icons nobody named.
 `)
 }
 
