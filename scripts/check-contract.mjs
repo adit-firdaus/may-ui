@@ -510,6 +510,42 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * The defaults key is the exported name.
+   *
+   * `components={{ Button: { size: 'lg' } }}` is looked up by the string a
+   * barrel hands to `mayStyled`, and every component's defaults arrive through
+   * that one call — there is no per-component wiring to get wrong. What there
+   * is to get wrong is the string: a barrel that borrows another component's
+   * sheet sits one careless copy away from registering under that component's
+   * name, and then a consumer's defaults for it are silently never applied,
+   * while the ones for its neighbour apply twice. Nothing about the rendering
+   * would look wrong.
+   *
+   * Cheap to state and it only fires on a real mismatch.
+   */
+  [
+    'every mayStyled name matches the name it is exported under',
+    (() => {
+      const pattern = /export const (\w+) = (?:\/\*#__PURE__\*\/ )?mayStyled\(\s*'([^']+)'/g
+      const offenders = []
+      let checked = 0
+      for (const file of sources().filter((name) => name.endsWith('/index.ts'))) {
+        for (const match of readFileSync(file, 'utf8').matchAll(pattern)) {
+          checked++
+          if (match[1] !== match[2]) offenders.push(`${match[1]} registered as '${match[2]}'`)
+        }
+      }
+      if (!checked) {
+        console.log('\n       matched no mayStyled export at all — the pattern has gone stale')
+        return false
+      }
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       defaults key does not match the export: ${offenders.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0
