@@ -101,11 +101,12 @@ const prose = READERS.map((file) => {
 const entries = { '.': 'mayui', './desktop': 'desktop', './mobile': 'mobile' }
 const undocumented = []
 for (const [subpath, file] of Object.entries(entries)) {
-  let exported
-  try {
-    exported = Object.keys(await import(resolve(root, `dist/${file}.js`)))
-  } catch {
-    continue
+  // Not `continue`: an entry that will not import is the whole check going
+  // quiet, which is the failure this file is meant to notice, not skip.
+  const exported = Object.keys(await import(resolve(root, `dist/${file}.js`)))
+  if (exported.length === 0) {
+    console.error(`  FAIL dist/${file}.js exports nothing — the export check below is vacuous`)
+    failed = true
   }
   for (const name of exported) {
     checked++
@@ -131,20 +132,19 @@ if (undocumented.length) {
  */
 const subpaths = Object.keys(JSON.parse(read('package.json')).exports)
   .filter((key) => key.startsWith('./') && key !== './package.json')
-let agentFile = ''
-try {
-  agentFile = read('llms.txt')
-} catch {
-  agentFile = ''
+// Read without a fallback: catching the missing file and carrying on is the
+// same as not having the check.
+const agentFile = read('llms.txt')
+if (subpaths.length === 0) {
+  console.error('  FAIL package.json declares no subpath exports — nothing to check llms.txt against')
+  failed = true
 }
-if (agentFile) {
-  // Prose writes them without the leading dot — `/desktop`, not `./desktop`.
-  const missing = subpaths.filter((key) => !agentFile.includes(key.slice(1)))
-  checked += subpaths.length
-  if (missing.length) {
-    console.error(`  FAIL llms.txt does not mention entry point(s): ${missing.join(', ')}`)
-    failed = true
-  }
+// Prose writes them without the leading dot — `/desktop`, not `./desktop`.
+const missing = subpaths.filter((key) => !agentFile.includes(key.slice(1)))
+checked += subpaths.length
+if (missing.length) {
+  console.error(`  FAIL llms.txt does not mention entry point(s): ${missing.join(', ')}`)
+  failed = true
 }
 
 if (failed) {
