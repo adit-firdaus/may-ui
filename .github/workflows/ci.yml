@@ -10,11 +10,21 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      # `engines` allows >=20, so the gate has to actually run on the versions
+      # a consumer may build with. `fail-fast: false` because knowing whether a
+      # break is one version or all three is most of the diagnosis.
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    name: verify (node ${{ matrix.node }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node }}
           cache: npm
-      - run: npm ci
+      # `--ignore-scripts` skips the `prepare` lifecycle, which would run a
+      # full generate + typecheck + build that `npm run verify` then repeats.
+      - run: npm ci --ignore-scripts
       - run: npm run verify

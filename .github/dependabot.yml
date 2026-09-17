@@ -1,0 +1,19 @@
+# Grouped so a week of patch bumps arrives as one reviewable PR rather than
+# fifteen. Runtime dependencies stay separate: `motion` and `react-icons` are
+# the only two, they ship to consumers, and each deserves reading on its own.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      runtime:
+        patterns: ['motion', 'react-icons']
+      dev:
+        dependency-type: development
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
