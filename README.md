@@ -305,8 +305,16 @@ They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a dem
 - Hover styling is gated behind `@media (hover: hover) and (pointer: fine)`, so touch
   devices never get stuck hover
 - Everything collapses under `prefers-reduced-motion`, including animation iteration
-- RTL mirrors both halves: layout through logical properties, and every
-  directional glyph through a `[dir='rtl']` rule that `check:contract` enforces
+- RTL mirrors three things, not two. Layout goes through logical properties and
+  directional glyphs through a `[dir='rtl']` rule — and geometry **computed in
+  JavaScript** reads the direction back off the element. That third one is the
+  one that hides: a knob positioned by `translate`, a pointer delta, a scale
+  origin and a `start`/`end` alignment all look right at rest, because the CSS
+  around them mirrors itself, and are wrong the moment you touch them. `Slider`,
+  `SplitPane`, `placeFloating` and the sliding thumb behind five controls each
+  read it now. Put `dir` on `MayProvider` or on the document; both work, and a
+  mirrored subtree inside an LTR page is read from the nearest element rather
+  than from `<html>`
 - Modal surfaces mark the rest of the document `inert`, which removes it from the
   accessibility tree as well as from focus order — a Tab cycle only ever contained Tab
 
