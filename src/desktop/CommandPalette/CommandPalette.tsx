@@ -1,4 +1,4 @@
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
+import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { IoSearch } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
@@ -37,7 +37,13 @@ export interface CommandGroup {
   items: CommandItem[]
 }
 
-export interface CommandPaletteProps {
+/*
+ * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
+ * an extra `aria-*`, as Modal and Sheet already allowed. `onSelect` is omitted
+ * because this component means "a command was chosen" by it, which collides
+ * with the DOM event of the same name.
+ */
+export interface CommandPaletteProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   /**
    * Controlled state. Omit it and the palette owns its own — which, with the
    * default hotkey, means it needs nothing from the consumer at all.
@@ -316,6 +322,7 @@ export function CommandPalette({
   hideFooter = false,
   label = 'Commands',
   className,
+  ...rest
 }: CommandPaletteProps) {
   const id = useAutoId()
   const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
@@ -537,6 +544,7 @@ export function CommandPalette({
       {triggerNode}
       {mounted && (
     <div
+      {...rest}
       className="may-command__scrim"
       data-slot="scrim"
       data-state={open ? 'open' : 'closed'}

@@ -325,6 +325,28 @@ const assertions = [
     )
     return /role="combobox"/.test(s) && /aria-expanded="false"/.test(s)
   }],
+  /*
+   * Arbitrary props reach the DOM.
+   *
+   * Modal's own comment called this "the things every other component already
+   * allows" — data-testid for an e2e run, an id, an extra aria-* — but six
+   * components had closed prop types and forwarded none of them, so a test
+   * could not find a Popover and a consumer could not label one.
+   */
+  ...[
+    ['Popover', () => h(Adaptive.Popover, { 'data-testid': 'probe', id: 'probe-id', trigger: h('button', {}, 'x') }, 'body')],
+    ['Menu', () => h(Adaptive.Menu, { 'data-testid': 'probe', id: 'probe-id', trigger: h('button', {}, 'x'), items: [{ label: 'a' }] })],
+    ['Tooltip', () => h(Adaptive.Tooltip, { 'data-testid': 'probe', id: 'probe-id', content: 'tip' }, h('button', {}, 'x'))],
+    ['ActionSheet', () => h(Adaptive.ActionSheet, { 'data-testid': 'probe', id: 'probe-id', open: true, items: [{ label: 'a' }] })],
+    ['CommandPalette', () => h(Desktop.CommandPalette, { 'data-testid': 'probe', id: 'probe-id', open: true, groups: [] })],
+    ['Popup', () => h(Mobile.Popup, { 'data-testid': 'probe', id: 'probe-id', visible: true }, 'body')],
+  ].map(([name, node]) => [
+    `${name} forwards data-testid and id to the DOM`,
+    () => {
+      const s = renderToStaticMarkup(h(Adaptive.MayProvider, {}, node()))
+      return /data-testid="probe"/.test(s) && /id="probe-id"/.test(s)
+    },
+  ]),
   ['Text renders the element it is told to', () =>
     /<a [^>]*href="\/x"[^>]*class="[^"]*may-text/.test(
       renderToStaticMarkup(h(Adaptive.MayProvider, {}, h(Adaptive.Text, { as: 'a', href: '/x' }, 'link'))))],

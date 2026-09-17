@@ -1,4 +1,4 @@
-import type { MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import {
   cloneElement,
   isValidElement,
@@ -157,7 +157,13 @@ interface TriggerProps {
   'aria-controls'?: string
 }
 
-export interface PopoverProps {
+/*
+ * Extends `HTMLAttributes` for the same reason Modal does: a consumer needs to
+ * attach `data-testid` for an e2e run, an `id`, or an extra `aria-*`, and a
+ * closed prop type refuses all three. `role` is omitted because this component
+ * narrows it to the two values a popover surface may carry.
+ */
+export interface PopoverProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'role'> {
   /**
    * The anchor. A React element is cloned so the open state lands on the real
    * control; anything else is wrapped in a plain button, because a popover you
@@ -223,6 +229,7 @@ export function Popover({
   className,
   surfaceClassName,
   'aria-label': ariaLabel,
+  ...rest
 }: PopoverProps) {
   const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
   const reducedMotion = useReducedMotion()
@@ -391,6 +398,7 @@ export function Popover({
 
   return (
     <span
+      {...rest}
       ref={rootRef}
       data-slot="popover"
       className={cx('may-popover', className)}

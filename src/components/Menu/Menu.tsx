@@ -1,5 +1,5 @@
 import { IoCheckmark } from 'react-icons/io5'
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
+import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
@@ -63,7 +63,13 @@ export interface MenuItem {
   shortcut?: string
 }
 
-export interface MenuProps {
+/*
+ * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
+ * an extra `aria-*`, the way Modal already allowed. They ride on the Popover
+ * this delegates to — the surface a test actually wants to find — rather than
+ * on the inner menu, which exists only while open.
+ */
+export interface MenuProps extends HTMLAttributes<HTMLSpanElement> {
   /** The control that opens the menu. Cloned to carry the open state. */
   trigger: ReactNode
   items: MenuItem[]
@@ -100,6 +106,7 @@ export function Menu({
   onOpenChange,
   className,
   'aria-label': ariaLabel,
+  ...rest
 }: MenuProps) {
   const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
   const [active, setActive] = useState(-1)
@@ -236,6 +243,7 @@ export function Menu({
 
   return (
     <Popover
+      {...rest}
       trigger={trigger}
       open={open}
       onOpenChange={setOpen}

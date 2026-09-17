@@ -1,4 +1,4 @@
-import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import {
   cloneElement,
   isValidElement,
@@ -51,7 +51,12 @@ interface TriggerProps {
   'aria-describedby'?: string
 }
 
-export interface TooltipProps {
+/*
+ * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
+ * an extra `aria-*` — the same set Modal has always allowed. `children` is
+ * omitted because this component requires exactly one trigger element.
+ */
+export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   /** The control being described. */
   children: ReactNode
   /** The hint. A few words — anything longer belongs in the interface. */
@@ -89,6 +94,7 @@ export function Tooltip({
   delay = 500,
   disabled = false,
   className,
+  ...rest
 }: TooltipProps) {
   const [open, setOpen] = useState(false)
   const reducedMotion = useReducedMotion()
@@ -191,6 +197,7 @@ export function Tooltip({
 
   return (
     <span
+      {...rest}
       data-slot="tooltip"
       className={cx('may-tooltip', className)}
       onPointerEnter={onPointerEnter}

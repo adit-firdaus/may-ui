@@ -1,4 +1,5 @@
 import type {
+  HTMLAttributes,
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
   ReactNode,
@@ -28,7 +29,13 @@ export interface ActionSheetAction {
   icon?: ReactNode
 }
 
-export interface ActionSheetProps {
+/*
+ * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
+ * an extra `aria-*`, as Modal and Sheet already allowed. `title` is omitted
+ * because this component means a heading by it, not the HTML tooltip
+ * attribute.
+ */
+export interface ActionSheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Controlled state. Omit it and the sheet owns its own. */
   open?: boolean
   /** Starting state when uncontrolled. @default false */
@@ -99,6 +106,7 @@ export function ActionSheet({
   cancelLabel = 'Cancel',
   anchorRef,
   className,
+  ...rest
 }: ActionSheetProps) {
   const id = useAutoId()
   const { open, setOpen } = useOpenState({ open: openProp, defaultOpen, onOpenChange })
@@ -269,6 +277,7 @@ export function ActionSheet({
       {triggerNode}
       {mounted && (
     <div
+      {...rest}
       className="may-action-sheet__scrim"
       data-slot="scrim"
       data-state={open ? 'open' : 'closed'}

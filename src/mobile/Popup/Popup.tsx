@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
 import { Sheet } from '../../components/Sheet'
 /* Value import, not type-only: Popup styles Sheet's own class names, and a
@@ -6,7 +6,13 @@ import { Sheet } from '../../components/Sheet'
  * Sheet.css away and render the popup unstyled. It also fixes the cascade
  * order, so Popup.css (imported below) always lands after the rules it pins. */
 
-export interface PopupProps {
+/*
+ * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
+ * an extra `aria-*`. They land on the host, which is `display: contents` and
+ * generates no box — so nothing about the layout changes. `title` is omitted
+ * because this component means a heading by it.
+ */
+export interface PopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Phone-shaped naming for what `Sheet` calls `open`. */
   /** Controlled state. Omit it and the popup owns its own. */
   visible?: boolean
@@ -100,6 +106,7 @@ export function Popup({
   title,
   padded = false,
   className,
+  ...rest
 }: PopupProps) {
   /*
    * Sheet's drag only resolves downward, so it is meaningful for a panel
@@ -112,6 +119,7 @@ export function Popup({
 
   return (
     <div
+      {...rest}
       data-slot="popup"
       data-position={position}
       data-safe-area={safeArea ? 'true' : 'false'}
