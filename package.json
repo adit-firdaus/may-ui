@@ -70,7 +70,7 @@
     "smoke": "node scripts/smoke.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:size": "node scripts/check-size.mjs",
-    "verify": "npm run build && npm run check:generated && npm run smoke && npm run check:provider && npm run check:tokens && npm run check:contract && npm run check:size && npm run check:coverage && npm run check:docs && npm run site:build && npm run check:site",
+    "verify": "npm run build && npm run check:generated && npm run smoke && npm run check:provider && npm run check:tokens && npm run check:contract && npm run check:size && npm run check:consumer-size && npm run check:coverage && npm run check:docs && npm run site:build && npm run check:site",
     "check:provider": "node scripts/check-provider.mjs",
     "check:contract": "node scripts/check-contract.mjs",
     "site:meta": "node scripts/gen-catalog-meta.mjs",
@@ -83,7 +83,8 @@
     "examples:build": "npm run site:build",
     "check:coverage": "node scripts/check-coverage.mjs",
     "check:generated": "node scripts/check-generated.mjs",
-    "check:docs": "node scripts/check-docs.mjs"
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:consumer-size": "node scripts/check-consumer-size.mjs"
   },
   "peerDependencies": {
     "react": ">=19 <20",

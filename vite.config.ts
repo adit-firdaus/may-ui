@@ -38,7 +38,25 @@ export default defineConfig({
       // Runtime packages stay external so consumers resolve one shared copy;
       // their bundler can tree-shake the icons and Motion features they use.
       external: [/^react$/, 'react-dom', 'react/jsx-runtime', /^react-icons/, /^motion(?:\/|$)/],
-      output: { globals: { react: 'React', 'react-dom': 'ReactDOM' } },
+      output: {
+        globals: { react: 'React', 'react-dom': 'ReactDOM' },
+        /*
+         * One output file per input module.
+         *
+         * Rollup's default grouping put Button in the same chunk as every form
+         * control and the toast host, so a consumer importing only Button paid
+         * for all of them — their CSS strings included — no matter how well
+         * annotated the barrels were.
+         *
+         * Grouping by component directory instead was worse: IconButton
+         * borrows Button's sheet, so hand-drawn chunk boundaries produced a
+         * chunk that referenced Button before initialising it. Mirroring the
+         * source tree invents no boundaries at all, which is the only version
+         * with no cycle to get wrong. A library's output is re-bundled by the
+         * consumer, so the file count costs them nothing.
+         */
+        preserveModules: true,
+      },
     },
     sourcemap: true,
   },

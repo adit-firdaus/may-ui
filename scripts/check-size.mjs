@@ -1,5 +1,5 @@
 /**
- * Weight gate. "Lightweight" is only real if it is enforced.
+ * Published-graph weight. "Lightweight" is only real if it is enforced.
  *
  * This measures each entry's TRANSITIVE CLOSURE, not the entry file. Rollup
  * hoists code shared between entries into separate chunks, so once a fourth
@@ -7,18 +7,34 @@
  * over a 121kB chunk. Measuring the entry file alone would have reported a 96%
  * size *improvement* while the real cost to a consumer was unchanged — a gate
  * that passes for the wrong reason is worse than no gate.
+ *
+ * What it is NOT, since the build began preserving modules: a proxy for what an
+ * app downloads. One file per module means per-module import/export boilerplate
+ * that a consumer's bundler strips on the way in, so this total now runs ahead
+ * of the real cost. `check-consumer-size.mjs` bundles a real import and weighs
+ * that; this file's job is to catch the published graph growing without anyone
+ * noticing.
  */
 import { readFileSync, statSync, existsSync, readdirSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { fileURLToPath } from 'node:url'
-import { dirname, resolve, join } from 'node:path'
+import { dirname, resolve, join, relative } from 'node:path'
 import { builtStyleEntries, styleSheetsFor } from './built-styles.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 const dist = join(root, 'dist')
 
-/** Follow static imports/re-exports from an entry and return every file reached. */
+/**
+ * Follow static imports/re-exports from an entry and return every file reached.
+ *
+ * Resolves each specifier against the DIRECTORY OF THE IMPORTING FILE, not
+ * against dist/. The build preserves the source tree, so a nested module
+ * reaches its siblings with `../../components/...`: a walker that only matched
+ * a leading `./` stopped at the first level and reported the desktop entry as
+ * 807 bytes for six components. That is the failure this file's header warns
+ * about — a gate that passes for the wrong reason.
+ */
 function closure(entry) {
   const seen = new Set()
   const queue = [entry]
@@ -29,8 +45,10 @@ function closure(entry) {
     if (!existsSync(path)) continue
     seen.add(file)
     const src = readFileSync(path, 'utf8')
-    for (const m of src.matchAll(/(?:from|import)\s*["'](\.\/[^"']+)["']/g)) {
-      queue.push(m[1].replace(/^\.\//, ''))
+    for (const m of src.matchAll(/(?:from|import)\s*["'](\.[^"']+)["']/g)) {
+      // Relative to the importer, then back to a dist-relative key.
+      const resolved = relative(dist, resolve(dirname(path), m[1]))
+      queue.push(resolved)
     }
   }
   return [...seen]
@@ -41,14 +59,14 @@ const gz = (files) =>
 const raw = (files) => files.reduce((n, f) => n + statSync(join(dist, f)).size, 0)
 
 const BUDGETS = {
-  // What every consumer of `mayui` pays.
-  'mayui.js': 82 * 1024,
+  // The published graph behind the default entry.
+  'mayui.js': 90 * 1024,
   // Opt-in families. Importing 'mayui' pulls in neither.
-  'desktop.js': 43 * 1024,
-  'mobile.js': 36 * 1024,
+  'desktop.js': 46 * 1024,
+  'mobile.js': 39 * 1024,
   // The example screens. Never imported by a consumer — this budget exists to
   // catch them leaking into the main entry.
-  'examples.js': 171 * 1024,
+  'examples.js': 205 * 1024,
 }
 
 let failed = false
