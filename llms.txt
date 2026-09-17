@@ -27,4 +27,7 @@
 
 - Install: `npm install @adit_firdaus/may-ui` (react and react-dom 19 are peer deps)
 - Import: `import { Button } from '@adit_firdaus/may-ui'`; components carry React stylesheet resources
-- Entries: `@adit_firdaus/may-ui` (adaptive), `/desktop`, `/mobile`
+- Entries: `@adit_firdaus/may-ui` (adaptive), `/desktop`, `/mobile`, `/examples` (composed screens, not part of the component library)
+- No stylesheet to import: each component renders a React style resource, hoisted and de-duplicated
+- Next.js App Router: every entry carries `'use client'`, so importing from a server component works
+- Strict CSP: set `styleNonce` on `MayProvider` AND pass React's render option in its object form, `{ nonce: { style } }` — the string form is script-only

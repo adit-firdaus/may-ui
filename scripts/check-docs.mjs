@@ -119,6 +119,34 @@ if (undocumented.length) {
   failed = true
 }
 
+/*
+ * llms.txt lists the real entry points.
+ *
+ * It is the file an agent reads first, so a wrong claim there propagates into
+ * generated code rather than just misleading one person. It has drifted
+ * before: it claimed "no runtime dependencies beyond React" while the package
+ * shipped two, and its entry list omitted `/examples`.
+ *
+ * The subpaths are in package.json, so the list is checkable.
+ */
+const subpaths = Object.keys(JSON.parse(read('package.json')).exports)
+  .filter((key) => key.startsWith('./') && key !== './package.json')
+let agentFile = ''
+try {
+  agentFile = read('llms.txt')
+} catch {
+  agentFile = ''
+}
+if (agentFile) {
+  // Prose writes them without the leading dot — `/desktop`, not `./desktop`.
+  const missing = subpaths.filter((key) => !agentFile.includes(key.slice(1)))
+  checked += subpaths.length
+  if (missing.length) {
+    console.error(`  FAIL llms.txt does not mention entry point(s): ${missing.join(', ')}`)
+    failed = true
+  }
+}
+
 if (failed) {
   console.error(`
        A command was renamed and the docs were not, a doc describes
