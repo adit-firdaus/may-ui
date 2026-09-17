@@ -189,6 +189,53 @@ check('mobile pattern chrome stays compact and unobstructed', () => {
   assert.match(css, /site-pattern-stage[^}]*padding-inline: 0/s)
 })
 
+/*
+ * A visible component with no preview fixture shows a text placeholder on its
+ * own catalogue page — which is the first thing anyone evaluating it sees.
+ * Combobox shipped that way, and no gate noticed, because the catalogue checks
+ * parity of ENTRIES and says nothing about whether an entry renders anything.
+ *
+ * The exemptions are the components that correctly have no preview of their
+ * own: layout primitives with nothing to show, sub-components demonstrated
+ * through their parent, and the non-visual provider.
+ */
+check('every visible component has a catalogue preview fixture', () => {
+  const NO_PREVIEW_NEEDED = new Set([
+    // Layout primitives: a box with nothing in it is not a preview.
+    'Box', 'Grid', 'Stack', 'SafeArea', 'ScrollArea', 'VisuallyHidden',
+    // Shown through their parent's fixture.
+    'AccordionItem', 'AvatarGroup', 'CardBody', 'CardDescription', 'CardFooter',
+    'CardHeader', 'CardTitle', 'ToolbarSpacer',
+    // Not visual at all.
+    'PlatformProvider',
+  ])
+
+  const source = readFileSync(resolve(root, 'examples/src/catalog/PreviewRenderer.tsx'), 'utf8')
+
+  /*
+   * `baseProps` only. The file also holds `copyDefaults`, which feeds the
+   * copyable snippet rather than the rendered preview — counting both let a
+   * component present in only the second one pass while its page still showed
+   * a placeholder, which is the exact bug this check exists for.
+   */
+  const start = source.indexOf('const baseProps')
+  const end = source.indexOf('const copyDefaults')
+  assert.ok(start > -1 && end > start, 'expected baseProps and copyDefaults in PreviewRenderer')
+  const baseSource = source.slice(start, end)
+  const fixtures = new Set([...baseSource.matchAll(/^ {2}(\w+):\s*\{/gm)].map((m) => m[1]))
+  const dts = readFileSync(resolve(root, 'dist/index.d.ts'), 'utf8')
+  const exported = [...dts.matchAll(/^export declare (?:function|const) ([A-Z]\w*)/gm)].map((m) => m[1])
+
+  assert.ok(exported.length > 40, 'expected the public exports to be readable')
+
+  const missing = exported.filter((name) => !fixtures.has(name) && !NO_PREVIEW_NEEDED.has(name))
+  assert.deepEqual(
+    missing,
+    [],
+    `no catalogue preview fixture for: ${missing.join(', ')} — add one to PreviewRenderer.tsx, or exempt it there with a reason`,
+  )
+})
+
 if (failures.length) {
   console.log(`\n${failures.length} site contract check(s) failed`)
   process.exit(1)
