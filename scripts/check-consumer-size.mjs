@@ -79,4 +79,58 @@ if (!allOk && allSize < ALL.min) {
 `)
 }
 
+/*
+ * The runtime dependencies stay shakeable.
+ *
+ * README tells a consumer their bundler will shake the icons and the Motion
+ * features they do not use, and every measurement above externalises both —
+ * which ASSUMES that claim rather than testing it. `motion` is imported by
+ * exactly one component, SegmentedControl, so a Button-only bundle reaching
+ * into it would mean a consumer paying for a component they never named.
+ *
+ * Measured as BYTES IN THE OUTPUT, which took two tries to get right.
+ * Grepping the minified text for names like `useDragControls` finds nothing
+ * whether or not the module is there, because the minifier has renamed them —
+ * a check that could never fail. Switching to `metafile.inputs` then failed
+ * even on a clean tree, because that lists every module esbuild READ, including
+ * the ones it went on to shake out. `outputs[].inputs[].bytesInOutput` is the
+ * only one of the three that answers the question asked.
+ */
+const bundled = await build({
+  stdin: {
+    contents: `import { Button } from ${JSON.stringify(entry)}\nconsole.log(Button)\n`,
+    resolveDir: root,
+    loader: 'js',
+  },
+  bundle: true,
+  minify: true,
+  format: 'esm',
+  write: false,
+  metafile: true,
+  // react stays external; motion and react-icons deliberately do NOT.
+  external: ['react', 'react-dom', 'react/jsx-runtime'],
+  logLevel: 'silent',
+})
+
+const contributed = Object.values(bundled.metafile.outputs).flatMap((out) =>
+  Object.entries(out.inputs ?? {})
+    .filter(([file, info]) => /node_modules\/(motion|framer-motion)\//.test(file) && info.bytesInOutput > 0)
+    .map(([file, info]) => `${file} (${info.bytesInOutput}B)`),
+)
+const pulled = contributed
+
+console.log('')
+if (pulled.length === 0) {
+  console.log('  ok   no Motion module contributes bytes to a Button-only bundle')
+} else {
+  failed = true
+  console.error(`  FAIL ${pulled.length} Motion module(s) contribute bytes to a Button-only bundle`)
+  console.error(`         e.g. ${pulled.slice(0, 3).join(', ')}`)
+  console.error(`
+       motion is imported by SegmentedControl alone. If it reaches a Button
+       bundle, something outside that component now depends on it and every
+       consumer pays for it.
+`)
+}
+
 if (failed) process.exit(1)

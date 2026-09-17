@@ -18,7 +18,10 @@ and a token layer you can theme.
 npm install @adit_firdaus/may-ui
 ```
 
-`react` and `react-dom` 19 are peer dependencies. [`react-icons`](https://react-icons.github.io/react-icons/)
+`react` and `react-dom` 19 are peer dependencies. The two runtime dependencies
+stay external, so your bundler shakes the icons and the Motion features you do
+not use — `motion` is imported by `SegmentedControl` alone, and
+`check:consumer-size` fails the build if any of it reaches a Button-only bundle. [`react-icons`](https://react-icons.github.io/react-icons/)
 supplies Ionicons, while [`motion`](https://motion.dev/docs/react) projects
 SegmentedControl's real-sized selection thumb. Both stay external to May UI's
 build so your bundler tree-shakes the features it uses.
