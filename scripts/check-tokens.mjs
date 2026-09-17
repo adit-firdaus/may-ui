@@ -129,5 +129,42 @@ if (unreadAliases.length === 0) {
 `)
 }
 
-const tokenParityFailed = typedButUndeclared.length + declaredButUntyped.length
+/*
+ * An exported token value is a CSS value, not prose.
+ *
+ * The generator builds `mayLightTokens` by matching `--may-name: value;` out
+ * of its own output, and it did that WITHOUT stripping comments — so a note
+ * that mentioned a token by name took over its value. A comment reading
+ * "which is NOT --may-label: a label follows the theme…" made
+ * `mayLightTokens.label` the rest of that sentence. The CSS was unaffected,
+ * because a browser does strip comments; only `useMayTokens()` was wrong, and
+ * name parity above passes either way since the NAME was still there.
+ *
+ * `calc(var(--x) * 2)` is a legitimate asterisk, so the rule is a comment
+ * marker, or a bare ` * ` outside a math function, or a value longer than any
+ * real one — the longest is a 248-character `linear()` spring.
+ */
+const MATH = /\b(?:calc|min|max|clamp)\(/
+const valueBlock = generated.slice(
+  generated.indexOf('export const mayLightTokens'),
+  generated.indexOf('export const mayDarkTokens'),
+)
+const suspect = [...valueBlock.matchAll(/^\s+(\w+): ("[^"]*"|'[^']*'),/gm)]
+  .map(([, name, quoted]) => [name, quoted.slice(1, -1)])
+  .filter(([, value]) =>
+    value.includes('/*') || value.includes('*/') || value.length > 300 ||
+    (/ \* /.test(value) && !MATH.test(value)))
+
+if (suspect.length === 0) {
+  console.log(`ok   every exported token value looks like a CSS value`)
+} else {
+  console.log('\nTOKEN VALUE THAT IS NOT A CSS VALUE:')
+  for (const [name, value] of suspect) console.log(`  ${name}: ${JSON.stringify(value.slice(0, 80))}`)
+  console.log(`
+       A comment in gen-tokens.mjs has leaked into a value. The parser strips
+       comments before matching declarations — check that it still does.
+`)
+}
+
+const tokenParityFailed = typedButUndeclared.length + declaredButUntyped.length + suspect.length
 process.exit(undefinedTokens.length + tokenParityFailed + unreadAliases.length ? 1 : 0)

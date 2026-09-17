@@ -539,12 +539,22 @@ const withoutSupports = (source) => {
   return out
 }
 
+/*
+ * Comments are stripped FIRST.
+ *
+ * Without that, a comment mentioning a token by name poisons its value: a
+ * note reading "the foreground for a bright fill, which is NOT --may-label: a
+ * label follows the theme…" made `mayLightTokens.label` the rest of that
+ * sentence. The CSS stayed correct, because a browser does strip comments —
+ * only the typed values were wrong, so nothing looked broken until
+ * `useMayTokens().label` was read. Same shape as the @supports fallback this
+ * file already strips: the parser saw text a browser never would.
+ */
 const declarations = (source) =>
   Object.fromEntries(
-    [...source.matchAll(/--may-([\w-]+)\s*:\s*([^;]+);/g)].map((match) => [
-      match[1],
-      match[2].trim().replace(/\s+/g, ' '),
-    ]),
+    [...source.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/--may-([\w-]+)\s*:\s*([^;]+);/g)].map(
+      (match) => [match[1], match[2].trim().replace(/\s+/g, ' ')],
+    ),
   )
 
 const rootStarts = [...css.matchAll(/:root\s*\{/g)].map((match) => match.index)
