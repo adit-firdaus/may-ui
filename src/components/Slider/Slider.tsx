@@ -169,7 +169,17 @@ export function Slider({
       const usable = rect.width - thumbSize
       if (usable <= 0) return lo
       const t = (clientX - rect.left - thumbSize / 2) / usable
-      return quantize(lo + t * (hi - lo), lo, hi, s)
+      /*
+       * Mirrored for RTL, where the low end is on the RIGHT.
+       *
+       * The fill and the knob both anchor with `inset-inline-start`, so the
+       * track reverses itself in CSS — but this mapping did not, and a click
+       * near the visually-high left end returned 9 out of 100 while the knob
+       * jumped to the opposite side. Read from the track rather than the
+       * document, so a subtree with its own `dir` is right too.
+       */
+      const ratio = getComputedStyle(track).direction === 'rtl' ? 1 - t : t
+      return quantize(lo + ratio * (hi - lo), lo, hi, s)
     }
 
     // Registered before `draggable`'s own listener, so the offset is set before

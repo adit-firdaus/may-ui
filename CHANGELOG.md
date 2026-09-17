@@ -122,6 +122,16 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`Slider` works in RTL.** Its fill is width plus `inset-inline-start`, so
+  that mirrored on its own — but two things did not follow it. The knob pairs
+  the same logical anchor with a *physical* `translate`, so under `dir="rtl"`
+  it was pushed off the end: measured at value 30, the knob sat at 127% of the
+  track, outside it entirely. And the pointer-to-value mapping read
+  left-to-right, so a click at the visually-high left end returned 9 out of 100
+  and threw the knob to the far side. Both mirror now — measured in RTL, a
+  click near the left edge gives 91 and the knob lands 0.90 of the way in from
+  the right; LTR is unchanged at 9 and 0.10 from the left.
+
 - **The sliding thumb now mirrors for RTL.** It is laid out at 1px, anchored
   with `inset-inline-start` and scaled to the width of the item beneath it —
   and under `dir="rtl"` that anchor is the right edge, so both the scale origin

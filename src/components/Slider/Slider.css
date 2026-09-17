@@ -136,6 +136,20 @@
    * A single shorthand could only ever carry one.
    */
   translate: calc(var(--may-slider-pct) * (100cqi - var(--may-slider-thumb))) -50%;
+}
+
+/*
+ * The travel is mirrored, because the anchor already is.
+ *
+ * `inset-inline-start: 0` puts the thumb at the track's RIGHT edge under
+ * `dir="rtl"`, and a positive translate then pushes it further right, off the
+ * end: measured at 30%, the knob sat at 127% of the track, outside it
+ * entirely, while the fill — which is width plus a logical inset — mirrored
+ * correctly on its own. Only the thumb pairs a logical anchor with a physical
+ * translate, so only the thumb needs this.
+ */
+[dir='rtl'] .may-slider__thumb {
+  translate: calc(var(--may-slider-pct) * (100cqi - var(--may-slider-thumb)) * -1) -50%;
   scale: 1;
   transition:
     translate var(--may-duration-settle) var(--may-spring-snappy),

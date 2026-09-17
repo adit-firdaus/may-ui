@@ -603,6 +603,37 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * The Slider mirrors in both halves, not just the visible one.
+   *
+   * Its fill is width plus `inset-inline-start`, so CSS reverses that on its
+   * own. Two things did not follow. The knob pairs the same logical anchor
+   * with a PHYSICAL `translate`, so under `dir="rtl"` it was pushed off the
+   * end — measured at value 30, the knob sat at 127% of the track, outside it
+   * entirely. And the pointer-to-value mapping read left-to-right, so a click
+   * at the visually-high left end returned 9 out of 100 and threw the knob to
+   * the far side.
+   *
+   * A browser is the only place the geometry can be proved, so what is
+   * checked here is that both halves still consult direction at all.
+   */
+  [
+    'the Slider mirrors its knob travel and its pointer mapping',
+    (() => {
+      const missing = []
+      const styles = readFileSync(join(srcRoot, 'components/Slider/Slider.css'), 'utf8')
+      if (!/\[dir=['"]?rtl['"]?\][^{]*\.may-slider__thumb[^{]*\{[^}]*translate[^}]*\* -1/s.test(styles)) {
+        missing.push('no mirrored translate for the knob')
+      }
+      const source = readFileSync(join(srcRoot, 'components/Slider/Slider.tsx'), 'utf8')
+      if (!/direction === 'rtl' \? 1 - t : t/.test(source)) {
+        missing.push('the pointer mapping does not mirror')
+      }
+      return (
+        missing.length === 0 || (console.log(`\n       Slider: ${missing.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0
