@@ -56,6 +56,25 @@ export default defineConfig({
          * consumer, so the file count costs them nothing.
          */
         preserveModules: true,
+        /*
+         * Mark the entries as client modules, for React Server Components.
+         *
+         * Without this, a Next.js App Router page — a server component by
+         * default — cannot even build against this package. Proved against
+         * Next.js 15.1: `import { Button } from '@adit_firdaus/may-ui'` in a
+         * server component fails "Failed to collect page data" with
+         * `TypeError: (0, n.createContext) is not a function`, because
+         * src/config/context.tsx calls createContext at module scope and
+         * React's server build does not export it. Node reproduces it on its
+         * own with `--conditions=react-server`.
+         *
+         * The four entries are the only doors — `exports` lists no others and
+         * an unlisted path throws ERR_PACKAGE_PATH_NOT_EXPORTED — and a
+         * directive on a module puts everything it imports in the client
+         * graph, so four is sufficient. `banner` rather than a renderChunk
+         * plugin because Rollup accounts for it in the sourcemap.
+         */
+        banner: (chunk) => (chunk.isEntry ? "'use client';" : ''),
       },
     },
     sourcemap: true,

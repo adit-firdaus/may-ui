@@ -113,6 +113,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **Next.js App Router now works at all.** No entry carried a `'use client'`
+  directive, so a server component — the App Router default — could not build
+  against this package. Reproduced with Next.js 15.1: `import { Button } from
+  '@adit_firdaus/may-ui'` in `app/page.tsx` fails the build with
+  `TypeError: (0 , n.createContext) is not a function`, because
+  `src/config/context.tsx` calls `createContext` at module scope and React's
+  server build does not export it. `node --conditions=react-server` reproduces
+  it without Next at all. The four entries now open with the directive, and the
+  same app builds and prerenders — its static HTML carries `.may-root`, the
+  button's classes and its CSS. Gated in `check:provider`, for all eight entry
+  files across both formats.
+
 - **Dark mode passes the contrast tier too.** The `prefers-contrast: more`
   audit had only ever been run in light. Run in dark it reported violations in
   all three catalogues, and they shared one pairing: white on `#5EA9FF` at

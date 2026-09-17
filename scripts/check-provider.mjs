@@ -341,6 +341,33 @@ check('useMayTokens resolves default < tokens < mode', () => {
   assert.equal(read({ theme: { tokens: { blue: undefined } } }), '#007aff', 'undefined is not a value')
 })
 
+/*
+ * Every entry declares itself a client module.
+ *
+ * Without the directive a Next.js App Router page — a server component by
+ * default — cannot build against this package at all. Proved against Next.js
+ * 15.1: importing Button into a server component fails "Failed to collect
+ * page data" with `TypeError: (0, n.createContext) is not a function`,
+ * because src/config/context.tsx calls createContext at module scope and
+ * React's server build does not export it. `node --conditions=react-server`
+ * reproduces it without Next at all.
+ *
+ * It is one line of Rollup config and nothing in the library references it,
+ * so it is exactly the sort of thing a later change to output options drops
+ * silently — and the symptom lands in the consumer's build, not ours.
+ */
+check('every entry is marked a client module', () => {
+  for (const file of ['mayui.js', 'desktop.js', 'mobile.js', 'examples.js',
+                      'mayui.cjs', 'desktop.cjs', 'mobile.cjs', 'examples.cjs']) {
+    const head = readFileSync(resolve(root, 'dist', file), 'utf8').slice(0, 64)
+    assert.match(head, /^['"]use client['"];/, `${file} does not open with the directive`)
+  }
+  // Not on the leaves: the directive marks a boundary, and repeating it on
+  // every one of ~200 preserved modules is bytes for nothing.
+  const leaf = readFileSync(resolve(root, 'dist/src/components/Button/Button.js'), 'utf8')
+  assert.equal(/^['"]use client['"]/.test(leaf), false, 'leaf modules should not carry it')
+})
+
 check('ESM and CJS export the same names from every entry', () => {
   const require = createRequire(import.meta.url)
   const entries = [

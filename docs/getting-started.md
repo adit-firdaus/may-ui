@@ -182,6 +182,36 @@ Passing `error` to the `Field` is what marks the control invalid — it flips
 `aria-invalid`, swaps the description for the message and points
 `aria-describedby` at it, so the visual and announced states cannot drift apart.
 
+## Next.js App Router
+
+Every entry ships with a `'use client'` directive, so importing from this
+package is safe from anywhere — including a server component, which is the App
+Router default:
+
+```tsx
+// app/page.tsx — no directive needed here
+import { Button, MayProvider } from '@adit_firdaus/may-ui'
+
+export default function Page() {
+  return <MayProvider><Button>Continue</Button></MayProvider>
+}
+```
+
+That builds and prerenders: verified against Next.js 15.1, where the static
+output carries `.may-root`, the button's classes and its CSS, hoisted by
+React's own style resources with no stylesheet import.
+
+`MayProvider` holds React context, so put it in your root layout and let the
+tree below it be server components. The provider itself becomes a client
+boundary — that is what the directive is for — and a server component may
+still be rendered as its child.
+
+The directive is on the four entries only, not on the ~200 preserved modules
+beneath them. A directive marks a boundary and everything the module imports
+joins the client graph, so four is sufficient, and `exports` lists no other
+path: a deep import throws `ERR_PACKAGE_PATH_NOT_EXPORTED` rather than
+quietly bypassing it.
+
 ## Cascade and Tailwind
 
 May UI resources live in `@layer may-ui`. Unlayered application CSS wins over
