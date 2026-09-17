@@ -275,6 +275,55 @@ check('the package emits and exports no stylesheet', () => {
   assert.equal(existsSync(resolve(root, 'dist/mayui.css')), false)
 })
 
+/*
+ * A stateful prop comes with an uncontrolled counterpart.
+ *
+ * Five overlays plus mobile Popup used to demand `open` (or `visible`) and a
+ * close handler, so showing a dialog cost the consumer a useState and two
+ * callbacks before they could write any content — while Popover, Menu,
+ * Collapsible and Sidebar managed themselves. One library, two contracts.
+ *
+ * Read off the published types rather than the source, because the published
+ * types are what a consumer actually programs against.
+ */
+check('every controllable prop has a default counterpart', () => {
+  /*
+   * Genuinely controlled-only, with reasons:
+   *   Steps, Pagination — the consumer always has to know the step or page to
+   *     render the content beside it, so an uncontrolled one could never be
+   *     read back and would be API nobody could use.
+   *   SplitPane.size — the deprecated pixel alias; `paneSize` carries the
+   *     default and the new name.
+   */
+  const EXEMPT = new Set(['StepsProps.current', 'PaginationProps.current', 'SplitPaneProps.size'])
+  const PAIRS = { open: 'defaultOpen', visible: 'defaultVisible', collapsed: 'defaultCollapsed' }
+
+  const sources = ['dist/index.d.ts', 'dist/desktop.d.ts', 'dist/mobile.d.ts'].map((file) =>
+    readFileSync(resolve(root, file), 'utf8'),
+  )
+
+  const offenders = []
+  for (const dts of sources) {
+    // Each exported props interface, with its body up to the closing brace.
+    for (const match of dts.matchAll(/export declare interface (\w+Props)[^{]*\{([\s\S]*?)\n\}/g)) {
+      const [, name, body] = match
+      for (const [prop, fallback] of Object.entries(PAIRS)) {
+        const declared = new RegExp(`^\\s{4}${prop}\\?:`, 'm').test(body)
+        const hasDefault = new RegExp(`^\\s{4}${fallback}\\?:`, 'm').test(body)
+        if (declared && !hasDefault && !EXEMPT.has(`${name}.${prop}`)) {
+          offenders.push(`${name}.${prop} (no ${fallback})`)
+        }
+      }
+    }
+  }
+
+  assert.deepEqual(
+    [...new Set(offenders)],
+    [],
+    `controlled-only: ${[...new Set(offenders)].join(', ')} — add the default, or exempt it in check-provider.mjs with a reason`,
+  )
+})
+
 if (failures.length) {
   console.log(`\n${failures.length} provider-first contract check(s) failed`)
   process.exit(1)
