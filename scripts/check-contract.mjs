@@ -571,6 +571,38 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * The sliding thumb mirrors for RTL.
+   *
+   * The thumb is laid out at 1px, anchored with `inset-inline-start` and
+   * SCALED to the width of the item it sits under. Under `dir="rtl"` that
+   * anchor is the right edge, so both the scale origin and the sign of the
+   * translate have to flip — and scaling a 1px box about the wrong edge moves
+   * it by its whole width, not by a pixel. Measured before the fix, on a
+   * document with dir="rtl": a CapsuleTabs thumb sat one chip clear of its
+   * chip, and a Pagination thumb 331px away.
+   *
+   * Five controls share this hook, so the mirroring lives in it rather than
+   * in five sheets. Only a browser can prove the geometry, so what is checked
+   * here is that the direction is still consulted at all — deleting either
+   * half would leave RTL silently wrong again, and no other gate reads this
+   * file.
+   */
+  [
+    'the sliding thumb still mirrors itself for RTL',
+    (() => {
+      const source = readFileSync(join(srcRoot, 'motion/sliding-thumb.ts'), 'utf8')
+      const missing = []
+      if (!/direction === 'rtl'/.test(source)) missing.push('no direction read')
+      if (!/100% 50%/.test(source)) missing.push('no mirrored transform-origin')
+      if (!/rtl \? -offset : offset/.test(source)) missing.push('translate sign is not flipped')
+      if (!/t\.right - s\.right/.test(source)) missing.push('geometry is not measured from the right edge')
+      return (
+        missing.length === 0 ||
+        (console.log(`\n       sliding-thumb.ts: ${missing.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0

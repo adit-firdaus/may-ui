@@ -54,10 +54,23 @@ export function geometryFor(
 ): ThumbGeometry {
   const t = trackRect ?? track.getBoundingClientRect()
   const s = segment.getBoundingClientRect()
-  return axis === 'block'
-    ? { x: s.top - t.top, width: s.height }
+  if (axis === 'block') return { x: s.top - t.top, width: s.height }
+  /*
+   * Measured from the INLINE START edge, which is the right one in RTL.
+   *
+   * The thumb is anchored with `inset-inline-start: 0`, so its zero is the
+   * track's right edge under `dir="rtl"`. Measuring from the left there put
+   * every thumb a full track-width out; `applyThumb` negates the translate to
+   * match, and sets the transform-origin to the same edge.
+   */
+  return isRtl(track)
+    ? { x: t.right - s.right, width: s.width }
     : { x: s.left - t.left, width: s.width }
 }
+
+/** The element's resolved writing direction. */
+const isRtl = (element: HTMLElement): boolean =>
+  getComputedStyle(element).direction === 'rtl'
 
 export interface ApplyOptions {
   /** Which axis the thumb translates and stretches on. @default 'inline' */
@@ -139,10 +152,22 @@ export function applyThumb(
   const centred = x - (width * (along - 1)) / 2
   const offset = centred + overdrag
 
+  /*
+   * The origin is the inline-start edge, and in RTL that is the right one.
+   *
+   * The thumb is laid out at 1px and scaled, so scaling about the wrong edge
+   * moves it by its whole width, not by a pixel: measured under `dir="rtl"`,
+   * a CapsuleTabs thumb sat one chip clear of the chip it belonged to and a
+   * Pagination thumb 331px away. Written here rather than in each sheet so
+   * the five controls that share this cannot drift apart.
+   */
+  const rtl = axis === 'inline' && isRtl(thumb)
+  const origin = axis === 'block' ? '0 0' : rtl ? '100% 50%' : '0 50%'
+
   const transform =
     axis === 'block'
       ? `translateY(${offset}px) scaleY(${width * along}) scaleX(${cross})`
-      : `translateX(${offset}px) scaleX(${width * along}) scaleY(${cross})`
+      : `translateX(${rtl ? -offset : offset}px) scaleX(${width * along}) scaleY(${cross})`
 
   /*
    * Write only what actually changed. A style write is not free even when the
@@ -165,6 +190,7 @@ export function applyThumb(
     last.transition = transition
     thumb.style.transition = transition
   }
+  if (thumb.style.transformOrigin !== origin) thumb.style.transformOrigin = origin
   if (last.transform !== transform) {
     last.transform = transform
     thumb.style.transform = transform

@@ -122,6 +122,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **The sliding thumb now mirrors for RTL.** It is laid out at 1px, anchored
+  with `inset-inline-start` and scaled to the width of the item beneath it —
+  and under `dir="rtl"` that anchor is the right edge, so both the scale origin
+  and the sign of the translate have to flip. Scaling a 1px box about the wrong
+  edge moves it by its whole width, not by a pixel: measured on a document with
+  `dir="rtl"`, a `CapsuleTabs` thumb sat a full chip clear of the chip it
+  belonged to and a `Pagination` thumb 331px away. `Selector`, `Steps` and
+  mobile `TabBar` share the same hook and were affected too; `SegmentedControl`
+  was not, because Motion's layout projection already handles direction. Fixed
+  in the hook rather than in five sheets, and verified in both directions on a
+  real document: every thumb now lands exactly on its item.
+
 - **A second toast host now warns instead of doubling every toast.** The queue
   is module-level and each mounted host renders all of it, so a `MayProvider`
   on each of two React roots made one `toast()` call produce two identical
