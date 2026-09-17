@@ -68,13 +68,61 @@ const RouterLink = ({ href, ...props }) => <Link to={href} {...props} />
 <MayProvider linkComponent={RouterLink}>…</MayProvider>
 ```
 
-For one control, `Button`, `IconButton`, and `Fab` support `asChild`:
+For one control, `asChild` renders May's presentation onto your own element, so
+the anchor stays a real anchor — middle-click, cmd-click, open-in-new-tab and
+"copy link address" keep working, which `onClick` plus `navigate()` breaks:
 
 ```tsx
 <Button asChild>
   <Link to="/albums">Open albums</Link>
 </Button>
 ```
+
+`Button`, `IconButton`, `Fab`, `Card`, `ListRow`, `Tag`, `Avatar` and desktop
+`NavTree` support it. The child's own props win on conflict; only `className` is
+merged. A whole card or a settings row can be the link:
+
+```tsx
+<Card asChild>
+  <Link to="/albums/reykjavik">
+    <CardTitle>Reykjavík</CardTitle>
+    <CardDescription>48 photos</CardDescription>
+  </Link>
+</Card>
+
+<List>
+  <ListRow asChild title="Wi-Fi" detail="Kaffibarinn">
+    <Link to="/settings/wifi" />
+  </ListRow>
+</List>
+```
+
+## Overlays without state
+
+Every overlay manages its own open state unless you take it over. Hand it a
+`trigger` and there is nothing else to wire:
+
+```tsx
+<Modal trigger={<Button>Settings</Button>} title="Settings">
+  <Text>No useState, no handlers.</Text>
+</Modal>
+```
+
+The trigger element is cloned, so your own `onClick` still runs and the
+`aria-haspopup`, `aria-expanded` and `aria-controls` wiring is done for you.
+`Modal`, `Sheet`, `AlertDialog`, `ActionSheet`, `Popover`, `Menu` and
+`CommandPalette` all take one; `CommandPalette` needs none at all, because its
+hotkey already opens it.
+
+Pass `open` and the component stops managing anything, which is what you want
+when the state lives in a router or a store:
+
+```tsx
+<Modal open={open} onClose={() => setOpen(false)} title="Settings">…</Modal>
+```
+
+`defaultOpen` sets the starting state, and `onOpenChange` fires either way.
+`AlertDialog` closes itself once `onConfirm` has run.
 
 ## Cascade and Tailwind
 

@@ -6,6 +6,47 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ## Unreleased
 
+### Added
+
+- **Overlays own their open state.** `Modal`, `Sheet`, `AlertDialog`,
+  `ActionSheet` and `CommandPalette` take `trigger`, `defaultOpen` and
+  `onOpenChange`, so showing a dialog no longer costs a `useState` and two
+  handlers. Passing `open` still takes over completely, so every existing call
+  site is unchanged. `AlertDialog` closes itself once `onConfirm` has run.
+- **`asChild` on the interactive surfaces.** `Card`, `ListRow`, `Tag` and
+  `Avatar` join `Button`, `IconButton`, `Fab` and `NavTree`, so a card or a
+  settings row can be a real router link rather than a div with a click
+  handler — which keeps middle-click, cmd-click and "copy link address"
+  working.
+- `check:generated` fails the build when the committed `tokens.css`,
+  `motion.css` or `tokens.generated.ts` disagree with their generators. Not
+  hand-editing them was already a documented hard rule; nothing enforced it.
+- `check:docs` fails when the docs name an `npm run` script that does not exist.
+- `check:contract` rejects a `keydown` listener registered outside
+  `src/overlay`, so the layering bug below cannot come back.
+
+### Changed
+
+- **One button costs 22 kB gzipped instead of 69 kB.** Every component barrel
+  made two unannotated top-level calls, and `withMayStyles` mutated its own
+  return value, so no bundler could drop any of them and importing `Button`
+  pulled in the CSS of all 74 components. The two helpers merged into one
+  `mayStyled` and every call is annotated pure.
+- `size` is one vocabulary. Seventeen components share `Exclude<MaySize, 'xs'>`;
+  `Avatar` extends it with `'xl'` and `Modal`/`Sheet` with `'full'`. No runtime
+  values changed.
+- `SplitPane`'s pixel prop is `paneSize` / `defaultPaneSize` /
+  `onPaneSizeChange`, because `size` means a scale step everywhere else.
+  `size`, `defaultSize` and `onSizeChange` still work and are deprecated.
+- `Text` is generic over `as`, so `<Text as="a" href="…">` typechecks — it
+  previously did not.
+- Overlay mechanics live in `src/overlay`: `useOverlay`, `useDismissLayer`,
+  `useOpenState`, `overlayTrigger` and `useExitDelay`. `useExitDelay` is
+  re-exported from `Popover` for compatibility.
+- `Sheet` focuses its panel on open rather than its first focusable, matching
+  `Modal` — a first focusable is very often a destructive action, and a stray
+  Return must not land on it.
+
 ### Fixed
 
 - **Escape no longer closes two overlays at once.** `Sheet` and `Popover` each
@@ -26,23 +67,6 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 - **Screen readers can no longer read through a modal.** Open modal surfaces now
   mark the rest of the document `inert`, which removes it from the accessibility
   tree as well as from focus order. A Tab cycle only ever contained the Tab key.
-
-### Changed
-
-- Overlay mechanics moved to `src/overlay`: `useOverlay`, `useDismissLayer` and
-  `useExitDelay`. `useExitDelay` is re-exported from `Popover` for compatibility.
-- `Sheet` now focuses its panel on open rather than its first focusable, matching
-  `Modal` — a first focusable is very often a destructive action, and a stray
-  Return must not land on it.
-
-### Added
-
-- `check:generated` fails the build when the committed `tokens.css`,
-  `motion.css` or `tokens.generated.ts` disagree with their generators. Not
-  hand-editing them was already a documented hard rule; nothing enforced it.
-- `check:docs` fails when the docs name an `npm run` script that does not exist.
-- `check:contract` now rejects a `keydown` listener registered outside
-  `src/overlay`, so the layering bug above cannot come back.
 
 ## [0.2.0] — 2026-09-10
 

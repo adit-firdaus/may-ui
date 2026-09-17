@@ -175,7 +175,45 @@ Everything collapses under `prefers-reduced-motion`.
 ## Shared vocabulary
 
 - **`tone`** — `tint` · `neutral` · `success` · `warning` · `danger`
-- **`size`** — `sm` · `md` · `lg`
+- **`size`** — `sm` · `md` · `lg` (`Avatar` adds `xl`; `Modal` and `Sheet` add `full`)
+- **`asChild`** — render a component's presentation onto your own element
+- **`trigger` / `defaultOpen` / `onOpenChange`** — an overlay that owns its state
+
+## Overlays own their state
+
+Hand an overlay a `trigger` and nothing else needs wiring — no `useState`, no
+handlers:
+
+```tsx
+<Modal trigger={<Button>Settings</Button>} title="Settings">
+  <Text>The modal manages itself.</Text>
+</Modal>
+```
+
+The trigger is cloned, so your own `onClick` still runs and the
+`aria-haspopup` / `aria-expanded` / `aria-controls` wiring is done for you.
+Pass `open` and the component stops managing anything, which is what you want
+when the state lives in a router or a store. `AlertDialog` closes itself once
+`onConfirm` has run, and `CommandPalette` needs no trigger at all — its hotkey
+already opens it.
+
+## Composition
+
+`asChild` renders a component's presentation onto the element you supply, so a
+link stays a real `<a>`. `onClick` plus `navigate()` is not a substitute: it
+loses middle-click, cmd-click, open-in-new-tab, "copy link address" and
+crawlability, and hands assistive tech the wrong element.
+
+```tsx
+<Card asChild>
+  <Link to="/albums/reykjavik">
+    <CardTitle>Reykjavík</CardTitle>
+  </Link>
+</Card>
+```
+
+Supported by `Button`, `IconButton`, `Fab`, `Card`, `ListRow`, `Tag`, `Avatar`
+and desktop `NavTree`. The child's own props win; only `className` is merged.
 
 ## Forms
 
