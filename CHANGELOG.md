@@ -68,11 +68,16 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Changed
 
-- **One button costs 22 kB gzipped instead of 69 kB.** Every component barrel
-  made two unannotated top-level calls, and `withMayStyles` mutated its own
-  return value, so no bundler could drop any of them and importing `Button`
-  pulled in the CSS of all 74 components. The two helpers merged into one
-  `mayStyled` and every call is annotated pure.
+- **One button costs 6.8 kB gzipped instead of 69 kB**, foundation tokens,
+  springs and base CSS included. Two causes, both measured against a packed
+  tarball in a clean project. Every component barrel made two unannotated
+  top-level calls and `withMayStyles` mutated its own return value, so no
+  bundler could drop any of them; the two helpers merged into one `mayStyled`
+  and every call is annotated pure, which took it to 22 kB. Rollup had then
+  already grouped `Button` into one chunk with every form control and the toast
+  host, so the build preserves modules instead, which took it to 6.8 kB. The
+  whole-library figure barely moved, which is the control: a sharp drop there
+  would mean exports being shaken away.
 - `size` is one vocabulary. Seventeen components share `Exclude<MaySize, 'xs'>`;
   `Avatar` extends it with `'xl'` and `Modal`/`Sheet` with `'full'`. No runtime
   values changed.
