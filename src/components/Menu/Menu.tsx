@@ -70,7 +70,15 @@ export interface MenuItem {
  * on the inner menu, which exists only while open.
  */
 export interface MenuProps extends HTMLAttributes<HTMLSpanElement> {
-  /** The control that opens the menu. Cloned to carry the open state. */
+  /**
+   * The control that opens the menu. Cloned to carry the open state.
+   *
+   * Menus render inline rather than through a portal, so do not put one inside
+   * an ARIA-structured container — a `role="list"`, `tablist`, `radiogroup` or
+   * `menu`. The wrapper holding the trigger and panel becomes a child the
+   * container's role does not allow, which axe reports as
+   * aria-required-children. Put it beside the container instead.
+   */
   trigger: ReactNode
   items: MenuItem[]
   /** @default 'bottom-start' */

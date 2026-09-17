@@ -57,6 +57,13 @@ interface TriggerProps {
  * omitted because this component requires exactly one trigger element.
  */
 export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
+  /*
+   * Tooltips render inline rather than through a portal, so do not put one
+   * inside an ARIA-structured container — a `role="list"`, `tablist`,
+   * `radiogroup` or `menu`. The wrapper holding the trigger and panel becomes
+   * a child the container's role does not allow, which axe reports as
+   * aria-required-children. Wrap the control outside the container instead.
+   */
   /** The control being described. */
   children: ReactNode
   /** The hint. A few words — anything longer belongs in the interface. */

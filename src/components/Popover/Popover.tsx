@@ -167,7 +167,12 @@ export interface PopoverProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'rol
   /**
    * The anchor. A React element is cloned so the open state lands on the real
    * control; anything else is wrapped in a plain button, because a popover you
-   * cannot reach from the keyboard is not a popover.
+   * cannot reach from the keyboard is not a popover.   *
+   * Popovers render inline rather than through a portal, so do not put one
+   * inside an ARIA-structured container — a `role="list"`, `tablist`,
+   * `radiogroup` or `menu`. The wrapper holding the trigger and panel becomes
+   * a child the container's role does not allow, which axe reports as
+   * aria-required-children. Put it beside the container instead.
    */
   trigger: ReactNode
   children?: ReactNode
