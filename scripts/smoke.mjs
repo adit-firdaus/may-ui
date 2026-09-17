@@ -127,6 +127,23 @@ const targets = [
   ...collect(Mobile, 'mobile'),
 ]
 
+/*
+ * A target list this short means `collect` stopped finding components.
+ *
+ * Everything below is "render each one and report what broke", which reports
+ * nothing broken when there is nothing to render — it would print
+ * `rendered: 0/-1` and exit 0. The floor is well under the 92 found today, so
+ * it catches a collapse rather than a component being retired.
+ */
+const FLOOR_TARGETS = 60
+if (targets.length < FLOOR_TARGETS) {
+  console.error(
+    `smoke collected only ${targets.length} component(s), expected at least ${FLOOR_TARGETS}. ` +
+      'Nothing below is being exercised until that is fixed.',
+  )
+  process.exit(1)
+}
+
 const failures = []
 const rendered = []
 
