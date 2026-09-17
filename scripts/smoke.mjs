@@ -340,6 +340,8 @@ const assertions = [
     ['ActionSheet', () => h(Adaptive.ActionSheet, { 'data-testid': 'probe', id: 'probe-id', open: true, items: [{ label: 'a' }] })],
     ['CommandPalette', () => h(Desktop.CommandPalette, { 'data-testid': 'probe', id: 'probe-id', open: true, groups: [] })],
     ['Popup', () => h(Mobile.Popup, { 'data-testid': 'probe', id: 'probe-id', visible: true }, 'body')],
+    ['Selector', () => h(Mobile.Selector, { 'data-testid': 'probe', id: 'probe-id', options: [{ value: 'a', label: 'A' }] })],
+    ['MayProvider', () => h('div', {}, h(Adaptive.MayProvider, { 'data-testid': 'probe', id: 'probe-id' }, 'x'))],
   ].map(([name, node]) => [
     `${name} forwards data-testid and id to the DOM`,
     () => {

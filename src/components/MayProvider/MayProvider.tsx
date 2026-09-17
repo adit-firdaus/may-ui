@@ -1,4 +1,4 @@
-import type { CSSProperties, ElementType, ReactNode } from 'react'
+import type { CSSProperties, ElementType, ReactNode, HTMLAttributes } from 'react'
 import { useEffect, useId, useMemo } from 'react'
 import { cx } from '../../utils/cx'
 import { LinkComponentProvider } from '../../hooks/link'
@@ -22,7 +22,12 @@ const providerStyle = mayStyleSheet('MayProvider', providerCss)
 declare const process: { env?: { NODE_ENV?: string } } | undefined
 const isDevelopment = typeof process === 'undefined' || process.env?.NODE_ENV !== 'production'
 
-export interface MayProviderProps {
+/*
+ * Extends `HTMLAttributes` so the root element can be addressed like any
+ * other: `id`, `data-testid`, and `dir="rtl"` — which is the natural place to
+ * put it, since the provider owns the element every component inherits from.
+ */
+export interface MayProviderProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode
   theme?: MayThemeConfig
   components?: MayComponentDefaults
@@ -98,6 +103,7 @@ export function MayProvider({
   styleNonce,
   className,
   inline = false,
+  ...rest
 }: MayProviderProps) {
   const parent = useMayParentConfig()
   const depth = (parent?.depth ?? -1) + 1
@@ -158,6 +164,7 @@ export function MayProvider({
           <MayStyles sheets={[providerStyle]} />
           {rules && <style nonce={effectiveNonce}>{rules}</style>}
           <div
+            {...rest}
             data-slot="root"
             data-may-scope={scope}
             className={cx('may-root', inline && 'may-root--inline', className)}

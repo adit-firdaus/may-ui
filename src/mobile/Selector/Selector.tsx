@@ -1,4 +1,4 @@
-import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
+import type { CSSProperties, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import { useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
@@ -27,7 +27,15 @@ export type SelectorSize = Exclude<MaySize, 'xs'>
 /** A fixed column count, or `'auto'` to let items wrap at their natural width. */
 export type SelectorColumns = number | 'auto'
 
-interface SelectorBaseProps<T extends string = string> {
+/*
+ * Extends `HTMLAttributes` so a consumer can attach `data-testid`, an `id` or
+ * an extra `aria-*`, as the rest of the package allows. `onChange` and
+ * `defaultValue` are omitted because this component redefines both: the
+ * handler reports a value and its option rather than a DOM event, and the
+ * default is a value or a list of them.
+ */
+interface SelectorBaseProps<T extends string = string>
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   options: SelectorOption<T>[]
   /** @default 'card' */
   variant?: SelectorVariant
@@ -93,6 +101,19 @@ export function Selector<T extends string = string>(props: SelectorProps<T>) {
     size = 'md',
     disabled = false,
     className,
+    /*
+     * Pulled out so they do not reach the DOM, but read through `props` below
+     * rather than from here: destructuring a discriminated union widens
+     * `multiple` to boolean and loses the narrowing that pairs it with the
+     * right `value` type.
+     */
+    multiple: _multiple,
+    columns: _columns,
+    value: _value,
+    defaultValue: _defaultValue,
+    onChange: _onChange,
+    'aria-label': _ariaLabel,
+    ...rest
   } = props
 
   const multiple = props.multiple === true
@@ -221,6 +242,7 @@ export function Selector<T extends string = string>(props: SelectorProps<T>) {
 
   return (
     <div
+      {...rest}
       ref={trackRef}
       role={multiple ? 'group' : 'radiogroup'}
       aria-label={props['aria-label']}

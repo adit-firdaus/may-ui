@@ -16,13 +16,16 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   and zero violations of every other WCAG 2.1 A/AA rule in all three families.
   The exact values are documented in the README and reachable through
   `theme={{ light, dark }}` if you need AA by default.
-- **Six components now forward arbitrary props.** `Popover`, `Menu`,
-  `Tooltip`, `ActionSheet`, `CommandPalette` and mobile `Popup` had closed prop
-  types, so `data-testid`, `id` and extra `aria-*` were all refused — while
-  Modal's own comment described that set as "the things every other component
-  already allows". Each extends `HTMLAttributes` now, omitting only the props it
-  genuinely redefines: `role` on Popover, `title` on ActionSheet and Popup,
-  `children` on Tooltip, `onSelect` on CommandPalette.
+- **Eight components now forward arbitrary props.** `Popover`, `Menu`,
+  `Tooltip`, `ActionSheet`, `CommandPalette`, mobile `Popup`, mobile `Selector`
+  and `MayProvider` had closed prop types, so `data-testid`, `id` and extra
+  `aria-*` were all refused — while Modal's own comment described that set as
+  "the things every other component already allows". Each extends
+  `HTMLAttributes` now, omitting only the props it genuinely redefines: `role`
+  on Popover, `title` on ActionSheet and Popup, `children` on Tooltip,
+  `onSelect` on CommandPalette, `onChange` and `defaultValue` on Selector.
+  `dir="rtl"` on `MayProvider` is now the natural place to put it, since the
+  provider owns the element every component inherits from.
 - **`Menu` rows take any node.** `label` was the one item descriptor in the
   package still forced to a string, because type-ahead needs text to compare.
   It is `ReactNode` now, with `textValue` carrying the text for type-ahead and
