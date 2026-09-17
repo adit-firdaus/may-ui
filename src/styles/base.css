@@ -181,7 +181,16 @@
  * border-radius, so the ring hugs the capsule on its own.
  */
 .may-root :focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  /*
+   * Solid, not a 45% wash. Composited over the surfaces it actually sits on,
+   * the wash measured 1.85:1 on white and 1.78:1 on the grouped background —
+   * against the 3:1 that WCAG asks of a focus indicator. Alpha alone could
+   * not fix it: 0.8 still reads 2.83:1 on grouped, and the tint tops out at
+   * 4.02:1 white / 3.6:1 grouped even fully opaque, so full opacity is the
+   * only value with any margin. It is also what macOS draws, and it deletes
+   * a color-mix from the hottest rule in the sheet.
+   */
+  outline: 3px solid var(--may-color-ring);
   outline-offset: 2px;
 }
 

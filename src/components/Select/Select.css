@@ -100,7 +100,7 @@
 }
 
 .may-select:has(.may-select__native:focus-visible) {
-  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline: 3px solid var(--may-color-ring);
   outline-offset: 2px;
 }
 

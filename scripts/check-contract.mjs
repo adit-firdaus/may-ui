@@ -468,6 +468,40 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * The focus ring is never diluted.
+   *
+   * It was `color-mix(in srgb, var(--may-color-ring) 45%, transparent)`.
+   * Composited over the surfaces it actually sits on — the outline is offset
+   * 2px, so that is the page behind, not the control's own fill — the wash
+   * measured 1.85:1 on white and 1.78:1 on the grouped background, against
+   * the 3:1 a focus indicator is asked for. Alpha could not rescue it: 0.8
+   * still read 2.83:1 on grouped, and the tint tops out at 4.02:1 white /
+   * 3.60:1 grouped fully opaque. Solid is the only value with margin, in all
+   * four surface/mode pairs (worst 3.60:1; dark reaches 4.66 and 5.76).
+   *
+   * axe cannot find this — it does not evaluate focus-state styles — and it
+   * is invisible to anyone using a mouse, which is why a soft ring reads as
+   * a tasteful choice right up until someone has to find it.
+   */
+  [
+    'the focus ring is a solid colour, not a wash',
+    (() => {
+      const offenders = []
+      for (const match of css.matchAll(/([^{}]*)\{([^}]*)\}/g)) {
+        const selectors = match[1].split(',').filter((one) => /:focus(-visible)?\b/.test(one))
+        if (!selectors.length) continue
+        const outline = match[2].match(/(?:^|;)\s*outline\s*:([^;]*)/)
+        if (!outline) continue
+        if (!/color-mix|\btransparent\b|rgba?\(|\/\s*0?\.\d/.test(outline[1])) continue
+        offenders.push(`${selectors[0].trim().slice(-40)} {${outline[1].trim()}}`)
+      }
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       diluted focus ring: ${offenders.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0

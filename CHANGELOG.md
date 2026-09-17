@@ -106,6 +106,16 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **The focus ring is now legible.** It was the tint at 45% opacity, in
+  `base.css` and hand-rolled again in Checkbox, Radio, Select and Switch —
+  five copies of the same wash. Composited over the surfaces it sits on (the
+  outline is offset, so that is the page behind, not the control's fill) it
+  measured 1.85:1 on white and 1.78:1 on the grouped background, against the
+  3:1 asked of a focus indicator. Alpha could not fix it — 0.8 still reads
+  2.83:1 on grouped — so the ring is solid now, which measures 4.02:1 white
+  and 3.60:1 grouped in light, 4.66:1 and 5.76:1 in dark. axe cannot find
+  this, since it does not evaluate focus-state styles.
+
 - **Keyboard focus no longer squares off every rounded control.** The global
   focus rule carried `border-radius: inherit`, intended for the ring. It
   applies to the focused element, and at `.may-root :focus-visible` it

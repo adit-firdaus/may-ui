@@ -98,7 +98,7 @@
 }
 
 .may-radio__input:focus-visible + .may-radio__ring {
-  outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
+  outline: 3px solid var(--may-color-ring);
   outline-offset: 2px;
 }
 
