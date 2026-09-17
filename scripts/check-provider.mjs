@@ -427,6 +427,45 @@ check('a token value cannot carry a second declaration', () => {
   assert.match(styleOf({ controlH: 'calc(2rem + 4px)' }), /--may-user-control-h:calc\(2rem \+ 4px\)/)
 })
 
+/*
+ * A second toast host warns instead of silently doubling every toast.
+ *
+ * The queue is module-level, so each mounted host renders all of it: with a
+ * provider on each of two React roots, one `toast()` call produced two
+ * identical toasts, one per root — measured in a browser. `host={false}` on
+ * the secondary root is the documented answer, but forgetting it said
+ * nothing, and a duplicate toast reads as a bug in the consumer's own code.
+ * The zero-host case already warned; the two-host case is its mirror and did
+ * not.
+ *
+ * Driven through registerToastHost directly because effects do not run under
+ * renderToStaticMarkup, so the host can never mount in an SSR check. The
+ * warning latches after one firing, so the silent case has to be asserted
+ * first.
+ */
+await checkAsync('a second toast host warns rather than doubling the queue', async () => {
+  const { registerToastHost } = await import('../dist/src/components/Toast/Toast.js')
+  const seen = []
+  const warn = console.warn
+  console.warn = (message) => seen.push(String(message))
+  try {
+    const releaseFirst = registerToastHost()
+    await new Promise((settle) => queueMicrotask(settle))
+    assert.deepEqual(seen.filter((m) => m.includes('hosting toasts')), [], 'one host must be silent')
+
+    const releaseSecond = registerToastHost()
+    await new Promise((settle) => queueMicrotask(settle))
+    const duplicates = seen.filter((m) => m.includes('hosting toasts'))
+    assert.equal(duplicates.length, 1, `expected one warning, saw ${duplicates.length}`)
+    assert.match(duplicates[0], /host=\{false\}/)
+
+    releaseSecond()
+    releaseFirst()
+  } finally {
+    console.warn = warn
+  }
+})
+
 check('ESM and CJS export the same names from every entry', () => {
   const require = createRequire(import.meta.url)
   const entries = [

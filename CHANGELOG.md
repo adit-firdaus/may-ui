@@ -122,6 +122,15 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **A second toast host now warns instead of doubling every toast.** The queue
+  is module-level and each mounted host renders all of it, so a `MayProvider`
+  on each of two React roots made one `toast()` call produce two identical
+  toasts — measured in a browser, one per root. `host={false}` on the secondary
+  root is the documented answer, but forgetting it was silent, and a duplicate
+  toast reads as a bug in your own code. The zero-host case already warned;
+  this is its mirror. Deferred and re-checked, so a remount — StrictMode, a hot
+  reload — passing through two hosts does not warn.
+
 - **A theme token value can no longer carry a second CSS declaration.**
   Overrides land as inline custom properties on the root, which keeps a
   consumer's value out of stylesheet text — but an inline style is still a

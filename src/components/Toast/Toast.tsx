@@ -93,6 +93,7 @@ let limit = DEFAULT_LIMIT
 let sequence = 0
 let hosts = 0
 let warnedMissingHost = false
+let warnedDuplicateHost = false
 const listeners = new Set<() => void>()
 const exitTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
@@ -106,9 +107,36 @@ const isDevelopment = typeof process === 'undefined' || process.env?.NODE_ENV !=
 export function registerToastHost(): () => void {
   hosts += 1
   warnedMissingHost = false
+  warnIfDuplicated()
   return () => {
     hosts = Math.max(0, hosts - 1)
   }
+}
+
+/*
+ * Two hosts render every toast twice.
+ *
+ * The queue is module-level, so each mounted host renders all of it: with a
+ * provider on each of two React roots, one `toast()` call produced two
+ * identical toasts, one per root, and nothing said why. `host={false}` on the
+ * secondary root is the answer and is documented, but forgetting it was
+ * silent. A nested provider already warns; separate roots did not, and they
+ * are the case the option exists for.
+ *
+ * Deferred and re-checked, because a remount passes through two hosts
+ * legitimately — React's StrictMode and a hot reload both register the new
+ * host before releasing the old.
+ */
+function warnIfDuplicated(): void {
+  if (!isDevelopment || warnedDuplicateHost || hosts < 2) return
+  queueMicrotask(() => {
+    if (hosts < 2 || warnedDuplicateHost) return
+    warnedDuplicateHost = true
+    console.warn(
+      'May UI: more than one MayProvider is hosting toasts, so each one renders the ' +
+        'whole queue and every toast appears twice. Pass host={false} to all but one.',
+    )
+  })
 }
 
 function warnIfUnhosted(): void {
