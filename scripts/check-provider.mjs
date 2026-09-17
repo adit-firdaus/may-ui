@@ -297,6 +297,50 @@ check('the package emits and exports no stylesheet', () => {
  * consumer with `undefined` where a component should be, at runtime, with no
  * type error and no build warning anywhere in this repo.
  */
+/*
+ * useMayTokens() resolves the same tiers the stylesheet does.
+ *
+ * The check on the rendered provider proves the CSS carries each tier. The
+ * hook is the other half of the same contract, and it is what a consumer
+ * reads to paint their own canvas or chart to match the components — so a
+ * disagreement between the two shows up as a shade that is almost right.
+ * Worth asserting separately after `useMayTokens()` turned out to be handing
+ * back the legacy cubic-bezier for every spring.
+ */
+check('useMayTokens resolves default < tokens < mode', () => {
+  const read = (props) => {
+    let seen
+    const Probe = () => {
+      seen = May.useMayTokens().blue
+      return null
+    }
+    renderToStaticMarkup(h(May.MayProvider, props, h(Probe)))
+    return seen
+  }
+
+  assert.equal(read({}), '#007aff', 'the light default')
+  assert.equal(read({ theme: { tokens: { blue: '#common' } } }), '#common', 'common beats default')
+  assert.equal(
+    read({ theme: { tokens: { blue: '#common' }, light: { blue: '#light' } } }),
+    '#light',
+    'the mode tier beats common',
+  )
+  assert.equal(
+    read({ theme: { mode: 'dark', tokens: { blue: '#common' }, dark: { blue: '#dark' } } }),
+    '#dark',
+    'dark takes the dark tier',
+  )
+  assert.equal(
+    read({ theme: { mode: 'dark', tokens: { blue: '#common' }, light: { blue: '#light' } } }),
+    '#common',
+    'dark ignores the light tier',
+  )
+  // An optional value threaded through must not wipe the default: the provider
+  // filters undefined at the boundary, which is what keeps the plain spread in
+  // resolveTokens safe.
+  assert.equal(read({ theme: { tokens: { blue: undefined } } }), '#007aff', 'undefined is not a value')
+})
+
 check('ESM and CJS export the same names from every entry', () => {
   const require = createRequire(import.meta.url)
   const entries = [
