@@ -57,7 +57,7 @@
     }
   },
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run verify",
     "prepare": "npm run build",
     "gen:springs": "node scripts/gen-springs.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",

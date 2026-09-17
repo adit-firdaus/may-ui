@@ -11,6 +11,18 @@ npm run storybook    # the component workshop, on :6006
 npm run site         # unified website, catalog, patterns and playground
 ```
 
+## Releasing
+
+`npm publish` runs the whole gate first, not just the build — `prepublishOnly`
+is `npm run verify`, which takes about 22 seconds. It used to be `npm run
+build`, so a tree that compiled but failed a contract check, a bundle budget or
+a docs claim could be published; the gate is only worth having if the one
+command that ships the package runs it.
+
+There are no tags yet. `npm version <patch|minor|major>` creates one and
+updates `package.json`; move the `## Unreleased` heading in `CHANGELOG.md` to
+the new number in the same commit.
+
 ## The gate
 
 Before you open a PR, run:
