@@ -11,6 +11,18 @@ const options = [
   { label: 'Two', value: 'two' },
 ]
 
+/*
+ * Richer than `options` on purpose: the whole reason Combobox exists beside
+ * Select is search, several values, and rows with more than text. A preview
+ * showing two bare strings would look like a worse Select.
+ */
+const comboboxOptions = [
+  { value: 'en-US', label: 'English (U.S.)', group: 'Primary' },
+  { value: 'ja', label: '日本語', description: 'Japanese' },
+  { value: 'de', label: 'Deutsch', description: 'German' },
+  { value: 'fr', label: 'Français', description: 'French' },
+]
+
 const baseProps: Record<string, Record<string, unknown>> = {
   ActionSheet: { open: false, onClose: noop, items: [{ label: 'Copy', onSelect: noop }] },
   Alert: { title: 'A thoughtful heads-up', children: 'May UI keeps feedback concise and actionable.' },
@@ -48,6 +60,13 @@ const baseProps: Record<string, Record<string, unknown>> = {
   SearchField: { placeholder: 'Search components' },
   SegmentedControl: { options, defaultValue: 'one', 'aria-label': 'View' },
   Select: { options, defaultValue: 'one', 'aria-label': 'Choose an option' },
+  Combobox: {
+    options: comboboxOptions,
+    multiple: true,
+    defaultValue: ['en-US'],
+    placeholder: 'Add a language',
+    'aria-label': 'Languages',
+  },
   Separator: { label: 'or' },
   Sheet: { open: false, onClose: noop, title: 'Configuration' },
   Skeleton: { width: '100%' },
@@ -174,6 +193,7 @@ const copyDefaults: Record<string, Record<string, unknown>> = {
   Spinner: { label: 'Loading' },
   Skeleton: {},
   Select: { options: [{ label: 'One', value: 'one' }] },
+  Combobox: { options: comboboxOptions, defaultValue: 'ja', 'aria-label': 'Languages' },
   SegmentedControl: { options: [{ label: 'One', value: 'one' }, { label: 'Two', value: 'two' }] },
   ActionSheet: { open: true, onClose: noop, items: [{ label: 'Copy', onSelect: noop }] },
   AlertDialog: { open: true, onClose: noop, onConfirm: noop, title: 'Confirm action' },
