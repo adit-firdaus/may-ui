@@ -10,7 +10,7 @@
  * Cheap to check and it only ever fires on a real mismatch: every `npm run X`
  * written in the docs must be a script that exists.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve, relative } from 'node:path'
 
@@ -43,12 +43,47 @@ for (const file of DOCS) {
   }
 }
 
+/*
+ * Counts drift silently.
+ *
+ * The README advertised 74 components until Combobox landed and made it 75, and
+ * nothing would have caught the stale number — the same class of bug as the
+ * changelog claiming a button cost 22 kB after it had become 6.8 kB. A number
+ * in prose is a claim, and claims are checkable.
+ */
+const counted = {
+  components: ['src/components', 'src/desktop', 'src/mobile'].reduce(
+    (total, dir) => total + readdirSync(resolve(root, dir)).length,
+    0,
+  ),
+}
+
+for (const [label, actual] of Object.entries(counted)) {
+  const pattern = new RegExp(`(\\d+) ${label}\\b`)
+  for (const file of DOCS) {
+    let source
+    try {
+      source = read(file)
+    } catch {
+      continue
+    }
+    const found = source.match(pattern)
+    if (!found) continue
+    checked++
+    if (Number(found[1]) === actual) continue
+    const line = source.slice(0, found.index).split('\n').length
+    console.error(`  FAIL ${file}:${line} — says ${found[1]} ${label}, there are ${actual}`)
+    failed = true
+  }
+}
+
 if (failed) {
   console.error(`
-       Either the script was renamed and the docs were not, or the docs
-       describe something that never existed. Fix whichever is wrong.
+       A command was renamed and the docs were not, a doc describes
+       something that never existed, or a count moved when a component was
+       added. Fix whichever it is — the docs are a claim, not a comment.
 `)
   process.exit(1)
 }
 
-console.log(`  ok   ${checked} documented command(s) all exist`)
+console.log(`  ok   ${checked} documented command(s) and count(s) all check out`)
