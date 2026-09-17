@@ -30,9 +30,30 @@ contract** rather than trusting it:
 - hairlines at true device pixels; the tint/primary split intact; springs that
   are real `linear()` samples
 
-It also holds per-entry bundle budgets and fails if an exported component appears
-in no example. A regression fails the build. There are **no unit tests** — the
-verify chain plus a look in Storybook is how you show a change works.
+It also holds bundle budgets — both the published graph and, separately, what a
+consumer's bundler actually ships for a realistic import — and fails if an
+exported component appears in no example, has no catalogue preview, swallows
+arbitrary props, or declares a stateful prop with no uncontrolled counterpart. A
+regression fails the build. There are **no unit tests** — the verify chain plus a
+look in Storybook is how you show a change works.
+
+### Checking a real consumer
+
+The gate bundles with esbuild, which catches weight but not *resolution*. The
+build preserves modules, so `dist` is a tree of small files reached through the
+`exports` map — and a broken entry there fails only in a consumer's project, not
+here. After changing anything about the build, pack it and build a throwaway app
+against the tarball:
+
+```bash
+npm pack
+```
+
+Then in a scratch directory: install that tarball plus `react`, `react-dom`,
+`react-icons`, `motion` and `vite`, import something from each of the three
+entries, and run a production build. It should transform cleanly and render with
+its CSS applied — the style resources arrive through React, so unstyled output
+means the entry resolved but the runtime did not.
 
 ## Generated files
 
