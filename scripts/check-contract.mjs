@@ -13,14 +13,39 @@ import { join, relative } from 'node:path'
 const srcRoot = new URL('../src/', import.meta.url).pathname
 
 /** Every .ts/.tsx under src/, excluding stories. */
-function sources(dir = srcRoot) {
+function walk(dir) {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...sources(path))
+    if (entry.isDirectory()) out.push(...walk(path))
     else if (/\.tsx?$/.test(entry.name) && !entry.name.includes('.stories.')) out.push(path)
   }
   return out
+}
+
+/*
+ * Refuse an empty source list, for the same reason built-styles refuses an
+ * empty stylesheet: most assertions here read "no file does X", which is true
+ * of no files at all. Measured — with the walk stubbed to match nothing, 26
+ * assertions printed `ok`, and the suite only failed because one of them
+ * happens to check that it matched something.
+ *
+ * The floor is far below the real count so it catches a broken path or a
+ * changed extension filter, not growth.
+ */
+const FLOOR_SOURCES = 150
+let discovered = null
+function sources() {
+  if (discovered) return discovered
+  const found = walk(srcRoot)
+  if (found.length < FLOOR_SOURCES) {
+    throw new Error(
+      `check-contract found only ${found.length} source file(s) under ${srcRoot}, expected at least ` +
+        `${FLOOR_SOURCES}. Every source assertion below is vacuous until this is fixed.`,
+    )
+  }
+  discovered = found
+  return discovered
 }
 
 /*
