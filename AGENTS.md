@@ -37,7 +37,12 @@ without having run the gate.
 
 - **Never hand-edit `src/styles/tokens.css` or `src/styles/motion.css`.** They
   are generated. Edit `scripts/gen-tokens.mjs` / `scripts/gen-springs.mjs` and
-  run `npm run generate`.
+  run `npm run generate`. `check:generated` enforces this: the build fails when
+  the committed artifacts disagree with their generators.
+- **Dismissible surfaces go through `src/overlay`.** `useOverlay` owns the scroll
+  lock, focus handover, `inert` containment and Escape; `useDismissLayer` gives a
+  non-modal layer Escape alone. Registering a `keydown` listener on `document`
+  loses the layer race and `check:contract` rejects it.
 - **Style from tokens only** — no literal colour, spacing, radius, shadow or
   duration. If a value you need has no token, add it to the generator.
 - **No borders on controls.** Surfaces separate by value (fill + hairline), not
@@ -105,7 +110,7 @@ fix(pages): drop vite-plugin-dts from the Storybook build
 ## Commands
 
 ```bash
-npm run dev        # Vite playground
+npm run dev        # alias for npm run storybook
 npm run storybook  # component workshop
 npm run site       # unified website, catalog, patterns and playground
 npm run examples   # alias for npm run site

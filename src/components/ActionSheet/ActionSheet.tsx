@@ -4,7 +4,7 @@ import type {
   ReactNode,
   RefObject,
 } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
@@ -12,7 +12,8 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
-import { useExitDelay } from '../Popover/Popover'
+import { useExitDelay, useOverlay } from '../../overlay'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /** Matches the exit transition in ActionSheet.css. */
 const EXIT_MS = 150
@@ -54,14 +55,9 @@ export interface ActionSheetProps {
   className?: string
 }
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
 /** Gap between the anchor and the menu, and the menu's minimum viewport margin, in px. */
 const ANCHOR_GAP = 6
 const VIEWPORT_MARGIN = 8
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 interface Placement {
   top: number
@@ -93,8 +89,6 @@ export function ActionSheet({
   anchorRef,
   className,
 }: ActionSheetProps) {
-  const panelRef = useRef<HTMLDivElement>(null)
-  const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
   // `items` wins; `actions` is the deprecated spelling of the same list.
   const list = items ?? actions
@@ -110,34 +104,34 @@ export function ActionSheet({
   // never rendered as "anchored" in a frame that has no coordinates for it.
   const anchored = placement !== null
 
-  /** Every enabled row, in visual order — what the arrow keys walk. */
-  const rows = () =>
+  /**
+   * Every enabled row, in visual order — what the arrow keys walk.
+   *
+   * Annotated because `useOverlay`'s `initialFocus` calls this while `panelRef`
+   * is still being inferred from the same call, which is a cycle TypeScript
+   * cannot resolve on its own.
+   */
+  const rows = (): HTMLButtonElement[] =>
     Array.from(
       panelRef.current?.querySelectorAll<HTMLButtonElement>(
         '[data-slot="action-sheet-action"]:not(:disabled)',
       ) ?? [],
     )
 
-  useEffect(() => {
-    if (!open) return
-    restoreTo.current = document.activeElement as HTMLElement | null
-
-    // A phone action sheet is modal, so the page behind it must not scroll. The
-    // desktop menu deliberately skips the lock: it is a popover, and hiding the
-    // page's scrollbar to open a menu jolts the whole layout sideways.
-    const body = document.body
-    const previousOverflow = body.style.overflow
-    if (!menu) body.style.overflow = 'hidden'
-
-    // Menus put focus on their first item; so does the sheet, whose first row is
-    // never the destructive one — iOS always sorts destructive actions last.
-    rows()[0]?.focus()
-
-    return () => {
-      body.style.overflow = previousOverflow
-      restoreTo.current?.focus?.()
-    }
-  }, [open, menu])
+  /*
+   * `menu` mode is modal in every other respect but deliberately takes neither
+   * the scroll lock nor inert: it is a popover then, and hiding the page's
+   * scrollbar to open a menu jolts the whole layout sideways.
+   *
+   * Menus put focus on their first item; so does the sheet, whose first row is
+   * never the destructive one — iOS always sorts destructive actions last.
+   */
+  const { panelRef } = useOverlay<HTMLDivElement>({
+    open: mounted,
+    onClose,
+    modal: !menu,
+    initialFocus: () => rows()[0] ?? null,
+  })
 
   /*
    * Anchored placement. Measured with offsetWidth/offsetHeight rather than a
@@ -209,18 +203,10 @@ export function ActionSheet({
   }, [open, menu, anchorRef, list.length])
 
   /*
-   * Handled on the scrim rather than on `document`: an action sheet is very
-   * often raised from inside a Sheet or a Modal, and two overlays listening on
-   * document would both hear the same Escape — with the outer one, registered
-   * first, closing the parent out from under this one.
+   * Escape belongs to the layer stack, and containment to `inert`. What is left
+   * here is the roving arrow navigation, which is this component's own.
    */
   const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      event.stopPropagation()
-      onClose()
-      return
-    }
-
     const items = rows()
     if (items.length === 0) return
     const index = items.indexOf(document.activeElement as HTMLButtonElement)
@@ -242,18 +228,6 @@ export function ActionSheet({
       return
     }
 
-    if (event.key !== 'Tab') return
-    const nodes = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE)
-    if (!nodes || nodes.length === 0) return
-    const first = nodes[0]!
-    const last = nodes[nodes.length - 1]!
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault()
-      first.focus()
-    }
   }
 
   const onScrimDown = (event: ReactMouseEvent<HTMLDivElement>) => {

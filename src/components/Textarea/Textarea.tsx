@@ -1,8 +1,9 @@
 import type { ChangeEvent, ForwardedRef, TextareaHTMLAttributes } from 'react'
-import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { forwardRef, useCallback, useEffect, useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useFieldControl } from '../Field/Field'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 export type TextareaSize = Exclude<MaySize, 'xs'>
 
@@ -27,8 +28,6 @@ function assignRef<T>(ref: ForwardedRef<T>, node: T | null) {
   if (typeof ref === 'function') ref(node)
   else if (ref) ref.current = node
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * A multi-line text field.

@@ -230,6 +230,26 @@ const assertions = [
   }],
   ['VisuallyHidden actually hides visually', () => /may-sr-only/.test(html('VisuallyHidden', { children: 'x' }))],
   ['ScrollArea opts into the scrollbar + overscroll rules', () => /data-slot="scroll-area"/.test(html('ScrollArea', { children: 'x' }))],
+  /*
+   * A modal that announces itself must also contain focus. These only prove the
+   * markup half — that the dialog still declares itself, and that the panel the
+   * inert boundary attaches to is the one carrying `aria-modal`. The behaviour
+   * (Escape ownership, `inert`, focus handover) is not observable from SSR and
+   * is covered by `check:contract` plus driving Storybook.
+   */
+  ['CommandPalette declares a modal dialog', () => {
+    const s = html('CommandPalette')
+    return /role="dialog"[^>]*aria-modal="true"|aria-modal="true"[^>]*role="dialog"/.test(s)
+  }],
+  ['CommandPalette is still a combobox over a listbox', () => {
+    const s = html('CommandPalette')
+    return /role="combobox"/.test(s) && /role="listbox"/.test(s) && /aria-controls=/.test(s)
+  }],
+  ['ActionSheet keeps its rows addressable for the roving arrows', () =>
+    /data-slot="action-sheet-action"/.test(html('ActionSheet'))],
+  ['Text renders the element it is told to', () =>
+    /<a [^>]*href="\/x"[^>]*class="[^"]*may-text/.test(
+      renderToStaticMarkup(h(Adaptive.MayProvider, {}, h(Adaptive.Text, { as: 'a', href: '/x' }, 'link'))))],
 ]
 
 let failed = 0

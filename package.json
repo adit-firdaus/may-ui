@@ -1,7 +1,7 @@
 {
   "name": "@adit_firdaus/may-ui",
   "version": "0.2.0",
-  "description": "May UI — an Apple-native React design system with iOS design language and real spring motion.",
+  "description": "May UI \u2014 an Apple-native React design system with iOS design language and real spring motion.",
   "type": "module",
   "license": "MIT",
   "author": "Adit Firdaus <aditfirdaus.dml@gmail.com>",
@@ -70,7 +70,7 @@
     "smoke": "node scripts/smoke.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:size": "node scripts/check-size.mjs",
-    "verify": "npm run build && npm run smoke && npm run check:provider && npm run check:tokens && npm run check:contract && npm run check:size && npm run check:coverage && npm run site:build && npm run check:site",
+    "verify": "npm run build && npm run check:generated && npm run smoke && npm run check:provider && npm run check:tokens && npm run check:contract && npm run check:size && npm run check:coverage && npm run check:docs && npm run site:build && npm run check:site",
     "check:provider": "node scripts/check-provider.mjs",
     "check:contract": "node scripts/check-contract.mjs",
     "site:meta": "node scripts/gen-catalog-meta.mjs",
@@ -81,7 +81,9 @@
     "check:site": "npm run site:meta && node scripts/check-site.mjs",
     "examples": "npm run site",
     "examples:build": "npm run site:build",
-    "check:coverage": "node scripts/check-coverage.mjs"
+    "check:coverage": "node scripts/check-coverage.mjs",
+    "check:generated": "node scripts/check-generated.mjs",
+    "check:docs": "node scripts/check-docs.mjs"
   },
   "peerDependencies": {
     "react": ">=19 <20",

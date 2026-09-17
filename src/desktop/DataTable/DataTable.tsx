@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes, KeyboardEvent, MouseEvent, ReactNode } from 'react'
-import { isValidElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { isValidElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
@@ -9,6 +9,7 @@ import { Checkbox } from '../../components/Checkbox'
 import { Input } from '../../components/Input'
 import { Select } from '../../components/Select'
 import { Pagination } from '../../components/Pagination'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 /*
  * The card, the hairlines, the cell metrics and the row washes are Table's, and
  * this component renders Table's own class names to inherit all four rather
@@ -144,8 +145,6 @@ const FALLBACK_ROW_HEIGHT: Record<Exclude<MaySize, 'xs'>, number> = { sm: 36, md
  * of before it — the single most common sorting bug in a device table.
  */
 const COLLATOR = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 function resolveKey<T>(rowKey: DataTableRowKey<T>, row: T, index: number): string {
   if (typeof rowKey === 'function') return String(rowKey(row, index))
@@ -675,7 +674,7 @@ export function DataTable<T>({
   })
   const headRefs = useRef<Record<string, HTMLTableCellElement | null>>({})
   const [autoSized, setAutoSized] = useState(false)
-  const signature = columns.map((column) => column.key).join(' ')
+  const signature = columns.map((column) => column.key).join('\0')
   const sizedFor = useRef<string | null>(null)
 
   /*

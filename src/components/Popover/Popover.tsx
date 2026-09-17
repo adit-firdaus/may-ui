@@ -4,14 +4,15 @@ import {
   isValidElement,
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react'
 import { cx } from '../../utils/cx'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
+import { FOCUSABLE, useDismissLayer, useExitDelay } from '../../overlay'
 
 /** Which edge of the anchor the panel sits against. */
 export type PopoverSide = 'top' | 'bottom' | 'left' | 'right'
@@ -46,11 +47,6 @@ const ARROW_REACH = 8
 const ARROW_MARGIN = 24
 /** Matches `--may-duration-fast`; the panel stays mounted this long to animate out. */
 const EXIT_MS = 150
-
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export interface FloatingPosition {
   x: number
@@ -147,27 +143,12 @@ export function placeFloating(
   }
 }
 
-/**
- * Keeps a closed overlay mounted for the length of its exit animation.
- *
- * Unmounting the moment `open` goes false makes every dismissal instant, which
- * next to an entrance that springs reads as a glitch rather than a decision.
+/*
+ * `useExitDelay` moved to `src/overlay` — it is overlay lifetime, not popover
+ * behaviour, and Modal, Sheet, AlertDialog, ActionSheet and CommandPalette all
+ * took it from here. Re-exported so that import path keeps working.
  */
-export function useExitDelay(open: boolean, ms: number): boolean {
-  const [mounted, setMounted] = useState(open)
-
-  useEffect(() => {
-    if (open) {
-      setMounted(true)
-      return
-    }
-    if (!mounted) return
-    const timer = setTimeout(() => setMounted(false), ms)
-    return () => clearTimeout(timer)
-  }, [open, mounted, ms])
-
-  return mounted
-}
+export { useExitDelay } from '../../overlay'
 
 /** Props Popover injects into whatever element it is handed as a trigger. */
 interface TriggerProps {
@@ -342,28 +323,22 @@ export function Popover({
     [setOpen],
   )
 
+  /*
+   * The topmost dismissible layer owns Escape: without this a popover inside a
+   * Sheet would take the sheet down with it. That ordering now comes from the
+   * shared layer stack rather than from listener registration order, which is
+   * what made the old capture-phase listener lose this race to the Sheet.
+   */
+  useDismissLayer({ open, onClose: useCallback(() => requestClose(true), [requestClose]) })
+
   useEffect(() => {
     if (!open) return
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      // The topmost dismissible layer owns the key: without this a popover
-      // inside a Sheet would take the sheet down with it.
-      event.stopPropagation()
-      requestClose(true)
-    }
-
     const onPointerDown = (event: PointerEvent) => {
       if (rootRef.current?.contains(event.target as Node)) return
       requestClose(false)
     }
-
-    document.addEventListener('keydown', onKeyDown, true)
     document.addEventListener('pointerdown', onPointerDown, true)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown, true)
-      document.removeEventListener('pointerdown', onPointerDown, true)
-    }
+    return () => document.removeEventListener('pointerdown', onPointerDown, true)
   }, [open, requestClose])
 
   /* --------------------------------- focus -------------------------------- */

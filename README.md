@@ -254,7 +254,7 @@ They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a dem
 ## Development
 
 ```bash
-npm run dev          # Vite playground
+npm run dev          # alias for npm run storybook
 npm run storybook    # component workshop
 npm run site         # unified website, docs, catalog and playground
 npm run examples     # alias for npm run site
@@ -263,9 +263,13 @@ npm run build        # library build (four entries) + types
 npm run verify       # library gates plus the unified site build and contract
 ```
 
+Release notes and the 0.2.0 migration table live in
+[`CHANGELOG.md`](CHANGELOG.md).
+
 `npm run generate` regenerates `src/styles/tokens.css`,
 `src/styles/tokens.generated.ts`, and `src/styles/motion.css`. **Never edit those
-files by hand** — they are build output.
+files by hand** — they are build output, and `check:generated` fails the build
+when the committed artifacts disagree with their generators.
 
 ### The gates
 

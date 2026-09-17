@@ -1,5 +1,4 @@
-import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
-import { useEffect, useRef } from 'react'
+import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import type { MayFooterLayout } from '../../types'
@@ -7,9 +6,7 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
-/* The overlay lifetime helper lives with Popover, which is where every other
- * dismissable surface takes it from. */
-import { useExitDelay } from '../Popover/Popover'
+import { useExitDelay, useOverlay } from '../../overlay'
 
 /** Matches the exit animation in Modal.css. */
 const EXIT_MS = 150
@@ -50,9 +47,6 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   className?: string
 }
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
 /**
  * A centred dialog.
  *
@@ -81,8 +75,6 @@ export function Modal({
   className,
   ...rest
 }: ModalProps) {
-  const panelRef = useRef<HTMLDivElement>(null)
-  const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
@@ -95,63 +87,16 @@ export function Modal({
    * the scrollbar back while the panel is still animating out, and the viewport
    * narrowing under it makes the dialog's width visibly snap mid-exit. Holding
    * the lock until the tree actually unmounts keeps the geometry still.
+   *
+   * Everything else — the gutter arithmetic, focus handover, Escape ownership
+   * and inert containment — lives in `useOverlay`, so every overlay in the
+   * package agrees on it.
    */
-  useEffect(() => {
-    if (!mounted) return
-    const panel = panelRef.current
-    restoreTo.current = document.activeElement as HTMLElement | null
-
-    const body = document.body
-    const previousOverflow = body.style.overflow
-    const previousPadding = body.style.paddingRight
-    // Hiding the page's scrollbar widens the viewport by exactly its width, and
-    // the whole layout jumps sideways behind the scrim unless that width is
-    // handed back as padding. Nested overlays measure 0 here, so they add none.
-    const gutter = window.innerWidth - document.documentElement.clientWidth
-    body.style.overflow = 'hidden'
-    if (gutter > 0) body.style.paddingRight = `${gutter}px`
-
-    // Focus the dialog itself rather than its first focusable: that first
-    // focusable is very often a destructive footer action, and landing on it
-    // makes a stray Return key destructive. A consumer that wants a specific
-    // control focused marks it `autoFocus`, which React honours during commit —
-    // before this effect runs, which is why the containment check comes first.
-    if (panel && !panel.contains(document.activeElement)) panel.focus()
-
-    return () => {
-      body.style.overflow = previousOverflow
-      body.style.paddingRight = previousPadding
-      restoreTo.current?.focus?.()
-    }
-  }, [mounted])
-
-  /*
-   * Keys are handled on the scrim rather than on `document`. Both overlays in a
-   * stack would otherwise hear the same Escape, and the outer one — registered
-   * first — would win, closing the parent out from under its own child. Focus
-   * is trapped inside the panel, so every key the dialog cares about bubbles
-   * through here first, and `stopPropagation` lets the innermost one claim it.
-   */
-  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      if (!closeOnEscape) return
-      event.stopPropagation()
-      onClose()
-      return
-    }
-    if (event.key !== 'Tab') return
-    const nodes = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE)
-    if (!nodes || nodes.length === 0) return
-    const first = nodes[0]!
-    const last = nodes[nodes.length - 1]!
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault()
-      first.focus()
-    }
-  }
+  const { panelRef } = useOverlay<HTMLDivElement>({
+    open: mounted,
+    onClose,
+    closeOnEscape,
+  })
 
   const onScrimDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return
@@ -174,7 +119,6 @@ export function Modal({
       data-slot="scrim"
       data-state={open ? 'open' : 'closed'}
       onMouseDown={onScrimDown}
-      onKeyDown={onKeyDown}
     >
       <div
         ref={panelRef}

@@ -4,7 +4,6 @@ import {
   isValidElement,
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react'
@@ -16,15 +15,15 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
  * rules are the kind of decision that goes quietly wrong once two versions of
  * it exist. `useExitDelay` comes along for the same reason.
  */
-import { placeFloating, useExitDelay } from '../Popover/Popover'
+import { placeFloating } from '../Popover/Popover'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 import type { PopoverPlacement } from '../Popover/Popover'
+import { useDismissLayer, useExitDelay } from '../../overlay'
 
 /** Gap between the control and its hint, in px — `--may-space-2`. */
 const DEFAULT_OFFSET = 8
 /** Matches `--may-duration-fast`; the hint stays mounted this long to fade out. */
 const EXIT_MS = 150
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * Whether this pointer can actually hover.
@@ -162,16 +161,14 @@ export function Tooltip({
 
   /* ------------------------------- dismissal ------------------------------ */
 
-  useEffect(() => {
-    if (!open) return
-    // WCAG 2.1: content shown on hover or focus must be dismissible without
-    // moving the pointer, because a hint can cover the thing it describes.
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') hide()
-    }
-    document.addEventListener('keydown', onKeyDown, true)
-    return () => document.removeEventListener('keydown', onKeyDown, true)
-  }, [open, hide])
+  /*
+   * WCAG 2.1: content shown on hover or focus must be dismissible without
+   * moving the pointer, because a hint can cover the thing it describes.
+   *
+   * Through the shared stack, so a tip raised over an open popover takes the
+   * key from it rather than racing it.
+   */
+  useDismissLayer({ open, onClose: hide })
 
   /* -------------------------------- trigger ------------------------------- */
 

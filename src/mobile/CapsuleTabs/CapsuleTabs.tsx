@@ -1,10 +1,11 @@
 import type { HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /** A gentle puff — the chips sit close, so the pill stays inside its lane. */
 const PRESS_SCALE = 1.1
@@ -43,8 +44,6 @@ export interface CapsuleTabsProps<T extends string = string> extends Omit<HTMLAt
   /** @default 'md' */
   size?: CapsuleTabsSize
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * Bring the selected capsule into view.

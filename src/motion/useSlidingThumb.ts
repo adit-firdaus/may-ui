@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import type { PointerEvent as ReactPointerEvent, RefObject } from 'react'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { applyThumb, geometryFor, segmentAt, SETTLE_MS } from './sliding-thumb'
 import type { ThumbAxis } from './sliding-thumb'
 import { rubber } from './gesture'
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect'
 
 /**
  * The sliding-thumb gesture, as a hook.
@@ -76,8 +77,6 @@ export interface SlidingThumbApi<T extends HTMLElement, I extends HTMLElement> {
   /** Spread onto the track. Starts the gesture. */
   onPointerDown: (event: ReactPointerEvent<T>) => void
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /** Half the thumb's cross-axis extent — the radius its pill ends want. */
 const thumbRadius = (thumb: HTMLElement, axis: ThumbAxis) =>

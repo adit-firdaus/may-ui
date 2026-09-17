@@ -10,7 +10,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -21,6 +20,7 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { applyThumb, geometryFor } from '../../motion/sliding-thumb'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /**
  * `underline` is the bar that rides under the selected tab — the macOS/iPadOS
@@ -52,8 +52,6 @@ function useTabsContext(component: string): TabsContextValue {
   if (!context) throw new Error(`<${component}> must be rendered inside <Tabs>.`)
   return context
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 const tabNodes = (root: HTMLElement | null): HTMLButtonElement[] =>
   Array.from(root?.querySelectorAll<HTMLButtonElement>('[data-slot="tab"]') ?? [])

@@ -7,7 +7,7 @@ import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
-import { useExitDelay } from '../../components/Popover/Popover'
+import { useExitDelay, useOverlay } from '../../overlay'
 import { Kbd } from '../../components/Kbd'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
 
@@ -311,7 +311,6 @@ export function CommandPalette({
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  const restoreTo = useRef<HTMLElement | null>(null)
 
   const [internalQuery, setInternalQuery] = useState(defaultQuery ?? '')
   const query = queryProp ?? internalQuery
@@ -349,28 +348,17 @@ export function CommandPalette({
 
   /* ------------------------------ open lifecycle --------------------------- */
 
-  useEffect(() => {
-    if (!open) return
-    restoreTo.current = document.activeElement as HTMLElement | null
-
-    const body = document.body
-    const previousOverflow = body.style.overflow
-    const previousPadding = body.style.paddingRight
-    // Hiding the page's scrollbar widens the viewport by exactly its width, and
-    // the layout behind the scrim jumps sideways unless that width is handed
-    // back as padding.
-    const gutter = window.innerWidth - document.documentElement.clientWidth
-    body.style.overflow = 'hidden'
-    if (gutter > 0) body.style.paddingRight = `${gutter}px`
-
-    inputRef.current?.focus()
-
-    return () => {
-      body.style.overflow = previousOverflow
-      body.style.paddingRight = previousPadding
-      restoreTo.current?.focus?.()
-    }
-  }, [open])
+  /*
+   * The palette declared `aria-modal` but contained nothing: Tab walked
+   * straight out of it into the page behind the scrim, and a screen reader's
+   * virtual cursor read through it. `useOverlay` makes the rest of the document
+   * inert, which contains both.
+   */
+  const { panelRef } = useOverlay<HTMLDivElement>({
+    open,
+    onClose: () => onOpenChange(false),
+    initialFocus: () => inputRef.current,
+  })
 
   // A palette that reopens holding the last search is a palette you have to
   // clear before you can use it. Controlled callers decide for themselves.
@@ -507,10 +495,6 @@ export function CommandPalette({
         commit(match.item)
         break
       }
-      case 'Escape':
-        event.preventDefault()
-        onOpenChange(false)
-        break
       default:
         break
     }
@@ -532,6 +516,7 @@ export function CommandPalette({
       }}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={label}

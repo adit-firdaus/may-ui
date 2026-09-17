@@ -6,11 +6,12 @@ import type {
   InputHTMLAttributes,
   KeyboardEvent,
 } from 'react'
-import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { forwardRef, useRef, useState } from 'react'
 import { IoCloseCircle, IoSearch } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 export type SearchBarSize = Exclude<MaySize, 'xs'>
 
@@ -64,8 +65,6 @@ function assignRef<T>(ref: ForwardedRef<T>, node: T | null) {
   if (typeof ref === 'function') ref(node)
   else if (ref) ref.current = node
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * The search bar that sits at the head of a list.

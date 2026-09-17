@@ -4,7 +4,7 @@ import type {
   MouseEvent as ReactMouseEvent,
   ReactNode,
 } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import type { DragSample } from '../../motion/gesture'
 import { clampWithRubber, projectFlick, velocityFrom } from '../../motion/gesture'
@@ -17,6 +17,7 @@ import type { MaySize, MayTone } from '../../types'
  * unstyled button.
  */
 import { Fab } from '../../components/Fab'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /** Which edge the bubble parks on. Logical, so it mirrors under RTL. */
 export type BubbleEdge = 'start' | 'end'
@@ -49,8 +50,6 @@ export interface FloatingBubbleProps
 const SLOP = 4
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * A floating bubble that can be thrown at the edges of the display.

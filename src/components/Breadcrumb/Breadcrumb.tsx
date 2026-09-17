@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { useLinkComponent } from '../../hooks/link'
@@ -8,6 +8,7 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import type { FlipSnapshot } from '../../motion/flip'
 import { play, snapshot } from '../../motion/flip'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /** xs is absent: a crumb that small stops being a touch target. */
 export type BreadcrumbSize = Exclude<MaySize, 'xs'>
@@ -40,8 +41,6 @@ export interface BreadcrumbProps extends Omit<HTMLAttributes<HTMLElement>, 'onCl
   /** Accessible name for the trail. @default 'Breadcrumb' */
   'aria-label'?: string
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /** `index` is the crumb's position in the original trail, or -1 for the ellipsis. */
 interface Entry {

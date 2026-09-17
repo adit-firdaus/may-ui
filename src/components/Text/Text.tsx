@@ -1,5 +1,11 @@
-import type { CSSProperties, ElementType, HTMLAttributes, ReactNode } from 'react'
-import { forwardRef } from 'react'
+import type {
+  CSSProperties,
+  ComponentPropsWithoutRef,
+  ElementType,
+  HTMLAttributes,
+  ReactNode,
+  Ref,
+} from 'react'
 import { cx } from '../../utils/cx'
 import type { MayTextStyle } from '../../types'
 
@@ -16,7 +22,7 @@ export type TextWeight = 'regular' | 'medium' | 'semibold' | 'bold'
 
 export type TextAlign = 'start' | 'center' | 'end'
 
-export interface TextProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
+interface TextOwnProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
   children?: ReactNode
   /** One of Apple's 11 named text styles. @default 'body' */
   variant?: MayTextStyle
@@ -29,14 +35,26 @@ export interface TextProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
   clamp?: number
   /** Render in the monospace face, with tabular figures. */
   mono?: boolean
+}
+
+/**
+ * Generic over `as`, the same way `Box` is.
+ *
+ * `as?: ElementType` on its own types the element but not its props, so
+ * `<Text as="a" href="/x">` did not typecheck — the one idiom in the package
+ * that disagreed with `Box`, for no reason anyone chose.
+ */
+export type TextProps<E extends ElementType = 'p'> = TextOwnProps & {
   /**
    * Element to render. `p` by default because base.css keeps `p` selectable
    * while control chrome is not — body copy you cannot select is the tell in
    * the other direction. Use `span` for inline runs inside a row or a button.
    * @default 'p'
    */
-  as?: ElementType
-}
+  as?: E
+  /** React 19 passes `ref` as an ordinary prop, so no `forwardRef` is needed. */
+  ref?: Ref<Element>
+} & Omit<ComponentPropsWithoutRef<E>, keyof TextOwnProps | 'as' | 'ref'>
 
 /**
  * Every piece of non-heading copy in the system.
@@ -50,22 +68,20 @@ export interface TextProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
  * Picking `large-title` here does not make the element a heading. Use
  * `Heading` when the text is document structure; this one stays a paragraph.
  */
-export const Text = forwardRef<HTMLElement, TextProps>(function Text(
-  {
-    children,
-    variant = 'body',
-    tone = 'default',
-    weight,
-    align,
-    clamp,
-    mono = false,
-    as,
-    className,
-    style,
-    ...rest
-  },
+export function Text<E extends ElementType = 'p'>({
+  children,
+  variant = 'body',
+  tone = 'default',
+  weight,
+  align,
+  clamp,
+  mono = false,
+  as,
+  className,
+  style,
   ref,
-) {
+  ...rest
+}: TextProps<E>) {
   const Component = (as ?? 'p') as ElementType
 
   return (
@@ -88,4 +104,4 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
       {children}
     </Component>
   )
-})
+}

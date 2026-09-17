@@ -1,8 +1,9 @@
 import type { CSSProperties, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
-import { Children, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Children, useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { RUBBER_MAX, draggable, projectFlick, rubber } from '../../motion/gesture'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /**
  * `horizontal` splits the box left/right, so the divider itself is vertical.
@@ -42,8 +43,6 @@ const KEY_STEP = 16
  * enough that you feel the resistance give way before it happens.
  */
 const COLLAPSE_SLOP = RUBBER_MAX / 2
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * Two panes and a draggable divider.

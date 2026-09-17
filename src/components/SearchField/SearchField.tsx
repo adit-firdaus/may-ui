@@ -6,12 +6,13 @@ import type {
   InputHTMLAttributes,
   KeyboardEvent,
 } from 'react'
-import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { forwardRef, useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useFieldControl } from '../Field/Field'
 import { IoCloseCircle, IoSearch } from 'react-icons/io5'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 export type SearchFieldSize = Exclude<MaySize, 'xs'>
 
@@ -49,8 +50,6 @@ function assignRef<T>(ref: ForwardedRef<T>, node: T | null) {
   if (typeof ref === 'function') ref(node)
   else if (ref) ref.current = node
 }
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * The iOS search bar.

@@ -1,5 +1,5 @@
-import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
-import { useEffect, useRef } from 'react'
+import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import { useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -7,7 +7,7 @@ import { useAutoId } from '../../utils/useId'
 import { Button } from '../Button'
 /* The overlay lifetime helper lives with Popover, which is where every other
  * dismissable surface takes it from. */
-import { useExitDelay } from '../Popover/Popover'
+import { useExitDelay, useOverlay } from '../../overlay'
 
 /** Matches the exit animation in AlertDialog.css. */
 const EXIT_MS = 150
@@ -37,9 +37,6 @@ export interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   className?: string
 }
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
 /**
  * Confirm, or confirm something destructive.
  *
@@ -64,46 +61,27 @@ export function AlertDialog({
   className,
   ...rest
 }: AlertDialogProps) {
-  const panelRef = useRef<HTMLDivElement>(null)
   const confirmRef = useRef<HTMLButtonElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
-  const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
   const mounted = useExitDelay(open, reducedMotion ? 0 : EXIT_MS)
 
   /*
-   * Keyed to `mounted`, not `open`. The scroll lock hands the page's scrollbar
-   * width back as body padding; releasing it the moment `open` flips would put
-   * the scrollbar back while the panel is still animating out, and the viewport
-   * narrowing under it makes the dialog's width visibly snap mid-exit. Holding
-   * the lock until the tree actually unmounts keeps the geometry still.
+   * Keyed to `mounted`, not `open`: holding the scroll lock until the tree
+   * actually unmounts keeps the geometry still through the exit.
+   *
+   * A destructive alert opens on Cancel. A Return key pressed before the
+   * sentence has even been read must not be the one that deletes something —
+   * which is why the initial focus is passed in rather than left to the
+   * shared default.
    */
-  useEffect(() => {
-    if (!mounted) return
-    restoreTo.current = document.activeElement as HTMLElement | null
-
-    const body = document.body
-    const previousOverflow = body.style.overflow
-    const previousPadding = body.style.paddingRight
-    // Hiding the scrollbar widens the viewport by its own width; handing that
-    // width back as padding is what stops the page lurching sideways.
-    const gutter = window.innerWidth - document.documentElement.clientWidth
-    body.style.overflow = 'hidden'
-    if (gutter > 0) body.style.paddingRight = `${gutter}px`
-
-    // A destructive alert opens on Cancel. A Return key pressed before the
-    // sentence has even been read must not be the one that deletes something.
-    const initial = destructive ? cancelRef.current : confirmRef.current
-    initial?.focus()
-
-    return () => {
-      body.style.overflow = previousOverflow
-      body.style.paddingRight = previousPadding
-      restoreTo.current?.focus?.()
-    }
-  }, [mounted, destructive])
+  const { panelRef } = useOverlay<HTMLDivElement>({
+    open: mounted,
+    onClose: onCancel,
+    initialFocus: () => (destructive ? cancelRef.current : confirmRef.current),
+  })
 
   /**
    * Restart the nudge from zero. Setting the attribute again while the
@@ -116,31 +94,6 @@ export function AlertDialog({
     panel.removeAttribute('data-nudge')
     void panel.offsetWidth
     panel.setAttribute('data-nudge', 'true')
-  }
-
-  /*
-   * Keys are handled here rather than on `document`, so an alert raised from
-   * inside a sheet or a modal claims its own Escape instead of letting the
-   * outer overlay — which registered its listener first — close them both.
-   */
-  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      event.stopPropagation()
-      onCancel()
-      return
-    }
-    if (event.key !== 'Tab') return
-    const nodes = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE)
-    if (!nodes || nodes.length === 0) return
-    const first = nodes[0]!
-    const last = nodes[nodes.length - 1]!
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault()
-      first.focus()
-    }
   }
 
   const onScrimDown = (event: ReactMouseEvent<HTMLDivElement>) => {
@@ -160,7 +113,6 @@ export function AlertDialog({
       data-slot="scrim"
       data-state={open ? 'open' : 'closed'}
       onMouseDown={onScrimDown}
-      onKeyDown={onKeyDown}
     >
       <div
         ref={panelRef}

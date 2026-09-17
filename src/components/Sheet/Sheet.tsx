@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import type { MayFooterLayout } from '../../types'
@@ -7,9 +7,7 @@ import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
 import { clampWithRubber, draggable, projectFlick } from '../../motion/gesture'
-/* The overlay lifetime helper lives with Popover, which is where every other
- * dismissable surface takes it from. */
-import { useExitDelay } from '../Popover/Popover'
+import { useExitDelay, useOverlay } from '../../overlay'
 
 /** Matches the exit transition in Sheet.css. */
 const EXIT_MS = 150
@@ -54,9 +52,6 @@ export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   className?: string
 }
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
 /** Past this fraction of its own height, releasing dismisses rather than snapping back. */
 const DISMISS_RATIO = 0.35
 /** A decisive downward flick dismisses even from near the top. */
@@ -89,8 +84,6 @@ export function Sheet({
   className,
   ...rest
 }: SheetProps) {
-  const panelRef = useRef<HTMLDivElement>(null)
-  const restoreTo = useRef<HTMLElement | null>(null)
   const id = useAutoId()
   const isDesktop = useIsDesktop()
   const reducedMotion = useReducedMotion()
@@ -101,43 +94,21 @@ export function Sheet({
   // and a closed sheet has no footer to keep above the keys.
   useKeyboardInset(open)
 
-  const onKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.stopPropagation()
-        onClose()
-        return
-      }
-      if (event.key !== 'Tab') return
-      const nodes = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE)
-      if (!nodes || nodes.length === 0) return
-      const first = nodes[0]!
-      const last = nodes[nodes.length - 1]!
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    },
-    [onClose],
-  )
-
-  useEffect(() => {
-    if (!open) return
-    restoreTo.current = document.activeElement as HTMLElement | null
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.addEventListener('keydown', onKeyDown, true)
-    const target = panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ?? panelRef.current
-    target?.focus()
-    return () => {
-      document.removeEventListener('keydown', onKeyDown, true)
-      document.body.style.overflow = previousOverflow
-      restoreTo.current?.focus?.()
-    }
-  }, [open, onKeyDown])
+  /*
+   * Keyed to `mounted`, not `open`. Releasing the scroll lock and handing focus
+   * back the moment `open` flips does it at the START of the exit animation:
+   * the scrollbar returns, the viewport narrows under a panel that is still on
+   * screen, and its width snaps mid-dismiss.
+   *
+   * Escape is the layer stack's now. This component used to register a
+   * CAPTURE-phase listener on `document`, which beat every nested layer to the
+   * key regardless of what was on top — a Popover opened inside a Sheet took
+   * the Sheet down with it.
+   */
+  const { panelRef } = useOverlay<HTMLDivElement>({
+    open: mounted,
+    onClose,
+  })
 
   /* Drag-to-dismiss. The phone sheet only — a centred dialog has no edge to
    * drag from, and an edge drawer's axis is horizontal, so a downward drag

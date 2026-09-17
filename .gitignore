@@ -21,3 +21,6 @@ bun.lock
 .design-sync/node_modules
 .ds-sync/
 ds-bundle/
+
+# packed tarballs from local bundle-weight checks
+*.tgz

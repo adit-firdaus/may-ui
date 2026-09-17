@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Sheet } from '.'
 import { Button } from '../Button'
 import { List, ListRow } from '../List'
+import { Popover } from '../Popover'
 
 const meta = {
   title: 'Catalog/Adaptive/Sheet',
@@ -96,6 +97,46 @@ export const NotDismissible: Story = {
             </>
           }
         />
+      </>
+    )
+  },
+}
+
+/**
+ * A Popover raised from inside a Sheet — the case that used to close both.
+ *
+ * Sheet and Popover each registered a CAPTURE-phase `keydown` on `document`.
+ * Listeners on the same node fire in registration order, and `stopPropagation`
+ * does not suppress a sibling on that node, so the Sheet — having opened first
+ * — always heard Escape first and took itself down along with the popover.
+ *
+ * Press Escape with the popover open: the popover closes, the sheet stays.
+ * Press it again and the sheet closes. Dismissal unwinds one layer at a time.
+ */
+export const NestedDismissal: Story = {
+  render: () => {
+    const [open, setOpen] = useState(false)
+    return (
+      <>
+        <Button onClick={() => setOpen(true)}>Open sheet</Button>
+        <Sheet open={open} onClose={() => setOpen(false)} title="Nested dismissal">
+          <List>
+            <ListRow title="Escape closes the popover first" />
+            <ListRow title="Escape again closes the sheet" />
+          </List>
+          <Popover
+            placement="top"
+            trigger={
+              <Button data-testid="open-popover" variant="tinted">
+                Open popover
+              </Button>
+            }
+          >
+            <Button data-testid="inside-popover" size="sm">
+              Inside the popover
+            </Button>
+          </Popover>
+        </Sheet>
       </>
     )
   },

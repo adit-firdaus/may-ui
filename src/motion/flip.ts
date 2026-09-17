@@ -13,6 +13,18 @@ export interface FlipOptions {
   /** A curve token such as `var(--may-spring-bouncy)`. */
   easing?: string
   onFinish?: () => void
+  /**
+   * Collapse the animation to a single frame.
+   *
+   * This module is public through `export * as motion`, and a consumer calling
+   * `motion.flip` should not have to remember the media query to respect a
+   * system setting. `useReducedMotion()` is the value to pass; `sliding-thumb`
+   * takes the same option for the same reason.
+   *
+   * Collapsed rather than skipped, so `onFinish` still runs and a caller that
+   * cleans up after the animation is not left waiting on it forever.
+   */
+  reducedMotion?: boolean
 }
 
 export type FlipSnapshot = Map<Element, DOMRect>
@@ -31,9 +43,15 @@ export function snapshot(elements: Iterable<Element>): FlipSnapshot {
 export function play(
   elements: Iterable<Element>,
   first: FlipSnapshot,
-  { duration = 340, easing = 'var(--may-spring-smooth)', onFinish }: FlipOptions = {},
+  {
+    duration = 340,
+    easing = 'var(--may-spring-smooth)',
+    onFinish,
+    reducedMotion = false,
+  }: FlipOptions = {},
 ): Animation[] {
   const animations: Animation[] = []
+  if (reducedMotion) duration = 1
 
   for (const el of elements) {
     const before = first.get(el)

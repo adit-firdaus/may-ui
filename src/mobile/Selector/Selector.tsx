@@ -1,15 +1,14 @@
 import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import { IoCheckmark } from 'react-icons/io5'
 import type { MaySize } from '../../types'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 
 /** The pill lifts under the press, matching the chip family elsewhere. */
 const PRESS_SCALE = 1.1
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export interface SelectorOption<T extends string = string> {
   /** Primary line. */

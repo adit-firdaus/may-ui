@@ -5,12 +5,14 @@ import type {
   ReactNode,
   RefObject,
 } from 'react'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { IoCheckmark, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { Kbd } from '../../components/Kbd'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
+import { useDismissLayer } from '../../overlay'
 /* Kbd arrives as a module, so its stylesheet comes with it. */
 
 /** Matches the exit transition in ContextMenu.css. */
@@ -80,8 +82,6 @@ const SUBMENU_OPEN_DELAY = 110
 
 /** And waits again before closing, so crossing the gap into it is forgiving. */
 const SUBMENU_CLOSE_DELAY = 260
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 const isAction = (entry: ContextMenuEntry): entry is ContextMenuAction =>
   entry.type !== 'separator' && entry.type !== 'label'
@@ -611,6 +611,14 @@ export function ContextMenu({
     restoreTo.current?.focus?.()
   }
 
+  /*
+   * A fallback for the case where the panel never took focus, so its own
+   * handler never sees the key. Through the shared layer stack rather than a
+   * bare `document` listener, so a menu opened over another dismissible layer
+   * unwinds one level at a time instead of racing it.
+   */
+  useDismissLayer({ open: Boolean(anchor), onClose: close })
+
   const open = (event: ReactMouseEvent<HTMLDivElement>) => {
     onContextMenu?.(event)
     // A consumer that called preventDefault has said it handled the gesture.
@@ -639,15 +647,6 @@ export function ContextMenu({
       }
     }
     /*
-     * A fallback for the case where the panel never took focus, so its own
-     * handler never sees the key. The panel stops propagation for the keys it
-     * handles, which is what keeps a nested menu unwinding one level at a time
-     * rather than vanishing whole.
-     */
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close()
-    }
-    /*
      * A fixed panel does not follow the element it was opened over, so once
      * that element moves the menu is pointing at nothing. Capture, because the
      * scroll may happen in any ancestor rather than on the window — and skip
@@ -658,13 +657,11 @@ export function ContextMenu({
     }
 
     document.addEventListener('pointerdown', onPointerDown, true)
-    document.addEventListener('keydown', onKeyDown)
     window.addEventListener('resize', close)
     window.addEventListener('scroll', onScroll, true)
 
     return () => {
       document.removeEventListener('pointerdown', onPointerDown, true)
-      document.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('resize', close)
       window.removeEventListener('scroll', onScroll, true)
     }

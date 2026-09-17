@@ -7,7 +7,43 @@
  * quietly shipping.
  */
 import { builtCss as css } from './built-styles.mjs'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
+import { join, relative } from 'node:path'
+
+const srcRoot = new URL('../src/', import.meta.url).pathname
+
+/** Every .ts/.tsx under src/, excluding stories. */
+function sources(dir = srcRoot) {
+  const out = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) out.push(...sources(path))
+    else if (/\.tsx?$/.test(entry.name) && !entry.name.includes('.stories.')) out.push(path)
+  }
+  return out
+}
+
+/*
+ * Dismissal must go through the shared layer stack.
+ *
+ * Sheet and Popover each used to register a CAPTURE-phase `keydown` on
+ * `document`. Two listeners on the same node fire in registration order, and
+ * `stopPropagation` does not suppress a sibling on that node — so the Sheet,
+ * having opened first, always heard Escape first and a Popover inside it took
+ * the Sheet down too. `src/overlay/layers.ts` answers "who is on top" directly
+ * instead of inferring it from listener order; this keeps everyone on it.
+ *
+ * Two global hotkeys are legitimately not dismissals and stay exempt: the
+ * palette's own ⌘K toggle, and Kbd, which paints whichever key is held.
+ */
+const KEYDOWN_EXEMPT = ['desktop/CommandPalette/CommandPalette.tsx', 'components/Kbd/Kbd.tsx']
+const rogueKeydown = sources()
+  .filter((file) => {
+    const rel = relative(srcRoot, file)
+    if (rel.startsWith('overlay/') || KEYDOWN_EXEMPT.includes(rel)) return false
+    return /addEventListener\(\s*['"]keydown['"]/.test(readFileSync(file, 'utf8'))
+  })
+  .map((file) => relative(srcRoot, file))
 
 /** Strip every @media (hover: hover) block, so what remains is unguarded. */
 function stripHoverGuards(source) {
@@ -198,6 +234,11 @@ const checks = [
     !/box-shadow\s+\$\{TINT_MS\}/.test(thumbRuntime) &&
       !/transition:/.test(segmentedCss) &&
       /transition:\s*opacity\s+var\(--may-duration-fast\)\s+var\(--may-ease-out\)/.test(segmentedLabel),
+  ],
+  [
+    'overlay dismissal goes through the shared layer stack',
+    rogueKeydown.length === 0 ||
+      (console.log(`\n       registers its own keydown: ${rogueKeydown.join(', ')}`), false),
   ],
   [
     'element resets cannot out-specify the components they paint over',

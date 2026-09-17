@@ -1,8 +1,9 @@
 # May UI
 
 > Apple's design language as a React library — iOS/macOS shapes, real spring
-> physics compiled to CSS linear(), a --may-* token layer, and no runtime
-> dependencies beyond React. Published on npm as @adit_firdaus/may-ui.
+> physics compiled to CSS linear(), a --may-* token layer, and two focused
+> runtime dependencies: react-icons for glyphs and motion for SegmentedControl's
+> layout projection. Published on npm as @adit_firdaus/may-ui.
 
 ## Docs
 
