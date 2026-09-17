@@ -168,10 +168,21 @@
   outline: none;
 }
 
+/*
+ * No `border-radius` here. The rule carried `border-radius: inherit`, which
+ * applies to the FOCUSED element, not to the ring — and at `.may-root
+ * :focus-visible` it outranked the component's own radius. Tabbing to a pill
+ * Button inside a square container therefore set the button's radius to that
+ * container's 0, so every capsule in the system squared off the instant a
+ * keyboard user reached it. Only keyboard users ever saw it, and no gate
+ * looks at a computed radius.
+ *
+ * Nothing is lost by dropping it: `outline` already follows the element's own
+ * border-radius, so the ring hugs the capsule on its own.
+ */
 .may-root :focus-visible {
   outline: 3px solid color-mix(in srgb, var(--may-color-ring) 45%, transparent);
   outline-offset: 2px;
-  border-radius: inherit;
 }
 
 /* ------------------------------------------------------------------ *

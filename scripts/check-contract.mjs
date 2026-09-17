@@ -436,6 +436,38 @@ const checks = [
     overreachingResets.length === 0 ||
       (console.log(`\n       offending selector(s): ${overreachingResets.join(', ')}`), false),
   ],
+  /*
+   * A focus rule never inherits a radius.
+   *
+   * base.css had `border-radius: inherit` in `.may-root :focus-visible`,
+   * meant for the ring. It applies to the FOCUSED ELEMENT, and at that
+   * specificity it outranked the component's own radius — so tabbing to a
+   * pill Button inside a square container set the button's radius to that
+   * container's 0, and every capsule in the system squared off the moment a
+   * keyboard user reached it. Measured in a browser: 9999px before focus,
+   * 0px under a real Tab.
+   *
+   * Only keyboard users ever saw it. No gate reads a computed radius, axe
+   * does not look at shape, and a screenshot of a mouse-driven page cannot
+   * show it. `inherit` is the whole fault, so that is what this rejects — a
+   * skip link revealing itself on focus sets an explicit radius, and should.
+   */
+  [
+    'no focus rule inherits its border-radius',
+    (() => {
+      const offenders = []
+      for (const match of css.matchAll(/([^{}]*)\{([^}]*)\}/g)) {
+        const selectors = match[1].split(',').filter((one) => /:focus(-visible|-within)?\b/.test(one))
+        if (!selectors.length) continue
+        if (!/border-radius\s*:\s*inherit/.test(match[2])) continue
+        offenders.push(selectors[0].trim().slice(-48))
+      }
+      return (
+        offenders.length === 0 ||
+        (console.log(`\n       focus rule inherits a radius: ${offenders.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0

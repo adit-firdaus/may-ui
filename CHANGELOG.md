@@ -106,6 +106,20 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **Keyboard focus no longer squares off every rounded control.** The global
+  focus rule carried `border-radius: inherit`, intended for the ring. It
+  applies to the focused element, and at `.may-root :focus-visible` it
+  outranked each component's own radius — so tabbing to a pill `Button` inside
+  a square container set the button's radius to that container's `0`. Measured
+  in a browser: `9999px` before focus, `0px` under a real Tab press. Only
+  keyboard users ever saw it. The declaration is gone; `outline` already
+  follows the element's own radius, so the ring still hugs the capsule.
+- **`SegmentedControl` accepts DOM attributes.** Its props interface extended
+  nothing, so the `...rest` it spreads onto its root was typed `{}` and `id`,
+  `aria-describedby` and `data-testid` were type errors. It extends
+  `HTMLAttributes<HTMLDivElement>` now, minus the four props Motion redefines
+  on that element.
+
 - **`useMayTokens()` returned the legacy curve for every spring and ease.**
   `motion.css` declares each spring twice — the real `linear()` samples in
   `:root`, and a `cubic-bezier` stand-in inside
