@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 
 export interface ListProps extends HTMLAttributes<HTMLDivElement> {
@@ -65,6 +66,17 @@ export interface ListRowProps extends Omit<HTMLAttributes<HTMLElement>, 'title' 
   accessory?: ReactNode
   /** Makes the row activatable. Renders a real `<button>`. */
   onClick?: () => void
+  /**
+   * Render the row's presentation onto its child instead of a `<button>` —
+   * the way to make a settings row a router `<Link>` without losing the anchor,
+   * and with it middle-click, cmd-click and "copy link address".
+   *
+   * The child's own props win; `className` is merged. Pass the row's content
+   * through `title`/`subtitle` as usual and give the child no children of its
+   * own — they would be replaced by the row's.
+   * @default false
+   */
+  asChild?: boolean
   /** Show the disclosure chevron. Defaults to true when `onClick` is set. */
   chevron?: boolean
   /** Tint the title, for destructive rows like "Delete Account". */
@@ -86,6 +98,8 @@ export function ListRow({
   detail,
   accessory,
   onClick,
+  asChild = false,
+  children,
   chevron,
   align = 'center',
   destructive = false,
@@ -93,7 +107,8 @@ export function ListRow({
   className,
   ...rest
 }: ListRowProps) {
-  const interactive = Boolean(onClick)
+  // `asChild` is activatable by definition: the child is the control.
+  const interactive = Boolean(onClick) || asChild
   const showChevron = chevron ?? (interactive && !accessory)
   const { pressProps } = usePressFeedback(disabled || !interactive)
 
@@ -120,6 +135,20 @@ export function ListRow({
     role: 'listitem',
   }
 
+  if (asChild) {
+    return renderAsChild(
+      children,
+      {
+        ...rest,
+        ...shared,
+        ...pressProps,
+        onClick,
+        'aria-disabled': disabled || undefined,
+      },
+      () => content,
+    )
+  }
+
   if (!interactive) {
     return (
       <div {...rest} {...shared}>
@@ -127,6 +156,7 @@ export function ListRow({
       </div>
     )
   }
+
 
   return (
     <button

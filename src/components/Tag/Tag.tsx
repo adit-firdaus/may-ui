@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayTone } from '../../types'
 
@@ -8,6 +9,15 @@ import type { MaySize, MayTone } from '../../types'
 export type TagSize = Exclude<MaySize, 'xs'>
 
 export interface TagProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'onClick'> {
+  /**
+   * Render this component's presentation onto its child instead of its own
+   * element — the way to make it a router `<Link>` without losing the anchor,
+   * and with it middle-click, cmd-click and "copy link address".
+   *
+   * The child's own props win on conflict; `className` is merged.
+   * @default false
+   */
+  asChild?: boolean
   children?: ReactNode
   /** @default 'neutral' */
   tone?: MayTone
@@ -33,6 +43,7 @@ export interface TagProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'onClick
  */
 export function Tag({
   children,
+  asChild = false,
   tone = 'neutral',
   size = 'md',
   onRemove,
@@ -44,6 +55,26 @@ export function Tag({
   const { pressProps } = usePressFeedback(!onRemove)
   const label =
     removeLabel ?? (typeof children === 'string' ? `Remove ${children}` : 'Remove')
+
+  const shared = {
+    'data-slot': 'tag' as const,
+    'data-tone': tone,
+    'data-size': size,
+    className: cx('may-tag', asChild && 'may-hoverable may-pressable', className),
+  }
+
+  if (asChild) {
+    return renderAsChild(children, { ...rest, ...shared }, (kids) => (
+      <>
+        {leadingIcon && (
+          <span className="may-tag__icon" aria-hidden>
+            {leadingIcon}
+          </span>
+        )}
+        {kids}
+      </>
+    ))
+  }
 
   return (
     <span

@@ -247,6 +247,26 @@ const assertions = [
   }],
   ['ActionSheet keeps its rows addressable for the roving arrows', () =>
     /data-slot="action-sheet-action"/.test(html('ActionSheet'))],
+  /*
+   * asChild must yield the consumer's own element, not a div wearing its
+   * classes. The whole reason it exists is that onClick + navigate() loses
+   * middle-click, cmd-click, "copy link address" and crawlability, so a
+   * regression here is invisible in a screenshot and obvious to a user.
+   */
+  ...[
+    ['Button', () => h(Adaptive.Button, { asChild: true }, h('a', { href: '/x' }, 'Go'))],
+    ['IconButton', () => h(Adaptive.IconButton, { asChild: true, 'aria-label': 'Go' }, h('a', { href: '/x' }, '!'))],
+    ['Card', () => h(Adaptive.Card, { asChild: true }, h('a', { href: '/x' }, 'Card'))],
+    ['ListRow', () => h(Adaptive.List, {}, h(Adaptive.ListRow, { asChild: true, title: 'Wi-Fi' }, h('a', { href: '/x' })))],
+    ['Tag', () => h(Adaptive.Tag, { asChild: true }, h('a', { href: '/x' }, 'swift'))],
+    ['Avatar', () => h(Adaptive.Avatar, { asChild: true, name: 'Ada Lovelace' }, h('a', { href: '/x' }))],
+  ].map(([name, node]) => [
+    `${name} asChild renders the caller's own <a>, styled`,
+    () => {
+      const s = renderToStaticMarkup(h(Adaptive.MayProvider, {}, node()))
+      return /<a [^>]*href="\/x"/.test(s) && /<a [^>]*class="[^"]*may-/.test(s) && !/<button/.test(s)
+    },
+  ]),
   ['Text renders the element it is told to', () =>
     /<a [^>]*href="\/x"[^>]*class="[^"]*may-text/.test(
       renderToStaticMarkup(h(Adaptive.MayProvider, {}, h(Adaptive.Text, { as: 'a', href: '/x' }, 'link'))))],

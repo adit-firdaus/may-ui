@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 
 /**
@@ -27,6 +28,15 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, 'onClick'> 
    * `<button>` element. Implied by `onClick`.
    */
   interactive?: boolean
+  /**
+   * Render this component's presentation onto its child instead of its own
+   * element — the way to make it a router `<Link>` without losing the anchor,
+   * and with it middle-click, cmd-click and "copy link address".
+   *
+   * The child's own props win on conflict; `className` is merged.
+   * @default false
+   */
+  asChild?: boolean
   onClick?: () => void
   disabled?: boolean
 }
@@ -41,6 +51,7 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, 'onClick'> 
  */
 export function Card({
   children,
+  asChild = false,
   variant = 'elevated',
   padding = 'md',
   interactive,
@@ -49,7 +60,8 @@ export function Card({
   className,
   ...rest
 }: CardProps) {
-  const activatable = Boolean(interactive ?? onClick)
+  // asChild makes the child the control, so the card is activatable either way.
+  const activatable = Boolean(interactive ?? onClick) || asChild
   const { pressProps } = usePressFeedback(disabled || !activatable)
 
   const shared = {
@@ -62,6 +74,14 @@ export function Card({
       activatable && 'may-hoverable',
       className,
     ),
+  }
+
+  if (asChild) {
+    return renderAsChild(
+      children,
+      { ...rest, ...shared, ...pressProps, onClick, 'aria-disabled': disabled || undefined },
+      (kids) => kids,
+    )
   }
 
   // A div with onClick is invisible to keyboard and switch-access users, so an

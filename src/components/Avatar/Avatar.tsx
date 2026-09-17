@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, isValidElement, useEffect, useState } from 'react'
 import { IoPerson } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
+import { renderAsChild } from '../../utils/asChild'
 import type { MaySize } from '../../types'
 
 /** xs–xl. `md` is exactly one touch target; the rest are proportions of it. */
@@ -19,6 +20,15 @@ const HUES = ['blue', 'indigo', 'purple', 'pink', 'teal', 'green', 'orange', 'gr
 export type AvatarHue = (typeof HUES)[number]
 
 export interface AvatarProps extends HTMLAttributes<HTMLSpanElement> {
+  /**
+   * Render the avatar's presentation onto its child instead of a `<span>` — an
+   * avatar that links to a profile is a link, not a span with a handler.
+   *
+   * The child's own props win on conflict; `className` is merged. Give the
+   * child no children of its own; the avatar supplies them.
+   * @default false
+   */
+  asChild?: boolean
   /** Drives both the initials and — deterministically — the fallback colour. */
   name?: string
   src?: string
@@ -73,6 +83,8 @@ function hueFor(seed: string): AvatarHue {
  * that 404s must not leave a hole in the row.
  */
 export function Avatar({
+  asChild = false,
+  children,
   name,
   src,
   alt,
@@ -97,34 +109,43 @@ export function Avatar({
   // whichever of the two elements — root or img — actually carries it.
   const label = alt ?? name ?? ariaLabel
 
+  const shared = {
+    'data-slot': 'avatar' as const,
+    'data-size': size,
+    'data-shape': shape,
+    'data-hue': !showImage && initials ? (hue ?? hueFor(name ?? '')) : undefined,
+    role: !showImage && label ? ('img' as const) : undefined,
+    'aria-label': !showImage && label ? label : undefined,
+    className: cx('may-avatar', asChild && 'may-hoverable', className),
+  }
+
+  /* One body for both paths: the image/initials/glyph cascade is the avatar,
+   * and a second copy of it inside the asChild branch is how the two drift. */
+  const inner = showImage ? (
+    <img
+      className="may-avatar__image"
+      src={src}
+      alt={label ?? ''}
+      draggable={false}
+      onError={() => setBroken(true)}
+    />
+  ) : initials ? (
+    <span className="may-avatar__initials" aria-hidden>
+      {initials}
+    </span>
+  ) : (
+    <span className="may-avatar__glyph" aria-hidden>
+      {fallback ?? <IoPerson aria-hidden focusable="false" />}
+    </span>
+  )
+
+  if (asChild) {
+    return renderAsChild(children, { ...rest, ...shared }, () => inner)
+  }
+
   return (
-    <span
-      {...rest}
-      data-slot="avatar"
-      data-size={size}
-      data-shape={shape}
-      data-hue={!showImage && initials ? (hue ?? hueFor(name ?? '')) : undefined}
-      role={!showImage && label ? 'img' : undefined}
-      aria-label={!showImage && label ? label : undefined}
-      className={cx('may-avatar', className)}
-    >
-      {showImage ? (
-        <img
-          className="may-avatar__image"
-          src={src}
-          alt={label ?? ''}
-          draggable={false}
-          onError={() => setBroken(true)}
-        />
-      ) : initials ? (
-        <span className="may-avatar__initials" aria-hidden>
-          {initials}
-        </span>
-      ) : (
-        <span className="may-avatar__glyph" aria-hidden>
-          {fallback ?? <IoPerson aria-hidden focusable="false" />}
-        </span>
-      )}
+    <span {...rest} {...shared}>
+      {inner}
     </span>
   )
 }
