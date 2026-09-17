@@ -154,6 +154,35 @@ const iconsInAll = contributionOf(everything.metafile, /node_modules\/react-icon
 const iconBytes = iconsInAll.reduce((total, { bytes }) => total + bytes, 0)
 const ICON_CEILING = 16 * 1024
 
+/*
+ * Prove the measurement can find things before trusting that it found none.
+ *
+ * Three assertions below are of the form "nothing matching X contributes
+ * bytes", and all three pass if `contributionOf` returns nothing for any
+ * reason — a renamed metafile field, a changed esbuild output shape, a
+ * pattern that no longer matches the paths. This file's own header records
+ * two earlier versions of exactly that mistake, so the controls are asserted
+ * rather than assumed.
+ *
+ * Each control reuses a metafile already built: the whole-entry bundle must
+ * contain Motion (SegmentedControl imports it), icon modules, and component
+ * modules — the last standing in for the `src/` pattern the examples check
+ * uses.
+ */
+const controls = [
+  ['Motion', contributionOf(everything.metafile, /node_modules\/(motion|framer-motion)\//)],
+  ['icon', iconsInAll],
+  ['component', contributionOf(everything.metafile, /src\/components\//)],
+]
+const blind = controls.filter(([, found]) => found.length === 0).map(([label]) => label)
+if (blind.length) {
+  failed = true
+  console.error(
+    `\n  FAIL the measurement finds no ${blind.join(', ')} module in a whole-library bundle —` +
+      ' every "contributes no bytes" check below is vacuous until that is fixed',
+  )
+}
+
 console.log('')
 if (pulled.length === 0) {
   console.log('  ok   no Motion module contributes bytes to a Button-only bundle')
