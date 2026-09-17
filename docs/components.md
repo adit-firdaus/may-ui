@@ -58,6 +58,25 @@ Reach for `Combobox` when `Select` physically cannot do it:
 A `<select>` cannot search, cannot show several values legibly, and cannot draw
 a row. Everything else is a reason to stay with it.
 
+## Which rows take a node, and which take text
+
+Item-driven components differ on purpose, not by accident:
+
+- **`Menu` and `ContextMenu` take `label: ReactNode`.** A macOS menu row really
+  does carry a checkmark, a shortcut and a submenu arrow, and these components
+  already model all three — so a badge or a second line belongs there too.
+  `Menu` also takes `textValue`, which type-ahead needs because a node has no
+  text to compare.
+- **`ActionSheet`, `SegmentedControl` and `SwipeAction` take `label: string`.**
+  Apple's own versions of these are text, and the shapes depend on it: a
+  segmented thumb is sized from its label, and a swipe action is read at a
+  glance mid-gesture.
+- **`Select` takes `label: string`** because it renders a real `<option>`, which
+  holds text and nothing else.
+- **`Combobox` takes `label: string` plus `description` and `icon`** — and
+  `renderOption` when none of that is enough. Search has to compare text, so the
+  label stays a string and the escape hatch is explicit.
+
 ## Dates: there is no DatePicker, on purpose
 
 `<Input type="date">` already works, and it is the better component:
