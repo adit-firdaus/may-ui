@@ -27,6 +27,13 @@ looking at:
 - **`asChild` and `trigger`.** Both clone a caller-supplied element and inject
   props onto it. They are as trusted as the element you pass; passing one built
   from untrusted input is your own injection.
+- **`components={{ … }}` defaults.** These are ordinary props, merged ahead of
+  the ones at the call site, so they carry React's own protections: attribute
+  values are escaped, a `javascript:` URL is blocked, and a string where a
+  handler belongs is rejected. Checked, and nothing here is special to May. The
+  exception is a `style` value, which React does not sanitise — the same is
+  true of `style` written directly on any element, so treat a default built
+  from untrusted input exactly as you would that.
 - **Theme token values.** `theme={{ tokens }}` lands as inline custom
   properties on the root, so a value never enters stylesheet text. It is still
   a declaration list, so a value containing `;`, `{` or `}` would split it and
