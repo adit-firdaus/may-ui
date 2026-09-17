@@ -54,6 +54,25 @@ function closure(entry) {
   return [...seen]
 }
 
+/*
+ * A closure this small means the walk broke, not that the bundle shrank.
+ *
+ * This has happened here before: the specifier pattern only matched `./`
+ * prefixes, so with nested output `desktop.js` resolved to 807 bytes for six
+ * components and every budget passed with room to spare. A budget check whose
+ * measurement can collapse to nothing is the gate this file's own header warns
+ * about, so the floors are asserted rather than trusted.
+ *
+ * Set at roughly a quarter of today's counts — 210, 58, 68 and 282 chunks —
+ * so real tree-shaking work can halve an entry without tripping them.
+ */
+const CLOSURE_FLOORS = {
+  'mayui.js': 50,
+  'desktop.js': 15,
+  'mobile.js': 15,
+  'examples.js': 70,
+}
+
 const gz = (files) =>
   gzipSync(Buffer.concat(files.map((f) => readFileSync(join(dist, f))))).length
 const raw = (files) => files.reduce((n, f) => n + statSync(join(dist, f)).size, 0)
@@ -77,6 +96,15 @@ for (const [entry, budget] of Object.entries(BUDGETS)) {
   const files = closure(entry)
   closures[entry] = files
   const gzipped = gz(files)
+  const floor = CLOSURE_FLOORS[entry]
+  if (floor !== undefined && files.length < floor) {
+    console.log(
+      `  FAIL ${entry.padEnd(14)} closure is only ${files.length} chunk(s), expected at least ${floor} —` +
+        ' the walk is broken, so this budget means nothing',
+    )
+    failed = true
+    continue
+  }
   const ok = gzipped <= budget
   if (!ok) failed = true
   console.log(
