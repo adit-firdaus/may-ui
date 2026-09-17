@@ -72,6 +72,20 @@
   transform: rotate(90deg);
 }
 
+/*
+ * Mirrored by ROTATION, not by scaleX.
+ *
+ * A closed chevron has to point the way the panel opens, which is reading
+ * order. Doing that with scaleX(-1) loses to the open rule above on
+ * specificity — that selector is four classes deep, this one is two — so the
+ * open state kept the mirror and pointed up. Rotating instead means the open
+ * rule still wins in both directions and still lands the chevron pointing
+ * down, which is the same in either direction, so it needs no RTL twin.
+ */
+[dir='rtl'] .may-collapsible__chevron {
+  transform: rotate(180deg);
+}
+
 /* ---------------------------------- panel --------------------------------- */
 
 /*

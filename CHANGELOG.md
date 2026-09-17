@@ -74,6 +74,13 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **Four directional chevrons pointed the wrong way in RTL.** The library
+  already supported RTL in six components, but `ListRow`, `Collapsible`,
+  `Sidebar` sections, `ContextMenu` submenus, `NavTree` branches and
+  `Pagination` arrows mirrored their *layout* through logical properties and
+  then pointed against the reading direction inside it. The disclosure
+  chevrons mirror by rotation rather than `scaleX`, because a four-class-deep
+  open rule outranks a two-class RTL one and left the open state pointing up.
 - **`DataTable`'s column resize grip had no value.** It is a focusable
   `role="separator"` — the ARIA window-splitter — which requires
   `aria-valuenow`, so a screen reader announced a splitter with no position.

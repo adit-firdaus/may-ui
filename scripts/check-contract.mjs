@@ -235,6 +235,49 @@ const checks = [
       !/transition:/.test(segmentedCss) &&
       /transition:\s*opacity\s+var\(--may-duration-fast\)\s+var\(--may-ease-out\)/.test(segmentedLabel),
   ],
+  /*
+   * Every directional glyph mirrors under RTL.
+   *
+   * The library supports RTL deliberately — Switch, Steps, Breadcrumb,
+   * SearchBar and NavBar all carry [dir='rtl'] rules — but four chevrons had
+   * been missed, so a disclosure row mirrored its LAYOUT and then pointed the
+   * wrong way inside it. The layout half is free from logical properties; the
+   * glyph half never is, and that asymmetry is exactly what makes it easy to
+   * forget on the next component.
+   */
+  [
+    'every directional chevron mirrors under RTL',
+    (() => {
+      const directional = [
+        'may-list-row__chevron',
+        'may-collapsible__chevron',
+        'may-sidebar-section__chevron',
+        'may-menu__chevron',
+        'may-navtree__twisty',
+        'may-pagination__arrow',
+        'may-breadcrumb__separator',
+        'may-nav-bar__chevron',
+        'may-nav-bar__back-chevron',
+      ]
+      const missing = directional.filter((cls) => {
+        // a [dir='rtl'] rule naming this class, anywhere in the built sheet
+        // The build strips the quotes: [dir='rtl'] ships as [dir=rtl].
+        /*
+         * The BODY has to carry a transform, not merely mention the class. A
+         * first version of this check only looked for the selector and passed
+         * happily against a rule whose declaration had been gutted to
+         * `opacity: 1` — the same outcome as no rule at all.
+         */
+        const re = new RegExp(`\\[dir=['"]?rtl['"]?\\][^{}]*\\.${cls}\\b[^{}]*\\{([^}]*)\\}`)
+        const found = css.match(re)
+        return !found || !/transform\s*:/.test(found[1])
+      })
+      return (
+        missing.length === 0 ||
+        (console.log(`\n       no [dir='rtl'] rule for: ${missing.join(', ')}`), false)
+      )
+    })(),
+  ],
   [
     'overlay dismissal goes through the shared layer stack',
     rogueKeydown.length === 0 ||

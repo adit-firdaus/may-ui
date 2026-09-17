@@ -160,3 +160,8 @@ button.may-list-row:disabled { cursor: not-allowed; opacity: 0.4; }
   flex-shrink: 0;
   color: var(--may-color-text-tertiary);
 }
+
+/* A disclosure chevron points the way the row goes, so it mirrors. */
+[dir='rtl'] .may-list-row__chevron {
+  transform: scaleX(-1);
+}

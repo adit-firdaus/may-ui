@@ -167,6 +167,11 @@ button.may-sidebar-section__header {
   transform: rotate(90deg);
 }
 
+/* Rotated, not mirrored, so the open rule above still wins. See Collapsible. */
+[dir='rtl'] .may-sidebar-section__chevron {
+  transform: rotate(180deg);
+}
+
 /*
  * `visibility` is what actually closes the group: a zero-height box with
  * `overflow: hidden` still leaves its links focusable, so a keyboard user

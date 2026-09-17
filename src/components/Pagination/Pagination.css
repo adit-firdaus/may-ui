@@ -105,6 +105,16 @@
   color: var(--may-color-tint);
 }
 
+/*
+ * Back and forward are reading-order words, not left and right, so both
+ * glyphs mirror. The buttons' own order already flows from the logical
+ * layout; only the arrowheads needed telling.
+ */
+[dir='rtl'] .may-pagination__arrow > svg,
+[dir='rtl'] .may-pagination__arrow > .may-pagination__digit > svg {
+  transform: scaleX(-1);
+}
+
 /* No :not([width]) guard: the arrow glyph is always the component's own, and
  * react-icons renders width/height as attributes. An author rule outranks a
  * presentation attribute, so the key's font-size still drives the chevron. */

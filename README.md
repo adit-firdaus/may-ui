@@ -288,6 +288,8 @@ They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a dem
 - Hover styling is gated behind `@media (hover: hover) and (pointer: fine)`, so touch
   devices never get stuck hover
 - Everything collapses under `prefers-reduced-motion`, including animation iteration
+- RTL mirrors both halves: layout through logical properties, and every
+  directional glyph through a `[dir='rtl']` rule that `check:contract` enforces
 - Modal surfaces mark the rest of the document `inert`, which removes it from the
   accessibility tree as well as from focus order — a Tab cycle only ever contained Tab
 

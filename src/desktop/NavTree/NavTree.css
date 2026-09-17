@@ -132,10 +132,21 @@
   display: block;
 }
 
+/*
+ * A collapsed branch points the way it opens, which is reading order. Rotated
+ * on the span that already owns the transform, rather than mirroring the svg
+ * inside it: the two would compose, and a mirrored glyph rotated the LTR way
+ * lands pointing up.
+ */
+[dir='rtl'] .may-navtree__twisty {
+  transform: rotate(180deg);
+}
+
 .may-navtree__node[data-state='open'] > .may-navtree__row > .may-navtree__twisty {
   /* Past 90° and back. The overshoot is the whole reason to animate it. */
   transform: rotate(90deg);
 }
+
 
 .may-navtree__row[data-selected='true'] > .may-navtree__twisty {
   color: currentColor;

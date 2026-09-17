@@ -209,6 +209,11 @@
   color: var(--may-color-text-tertiary);
 }
 
+/* Points at the edge the submenu opens from, so it mirrors with the layout. */
+[dir='rtl'] .may-menu__chevron {
+  transform: scaleX(-1);
+}
+
 .may-menu__item[data-active='true'] .may-menu__chevron {
   color: var(--may-color-text-secondary);
 }
