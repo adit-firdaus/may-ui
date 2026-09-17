@@ -33,11 +33,26 @@ const EXEMPT = new Set([
   'initialsFrom', // a plain utility, not a component
 ])
 
+/*
+ * Read the names out of the rolled-up d.ts.
+ *
+ * Two forms, because api-extractor emits both. `export declare const Box` is
+ * the common one; a name it had to rename on the way through comes out as
+ * `export { Text_2 as Text }`, and matching only the first form silently
+ * dropped `Text` — a component in nearly every screen — out of the checked
+ * set entirely. That is the failure mode this file exists to prevent, one
+ * level up: the gate looked like it covered everything while quietly
+ * covering one less.
+ *
+ * The count is cross-checked against the runtime exports below, so the next
+ * form api-extractor invents fails the build instead of shrinking the target.
+ */
 function exportedComponents(dtsPath) {
   if (!existsSync(dtsPath)) return []
   const src = readFileSync(dtsPath, 'utf8')
   const names = new Set()
   for (const m of src.matchAll(/export declare (?:function|const) ([A-Z]\w*)/g)) names.add(m[1])
+  for (const m of src.matchAll(/^export \{ \w+ as ([A-Z]\w*) \}/gm)) names.add(m[1])
   return [...names]
 }
 
@@ -49,6 +64,25 @@ const exported = new Set([
 
 if (!exported.size) {
   console.error('no exports found — run the build first')
+  process.exit(1)
+}
+
+/*
+ * The types and the runtime agree on which components exist.
+ *
+ * Everything below reads the d.ts, so a name the patterns above miss is a
+ * component this gate stops checking without saying so. The built modules are
+ * the second opinion.
+ */
+const runtimeComponents = new Set(
+  (await Promise.all(['mayui', 'desktop', 'mobile'].map((entry) =>
+    import(new URL(`../dist/${entry}.js`, import.meta.url)),
+  ))).flatMap((module) => Object.keys(module)).filter((name) => /^[A-Z]/.test(name)),
+)
+const unseen = [...runtimeComponents].filter((name) => !exported.has(name)).sort()
+if (unseen.length) {
+  console.error(`\n  FAIL the d.ts patterns miss ${unseen.length} exported component(s): ${unseen.join(', ')}`)
+  console.error('       Add the declaration form to exportedComponents() — until then they are unchecked.')
   process.exit(1)
 }
 
@@ -72,8 +106,9 @@ for (const file of files) {
 }
 
 const missing = [...exported].filter((n) => !EXEMPT.has(n) && !used.has(n)).sort()
-const covered = [...exported].filter((n) => used.has(n)).length
+// Both sides exclude the exempt, or the ratio reads as 91/88 — which it did.
 const target = [...exported].filter((n) => !EXEMPT.has(n)).length
+const covered = [...exported].filter((n) => !EXEMPT.has(n) && used.has(n)).length
 
 console.log('example coverage\n')
 console.log(`  example files: ${files.length}`)
