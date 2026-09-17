@@ -126,6 +126,27 @@ the collapsed phone shape re-labels every cell with its column header, so it
 needs the column metadata that `columns` carries. A `<TableCell>` written by
 hand has none, and would either lose the adaptive shape or have to rebuild it.
 
+## Pagination: use `compact` on a narrow column
+
+The numbered pager does not wrap and does not compress. The keys are a fixed
+44px (36 at `sm`, 52 at `lg`) because that is the touch target, and the row is
+width-stable so the keys never resize as the page moves — the sliding thumb
+travels along one axis and needs the geometry to hold still.
+
+The consequence is a width you have to plan for: eight `md` keys want **428px**,
+so below roughly 460px of usable width the row leaves its container rather than
+folding. Measured at a 320px viewport it overflows by 188px.
+
+```tsx
+// A sidebar, a modal footer, a phone — anywhere under ~460px.
+<Pagination compact page={page} pageCount={40} onPageChange={setPage} />
+```
+
+`compact` is two keys and a count, 240px wide, and fits. It is not a degraded
+mode for emergencies; it is what a pager in a narrow column should be. Reach
+for it whenever the container is not a full-width desktop region, and prefer
+it over reducing `siblingCount`, which shortens the row without bounding it.
+
 ## Toasts and imperative surfaces
 
 Toasts render through the host mounted by the outer `MayProvider`:

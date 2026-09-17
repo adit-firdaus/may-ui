@@ -20,8 +20,19 @@
   /*
    * No wrap. The thumb slides on one axis, and a row that breaks onto a second
    * line has no single axis to slide along. The row is width-stable by design
-   * (see `slotsFor`), so at a genuinely narrow width the keys tighten rather
-   * than fold; a pager that truly cannot fit is what `compact` is for.
+   * (see `slotsFor`), so the keys never resize as the page moves.
+   *
+   * They do not tighten either, and an earlier version of this comment said
+   * they did. The keys carry `flex-shrink: 0` and a `min-width` of the full
+   * control height, so a row that does not fit LEAVES ITS CONTAINER rather
+   * than compressing: eight md keys want 428px, and at a 320px viewport they
+   * are handed 240. `compact` is the answer and it fits in 240 — not a
+   * fallback for the very narrow, but what a pager below roughly 460px needs.
+   *
+   * Letting the keys shrink instead was tried and reverted. `__key` is a flex
+   * child of `__item`, not of this row, so a `flex-basis` on it does not
+   * govern the row's layout — the keys collapsed to 25px at every width,
+   * including 900px, rather than only where space was short.
    */
   flex-wrap: nowrap;
   gap: var(--may-space-1);
