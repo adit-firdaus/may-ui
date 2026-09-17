@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cx } from '../../utils/cx'
+import type { MaySize } from '../../types'
 
 /** The eleven app-icon gradients defined in the token layer. */
 export type IconTileGradient =
@@ -19,7 +20,7 @@ export type IconTileGradient =
  * `sm` is 29pt — the size iOS Settings draws a row icon at, and the size the
  * List hairline indent is measured against. `lg` is the 60pt home-screen icon.
  */
-export type IconTileSize = 'sm' | 'md' | 'lg'
+export type IconTileSize = Exclude<MaySize, 'xs'>
 
 export interface IconTileProps extends HTMLAttributes<HTMLSpanElement> {
   /** The glyph. An `<svg>` scales with the tile automatically. */

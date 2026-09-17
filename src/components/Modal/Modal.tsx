@@ -2,7 +2,7 @@ import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'r
 import { useCallback } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
-import type { MayFooterLayout } from '../../types'
+import type { MayFooterLayout, MaySize } from '../../types'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -50,7 +50,11 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
    */
   footerLayout?: MayFooterLayout
   /** @default 'md' */
-  size?: 'sm' | 'md' | 'lg' | 'full'
+  /**
+   * The shared scale plus `'full'`, which the scale has no step for: a sheet
+   * that takes the whole viewport is a different intent, not a fourth size.
+   */
+  size?: Exclude<MaySize, 'xs'> | 'full'
   /** Render the close chip in the top-trailing corner. @default true */
   closeButton?: boolean
   /** Accessible name for the close chip. @default 'Close' */

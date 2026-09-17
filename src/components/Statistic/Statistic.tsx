@@ -1,11 +1,12 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { IoCaretUp } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
+import type { MaySize } from '../../types'
 
 /** Which way the metric moved. `flat` is not "no delta" — it is "unchanged". */
 export type StatisticDirection = 'up' | 'down' | 'flat'
 
-export type StatisticSize = 'sm' | 'md' | 'lg'
+export type StatisticSize = Exclude<MaySize, 'xs'>
 
 export interface StatisticProps extends HTMLAttributes<HTMLDivElement> {
   label: ReactNode

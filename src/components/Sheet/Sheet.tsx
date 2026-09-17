@@ -2,7 +2,7 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { cx } from '../../utils/cx'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
-import type { MayFooterLayout } from '../../types'
+import type { MayFooterLayout, MaySize } from '../../types'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useAutoId } from '../../utils/useId'
@@ -43,7 +43,11 @@ export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
    */
   footerLayout?: MayFooterLayout
   /** @default 'md' */
-  size?: 'sm' | 'md' | 'lg' | 'full'
+  /**
+   * The shared scale plus `'full'`, which the scale has no step for: a sheet
+   * that takes the whole viewport is a different intent, not a fourth size.
+   */
+  size?: Exclude<MaySize, 'xs'> | 'full'
   /** Show the drag grabber on the phone presentation. @default true */
   grabber?: boolean
   /**

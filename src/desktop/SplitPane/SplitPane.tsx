@@ -16,10 +16,23 @@ export interface SplitPaneProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   children: ReactNode
   /** @default 'horizontal' */
   orientation?: SplitPaneOrientation
-  /** Size of the FIRST pane in px. Controlled. */
-  size?: number
+  /**
+   * Size of the FIRST pane, in px. Controlled.
+   *
+   * Named `paneSize` rather than `size` because everywhere else in the package
+   * `size` is a step on the shared scale — `'sm' | 'md' | 'lg'` — and one
+   * component where it silently means pixels is the kind of collision that
+   * only ever surfaces as a confused consumer.
+   */
+  paneSize?: number
   /** @default 260 */
+  defaultPaneSize?: number
+  onPaneSizeChange?: (size: number) => void
+  /** @deprecated Use `paneSize`. Kept so no existing caller breaks. */
+  size?: number
+  /** @deprecated Use `defaultPaneSize`. */
   defaultSize?: number
+  /** @deprecated Use `onPaneSizeChange`. */
   onSizeChange?: (size: number) => void
   /** @default 180 */
   min?: number
@@ -64,8 +77,11 @@ const COLLAPSE_SLOP = RUBBER_MAX / 2
 export function SplitPane({
   children,
   orientation = 'horizontal',
+  paneSize,
+  defaultPaneSize,
+  onPaneSizeChange,
   size,
-  defaultSize = 260,
+  defaultSize,
   onSizeChange,
   min = 180,
   max = 480,
@@ -78,6 +94,10 @@ export function SplitPane({
   id,
   ...rest
 }: SplitPaneProps) {
+  /* New name wins; the old one still works. */
+  const sizeProp = paneSize ?? size
+  const initialSizeProp = defaultPaneSize ?? defaultSize ?? 260
+  const emitSize = onPaneSizeChange ?? onSizeChange
   const [first, second] = Children.toArray(children)
   const autoId = useAutoId(id)
   const paneId = `${autoId}-pane`
@@ -85,7 +105,7 @@ export function SplitPane({
   const rootRef = useRef<HTMLDivElement>(null)
   const dividerRef = useRef<HTMLButtonElement>(null)
 
-  const [internalSize, setInternalSize] = useState(defaultSize)
+  const [internalSize, setInternalSize] = useState(initialSizeProp)
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed)
   const [dragging, setDragging] = useState(false)
   /** The container's extent along the split axis, so `max` can never exceed it. */
@@ -97,15 +117,15 @@ export function SplitPane({
   // The second pane keeps `min` for itself: a divider that can be shoved off
   // the far edge is a resize that destroys the thing you were resizing for.
   const effectiveMax = extent > 0 ? Math.min(max, Math.max(min, extent - min)) : max
-  const committed = Math.min(Math.max(size ?? internalSize, min), effectiveMax)
+  const committed = Math.min(Math.max(sizeProp ?? internalSize, min), effectiveMax)
   const shown = isCollapsed ? 0 : committed
 
   const commitSize = useCallback(
     (next: number) => {
-      if (size === undefined) setInternalSize(next)
-      onSizeChange?.(next)
+      if (sizeProp === undefined) setInternalSize(next)
+      emitSize?.(next)
     },
-    [size, onSizeChange],
+    [sizeProp, emitSize],
   )
 
   const commitCollapsed = useCallback(
@@ -300,7 +320,7 @@ export function SplitPane({
         onKeyDown={onKeyDown}
         onDoubleClick={() => {
           commitCollapsed(false)
-          commitSize(defaultSize)
+          commitSize(initialSizeProp)
         }}
         data-slot="split-divider"
         className="may-splitpane__divider"
