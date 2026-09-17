@@ -19,6 +19,16 @@ export type MayTextStyle =
   | 'caption-2'
 
 /**
+ * Alignment along the inline axis, in logical terms.
+ *
+ * `start` and `end` rather than left and right, so a mirrored layout needs no
+ * second set of values. `Text`, `Heading`, `Table` and `DataTable` all want the
+ * same three; Toolbar extends them with `between`, which distributes rather
+ * than aligns and so belongs to Toolbar alone.
+ */
+export type MayAlign = 'start' | 'center' | 'end'
+
+/**
  * Whether a grouped container is inset from its background or sits flat on it.
  *
  * `inset` is the iOS Settings shape — a rounded card floated off the grouped

@@ -179,6 +179,11 @@ Everything collapses under `prefers-reduced-motion`.
   `secondary` · `tertiary` — plus `tint` for a link. A different axis, not a
   subset: one is status, the other is hierarchy.
 - **`size`** — `sm` · `md` · `lg` (`Avatar` adds `xl`; `Modal` and `Sheet` add `full`)
+- **`align`** — `start` · `center` · `end`, logical rather than left/right so a
+  mirrored layout needs no second set. `Toolbar` adds `between`, which
+  distributes rather than aligns. `TextAlign` is an alias of it.
+- **`placement`** — `PopoverPlacement`, shared by `Popover`, `Menu` and
+  `Tooltip`: a side, optionally aligned (`bottom-start`, `left-end`).
 - **`variant`** — deliberately per-component, because it answers "which of this
   component's looks" and that differs. `Button` means emphasis
   (`filled` · `tinted` · `gray` · `plain`); `List`, `Accordion` and

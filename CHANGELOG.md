@@ -82,6 +82,9 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   other value components. `onChange` still works and is deprecated: it was the
   odd one out, and it was also why `onChange` had to be omitted from the
   HTMLAttributes it now extends — the collision was the symptom of the drift.
+- `MayAlign` names the `'start' | 'center' | 'end'` trio that `Table`,
+  `DataTable` and `Toolbar` spelled inline while `TextAlign` already named it.
+  `TextAlign` stays exported as an alias, so nothing consumers import changes.
 - `MayInset` names the `'inset' | 'plain'` pair that `List`, `Accordion` and
   `Descriptions` each spelled out inline. Same values, so no consumer's type
   narrows; `variant` stays per-component everywhere else, because it answers

@@ -7,7 +7,7 @@ import type {
   Ref,
 } from 'react'
 import { cx } from '../../utils/cx'
-import type { MayTextStyle } from '../../types'
+import type { MayTextStyle, MayAlign } from '../../types'
 
 /**
  * Tone is a role, not a colour. `secondary` and `tertiary` are Apple's label
@@ -20,7 +20,11 @@ export type TextTone = 'default' | 'secondary' | 'tertiary' | 'tint' | 'danger' 
 /** The four weights SF actually uses in the UI range. */
 export type TextWeight = 'regular' | 'medium' | 'semibold' | 'bold'
 
-export type TextAlign = 'start' | 'center' | 'end'
+/**
+ * Kept as its own exported name — consumers import it — but defined as the
+ * shared type rather than a second spelling of the same three values.
+ */
+export type TextAlign = MayAlign
 
 interface TextOwnProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
   children?: ReactNode

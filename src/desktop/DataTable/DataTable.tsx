@@ -4,7 +4,7 @@ import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { draggable } from '../../motion/gesture'
-import type { MaySize } from '../../types'
+import type { MaySize, MayAlign } from '../../types'
 import { Checkbox } from '../../components/Checkbox'
 import { Input } from '../../components/Input'
 import { Select } from '../../components/Select'
@@ -42,7 +42,7 @@ export interface DataTableColumn<T> {
   key: string
   header: ReactNode
   /** Overrides the alignment that `numeric` implies. */
-  align?: 'start' | 'center' | 'end'
+  align?: MayAlign
   /** End-aligns the column and switches on tabular figures, so digits stack. */
   numeric?: boolean
   /** Starting width in px. Dragging the grip writes over it. */

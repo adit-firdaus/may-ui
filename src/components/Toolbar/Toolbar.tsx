@@ -1,6 +1,7 @@
 import type { HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import { useRef } from 'react'
 import { cx } from '../../utils/cx'
+import type { MayAlign } from '../../types'
 
 /** What the arrow keys are allowed to move between. */
 const FOCUSABLE =
@@ -25,7 +26,7 @@ export interface ToolbarProps extends HTMLAttributes<HTMLDivElement> {
   /** Pin the bar to that edge while the surrounding scroll container moves. */
   sticky?: boolean
   /** How the actions distribute along the bar. @default 'between' */
-  align?: 'start' | 'center' | 'end' | 'between'
+  align?: MayAlign | 'between'
   /** Draw the hairline dividing the bar from the content it borders. */
   separator?: boolean
   /**

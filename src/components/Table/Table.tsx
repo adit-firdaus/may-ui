@@ -5,7 +5,7 @@ import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
-import type { MaySize } from '../../types'
+import type { MaySize, MayAlign } from '../../types'
 import { List, ListRow } from '../List/List'
 // The collapsed shape IS List's markup, so List's stylesheet has to arrive as a
 // value import: a type-only import is erased at compile time and Storybook then
@@ -16,7 +16,7 @@ export interface TableColumn<T> {
   key: string
   header: ReactNode
   /** Overrides the alignment that `numeric` implies. */
-  align?: 'start' | 'center' | 'end'
+  align?: MayAlign
   /** End-aligns the column and switches on tabular figures, so digits stack. */
   numeric?: boolean
   /** Applied through a `<col>`, so it survives table layout. A number is read as px. */
