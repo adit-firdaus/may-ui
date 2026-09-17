@@ -55,6 +55,12 @@ entries, and run a production build. It should transform cleanly and render with
 its CSS applied — the style resources arrive through React, so unstyled output
 means the entry resolved but the runtime did not.
 
+Bundlers are forgiving about an `exports` map in ways Node is not, so it is
+worth resolving each subpath under Node itself too — `await import(…)` and
+`require(…)` for `.`, `/desktop`, `/mobile` and `/examples`. All four should
+answer with the same export count either way, and a path that is not in the map
+should be refused with `ERR_PACKAGE_PATH_NOT_EXPORTED` rather than resolving.
+
 ## Generated files
 
 `src/styles/tokens.css`, `src/styles/tokens.generated.ts`, and

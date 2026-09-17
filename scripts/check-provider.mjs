@@ -3,6 +3,7 @@
  * package, because source-only assertions cannot catch lost style resources.
  */
 import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { createElement as h, Fragment, version as reactVersion } from 'react'
@@ -11,6 +12,7 @@ import { Writable } from 'node:stream'
 import * as May from '../dist/mayui.js'
 import * as Desktop from '../dist/desktop.js'
 import * as Mobile from '../dist/mobile.js'
+import * as Examples from '../dist/examples.js'
 
 const root = resolve(import.meta.dirname, '..')
 const failures = []
@@ -286,6 +288,34 @@ check('the package emits and exports no stylesheet', () => {
  * Read off the published types rather than the source, because the published
  * types are what a consumer actually programs against.
  */
+/*
+ * The two formats export the same names.
+ *
+ * The package ships ESM and CJS from one source, and the build preserves
+ * modules — so each entry is a re-export shim over a tree of files, twice
+ * over. A name that reached one format and not the other would leave a CJS
+ * consumer with `undefined` where a component should be, at runtime, with no
+ * type error and no build warning anywhere in this repo.
+ */
+check('ESM and CJS export the same names from every entry', () => {
+  const require = createRequire(import.meta.url)
+  const entries = [
+    ['.', May, '../dist/mayui.cjs'],
+    ['./desktop', Desktop, '../dist/desktop.cjs'],
+    ['./mobile', Mobile, '../dist/mobile.cjs'],
+    ['./examples', Examples, '../dist/examples.cjs'],
+  ]
+
+  for (const [name, namespace, cjsPath] of entries) {
+    const cjs = new Set(Object.keys(require(cjsPath)))
+    const esm = new Set(Object.keys(namespace))
+    const missingFromCjs = [...esm].filter((key) => !cjs.has(key))
+    const missingFromEsm = [...cjs].filter((key) => !esm.has(key) && key !== 'default')
+    assert.deepEqual(missingFromCjs, [], `${name}: in ESM but not CJS`)
+    assert.deepEqual(missingFromEsm, [], `${name}: in CJS but not ESM`)
+  }
+})
+
 check('every controllable prop has a default counterpart', () => {
   /*
    * Genuinely controlled-only, with reasons:
