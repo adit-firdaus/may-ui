@@ -124,6 +124,30 @@ when the state lives in a router or a store:
 `defaultOpen` sets the starting state, and `onOpenChange` fires either way.
 `AlertDialog` closes itself once `onConfirm` has run.
 
+## Form libraries
+
+Every control forwards its `ref` to the real DOM element — `Input` to the
+`<input>`, `Select` to the `<select>`, `Checkbox` and `Switch` to their
+`<input type="checkbox">` — and every one accepts `name`. So a form library's
+register spread lands where it expects:
+
+```tsx
+const { register } = useForm()
+
+<Field label="Email" error={errors.email?.message}>
+  <Input type="email" {...register('email', { required: 'Required' })} />
+</Field>
+```
+
+`Slider` and `Stepper` are ARIA-roled buttons rather than inputs, so they carry
+a hidden input for `name` instead; register their value through a controller.
+`Combobox` emits one hidden input per selected value, which is what
+`FormData.getAll` expects.
+
+Passing `error` to the `Field` is what marks the control invalid — it flips
+`aria-invalid`, swaps the description for the message and points
+`aria-describedby` at it, so the visual and announced states cannot drift apart.
+
 ## Cascade and Tailwind
 
 May UI resources live in `@layer may-ui`. Unlayered application CSS wins over
