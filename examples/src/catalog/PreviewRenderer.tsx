@@ -59,6 +59,22 @@ const baseProps: Record<string, Record<string, unknown>> = {
   Radio: { value: 'one', children: 'One' },
   SearchField: { placeholder: 'Search components' },
   SegmentedControl: { options, defaultValue: 'one', 'aria-label': 'View' },
+  Accordion: {
+    defaultValue: ['one'],
+    children: [
+      h(Adaptive.AccordionItem, { key: 'one', value: 'one', title: 'What is May UI?' },
+        'Apple’s design language as a React library.'),
+      h(Adaptive.AccordionItem, { key: 'two', value: 'two', title: 'Does it need a stylesheet?' },
+        'No — component CSS arrives as React style resources.'),
+    ],
+  },
+  ButtonGroup: {
+    children: [
+      h(Adaptive.Button, { key: 'a', variant: 'gray' }, 'Day'),
+      h(Adaptive.Button, { key: 'b', variant: 'gray' }, 'Week'),
+      h(Adaptive.Button, { key: 'c', variant: 'gray' }, 'Month'),
+    ],
+  },
   Select: { options, defaultValue: 'one', 'aria-label': 'Choose an option' },
   Combobox: {
     options: comboboxOptions,
