@@ -489,6 +489,56 @@
   }
 }
 
+/*
+ * Increase Contrast.
+ *
+ * Apple's own colours sit below WCAG AA 4.5:1 in several of Apple's own
+ * pairings, measured with axe against the real catalogue: white on systemBlue
+ * is 4.01:1, systemBlue as text on a tertiary fill is 3.14:1, and
+ * secondaryLabel over a grouped background is 3.28:1. Matching Apple is the
+ * point of this library, so the default palette keeps those values rather than
+ * quietly drifting off-brand.
+ *
+ * The media query below is the escape hatch the platform already provides, and
+ * it is what Apple's own Increase Contrast setting sets, so a reader who needs
+ * AA gets it from the OS without the consumer wiring anything. Only primitives
+ * move here; every semantic alias re-resolves through them.
+ */
+@media (prefers-contrast: more) {
+  :root,
+  [data-may-theme='light'] {
+    --may-label-secondary: rgba(60, 60, 67, 0.85);
+    --may-label-tertiary: rgba(60, 60, 67, 0.8);
+    --may-separator: rgba(60, 60, 67, 0.5);
+    --may-blue: #0040dd;
+    --may-red: #b3001f;
+    --may-green: #0a7c2f;
+    --may-orange: #8a4b00;
+  }
+
+  [data-may-theme='dark'] {
+    --may-label-secondary: rgba(235, 235, 245, 0.85);
+    --may-label-tertiary: rgba(235, 235, 245, 0.8);
+    --may-separator: rgba(235, 235, 245, 0.5);
+    --may-blue: #5ea9ff;
+    --may-red: #ff6961;
+    --may-green: #4ce07c;
+    --may-orange: #ffb340;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-may-theme='light']) {
+      --may-label-secondary: rgba(235, 235, 245, 0.85);
+      --may-label-tertiary: rgba(235, 235, 245, 0.8);
+      --may-separator: rgba(235, 235, 245, 0.5);
+      --may-blue: #5ea9ff;
+      --may-red: #ff6961;
+      --may-green: #4ce07c;
+      --may-orange: #ffb340;
+    }
+  }
+}
+
 :root {
   /* ---------------------------------------------------------------- *
    * Control height is a single knob; every rung is a proportion of it

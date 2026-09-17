@@ -126,6 +126,15 @@ const STAGGER_CAP = 10
 
 /** Default floor for a resize drag. Narrower than this and a header stops being readable. */
 const MIN_COLUMN_WIDTH = 72
+/*
+ * Upper bound reported to assistive tech, not enforced on the drag.
+ *
+ * A splitter announced as "280" with no range is meaningless, and ARIA
+ * defaults aria-valuemax to 100 — which would have every column read as far
+ * past its own maximum. A column wider than this is possible and fine; the
+ * number exists so the announced position has a scale.
+ */
+const MAX_COLUMN_WIDTH = 960
 
 /** One arrow press on a focused resize grip. */
 const RESIZE_STEP = 16
@@ -245,6 +254,10 @@ interface ResizeGripProps {
   columnKey: string
   label: string
   min: number
+  /** Current width, so the splitter can report a value. */
+  width: number
+  /** Upper bound for the reported range. */
+  max: number
   /** Must be stable across renders — see the note in the effect below. */
   onResize: (key: string, width: number) => void
 }
@@ -260,7 +273,7 @@ interface ResizeGripProps {
  * window-splitter pattern — so the column can also be resized with the arrow
  * keys by anyone who cannot hold and drag a 6px target.
  */
-function ResizeGrip({ columnKey, label, min, onResize }: ResizeGripProps) {
+function ResizeGrip({ columnKey, label, min, width, max, onResize }: ResizeGripProps) {
   const ref = useRef<HTMLSpanElement>(null)
   const [dragging, setDragging] = useState(false)
 
@@ -303,6 +316,17 @@ function ResizeGrip({ columnKey, label, min, onResize }: ResizeGripProps) {
       role="separator"
       aria-orientation="vertical"
       aria-label={`Resize ${label} column`}
+      /*
+       * A focusable separator IS the ARIA window-splitter, and the pattern
+       * requires a value: without aria-valuenow a screen reader announces a
+       * splitter with no position, and axe flags it as a critical
+       * aria-required-attr failure. SplitPane's divider always reported its
+       * value; this one did not.
+       */
+      aria-valuenow={Math.round(width)}
+      aria-valuemin={min}
+      aria-valuemax={Math.round(max)}
+      aria-valuetext={`${Math.round(width)} pixels`}
       tabIndex={0}
       onKeyDown={onKeyDown}
       data-dragging={dragging ? 'true' : undefined}
@@ -774,6 +798,8 @@ export function DataTable<T>({
             columnKey={column.key}
             label={label}
             min={column.minWidth ?? MIN_COLUMN_WIDTH}
+            width={widths[column.key] ?? column.width ?? MIN_COLUMN_WIDTH}
+            max={MAX_COLUMN_WIDTH}
             onResize={resizeColumn}
           />
         )}

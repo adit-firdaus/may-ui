@@ -328,9 +328,18 @@ button.may-sidebar-section__header {
     height var(--may-duration-settle) var(--may-spring-smooth);
 }
 
+/*
+ * Filled, not a wash.
+ *
+ * A translucent tint badge sitting on an already-tinted active row composited
+ * to 3.79:1 against its own tint-coloured text — measured with axe, and below
+ * AA even under Increase Contrast. A count on a selected row is a filled pill
+ * on both of Apple's platforms anyway, so this is the idiom as well as the
+ * readable option.
+ */
 .may-sidebar-item[data-active='true'] .may-sidebar-item__badge {
-  background: color-mix(in srgb, var(--may-color-tint) 22%, transparent);
-  color: var(--may-color-tint);
+  background: var(--may-color-primary);
+  color: var(--may-color-on-primary);
 }
 
 /*

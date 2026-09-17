@@ -330,6 +330,7 @@ export function CatalogAdaptive() {
             <Cell name="Select">
               <Select
                 fullWidth
+                aria-label="Export size"
                 defaultValue="large"
                 options={[
                   { label: 'Actual Size — 8064 × 6048', value: 'actual' },
@@ -361,7 +362,7 @@ export function CatalogAdaptive() {
             </Cell>
 
             <Cell name="Slider">
-              <Slider defaultValue={62} showValue formatValue={(v) => `${v}%`} />
+              <Slider aria-label="Quality" defaultValue={62} showValue formatValue={(v) => `${v}%`} />
             </Cell>
 
             <Cell name="Stepper" row>

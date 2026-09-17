@@ -8,6 +8,14 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`@media (prefers-contrast: more)` support.** Apple's own palette sits below
+  WCAG AA in several of Apple's own pairings, so the default keeps Apple's
+  values and the platform's Increase Contrast setting swaps in AA-safe
+  primitives. Audited with axe-core against all three catalogues: 58 library
+  contrast violations in the default palette, **zero** under the contrast tier,
+  and zero violations of every other WCAG 2.1 A/AA rule in all three families.
+  The exact values are documented in the README and reachable through
+  `theme={{ light, dark }}` if you need AA by default.
 - **`Combobox`.** A searchable, optionally multi-select picker: grouped rows,
   two-line rows, `renderOption` to replace a row's insides while keeping its
   semantics, and one hidden input per value so `FormData.getAll` works.
@@ -59,6 +67,17 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   Return must not land on it.
 
 ### Fixed
+
+- **`DataTable`'s column resize grip had no value.** It is a focusable
+  `role="separator"` — the ARIA window-splitter — which requires
+  `aria-valuenow`, so a screen reader announced a splitter with no position.
+  `SplitPane`'s divider always reported one; this did not.
+- **A dot-only `Badge` dropped its label.** `aria-label` is prohibited on a
+  generic element, so the name written for screen readers was the one thing
+  they ignored. It now takes `role="img"` when it is a labelled dot.
+- **A `Sidebar` badge on the active row was unreadable at 3.79:1** — a
+  translucent tint over an already-tinted row against tint-coloured text. It is
+  a filled pill now, which is the idiom on both Apple platforms anyway.
 
 - **Escape no longer closes two overlays at once.** `Sheet` and `Popover` each
   registered a capture-phase `keydown` on `document`. Two listeners on the same

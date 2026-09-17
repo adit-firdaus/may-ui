@@ -288,6 +288,44 @@ They are a separate entry, so importing `@adit_firdaus/may-ui` never pulls a dem
 - Hover styling is gated behind `@media (hover: hover) and (pointer: fine)`, so touch
   devices never get stuck hover
 - Everything collapses under `prefers-reduced-motion`, including animation iteration
+- Modal surfaces mark the rest of the document `inert`, which removes it from the
+  accessibility tree as well as from focus order — a Tab cycle only ever contained Tab
+
+### Colour contrast, honestly
+
+All three families pass every WCAG 2.1 A and AA rule under axe-core — **except
+colour contrast in the default palette**, and that is a deliberate trade rather
+than an oversight.
+
+The default palette is Apple's. Several of Apple's own pairings sit below AA's
+4.5:1 for normal text, measured against the real catalogue:
+
+| pairing | measured |
+|---|---|
+| white on systemBlue (`#007AFF`) — a filled button | 4.01:1 |
+| systemBlue as text on a tertiary fill — a tinted button | 3.14:1 |
+| secondaryLabel over a grouped background | 3.28:1 |
+
+Matching Apple is the point of this library, so the default keeps those values
+instead of quietly drifting off-brand. `@media (prefers-contrast: more)` — what
+Apple's own **Increase Contrast** setting sets — swaps in AA-safe primitives, at
+which point all three families report **zero** violations. A reader who needs
+the contrast gets it from the OS; nobody has to wire anything.
+
+If your audit requires AA in the default state, override the same primitives on
+the provider — they are typed token keys, not private variables:
+
+```tsx
+<MayProvider
+  theme={{
+    light: { labelSecondary: 'rgba(60, 60, 67, 0.85)', labelTertiary: 'rgba(60, 60, 67, 0.8)', blue: '#0040dd' },
+    dark: { labelSecondary: 'rgba(235, 235, 245, 0.85)', labelTertiary: 'rgba(235, 235, 245, 0.8)', blue: '#5ea9ff' },
+  }}
+>
+```
+
+Those are the exact values `prefers-contrast: more` applies, so the two routes
+agree.
 
 ## Development
 

@@ -103,7 +103,8 @@ const STYLE_BUDGETS = {
   'mayui.js': 27 * 1024,
   'desktop.js': 11 * 1024,
   'mobile.js': 11 * 1024,
-  'examples.js': 33 * 1024,
+  // The example screens carry Combobox's sheet too.
+  'examples.js': 35 * 1024,
 }
 
 console.log('\nembedded React style resources (unique per entry)\n')

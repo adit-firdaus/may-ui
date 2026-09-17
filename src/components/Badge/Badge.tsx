@@ -52,10 +52,20 @@ export function Badge({
   count,
   max = 99,
   className,
+  'aria-label': ariaLabel,
   ...rest
 }: BadgeProps) {
   const isCount = count !== undefined
   const dotOnly = dot && !isCount && children == null
+  /*
+   * A dot-only badge renders an empty span. `aria-label` is PROHIBITED on a
+   * generic element — a nameless role cannot take a name, and axe flags it as
+   * a serious aria-prohibited-attr failure — so the label was being dropped by
+   * the very readers it was written for. `img` is the role for a graphic that
+   * carries meaning through a text alternative, which is exactly what a
+   * coloured dot labelled "Unread" is.
+   */
+  const named = dotOnly && ariaLabel !== undefined
   const rootRef = useRef<HTMLSpanElement>(null)
   const previousCount = useRef(count)
   const reducedMotion = useReducedMotion()
@@ -84,6 +94,8 @@ export function Badge({
       data-tone={tone}
       data-size={size}
       data-shape={isCount ? 'count' : undefined}
+      role={named ? 'img' : undefined}
+      aria-label={ariaLabel}
       className={cx(
         'may-badge',
         isCount && 'may-badge--count',
