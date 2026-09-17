@@ -192,4 +192,30 @@ if (iconBytes <= ICON_CEILING) {
 `)
 }
 
+/*
+ * The demo screens never reach a consumer who did not ask for them.
+ *
+ * `src/examples` is a fourth entry precisely so importing `mayui` cannot pull
+ * a demo screen in, and check-size already asserts that against the published
+ * graph. This is the consumer's side of it, and it checks the case that graph
+ * check cannot: a namespace import of the whole main entry, which is the
+ * shape most likely to drag something unintended along.
+ */
+const exampleBytes = contributionOf(everything.metafile, /src\/examples\//).reduce(
+  (total, { bytes }) => total + bytes,
+  0,
+)
+
+if (exampleBytes === 0) {
+  console.log('  ok   no demo screen reaches a namespace import of the main entry')
+} else {
+  failed = true
+  console.error(`  FAIL demo screens contribute ${exampleBytes} B to the main entry`)
+  console.error(`
+       The screens are a separate entry so nobody pays for them by accident.
+       Something in src/ now imports one — find it rather than raising a
+       budget.
+`)
+}
+
 if (failed) process.exit(1)
