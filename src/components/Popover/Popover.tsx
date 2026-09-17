@@ -72,6 +72,19 @@ export function placeFloating(
   panel: { width: number; height: number },
   placement: PopoverPlacement,
   gap: number,
+  /*
+   * The element the placement is relative to, read only for its writing
+   * direction. `start` and `end` are documented as inline terms — "so a
+   * mirrored layout needs no second set of values" — and this resolved them
+   * to physical left and right: measured under `dir="rtl"`, a
+   * `bottom-start` popover aligned its LEFT edge with the anchor's left,
+   * where inline-start is the right one. The side names stay physical,
+   * because `left` means left in any direction.
+   *
+   * Passed as an element rather than a flag so a subtree with its own `dir`
+   * is right; omitted, it falls back to the document.
+   */
+  relativeTo?: Element | null,
 ): FloatingPosition {
   // clientWidth/Height rather than innerWidth/Height: they exclude a classic
   // scrollbar, which is exactly the strip a fixed panel must not sit under.
@@ -114,9 +127,17 @@ export function placeFloating(
   const anchorSpan = onVerticalAxis ? anchor.width : anchor.height
   const panelSpan = onVerticalAxis ? width : height
 
+  // Only the horizontal cross axis mirrors; a left/right placement aligns on
+  // the block axis, which has no inline direction to follow.
+  const mirrored =
+    onVerticalAxis &&
+    getComputedStyle(relativeTo ?? document.documentElement).direction === 'rtl'
+  const resolved: PopoverAlign =
+    !mirrored || align === 'center' ? align : align === 'start' ? 'end' : 'start'
+
   let cross = anchorStart + (anchorSpan - panelSpan) / 2
-  if (align === 'start') cross = anchorStart
-  else if (align === 'end') cross = anchorStart + anchorSpan - panelSpan
+  if (resolved === 'start') cross = anchorStart
+  else if (resolved === 'end') cross = anchorStart + anchorSpan - panelSpan
 
   // Shift back inside the viewport. This runs after the flip so it corrects the
   // side the panel actually landed on, and the outer Math.max keeps a panel
@@ -263,7 +284,7 @@ export function Popover({
     // panel away from its anchor frame by frame.
     surface.style.maxHeight = ''
     const panel = { width: surface.offsetWidth, height: surface.offsetHeight }
-    const next = placeFloating(anchor.getBoundingClientRect(), panel, placement, gap)
+    const next = placeFloating(anchor.getBoundingClientRect(), panel, placement, gap, anchor)
 
     surface.style.left = `${next.x}px`
     surface.style.top = `${next.y}px`

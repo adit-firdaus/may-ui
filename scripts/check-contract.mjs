@@ -659,6 +659,60 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * `start` and `end` on a floating surface follow the inline axis.
+   *
+   * types.ts defines that vocabulary as logical — "start and end rather than
+   * left and right, so a mirrored layout needs no second set of values" — and
+   * placeFloating resolved them to physical left and right. Measured under
+   * `dir="rtl"`: a `bottom-start` popover aligned its LEFT edge with the
+   * anchor's left, where inline-start is the right one. Popover, Tooltip and
+   * Combobox all place through this one function, so all three were wrong.
+   *
+   * The SIDE names stay physical on purpose — `left` means left in any
+   * direction — so only the cross-axis alignment mirrors, and only when that
+   * axis is the horizontal one.
+   */
+  [
+    'placeFloating resolves start and end against the inline axis',
+    (() => {
+      const source = readFileSync(join(srcRoot, 'components/Popover/Popover.tsx'), 'utf8')
+      const missing = []
+      if (!/direction === 'rtl'/.test(source)) missing.push('no direction read')
+      if (!/align === 'start' \? 'end' : 'start'/.test(source)) missing.push('start and end are not swapped')
+      if (!/onVerticalAxis &&/.test(source)) missing.push('mirrors on the block axis too')
+      for (const [file, caller] of [
+        ['components/Popover/Popover.tsx', 'Popover'],
+        ['components/Tooltip/Tooltip.tsx', 'Tooltip'],
+        ['components/Combobox/Combobox.tsx', 'Combobox'],
+      ]) {
+        const body = readFileSync(join(srcRoot, file), 'utf8')
+        // Balance the parens: a lazy regex stops at getBoundingClientRect()'s
+        // own closer and reads the call as three arguments short.
+        // Skip the DEFINITION — Popover.tsx both declares and calls it, and
+        // the signature ends in a type, not an element.
+        let start = -1
+        for (let at = body.indexOf('placeFloating('); at !== -1; at = body.indexOf('placeFloating(', at + 1)) {
+          if (/function\s+$/.test(body.slice(Math.max(0, at - 12), at))) continue
+          start = at
+          break
+        }
+        if (start === -1) { missing.push(`${caller} no longer calls placeFloating`); continue }
+        let depth = 0
+        let end = start
+        for (let i = body.indexOf('(', start); i < body.length; i++) {
+          if (body[i] === '(') depth++
+          else if (body[i] === ')' && --depth === 0) { end = i; break }
+        }
+        const call = body.slice(start, end + 1)
+        if (!/(anchor|rootRef\.current)\s*,?\s*\)$/.test(call))
+          missing.push(`${caller} passes no element to read direction from`)
+      }
+      return (
+        missing.length === 0 || (console.log(`\n       placeFloating: ${missing.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0

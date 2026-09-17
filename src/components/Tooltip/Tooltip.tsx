@@ -147,7 +147,7 @@ export function Tooltip({
     // offsetWidth/offsetHeight, not a rect: the hint is mid-scale while it
     // arrives, and a rect would measure the animation instead of the box.
     const panel = { width: surface.offsetWidth, height: surface.offsetHeight }
-    const next = placeFloating(anchor.getBoundingClientRect(), panel, placement, offset)
+    const next = placeFloating(anchor.getBoundingClientRect(), panel, placement, offset, anchor)
 
     surface.style.left = `${next.x}px`
     surface.style.top = `${next.y}px`

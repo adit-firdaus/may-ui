@@ -184,7 +184,13 @@ export function Combobox({
     if (!mounted || !rootRef.current || !popupRef.current) return
     const anchor = rootRef.current.getBoundingClientRect()
     const panel = popupRef.current.getBoundingClientRect()
-    const placed = placeFloating(anchor, { width: panel.width, height: panel.height }, 'bottom-start', OFFSET)
+    const placed = placeFloating(
+      anchor,
+      { width: panel.width, height: panel.height },
+      'bottom-start',
+      OFFSET,
+      rootRef.current,
+    )
     setPosition({ x: placed.x, y: placed.y, width: anchor.width })
   }, [mounted, matches.length])
 

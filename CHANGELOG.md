@@ -122,6 +122,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`placement="…-start"` and `"…-end"` follow the inline axis.** `types.ts`
+  defines that vocabulary as logical — "start and end rather than left and
+  right, so a mirrored layout needs no second set of values" — but
+  `placeFloating` resolved them to physical left and right. Measured under
+  `dir="rtl"`: a `bottom-start` `Popover` aligned its **left** edge with the
+  anchor's left, where inline-start is the right one. `Tooltip` and `Combobox`
+  place through the same function and were wrong the same way. The *side*
+  names stay physical on purpose — `left` means left in any direction — so only
+  the cross-axis alignment mirrors, and only when that axis is horizontal.
+  Direction is read from the anchor element, so a subtree with its own `dir`
+  is right too.
+
 - **`SplitPane` resizes the right way in RTL.** The sized pane is the first
   child, which `dir="rtl"` puts on the right — but the divider added a raw
   pointer delta and read physical arrow keys, so it moved *away* from the
