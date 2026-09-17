@@ -339,4 +339,10 @@ for (const [label, fn] of assertions) {
   if (!ok) failed++
 }
 
-process.exit(failed + renderFailed ? 1 : 0)
+/*
+ * Parenthesised. `failed + renderFailed ? 1 : 0` is correct — the sum is
+ * truthy whenever either is nonzero — but it reads like the precedence bug it
+ * is one keystroke away from being, and this is the line that decides whether
+ * the whole gate means anything.
+ */
+process.exit(failed > 0 || renderFailed > 0 ? 1 : 0)
