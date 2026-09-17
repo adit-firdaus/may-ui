@@ -448,6 +448,40 @@ const blockAt = (source, start) => {
   throw new Error(`unterminated CSS block at ${start}`)
 }
 
+/**
+ * Drop every `@supports` block, brace-matched.
+ *
+ * motion.css declares each spring twice: the real `linear()` samples in
+ * `:root`, and a `cubic-bezier` stand-in inside
+ * `@supports not (animation-timing-function: linear(0, 1))` for browsers that
+ * cannot parse the first. Parsing the file flat let the fallback win on
+ * position alone — `Object.fromEntries` keeps the last of a repeated key — so
+ * every spring in `mayLightTokens` and `mayDarkTokens` was the legacy curve,
+ * and `useMayTokens().springSnappy` handed a consumer a flat cubic-bezier
+ * while the components themselves animated on the real spring.
+ */
+const withoutSupports = (source) => {
+  let out = ''
+  let index = 0
+  while (index < source.length) {
+    const found = source.indexOf('@supports', index)
+    if (found === -1) {
+      out += source.slice(index)
+      break
+    }
+    out += source.slice(index, found)
+    const open = source.indexOf('{', found)
+    let depth = 0
+    let cursor = open
+    for (; cursor < source.length; cursor++) {
+      if (source[cursor] === '{') depth++
+      else if (source[cursor] === '}' && --depth === 0) break
+    }
+    index = cursor + 1
+  }
+  return out
+}
+
 const declarations = (source) =>
   Object.fromEntries(
     [...source.matchAll(/--may-([\w-]+)\s*:\s*([^;]+);/g)].map((match) => [
@@ -461,7 +495,7 @@ const motionCss = readFileSync(resolve(here, '../src/styles/motion.css'), 'utf8'
 const common = Object.assign(
   {},
   ...rootStarts.map((start) => declarations(blockAt(css, start))),
-  declarations(motionCss),
+  declarations(withoutSupports(motionCss)),
 )
 const darkStart = css.indexOf("[data-may-theme='dark']")
 const darkValues = declarations(blockAt(css, darkStart))

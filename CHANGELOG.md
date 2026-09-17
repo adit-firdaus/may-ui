@@ -106,6 +106,16 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`useMayTokens()` returned the legacy curve for every spring and ease.**
+  `motion.css` declares each spring twice — the real `linear()` samples in
+  `:root`, and a `cubic-bezier` stand-in inside
+  `@supports not (animation-timing-function: linear(0, 1))` for browsers that
+  cannot parse them. The token generator parsed the file flat, so the fallback
+  won on position alone, and all eight curves in `mayLightTokens` and
+  `mayDarkTokens` were the stand-in. Components always animated on the real
+  samples; only the values a consumer read back were wrong, which is why
+  nothing looked broken.
+
 - **Four directional chevrons pointed the wrong way in RTL.** The library
   already supported RTL in six components, but `ListRow`, `Collapsible`,
   `Sidebar` sections, `ContextMenu` submenus, `NavTree` branches and

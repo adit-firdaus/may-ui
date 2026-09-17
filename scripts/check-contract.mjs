@@ -225,6 +225,49 @@ const checks = [
       return !!m && m[1].split(',').some((n) => parseFloat(n) > 1)
     })(),
   ],
+  /*
+   * The exported token VALUES carry the springs too, not the fallback.
+   *
+   * The check above proves the sheet ships real samples. It said nothing
+   * about `mayLightTokens` / `mayDarkTokens`, which back `useMayTokens()` —
+   * and those were wrong: gen-tokens parsed motion.css flat, so the
+   * `cubic-bezier` stand-in inside `@supports not (…)` overwrote the real
+   * value on position alone. Every spring and ease a consumer read from the
+   * hook was the legacy curve, while the components animated on the samples.
+   *
+   * The expected set is read from motion.css rather than matched on names.
+   * A first attempt keyed on /^(spring|ease)/ and flagged easeOut and
+   * easeStandard, which are genuinely cubic-bezier, along with the duration
+   * companions — a check that fails on correct code is worse than none.
+   */
+  [
+    'the exported token values carry linear() springs, not the fallback',
+    (() => {
+      const motion = readFileSync(new URL('../src/styles/motion.css', import.meta.url), 'utf8')
+      const root = motion.slice(0, motion.indexOf('@supports') + 1 || undefined)
+      const shouldBeLinear = [...root.matchAll(/--may-([\w-]+)\s*:\s*(linear\([^;]*)/g)].map(
+        ([, name]) => name.replace(/-([a-z0-9])/g, (_, char) => char.toUpperCase()),
+      )
+
+      const generated = readFileSync(
+        new URL('../src/styles/tokens.generated.ts', import.meta.url),
+        'utf8',
+      )
+      const wrong = shouldBeLinear.filter((name) => {
+        const found = new RegExp(`^ {2}${name}: "([^"]*)"`, 'm').exec(generated)
+        return !found || !found[1].startsWith('linear(')
+      })
+
+      return (
+        shouldBeLinear.length > 0 &&
+        (wrong.length === 0 ||
+          (console.log(
+            `\n       ${wrong.length} curve(s) exported as the fallback: ${wrong.join(', ')}`,
+          ),
+          false))
+      )
+    })(),
+  ],
   [
     'a linear() fallback exists for older browsers',
     /@supports not \(animation-timing-function: linear/.test(css),
