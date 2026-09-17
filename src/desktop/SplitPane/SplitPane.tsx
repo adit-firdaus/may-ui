@@ -50,6 +50,16 @@ export interface SplitPaneProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
 
 /** Arrow-key step, in px. Coarse enough to be useful, fine enough to aim. */
 const KEY_STEP = 16
+
+/*
+ * +1 when the inline axis runs left-to-right, -1 when it runs right-to-left.
+ *
+ * A pointer delta and an arrow key are both PHYSICAL, while the pane they
+ * size is the first child — which `dir="rtl"` puts on the right. Multiplying
+ * by this is what keeps the divider under the pointer in both directions.
+ */
+const inlineSign = (root: HTMLElement | null): 1 | -1 =>
+  root && getComputedStyle(root).direction === 'rtl' ? -1 : 1
 /**
  * How far into the rubber band a release has to be for the pane to let go and
  * collapse. Half the band's travel: far enough that it takes intent, close
@@ -215,15 +225,16 @@ export function SplitPane({
         setDragging(true)
       },
       onMove: ({ dx, dy }) => {
-        track(resolve(start + (horizontal ? dx : dy)))
+        track(resolve(start + (horizontal ? dx * inlineSign(root) : dy)))
       },
       onEnd: ({ dx, dy, vx, vy }) => {
         setDragging(false)
         const { min: lo, max: hi, collapsible: canCollapse } = live.current
-        const target = start + (horizontal ? dx : dy)
+        const sign = inlineSign(root)
+        const target = start + (horizontal ? dx * sign : dy)
         // Distance alone would make a short, fast flick toward the edge feel
         // ignored, so the decision reads where the flick was heading.
-        const projected = target + projectFlick(horizontal ? vx : vy)
+        const projected = target + projectFlick(horizontal ? vx * sign : vy)
 
         // Symmetrical thresholds: half the band's travel closes an open pane,
         // and the same distance out of the edge is what reopens a shut one.
@@ -249,8 +260,18 @@ export function SplitPane({
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const decrease = horizontal ? 'ArrowLeft' : 'ArrowUp'
-    const increase = horizontal ? 'ArrowRight' : 'ArrowDown'
+    /*
+     * The arrows are physical; the pane they size is not.
+     *
+     * The sized pane is the first child, which `dir="rtl"` puts on the RIGHT
+     * — so there the key that grows it is ArrowLeft, and a pointer dragging
+     * left grows it too. Without this the divider moved AWAY from the
+     * pointer: measured in RTL, dragging 77px left shrank the pane from 240
+     * to 163 instead of growing it to 317.
+     */
+    const rtl = horizontal && inlineSign(rootRef.current) < 0
+    const decrease = horizontal ? (rtl ? 'ArrowRight' : 'ArrowLeft') : 'ArrowUp'
+    const increase = horizontal ? (rtl ? 'ArrowLeft' : 'ArrowRight') : 'ArrowDown'
 
     switch (event.key) {
       case decrease:

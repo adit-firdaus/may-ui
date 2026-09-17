@@ -634,6 +634,31 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * SplitPane's divider follows the pointer in both directions.
+   *
+   * The sized pane is the first child, which `dir="rtl"` puts on the RIGHT —
+   * so a pointer delta and an arrow key, both physical, have to be read
+   * against the inline axis rather than added raw. Measured in RTL before the
+   * fix: dragging the divider 77px LEFT shrank the pane from 240 to 163 and
+   * moved the divider away from the pointer, instead of growing it to 317.
+   *
+   * Both paths matter, and they failed together: the same raw delta drove the
+   * drag, the flick projection and the arrow keys.
+   */
+  [
+    'SplitPane reads the inline axis for its drag and its arrows',
+    (() => {
+      const source = readFileSync(join(srcRoot, 'desktop/SplitPane/SplitPane.tsx'), 'utf8')
+      const missing = []
+      if (!/direction === 'rtl' \? -1 : 1/.test(source)) missing.push('no inline-axis sign')
+      if (!/dx \* inlineSign\(root\)/.test(source)) missing.push('the drag adds a raw dx')
+      if (!/rtl \? 'ArrowRight' : 'ArrowLeft'/.test(source)) missing.push('the arrows are not mirrored')
+      return (
+        missing.length === 0 || (console.log(`\n       SplitPane: ${missing.join(', ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0

@@ -122,6 +122,14 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`SplitPane` resizes the right way in RTL.** The sized pane is the first
+  child, which `dir="rtl"` puts on the right — but the divider added a raw
+  pointer delta and read physical arrow keys, so it moved *away* from the
+  pointer. Measured: dragging 77px left shrank the pane from 240 to 163
+  instead of growing it to 317, and `ArrowLeft` shrank what it should grow.
+  The drag, the flick projection and the arrows all read the inline axis now;
+  LTR is unchanged.
+
 - **`Slider` works in RTL.** Its fill is width plus `inset-inline-start`, so
   that mirrored on its own — but two things did not follow it. The knob pairs
   the same logical anchor with a *physical* `translate`, so under `dir="rtl"`
