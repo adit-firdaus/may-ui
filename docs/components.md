@@ -41,6 +41,23 @@ bundle — each family is a separate entry.
 `TabBar`, `NavBar`, `SearchBar`, `PullToRefresh`, `SwipeAction`, `CapsuleTabs`,
 `Selector`, `Popup`, `FloatingBubble`
 
+## Select or Combobox
+
+Reach for `Select` first. It renders a real `<select>`, so it costs almost
+nothing, inherits the platform's own accessibility, and on a phone it is the
+system wheel — which no custom listbox beats. A dozen fixed options is exactly
+its job.
+
+Reach for `Combobox` when `Select` physically cannot do it:
+
+- the list is long enough that someone would rather **type** than scroll
+- more than one value can be chosen, and they need to be visible as tags
+- a row needs **more than text** — a second line, an icon, a group heading
+- the rows need custom rendering, through `renderOption`
+
+A `<select>` cannot search, cannot show several values legibly, and cannot draw
+a row. Everything else is a reason to stay with it.
+
 ## Table: select-all, sortable headers, bespoke cells
 
 `Table` is prop-driven, but the props are not limited to strings — `header` is a

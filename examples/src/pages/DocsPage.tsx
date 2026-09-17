@@ -3,12 +3,21 @@ import { marked } from 'marked'
 import gettingStarted from '../../../docs/getting-started.md?raw'
 import theming from '../../../docs/theming.md?raw'
 import motion from '../../../docs/motion.md?raw'
+import components from '../../../docs/components.md?raw'
 import { navigate, SiteLink } from '../router'
 
 const documents = {
   'getting-started': { title: 'Getting started', markdown: gettingStarted },
   theming: { title: 'Provider and theming', markdown: theming },
   motion: { title: 'Motion', markdown: motion },
+  /*
+   * Titled for what it actually contains. The family lists in it duplicate the
+   * live catalogue at /components, but the "which family" guidance and the
+   * Table recipe are prose that exists nowhere else, and it was reachable from
+   * nothing: every in-prose link to components.md is rewritten to /components,
+   * so the page itself had no route at all.
+   */
+  components: { title: 'Families and recipes', markdown: components },
 } as const
 
 export default function DocsPage({ slug }: { slug: string }) {
