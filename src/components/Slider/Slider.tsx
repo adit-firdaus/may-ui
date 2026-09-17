@@ -6,6 +6,15 @@ import type { MayTone } from '../../types'
 
 export interface SliderProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
+  /**
+   * Submits the current value under this name inside a `<form>`.
+   *
+   * The thumb is a `<button role="slider">` — focusable, switch-accessible and
+   * carrying real value semantics — which is the right element for everything
+   * except form submission, because a button has no form value. Naming the
+   * slider renders a hidden input alongside it so `FormData` sees the number.
+   */
+  name?: string
   /** Controlled value. */
   value?: number
   /** Uncontrolled initial value. Defaults to `min`. */
@@ -63,6 +72,7 @@ function quantize(raw: number, min: number, max: number, step: number): number {
  * value label together.
  */
 export function Slider({
+  name,
   value,
   defaultValue,
   onValueChange,
@@ -314,6 +324,8 @@ export function Slider({
       )}
 
       {showValue && <span className="may-slider__value">{display}</span>}
+
+      {name !== undefined && <input type="hidden" name={name} value={current} />}
     </div>
   )
 }

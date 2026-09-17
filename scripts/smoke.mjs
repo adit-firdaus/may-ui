@@ -267,6 +267,35 @@ const assertions = [
       return /<a [^>]*href="\/x"/.test(s) && /<a [^>]*class="[^"]*may-/.test(s) && !/<button/.test(s)
     },
   ]),
+  /*
+   * Every named control has to reach FormData.
+   *
+   * Slider's thumb is a <button role="slider"> and Stepper is two buttons in a
+   * role="group" — the right elements for a11y, and neither has a form value,
+   * so `name` landed on the wrapping div and a native submit sent nothing.
+   * Both now render a hidden input. Asserting the attribute is on a real
+   * form control rather than merely present is the whole point: the div had
+   * it too.
+   */
+  ['every named form control reaches FormData', () => {
+    const html = renderToStaticMarkup(
+      h(Adaptive.MayProvider, {}, h('form', {},
+        h(Adaptive.Input, { name: 'email', defaultValue: 'a@b.c' }),
+        h(Adaptive.Textarea, { name: 'bio', defaultValue: 'hi' }),
+        h(Adaptive.Select, { name: 'plan' }, h('option', { value: 'pro' }, 'Pro')),
+        h(Adaptive.Checkbox, { name: 'tos', defaultChecked: true }),
+        h(Adaptive.Switch, { name: 'beta' }),
+        h(Adaptive.Slider, { name: 'vol', defaultValue: 5 }),
+        h(Adaptive.Stepper, { name: 'qty', defaultValue: 2 }),
+        h(Adaptive.RadioGroup, { name: 'tier', defaultValue: 'b' },
+          h(Adaptive.Radio, { value: 'a' }, 'A'),
+          h(Adaptive.Radio, { value: 'b' }, 'B')),
+      )),
+    )
+    return ['email', 'bio', 'plan', 'tos', 'beta', 'vol', 'qty', 'tier'].every((n) =>
+      new RegExp(`<(input|select|textarea)[^>]*name="${n}"`).test(html),
+    )
+  }],
   ['Text renders the element it is told to', () =>
     /<a [^>]*href="\/x"[^>]*class="[^"]*may-text/.test(
       renderToStaticMarkup(h(Adaptive.MayProvider, {}, h(Adaptive.Text, { as: 'a', href: '/x' }, 'link'))))],

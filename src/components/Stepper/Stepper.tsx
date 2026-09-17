@@ -7,6 +7,14 @@ import type { MaySize } from '../../types'
 
 export interface StepperProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
+  /**
+   * Submits the current value under this name inside a `<form>`.
+   *
+   * The control is two buttons in a `role="group"`, which is the right shape
+   * for a stepper and has no form value of its own. Naming it renders a hidden
+   * input alongside so `FormData` sees the number.
+   */
+  name?: string
   /** Controlled value. */
   value?: number
   /** Uncontrolled initial value. Defaults to `min`, or 0 when there is none. */
@@ -138,6 +146,7 @@ function StepperHalf({
  * rather than ticking uselessly against it.
  */
 export function Stepper({
+  name,
   value,
   defaultValue,
   onValueChange,
@@ -266,6 +275,8 @@ export function Stepper({
       <span className="may-sr-only" aria-live="polite">
         {display}
       </span>
+
+      {name !== undefined && <input type="hidden" name={name} value={current} />}
     </div>
   )
 }

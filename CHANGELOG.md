@@ -13,6 +13,11 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   `onOpenChange`, so showing a dialog no longer costs a `useState` and two
   handlers. Passing `open` still takes over completely, so every existing call
   site is unchanged. `AlertDialog` closes itself once `onConfirm` has run.
+- **`name` on `Slider` and `Stepper`.** Both are correctly ARIA-roled — a
+  `<button role="slider">` and two buttons in a `role="group"` — and neither
+  had a form value, so `name` landed on the wrapping div and a native submit
+  sent nothing. Both now render a hidden input, and a smoke assertion fails the
+  build if any named control stops reaching `FormData`.
 - **`asChild` on the interactive surfaces.** `Card`, `ListRow`, `Tag` and
   `Avatar` join `Button`, `IconButton`, `Fab` and `NavTree`, so a card or a
   settings row can be a real router link rather than a div with a click
