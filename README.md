@@ -193,9 +193,10 @@ handlers:
 The trigger is cloned, so your own `onClick` still runs and the
 `aria-haspopup` / `aria-expanded` / `aria-controls` wiring is done for you.
 Pass `open` and the component stops managing anything, which is what you want
-when the state lives in a router or a store. `AlertDialog` closes itself once
-`onConfirm` has run, and `CommandPalette` needs no trigger at all — its hotkey
-already opens it.
+when the state lives in a router or a store. Mobile `Popup` takes the same three
+under its own phone-centric names — `visible`, `defaultVisible`,
+`onVisibleChange`. `AlertDialog` closes itself once `onConfirm` has run, and
+`CommandPalette` needs no trigger at all — its hotkey already opens it.
 
 ## Composition
 
@@ -313,6 +314,15 @@ instead of quietly drifting off-brand. `@media (prefers-contrast: more)` — wha
 Apple's own **Increase Contrast** setting sets — swaps in AA-safe primitives, at
 which point all three families report **zero** violations. A reader who needs
 the contrast gets it from the OS; nobody has to wire anything.
+
+**One known false positive.** Running axe over the mobile catalogue may report
+`may-capsule-tabs__label` and `__count` at roughly 1.1:1 — white text on a light
+track. The selected capsule's tint thumb is a transform-positioned *sibling* of
+the label rather than an ancestor, so axe reads the track behind it instead.
+Measured, the thumb fully covers the label and the real ratio is white on
+`--may-color-tint`. It appears only when the thumb has not finished being laid
+out, so the same page can report it on one run and not the next. Do not "fix" it
+by changing the label colour.
 
 If your audit requires AA in the default state, override the same primitives on
 the provider — they are typed token keys, not private variables:

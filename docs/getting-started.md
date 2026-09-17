@@ -110,9 +110,9 @@ Every overlay manages its own open state unless you take it over. Hand it a
 
 The trigger element is cloned, so your own `onClick` still runs and the
 `aria-haspopup`, `aria-expanded` and `aria-controls` wiring is done for you.
-`Modal`, `Sheet`, `AlertDialog`, `ActionSheet`, `Popover`, `Menu` and
-`CommandPalette` all take one; `CommandPalette` needs none at all, because its
-hotkey already opens it.
+`Modal`, `Sheet`, `AlertDialog`, `ActionSheet`, `Popover`, `Menu`, mobile
+`Popup` and `CommandPalette` all take one; `CommandPalette` needs none at all,
+because its hotkey already opens it.
 
 Pass `open` and the component stops managing anything, which is what you want
 when the state lives in a router or a store:
