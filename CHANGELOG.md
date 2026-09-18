@@ -127,6 +127,16 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **`Toolbar` no longer makes the page scroll sideways.** It is a flex row that
+  takes however many children you give it, and a `Button` will not shrink below
+  its own label — so with no wrap and no scroller, four buttons (the count
+  Toolbar's own note calls typical) overflowed and widened the **document**.
+  Measured at a 320px viewport: the page went to 431px, and hiding the bar
+  alone brought it back to 320. It wraps now, which costs nothing at any width
+  where the actions already fit — verified one row at 768 and 1440, two at 320
+  — and `ToolbarSpacer`, `align="between"` and the centred-spacer layout all
+  still lay out correctly.
+
 - **The behavioural base layer no longer needs a provider.** `.may-root` is
   rendered by `MayProvider` alone, and a provider is optional — the
   getting-started page opens by showing components used without one. Four base

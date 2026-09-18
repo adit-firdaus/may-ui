@@ -811,6 +811,39 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * A bar of actions wraps rather than widening the page.
+   *
+   * Toolbar is a flex ROW that takes however many children a caller gives it,
+   * and a Button will not shrink below its own label. With no wrap and no
+   * scroller, four buttons — the count Toolbar's own note calls typical —
+   * overflowed and, with nothing clipping them, made the DOCUMENT scroll
+   * sideways: measured at a 320px viewport, the page went to 431px, and
+   * hiding the bar alone brought it back to 320.
+   *
+   * Only Toolbar is checked, and deliberately. Stack has a `wrap` prop and
+   * ButtonGroup an `orientation`, so a caller there has an answer and an
+   * attached group that wrapped would look broken; Toolbar had neither.
+   * TabBar looked like it overflowed too and does not — that measurement was
+   * taken on a page another component had already widened.
+   */
+  [
+    'Toolbar wraps instead of overflowing its container',
+    (() => {
+      const styles = readFileSync(join(srcRoot, 'components/Toolbar/Toolbar.css'), 'utf8')
+      const root = styles.match(/^\.may-toolbar\s*\{([^}]*)\}/m)
+      if (!root) {
+        console.log('\n       no .may-toolbar root rule at all')
+        return false
+      }
+      const body = root[1]
+      if (/flex-wrap:\s*wrap/.test(body)) return true
+      // a scroller would be an acceptable answer too; silently doing neither is not
+      if (/overflow-x:\s*(auto|scroll)/.test(body)) return true
+      console.log('\n       .may-toolbar neither wraps nor scrolls — its children will widen the page')
+      return false
+    })(),
+  ],
 ]
 
 let bad = 0
