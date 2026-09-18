@@ -10,6 +10,19 @@
   display: inline-flex;
   align-items: stretch;
   min-width: 0;
+  /* Shrink-to-fit is not a ceiling: the children do not shrink, so without
+   * this the cluster keeps its full row width and pushes the page sideways. */
+  max-width: 100%;
+}
+
+/*
+ * A loose group is just buttons with a gap, so it wraps. An ATTACHED one never
+ * does — the middle child would end a visual row square at both corners while
+ * the first kept its rounded start, and three fragments do not read as a
+ * cluster. It turns vertical instead; `ButtonGroup.tsx` decides when.
+ */
+.may-button-group[data-attached='false'] {
+  flex-wrap: wrap;
 }
 
 .may-button-group[data-orientation='vertical'] {

@@ -78,8 +78,19 @@ const gz = (files) =>
 const raw = (files) => files.reduce((n, f) => n + statSync(join(dist, f)).size, 0)
 
 const BUDGETS = {
-  // The published graph behind the default entry.
-  'mayui.js': 90 * 1024,
+  /*
+   * The published graph behind the default entry.
+   *
+   * Raised from 90 KiB when four components stopped guessing their layout from
+   * the viewport and started measuring the box they are in: `Table`,
+   * `Descriptions`, `Pagination` and `ButtonGroup`, over one shared
+   * `useContainerWidth`. That is 140 bytes gzipped, and it buys a table that
+   * does not collapse with 988px of room, a pager that does not walk off a
+   * phone, and a button cluster that stacks rather than pushing the page
+   * sideways. Deliberate growth, not drift — the budget is here to make the
+   * difference visible, not to be raised whenever it bites.
+   */
+  'mayui.js': 92 * 1024,
   // Opt-in families. Importing 'mayui' pulls in neither.
   'desktop.js': 46 * 1024,
   'mobile.js': 39 * 1024,

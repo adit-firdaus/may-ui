@@ -149,6 +149,25 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   invented prop. That retype also found `ContextMenu` preview actions missing
   their required `id`.
 
+- **`Input` and `Combobox` cap their width against their container.** Both are
+  inline-level boxes wrapping a real `<input>`, and an inline box shrinks only
+  as far as its own min-content — which, around an `<input>`, is the control's
+  intrinsic ~20-character width. The `min-width: 0` they already carried lifts
+  the flex item's minimum, not the wrapper's intrinsic contribution. At 200%
+  text in a 320px column — WCAG 1.4.4 — `Input` drew 401px and scrolled the
+  page 81px, `Combobox` 69px. `Select` and `SearchField` had the missing line
+  all along.
+
+- **`ButtonGroup` adapts instead of pushing the page sideways.** An unattached
+  group now wraps, which is just buttons with a gap. An attached one never
+  wraps — the middle child would end a visual row square at both corners and
+  the cluster would read as three broken pieces — so it turns **vertical**
+  instead, the stacked shape the stylesheet already draws with rounded ends and
+  hairline seams. `orientation` is tri-state: pass it to fix the axis, leave it
+  off and the group measures its row against the room it has. Verified from
+  600px down to 150px and back: the switch is at the row's own measured width
+  in both directions, with no flip-flop while held at any width.
+
 - **A long word no longer pushes `Text` and `Heading` out of their box.**
   `.may-text` carried `overflow-wrap: break-word`, which lets a word break but
   does not lower the box's min-content width — so as a flex or grid item,

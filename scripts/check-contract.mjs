@@ -846,6 +846,44 @@ const checks = [
   ],
 
   /*
+   * A text control caps its own width.
+   *
+   * These wrappers are inline-level, and an inline-level box shrinks to
+   * min(max-content, available) only as far as its own min-content — which,
+   * around a real `<input>`, is the control's intrinsic ~20-character width.
+   * So the wrapper keeps that width and leaves its parent. `min-width: 0` does
+   * not cover it: that lifts the flex item's minimum, not the wrapper's
+   * intrinsic contribution. Invisible at 100% text on a wide screen, which is
+   * why two of the four had the line and two did not; at 200% text in a 320px
+   * column — WCAG 1.4.4 — Input scrolled the page 81px and Combobox 69px.
+   */
+  [
+    'every text control caps its width against its container',
+    (() => {
+      const wrappers = [
+        ['components/Input/Input.css', '.may-input'],
+        ['components/Combobox/Combobox.css', '.may-combobox'],
+        ['components/Select/Select.css', '.may-select'],
+        ['components/SearchField/SearchField.css', '.may-search'],
+      ]
+      const offenders = wrappers.filter(([file, selector]) => {
+        const text = readFileSync(join(srcRoot, file), 'utf8')
+        const rule = text.match(new RegExp(`^\\${selector}\\s*\\{([^}]*)\\}`, 'm'))
+        if (!rule) return true
+        return !/max-width:\s*100%/.test(rule[1].replace(/\/\*[\s\S]*?\*\//g, ''))
+      })
+      return (
+        offenders.length === 0 ||
+        (console.log(
+          `\n       ${offenders.map(([, s]) => s).join(', ')} set no max-width, so the control keeps` +
+            '\n       its intrinsic width and leaves its container once the text is scaled up',
+        ),
+        false)
+      )
+    })(),
+  ],
+
+  /*
    * A screen-reader caption cannot widen the page.
    *
    * `.may-sr-only` is `position: absolute`, and an absolutely positioned box
@@ -891,19 +929,35 @@ const checks = [
    * overflow.
    */
   [
-    'Pagination decides `compact` from its own width, not from a default',
+    'a shape that must adapt keeps its prop tri-state and measures',
     (() => {
-      const file = join(srcRoot, 'components/Pagination/Pagination.tsx')
-      const text = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
-      if (/compact\s*=\s*false/.test(text)) {
-        console.log('\n       Pagination defaults `compact` to false — the keys will overflow a phone again')
-        return false
+      /*
+       * Each of these has a prop whose default USED to be a literal, and the
+       * literal was the bug: the component could adapt, and did not unless the
+       * consumer knew to ask. Left off the prop now means "measure", which is
+       * why a default would silently restore the overflow.
+       */
+      const adaptive = [
+        ['components/Pagination/Pagination.tsx', /compact\s*=\s*(false|true)/, 'compact'],
+        ['components/ButtonGroup/ButtonGroup.tsx', /orientation\s*=\s*'/, 'orientation'],
+      ]
+      const offenders = []
+      for (const [file, defaulted, prop] of adaptive) {
+        const text = readFileSync(join(srcRoot, file), 'utf8')
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/\/\/.*/g, '')
+        const name = file.split('/').pop()
+        if (defaulted.test(text)) offenders.push(`${name} defaults \`${prop}\``)
+        else if (!/\buseContainerWidth\b/.test(text)) offenders.push(`${name} no longer measures its container`)
       }
-      if (!/\buseContainerWidth\b/.test(text)) {
-        console.log('\n       Pagination no longer measures its container, so it cannot know when to collapse')
-        return false
-      }
-      return true
+      return (
+        offenders.length === 0 ||
+        (console.log(
+          `\n       ${offenders.join('; ')}` +
+            '\n       — so it cannot know when it no longer fits, and overflows instead',
+        ),
+        false)
+      )
     })(),
   ],
 

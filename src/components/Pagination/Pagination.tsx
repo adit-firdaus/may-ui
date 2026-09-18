@@ -5,6 +5,7 @@ import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
 import { useContainerWidth } from '../../hooks/useContainerWidth'
+import { rowWidth } from '../../utils/rowWidth'
 import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 import type { MaySize } from '../../types'
 
@@ -180,15 +181,8 @@ export function Pagination({
   useIsomorphicLayoutEffect(() => {
     if (isCompact) return // nothing to measure; the stored requirement stands
     const list = rootRef.current?.querySelector('ul')
-    if (!list) return
-    const items = [...list.children].filter((child) => child.tagName === 'LI')
-    if (items.length === 0) return
-    const gap = Number.parseFloat(getComputedStyle(list).columnGap) || 0
-    const run =
-      items.reduce((sum, item) => sum + item.getBoundingClientRect().width, 0) +
-      gap * (items.length - 1)
-    // Rounded, so sub-pixel jitter cannot re-render this on every resize tick.
-    const measured = Math.ceil(run)
+    if (!list || list.children.length === 0) return
+    const measured = rowWidth(list)
     setNeeded((previous) => (previous === measured ? previous : measured))
   })
 

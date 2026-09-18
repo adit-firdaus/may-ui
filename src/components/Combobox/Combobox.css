@@ -11,6 +11,17 @@
   position: relative;
   display: inline-flex;
   min-width: 0;
+  /*
+   * Shrink-to-fit is not a ceiling. An inline-level box uses
+   * min(max-content, available) only down to its own min-content, and this one
+   * wraps a real `<input>` whose min-content IS its intrinsic ~20-character
+   * width — so the box holds that width and walks out of its parent. The
+   * `min-width: 0` above does not cover it: that lifts the flex item's
+   * minimum, not the wrapper's intrinsic contribution. Measured at 200% text
+   * in a 320px column, which is WCAG 1.4.4's case: the field drew 389px and the page scrolled 69px sideways. `Select` and
+   * `SearchField` have carried this line all along.
+   */
+  max-width: 100%;
   flex-direction: column;
 }
 

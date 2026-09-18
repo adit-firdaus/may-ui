@@ -24,11 +24,34 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect'
  * Callers treat `null` as "fall back to the viewport", which keeps SSR and
  * hydration exactly as they were.
  */
-export function useContainerWidth(ref: RefObject<HTMLElement | null>): number | null {
+export interface ContainerWidthOptions {
+  /**
+   * Which box to measure. `self` is right for an element that fills its
+   * parent, which is most of them.
+   *
+   * `parent` is for an element sized by its own CONTENT — an `inline-flex`
+   * cluster, say. Measuring such an element tells you how wide it currently
+   * is, not how much room it has, and if it shrank because it ran out of room
+   * the reading contradicts itself: `ButtonGroup` turned vertical at a narrow
+   * width, shrank to one button, and then read 91px forever and never turned
+   * back.
+   *
+   * @default 'self'
+   */
+  from?: 'self' | 'parent'
+}
+
+export function useContainerWidth(
+  ref: RefObject<HTMLElement | null>,
+  options?: ContainerWidthOptions,
+): number | null {
   const [width, setWidth] = useState<number | null>(null)
+  // Read to a primitive: an options object is a fresh identity every render,
+  // and depending on it would tear the observer down and rebuild it each time.
+  const from = options?.from ?? 'self'
 
   useIsomorphicLayoutEffect(() => {
-    const el = ref.current
+    const el = from === 'parent' ? ref.current?.parentElement : ref.current
     if (!el) return
 
     /*
@@ -47,7 +70,7 @@ export function useContainerWidth(ref: RefObject<HTMLElement | null>): number | 
     const observer = new ResizeObserver(read)
     observer.observe(el)
     return () => observer.disconnect()
-  }, [ref])
+  }, [ref, from])
 
   return width
 }
