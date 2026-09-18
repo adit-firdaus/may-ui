@@ -188,6 +188,13 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   containing block's inline start. The focusable reveal sets `position: static`
   and is unaffected.
 
+- **`Pagination`'s collapsed count wraps rather than holding one line.** The
+  arrows either side are touch targets and do not shrink, so the count gets
+  what is left — 128px of a 320px row. At 200% text "Page 2 of 6" wants 198px
+  of it, and while it refused to wrap the collapsed pager pushed the page
+  sideways by 69px: the shape the component falls back to could not fit
+  either. Both text sizes now measure 0, with the sentence intact.
+
 - **`Pagination` collapses instead of walking out of its container.** Its key
   row is `flex-wrap: nowrap` with `flex-shrink: 0` keys, so a row that does
   not fit leaves its box rather than tightening — nine `md` keys want 428px

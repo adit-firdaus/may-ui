@@ -168,7 +168,18 @@
   padding-inline: var(--may-space-3);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  /*
+   * Wraps rather than holding one line.
+   *
+   * The two arrows either side are touch targets and do not shrink, so the
+   * count gets whatever is left — 128px of a 320px row once the arrows and
+   * gaps are paid for. At 200% text "Page 2 of 6" wants 198px, and while it
+   * refused to wrap the collapsed pager pushed the page sideways by 69px:
+   * the shape the component falls back to could not fit either. Two lines of
+   * count is unremarkable at that text size, and keeps the sentence whole
+   * where an ellipsis would not.
+   */
+  min-width: 0;
 }
 
 /* ---------------------------------- sizes --------------------------------- */
