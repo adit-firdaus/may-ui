@@ -23,10 +23,32 @@ const comboboxOptions = [
   { value: 'fr', label: 'Français', description: 'French' },
 ]
 
-const baseProps: Record<string, Record<string, unknown>> = {
+const everything = { ...Adaptive, ...Desktop, ...Mobile }
+
+/*
+ * Typed against the real components, not `Record<string, unknown>`.
+ *
+ * It was the loose type, and the fixture for `Descriptions` passed `items` —
+ * a prop it does not have, and never had. TypeScript had nothing to say, so
+ * the prop fell through the component's rest spread onto the `<dl>` and the
+ * catalogue rendered an EMPTY card with `items="[object Object],[object
+ * Object]"` in the markup. `check:site` only asserts that a fixture EXISTS,
+ * which it did.
+ *
+ * `Partial` because a fixture supplies only what the preview needs; the
+ * mapped key is what makes each entry excess-property-checked against its own
+ * component, so a renamed or invented prop fails `npm run site:typecheck`.
+ */
+type Fixtures = {
+  [K in keyof typeof everything]?: typeof everything[K] extends ComponentType<infer P>
+    ? Partial<P>
+    : never
+}
+
+const baseProps: Fixtures = {
   ActionSheet: { open: false, onClose: noop, items: [{ label: 'Copy', onSelect: noop }] },
   Alert: { title: 'A thoughtful heads-up', children: 'May UI keeps feedback concise and actionable.' },
-  AlertDialog: { open: false, onClose: noop, onConfirm: noop, title: 'Remove this item?' },
+  AlertDialog: { open: false, onOpenChange: noop, onConfirm: noop, title: 'Remove this item?' },
   Avatar: { name: 'Ada Lovelace' },
   Badge: { children: 'New' },
   Breadcrumb: { items: [{ label: 'Library', href: '#' }, { label: 'Components' }] },
@@ -34,7 +56,12 @@ const baseProps: Record<string, Record<string, unknown>> = {
   Card: { children: 'A native-feeling surface with no visible stroke.' },
   Checkbox: { children: 'Include release notes' },
   Collapsible: { trigger: 'Show details', children: 'The panel follows the same spring language.' },
-  Descriptions: { items: [{ label: 'Platform', value: 'React 19' }, { label: 'Runtime CSS', value: 'None to import' }] },
+  Descriptions: {
+    children: [
+      h(Adaptive.DescriptionItem, { key: 'a', label: 'Platform', value: 'React 19' }),
+      h(Adaptive.DescriptionItem, { key: 'b', label: 'Runtime CSS', value: 'None to import' }),
+    ],
+  },
   DescriptionItem: { label: 'Platform', value: 'React 19' },
   EmptyState: { title: 'Nothing here yet', description: 'Create the first item to get started.' },
   Fab: { icon: '+', 'aria-label': 'Add' },
@@ -92,7 +119,7 @@ const baseProps: Record<string, Record<string, unknown>> = {
   Stepper: { defaultValue: 2, 'aria-label': 'Quantity' },
   Steps: { items: [{ title: 'Install' }, { title: 'Configure' }, { title: 'Ship' }], current: 1 },
   Switch: { children: 'Automatic appearance' },
-  Table: { columns: [{ key: 'name', header: 'Name' }, { key: 'status', header: 'Status' }], data: [{ name: 'May UI', status: 'Ready' }], rowKey: 'name' },
+  Table: { columns: [{ key: 'name', header: 'Name' }, { key: 'status', header: 'Status' }], data: [{ name: 'May UI', status: 'Ready' }], rowKey: (row) => String((row as { name: string }).name) },
   Tabs: { defaultValue: 'one', children: h(Adaptive.TabList, { 'aria-label': 'Preview tabs' }, options.map((option) => h(Adaptive.Tab, { key: option.value, value: option.value }, option.label))) },
   TabList: { children: options.map((option) => h(Adaptive.Tab, { key: option.value, value: option.value }, option.label)), 'aria-label': 'Preview tabs' },
   Tab: { value: 'one', children: 'One' },
@@ -104,8 +131,8 @@ const baseProps: Record<string, Record<string, unknown>> = {
   Toolbar: { children: [h(Adaptive.Button, { key: 'a', size: 'sm' }, 'Done'), h(Adaptive.ToolbarSpacer, { key: 's' }), h(Adaptive.IconButton, { key: 'i', 'aria-label': 'More' }, '•••')] },
   Tooltip: { label: 'Create a new item', children: h(Adaptive.Button, {}, 'Hover or focus') },
   CommandPalette: { open: false, onOpenChange: noop, groups: [], hotkey: false },
-  ContextMenu: { items: [{ label: 'Copy', onSelect: noop }], children: h('div', { className: 'site-context-target' }, 'Right-click target') },
-  DataTable: { columns: [{ key: 'name', header: 'Name' }], data: [{ name: 'May UI' }], rowKey: 'name' },
+  ContextMenu: { items: [{ id: 'copy', label: 'Copy', onSelect: noop }], children: h('div', { className: 'site-context-target' }, 'Right-click target') },
+  DataTable: { columns: [{ key: 'name', header: 'Name' }], data: [{ name: 'May UI' }], rowKey: (row) => String((row as { name: string }).name) },
   NavTree: { nodes: [{ id: 'components', label: 'Components', children: [{ id: 'button', label: 'Button' }] }] },
   Sidebar: { header: 'May UI', children: h(Desktop.SidebarSection, { title: 'Explore' }, h(Desktop.SidebarItem, { active: true, children: 'Components' })) },
   SidebarSection: { title: 'Explore', children: h(Desktop.SidebarItem, { active: true, children: 'Components' }) },
@@ -138,9 +165,18 @@ function OverlayPreview({
 }) {
   const [open, setOpen] = useState(false)
   const state = entry.name === 'Popup' ? { visible: open } : { open }
-  const callbacks = entry.name === 'CommandPalette'
-    ? { onOpenChange: setOpen }
-    : { onClose: () => setOpen(false) }
+  /*
+   * `onClose` is Modal's, Sheet's, ActionSheet's and Popup's contract.
+   * CommandPalette and AlertDialog are controlled through `onOpenChange`
+   * instead — and AlertDialog used to be handed `onClose`, which it does not
+   * declare, so the preview opened and its Cancel button did nothing: the
+   * dialog's own `setOpen(false)` is inert while `open` is controlled, and
+   * the only way out was Confirm.
+   */
+  const callbacks =
+    entry.name === 'CommandPalette' || entry.name === 'AlertDialog'
+      ? { onOpenChange: setOpen }
+      : { onClose: () => setOpen(false) }
   return (
     <>
       <Adaptive.Button onClick={() => setOpen(true)}>Open {entry.name}</Adaptive.Button>
@@ -163,7 +199,10 @@ export function PreviewRenderer({
 }) {
   const Component = modules[entry.family][entry.name as keyof typeof modules[typeof entry.family]] as ComponentType<Record<string, unknown>> | undefined
   if (!Component) return <Adaptive.EmptyState title="Preview unavailable" />
-  const merged = { ...(baseProps[entry.name] ?? { children: `${entry.name} preview` }), ...props }
+  const merged = {
+    ...(baseProps[entry.name as keyof typeof baseProps] ?? { children: `${entry.name} preview` }),
+    ...props,
+  } as Record<string, unknown>
 
   if (launchableOverlays.has(entry.name)) {
     return <OverlayPreview entry={entry} Component={Component} props={merged} />
@@ -212,7 +251,7 @@ const copyDefaults: Record<string, Record<string, unknown>> = {
   Combobox: { options: comboboxOptions, defaultValue: 'ja', 'aria-label': 'Languages' },
   SegmentedControl: { options: [{ label: 'One', value: 'one' }, { label: 'Two', value: 'two' }] },
   ActionSheet: { open: true, onClose: noop, items: [{ label: 'Copy', onSelect: noop }] },
-  AlertDialog: { open: true, onClose: noop, onConfirm: noop, title: 'Confirm action' },
+  AlertDialog: { open: true, onOpenChange: noop, onConfirm: noop, title: 'Confirm action' },
   Breadcrumb: { items: [{ label: 'Home', href: '/' }, { label: 'Current' }] },
   DataTable: { columns: [{ key: 'name', header: 'Name' }], data: [{ id: 'one', name: 'May UI' }], rowKey: 'id' },
   Field: { label: 'Email', children: 'Control' },

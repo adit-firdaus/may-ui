@@ -133,6 +133,22 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **The catalogue's `AlertDialog` can be cancelled again.** Its preview was
+  handed `onClose`, which `AlertDialog` does not declare — it closes through
+  `onOpenChange`. With `open` controlled from outside, the dialog's own
+  `setOpen(false)` is inert, so Cancel and Escape did nothing and Confirm was
+  the only way out. Verified in a browser both ways: old wiring stays open
+  after Cancel, new wiring closes. React emitted no warning of any kind.
+
+- **The catalogue's `Descriptions` preview is no longer an empty card.** The
+  fixture passed `items`, a prop it has never had, so the pairs vanished into
+  a rest spread and reached the DOM as `items="[object Object],[object
+  Object]"`. The fixture map was typed `Record<string, unknown>`, which
+  switched off the one check that could have caught it; it is now typed
+  against the components themselves, so `npm run site:typecheck` rejects an
+  invented prop. That retype also found `ContextMenu` preview actions missing
+  their required `id`.
+
 - **`Table` and `Descriptions` size themselves from their own box**, not from
   the window. Both directions were wrong and measured: a `Table` filling a
   1000px window collapsed to a phone list, because 1000 is under the 1024px
