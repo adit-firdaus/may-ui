@@ -58,19 +58,41 @@
  * half most systems get wrong in the other direction.
  * ------------------------------------------------------------------ */
 
-.may-root button,
-.may-root a,
-.may-root label,
-.may-root summary,
-.may-root [role='button'],
-.may-root [role='tab'],
-.may-root [role='option'],
-.may-root [role='menuitem'],
-.may-root [data-slot='list-row'],
-.may-root [data-slot='segmented'],
-.may-root [data-slot='nav-bar'],
-.may-root [data-slot='tab-bar'],
-.may-root [data-slot='toolbar'] {
+/*
+ * Both shapes, because a provider is optional.
+ *
+ * With a provider the interactive surface is a DESCENDANT of `.may-root`;
+ * without one the component root IS the surface — `.may-button` is the
+ * button. Scoped only to the descendant form, a bare Button kept the UA's
+ * text selection and its 300ms tap delay. Every selector stays
+ * class-qualified so a consumer's own `[role='button']` is never caught.
+ */
+:is([class^='may-'], [class*=' may-']) button,
+:is([class^='may-'], [class*=' may-']) a,
+:is([class^='may-'], [class*=' may-']) label,
+:is([class^='may-'], [class*=' may-']) summary,
+:is([class^='may-'], [class*=' may-']) [role='button'],
+:is([class^='may-'], [class*=' may-']) [role='tab'],
+:is([class^='may-'], [class*=' may-']) [role='option'],
+:is([class^='may-'], [class*=' may-']) [role='menuitem'],
+:is([class^='may-'], [class*=' may-']) [data-slot='list-row'],
+:is([class^='may-'], [class*=' may-']) [data-slot='segmented'],
+:is([class^='may-'], [class*=' may-']) [data-slot='nav-bar'],
+:is([class^='may-'], [class*=' may-']) [data-slot='tab-bar'],
+:is([class^='may-'], [class*=' may-']) [data-slot='toolbar'],
+button:is([class^='may-'], [class*=' may-']),
+a:is([class^='may-'], [class*=' may-']),
+label:is([class^='may-'], [class*=' may-']),
+summary:is([class^='may-'], [class*=' may-']),
+[role='button']:is([class^='may-'], [class*=' may-']),
+[role='tab']:is([class^='may-'], [class*=' may-']),
+[role='option']:is([class^='may-'], [class*=' may-']),
+[role='menuitem']:is([class^='may-'], [class*=' may-']),
+[data-slot='list-row']:is([class^='may-'], [class*=' may-']),
+[data-slot='segmented']:is([class^='may-'], [class*=' may-']),
+[data-slot='nav-bar']:is([class^='may-'], [class*=' may-']),
+[data-slot='tab-bar']:is([class^='may-'], [class*=' may-']),
+[data-slot='toolbar']:is([class^='may-'], [class*=' may-']) {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -89,7 +111,8 @@
  * scroller meant the gesture was never the control's to receive: on a phone it
  * simply could not be dragged.
  */
-.may-root [data-slot='segmented'] {
+:is([class^='may-'], [class*=' may-']) [data-slot='segmented'],
+[data-slot='segmented']:is([class^='may-'], [class*=' may-']) {
   touch-action: none;
 }
 
@@ -102,14 +125,21 @@
 }
 
 /* Icons and images are furniture too — dragging one off a button is never intended. */
-.may-root img,
-.may-root svg {
+:is([class^='may-'], [class*=' may-']) img,
+:is([class^='may-'], [class*=' may-']) svg {
   -webkit-user-drag: none;
   user-select: none;
 }
 
-.may-root input,
-.may-root textarea {
+/*
+ * Class-matched, not provider-matched: the 16px floor is what stops iOS
+ * zooming the viewport on focus, and a provider is optional. Scoped to
+ * `.may-root` it did nothing in the arrangement getting-started shows first.
+ */
+:is([class^='may-'], [class*=' may-']) input,
+:is([class^='may-'], [class*=' may-']) textarea,
+input:is([class^='may-'], [class*=' may-']),
+textarea:is([class^='may-'], [class*=' may-']) {
   caret-color: var(--may-color-tint);
   /* iOS zooms the viewport when a focused field is under 16px. */
   font-size: max(16px, 1em);
@@ -164,7 +194,15 @@
  * Focus — keyboard only, never on tap
  * ------------------------------------------------------------------ */
 
-.may-root :focus:not(:focus-visible) {
+/*
+ * Matched on the class, like the reduced-motion guard above and for the same
+ * reason: only MayProvider renders `.may-root`, and a provider is optional.
+ * Scoped to it, BOTH focus rules silently did nothing in a provider-less tree
+ * — measured, a bare Button showed the browser's own `auto 1px` ring on a
+ * click, where May suppresses it and draws its own on keyboard focus alone.
+ */
+:is([class^='may-'], [class*=' may-']) :focus:not(:focus-visible),
+:is([class^='may-'], [class*=' may-']):focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -180,7 +218,8 @@
  * Nothing is lost by dropping it: `outline` already follows the element's own
  * border-radius, so the ring hugs the capsule on its own.
  */
-.may-root :focus-visible {
+:is([class^='may-'], [class*=' may-']) :focus-visible,
+:is([class^='may-'], [class*=' may-']):focus-visible {
   /*
    * Solid, not a 45% wash. Composited over the surfaces it actually sits on,
    * the wash measured 1.85:1 on white and 1.78:1 on the grouped background —

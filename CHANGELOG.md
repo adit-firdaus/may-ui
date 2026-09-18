@@ -122,6 +122,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Fixed
 
+- **The behavioural base layer no longer needs a provider.** `.may-root` is
+  rendered by `MayProvider` alone, and a provider is optional — the
+  getting-started page opens by showing components used without one. Four base
+  rules were scoped to it and so did nothing in that arrangement, each measured
+  on a bare `Button` or `Input`: the focus ring (the browser's own `auto 1px`
+  showed instead of May's token ring), `touch-action` (`manipulation` never
+  applied, so the 300ms tap delay returned, and `SegmentedControl` could not be
+  dragged at all on touch), `user-select`, and the `max(16px, 1em)` floor that
+  stops iOS zooming a focused field. All four match on the class now, still
+  qualified so a consumer's own `[role="button"]` is never caught — verified.
+  Cosmetic rules stay provider-scoped on purpose: the page should win the font.
+
 - **`prefers-reduced-motion` is honoured without a provider.** The guard was
   written `.may-root *`, and only `MayProvider` renders `.may-root` — but a
   provider is optional, and the getting-started page opens by showing

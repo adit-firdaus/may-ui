@@ -760,6 +760,57 @@ const checks = [
       )
     })(),
   ],
+  /*
+   * The behavioural base layer does not require a provider.
+   *
+   * `.may-root` is rendered by MayProvider alone, and a provider is optional
+   * — getting-started opens by showing components used without one. Four base
+   * rules were scoped to it and so did nothing in that arrangement, each
+   * measured on a bare Button or Input: the focus ring (the browser's own
+   * `auto 1px` showed instead of May's token ring), `touch-action`
+   * (`manipulation` never applied, so the 300ms tap delay came back, and the
+   * segmented control could not be dragged at all on touch), `user-select`,
+   * and the 16px floor that stops iOS zooming a focused field.
+   *
+   * Cosmetic rules may stay provider-scoped — a font family the page should
+   * win, a selection colour. What must not is anything a component needs to
+   * BEHAVE. Checked by declaration, not by counting rules.
+   */
+  [
+    'the behavioural base layer works without a provider',
+    (() => {
+      const BEHAVIOURAL = [
+        ['outline', /outline:\s*3px/],
+        ['touch-action', /touch-action:\s*(manipulation|none)/],
+        ['user-select', /user-select:\s*none/],
+        ['the iOS field floor', /font-size:\s*max\(16px/],
+      ]
+      /*
+       * Read base.css itself, not the built aggregate. A first version
+       * scanned every sheet and passed while the base rule was still
+       * provider-scoped, because Checkbox, Radio, Select and Switch each
+       * declare their own `outline: 3px` and satisfied the search — a check
+       * answered by a rule other than the one it is about.
+       */
+      const base = readFileSync(join(srcRoot, 'styles/base.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+      const problems = []
+      for (const [label, pattern] of BEHAVIOURAL) {
+        const carriers = [...base.matchAll(/([^{}]*)\{([^}]*)\}/g)].filter((m) => pattern.test(m[2]))
+        if (carriers.length === 0) { problems.push(`${label}: base.css no longer declares it`); continue }
+        // …and every carrier must have a selector that matches without a provider
+        for (const carrier of carriers) {
+          const reachable = carrier[1]
+            .split(',')
+            .some((one) => one.trim() && !/\bmay-root\b/.test(one))
+          if (!reachable) problems.push(`${label}: only reachable inside .may-root`)
+        }
+      }
+      return (
+        problems.length === 0 ||
+        (console.log(`\n       provider-less base layer: ${problems.join('; ')}`), false)
+      )
+    })(),
+  ],
 ]
 
 let bad = 0
