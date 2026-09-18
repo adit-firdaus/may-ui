@@ -149,6 +149,26 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   invented prop. That retype also found `ContextMenu` preview actions missing
   their required `id`.
 
+- **A long word no longer pushes `Text` and `Heading` out of their box.**
+  `.may-text` carried `overflow-wrap: break-word`, which lets a word break but
+  does not lower the box's min-content width — so as a flex or grid item,
+  whose automatic minimum IS its min-content width, the text still refused to
+  shrink. Measured in a 200px box: a `Text` in block flow wrapped at 200px,
+  the same `Text` as a flex or grid item drew 350px, and a `Heading` drew
+  712px. It now also sets `min-width: 0`, the same release used by `.may-table`
+  and `.may-toolbar`.
+
+- **A screen-reader caption no longer widens the page.** `.may-sr-only` is
+  `position: absolute`, and an absolutely positioned box contributes to the
+  scrollable overflow of its containing block — the nearest positioned
+  ancestor, not the unpositioned scroller it happens to sit inside. Left at its
+  static position it escaped that clip: two `Statistic` deltas put their
+  "Up"/"Down" captions at x=355 inside a clipped stage and the document
+  scrolled sideways by 36px at 320px wide, with every visibly overflowing
+  element correctly clipped and nothing to blame. It is now pinned to its
+  containing block's inline start. The focusable reveal sets `position: static`
+  and is unaffected.
+
 - **`Pagination` collapses instead of walking out of its container.** Its key
   row is `flex-wrap: nowrap` with `flex-shrink: 0` keys, so a row that does
   not fit leaves its box rather than tightening — nine `md` keys want 428px

@@ -310,6 +310,21 @@ textarea:is([class^='may-'], [class*=' may-']) {
 
 .may-sr-only {
   position: absolute;
+  /*
+   * Pinned, not left at its static position.
+   *
+   * An absolutely positioned box contributes to the scrollable overflow of its
+   * CONTAINING BLOCK, which is the nearest positioned ancestor — not of the
+   * unpositioned scroller it happens to sit inside. So a caption left at its
+   * static position escapes that scroller's clip and lands on the page.
+   * Measured on the analytics pattern at 320px: two `Statistic` deltas put
+   * their "Up"/"Down" captions at x=355 inside a clipped 616px stage, and the
+   * document scrolled sideways by 36px with nothing visible to blame.
+   *
+   * The focusable reveal in VisuallyHidden.css sets `position: static`, which
+   * drops this along with the rest of the hiding, so a skip link is untouched.
+   */
+  inset-inline-start: 0;
   width: 1px;
   height: 1px;
   padding: 0;

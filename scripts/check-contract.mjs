@@ -846,6 +846,36 @@ const checks = [
   ],
 
   /*
+   * A screen-reader caption cannot widen the page.
+   *
+   * `.may-sr-only` is `position: absolute`, and an absolutely positioned box
+   * contributes to the scrollable overflow of its containing block — the
+   * nearest POSITIONED ancestor, not the unpositioned scroller it sits in. Left
+   * at its static position it therefore escapes that scroller's clip. Measured
+   * at 320px: two captions inside a clipped 616px stage sat at x=355 and the
+   * document scrolled 36px sideways, with every visibly overflowing element
+   * correctly clipped and nothing to blame.
+   */
+  [
+    '.may-sr-only is pinned, so a caption cannot widen the page',
+    (() => {
+      const base = readFileSync(join(srcRoot, 'styles/base.css'), 'utf8')
+      const rule = base.match(/\.may-sr-only\s*\{([^}]*)\}/)
+      if (!rule) {
+        console.log('\n       no .may-sr-only rule in base.css at all')
+        return false
+      }
+      const body = rule[1].replace(/\/\*[\s\S]*?\*\//g, '')
+      if (/inset(-inline)?(-start)?\s*:/.test(body)) return true
+      console.log(
+        '\n       .may-sr-only sets no inline inset, so it stays at its static position' +
+          '\n       and escapes any unpositioned scroller it is inside',
+      )
+      return false
+    })(),
+  ],
+
+  /*
    * Pagination collapses instead of leaving its container.
    *
    * `.may-pagination__list` is `flex-wrap: nowrap` with `flex-shrink: 0` keys

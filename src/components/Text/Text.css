@@ -21,7 +21,24 @@
   letter-spacing: var(--may-txt-tracking, var(--may-text-body-tracking));
   font-weight: var(--may-txt-weight, var(--may-text-body-weight));
   color: var(--may-txt-color, var(--may-color-text));
-  /* A long word in a narrow column breaks rather than pushing the layout out. */
+  /*
+   * A long word in a narrow column breaks rather than pushing the layout out.
+   *
+   * It takes BOTH of these, and the wrap alone was what this said before.
+   * `break-word` lets a word break, but it does not change the box's
+   * min-content width — so a flex or grid item, whose automatic minimum IS its
+   * min-content width, still refuses to shrink under the longest word and the
+   * text walks out of its container. Measured at a 200px box: a `Text` in
+   * block flow wrapped at 200px, the same `Text` as a flex or grid item drew
+   * 350px, and a `Heading` drew 712px. Most layouts here are flex.
+   *
+   * `min-width: 0` is the same release this file's neighbours already use —
+   * `.may-table`, `.may-toolbar`, `.may-descriptions-group`. It is preferred
+   * over `overflow-wrap: anywhere`, which also fixes it but by dropping the
+   * min-content contribution to a single character, so a `fit-content` box or
+   * a grid `auto` track would stop sizing itself to the words in it.
+   */
+  min-width: 0;
   overflow-wrap: break-word;
   /* Fixes orphans where supported, without touching the metrics. */
   text-wrap: pretty;
