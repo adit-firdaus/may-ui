@@ -149,6 +149,17 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   invented prop. That retype also found `ContextMenu` preview actions missing
   their required `id`.
 
+- **`Pagination` collapses instead of walking out of its container.** Its key
+  row is `flex-wrap: nowrap` with `flex-shrink: 0` keys, so a row that does
+  not fit leaves its box rather than tightening — nine `md` keys want 428px
+  and a phone hands them 320. `compact` already fitted in 240; it was just the
+  consumer's job to know that, so every default pager overflowed every phone.
+  `compact` is now tri-state: `true` or `false` still wins, and omitting it
+  measures the keys and collapses when they do not fit. Measured across a
+  container from 900px down to 240px and back — the switch is at 428px in both
+  directions, the row never exceeds its box at any width, and holding the
+  container astride the threshold for 1.5s produced no flip-flop.
+
 - **`Table` and `Descriptions` size themselves from their own box**, not from
   the window. Both directions were wrong and measured: a `Table` filling a
   1000px window collapsed to a phone list, because 1000 is under the 1024px

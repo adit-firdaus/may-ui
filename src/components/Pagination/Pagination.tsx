@@ -1,8 +1,11 @@
 import type { HTMLAttributes, ReactNode } from 'react'
+import { useRef, useState } from 'react'
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import { useSlidingThumb } from '../../motion/useSlidingThumb'
+import { useContainerWidth } from '../../hooks/useContainerWidth'
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect'
 import type { MaySize } from '../../types'
 
 /** The key lifts a little under the press, the way a segmented thumb does. */
@@ -27,6 +30,11 @@ export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onCh
    * Collapse to "Page 3 of 12" between the two arrows. Twelve keys do not fit
    * across a phone, and a pager that scrolls sideways is worse than one that
    * counts.
+   *
+   * Left off, the pager decides for itself: it measures the keys it would
+   * draw and collapses when they do not fit the space it has been given. Pass
+   * `true` to force the count, or `false` to insist on the keys and accept
+   * that a narrow container will have to scroll to reach them.
    */
   compact?: boolean
   /** Accessible name for the pager. @default 'Pagination' */
@@ -124,11 +132,29 @@ export function Pagination({
   onPageChange,
   siblingCount = 1,
   size = 'md',
-  compact = false,
+  compact,
   className,
   'aria-label': ariaLabel = 'Pagination',
   ...rest
 }: PaginationProps) {
+  const rootRef = useRef<HTMLElement>(null)
+  const width = useContainerWidth(rootRef)
+  /*
+   * What the full row of keys actually needs, measured from the keys.
+   *
+   * Not computed from the tokens: `--may-control-h` is in `rem`, so a reader
+   * at 200% text needs a proportionally wider row and a hard-coded 428 would
+   * collapse a pager that fits or keep one that does not. Not `scrollWidth`
+   * either — that clamps to the client width whenever the content fits, so a
+   * roomy pager would report its container's width as its requirement and
+   * collapse on the next pixel of shrink.
+   *
+   * The keys carry `flex-shrink: 0`, so their own widths are their natural
+   * ones even while the row is overflowing, which makes this readable in the
+   * state that matters and stable in the one that does not.
+   */
+  const [needed, setNeeded] = useState<number | null>(null)
+
   const total = Math.max(1, Math.floor(pageCount))
   const current = Math.min(Math.max(1, Math.floor(page)), total)
 
@@ -137,7 +163,34 @@ export function Pagination({
     if (clamped !== current) onPageChange(clamped)
   }
 
-  const slots = compact ? [] : slotsFor(current, total, siblingCount)
+  /*
+   * An explicit prop always wins. Otherwise the row collapses exactly when it
+   * would otherwise leave its container — which is what the note on
+   * `.may-pagination__list` has always said is the answer, except that until
+   * now the consumer had to know to ask for it. Nine md keys want 428px and a
+   * phone hands them 320, so the default pager overflowed every phone.
+   *
+   * Never collapses before the first measurement: `null` means "not measured",
+   * and guessing `compact` there would flash the count on every desktop load.
+   */
+  const isCompact = compact ?? (width !== null && needed !== null && width < needed)
+
+  const slots = isCompact ? [] : slotsFor(current, total, siblingCount)
+
+  useIsomorphicLayoutEffect(() => {
+    if (isCompact) return // nothing to measure; the stored requirement stands
+    const list = rootRef.current?.querySelector('ul')
+    if (!list) return
+    const items = [...list.children].filter((child) => child.tagName === 'LI')
+    if (items.length === 0) return
+    const gap = Number.parseFloat(getComputedStyle(list).columnGap) || 0
+    const run =
+      items.reduce((sum, item) => sum + item.getBoundingClientRect().width, 0) +
+      gap * (items.length - 1)
+    // Rounded, so sub-pixel jitter cannot re-render this on every resize tick.
+    const measured = Math.ceil(run)
+    setNeeded((previous) => (previous === measured ? previous : measured))
+  })
 
   /*
    * A filled key that SLIDES between slot positions instead of one key's fill
@@ -156,7 +209,7 @@ export function Pagination({
     selectedIndex: slots.findIndex((slot) => slot === current),
     roundEnds: true,
     pressScale: PRESS_SCALE,
-    enabled: !compact,
+    enabled: !isCompact,
   })
 
   const previous = (
@@ -175,19 +228,20 @@ export function Pagination({
   return (
     <nav
       {...rest}
+      ref={rootRef}
       aria-label={ariaLabel}
       data-slot="pagination"
       data-size={size}
-      data-compact={compact ? 'true' : undefined}
+      data-compact={isCompact ? 'true' : undefined}
       className={cx('may-pagination', className)}
     >
       <ul ref={trackRef} className="may-pagination__list" onPointerDown={onPointerDown}>
         {/* The sliding fill. First child so it paints beneath the keys; a bare
           * span in a list is furniture, hidden from the tree. */}
-        {!compact && <span ref={thumbRef} className="may-pagination__thumb" aria-hidden />}
+        {!isCompact && <span ref={thumbRef} className="may-pagination__thumb" aria-hidden />}
         {previous}
 
-        {compact ? (
+        {isCompact ? (
           <li className="may-pagination__item">
             {/* Polite, not assertive: the count is a confirmation, not an alert. */}
             <span className="may-pagination__status" aria-live="polite">

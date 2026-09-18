@@ -846,6 +846,38 @@ const checks = [
   ],
 
   /*
+   * Pagination collapses instead of leaving its container.
+   *
+   * `.may-pagination__list` is `flex-wrap: nowrap` with `flex-shrink: 0` keys
+   * — deliberately, because the sliding thumb needs one axis and a row that
+   * reflows under the finger is worse than one that does not. The consequence
+   * is that a row which does not fit walks out of its box: nine md keys want
+   * 428px and a phone hands them 320. The component's own `compact` mode fits
+   * in 240, so the fix was always present; it was just the consumer's job to
+   * know that, and every default pager overflowed every phone.
+   *
+   * So `compact` must stay tri-state — an explicit `true`/`false` wins, and
+   * omitting it measures. A `compact = false` default silently restores the
+   * overflow.
+   */
+  [
+    'Pagination decides `compact` from its own width, not from a default',
+    (() => {
+      const file = join(srcRoot, 'components/Pagination/Pagination.tsx')
+      const text = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
+      if (/compact\s*=\s*false/.test(text)) {
+        console.log('\n       Pagination defaults `compact` to false — the keys will overflow a phone again')
+        return false
+      }
+      if (!/\buseContainerWidth\b/.test(text)) {
+        console.log('\n       Pagination no longer measures its container, so it cannot know when to collapse')
+        return false
+      }
+      return true
+    })(),
+  ],
+
+  /*
    * A component laid out IN FLOW asks its container how much room it has, not
    * the window.
    *
