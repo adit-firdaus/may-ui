@@ -844,6 +844,54 @@ const checks = [
       return false
     })(),
   ],
+
+  /*
+   * A component laid out IN FLOW asks its container how much room it has, not
+   * the window.
+   *
+   * `useIsDesktop` is a viewport query, and for a Sheet or a Modal that is the
+   * whole truth — those are anchored to the window and nothing else decides
+   * their size. For a Table or a Descriptions card it is a guess about the
+   * parent, and it was wrong in both directions at once. Measured:
+   *
+   *   - a Table filling a 1000px window collapsed to a phone list, because
+   *     1000 < 1024, with 988px of room going unused;
+   *   - the same Table in a 254px sidebar of a 1400px window rendered a full
+   *     table and scrolled sideways inside the column.
+   *
+   * No choice of breakpoint fixes both, because the viewport does not know the
+   * sidebar is there. So the rule is: anything reaching for `useIsDesktop`
+   * that is not on the viewport-anchored list must also measure its own box.
+   */
+  (() => {
+    const VIEWPORT_ANCHORED = ['Modal', 'Sheet', 'AlertDialog', 'ActionSheet', 'MayHost', 'Popup']
+    const offenders = sources()
+      // Only the three component families. The hook itself, `platform.ts` and
+      // the example device frame all name `useIsDesktop` legitimately.
+      .filter((file) => /\/(components|desktop|mobile)\//.test(file))
+      .filter((file) => !VIEWPORT_ANCHORED.some((name) => file.endsWith(`/${name}/${name}.tsx`)))
+      /*
+       * Comments stripped first, and this is not fussiness: the first cut of
+       * this gate passed on a deliberately reverted Table, because the file's
+       * own comment still said "see `useContainerWidth`". A gate that reads
+       * prose is a gate that reports on prose.
+       */
+      .map((file) => [file, readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')])
+      .filter(([, text]) => /\buseIsDesktop\b/.test(text))
+      .filter(([, text]) => !/\buseContainerWidth\b/.test(text))
+      .map(([file]) => file.split('/src/').pop())
+
+    return [
+      'in-flow components size themselves from their container, not the viewport',
+      offenders.length === 0 ||
+        (console.log(
+          `\n       ${offenders.join(', ')} branches on the VIEWPORT but is laid out in flow.` +
+            '\n       Measure the element with useContainerWidth, or add it to VIEWPORT_ANCHORED' +
+            '\n       in this gate if it really is pinned to the window.',
+        ),
+        false),
+    ]
+  })(),
 ]
 
 let bad = 0

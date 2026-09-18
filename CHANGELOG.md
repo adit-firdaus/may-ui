@@ -8,6 +8,12 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`useContainerWidth(ref)`** — an element's own width, tracked as it resizes.
+  For a component laid out in flow, the container is the constraint and the
+  viewport is a guess about it. Returns `null` before the first measurement and
+  on the server, where callers fall back to `useIsDesktop()` and the markup
+  stays what it always was.
+
 - **`--may-target-min`** (24px), the floor for anything you press. Reach for
   `--may-control-h` first — 44px is Apple's number and the right one for a
   standalone control. This is for the parts that are a fraction of a control:
@@ -126,6 +132,18 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   Return must not land on it.
 
 ### Fixed
+
+- **`Table` and `Descriptions` size themselves from their own box**, not from
+  the window. Both directions were wrong and measured: a `Table` filling a
+  1000px window collapsed to a phone list, because 1000 is under the 1024px
+  desktop breakpoint, leaving 988px of room unused; the same `Table` in a 254px
+  sidebar of a 1400px window rendered as a full table and scrolled sideways
+  inside the column, which is exactly the shape the collapsed layout exists to
+  avoid. No choice of breakpoint fixes both, because the viewport does not know
+  the sidebar is there. `Table` now collapses under 640px of its own width, and
+  `Descriptions` takes as many of its `columns` as fit at 280px each — so
+  `columns={3}` resolves to three in a wide card, two in a medium one and one
+  on a phone, rather than all-or-nothing. A phone renders exactly as before.
 
 - **`Toolbar` no longer makes the page scroll sideways.** It is a flex row that
   takes however many children you give it, and a `Button` will not shrink below

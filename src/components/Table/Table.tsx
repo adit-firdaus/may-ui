@@ -1,9 +1,10 @@
 import type { CSSProperties, HTMLAttributes, MouseEvent, ReactNode } from 'react'
-import { Fragment, isValidElement } from 'react'
+import { Fragment, isValidElement, useRef } from 'react'
 import { IoCheckmark } from 'react-icons/io5'
 import { cx } from '../../utils/cx'
 import { useAutoId } from '../../utils/useId'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
+import { useContainerWidth } from '../../hooks/useContainerWidth'
 import { usePressFeedback } from '../../hooks/usePressFeedback'
 import type { MaySize, MayAlign } from '../../types'
 import { List, ListRow } from '../List/List'
@@ -65,6 +66,16 @@ const NO_SELECTION: ReadonlySet<string> = new Set()
  * to read as a cascade; staggering row two hundred would just make it late.
  */
 const STAGGER_CAP = 10
+
+/**
+ * Container width at which the table stops being a table.
+ *
+ * Deliberately NOT `--may-breakpoint-desktop`. That token describes a device
+ * — it decides whether a Sheet slides up from the bottom of the window — and a
+ * Table asks a different question: is there room here for columns? The two
+ * answers diverge in both directions, which is the bug this replaced.
+ */
+const COLLAPSE_W = 640
 
 function resolveKey<T>(rowKey: TableRowKey<T>, row: T, index: number): string {
   if (typeof rowKey === 'function') return String(rowKey(row, index))
@@ -207,7 +218,20 @@ export function Table<T>({
   style,
   ...rest
 }: TableProps<T>) {
+  const rootRef = useRef<HTMLDivElement>(null)
   const isDesktop = useIsDesktop()
+  const width = useContainerWidth(rootRef)
+  /*
+   * The threshold is the table's OWN width, not the window's. Four columns in
+   * 640px get 160px each, which a header and a short value fit; below that the
+   * columns are narrower than the words in them and the list is the honest
+   * shape. A viewport query cannot answer this — see `useContainerWidth`.
+   *
+   * `width` is null until the first layout effect and on the server, and the
+   * viewport is the best guess available then; it is also what this component
+   * used to answer with always, so nothing about SSR or hydration changes.
+   */
+  const collapsed = width === null ? !isDesktop : width < COLLAPSE_W
   const captionId = useAutoId()
   const selected = selectedKeys ? new Set(selectedKeys) : NO_SELECTION
   const isEmpty = data.length === 0
@@ -238,7 +262,7 @@ export function Table<T>({
 
   /* ------------------------------- collapsed ------------------------------ */
 
-  if (!isDesktop) {
+  if (collapsed) {
     /*
      * The trailing detail is the last column that is not the title — a table's
      * final column is nearly always its headline value (a size, a date, a
@@ -256,7 +280,7 @@ export function Table<T>({
     const primaryColumn = columns[primaryIndex]
 
     return (
-      <div {...rest} {...root} data-layout="stacked" className={cx('may-table', className)}>
+      <div {...rest} {...root} ref={rootRef} data-layout="stacked" className={cx('may-table', className)}>
         {sectionTitle}
         <List variant="inset" aria-labelledby={caption ? captionId : undefined}>
           {isEmpty
@@ -324,7 +348,7 @@ export function Table<T>({
   const hasWidths = columns.some((column) => column.width !== undefined)
 
   return (
-    <div {...rest} {...root} data-layout="table" className={cx('may-table', className)}>
+    <div {...rest} {...root} ref={rootRef} data-layout="table" className={cx('may-table', className)}>
       {sectionTitle}
       <div
         className="may-table__scroller"

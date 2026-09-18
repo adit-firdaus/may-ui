@@ -8,3 +8,4 @@ export type { MayPlatform, PlatformProviderProps } from './platform'
 // public so a consumer can build their own navigational component with it.
 export { useLinkComponent } from './link'
 export { useKeyboardInset } from './useKeyboardInset'
+export { useContainerWidth } from './useContainerWidth'

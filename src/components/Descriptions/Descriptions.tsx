@@ -1,7 +1,8 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
-import { Children, createContext, isValidElement, useContext } from 'react'
+import { Children, createContext, isValidElement, useContext, useRef } from 'react'
 import { cx } from '../../utils/cx'
 import { useIsDesktop } from '../../hooks/useIsDesktop'
+import { useContainerWidth } from '../../hooks/useContainerWidth'
 import type { MayInset } from '../../types'
 
 /**
@@ -13,6 +14,14 @@ const DescriptionRowContext = createContext<{ index: number; columns: number }>(
   index: 0,
   columns: 1,
 })
+
+/**
+ * Narrowest a key/value column may get before it is worth one fewer of them.
+ * A pair is a label, a gap and a value on one line; under this the value wraps
+ * under a label that is itself ellipsised, and two cramped columns read worse
+ * than one comfortable one.
+ */
+const MIN_COLUMN_W = 280
 
 export interface DescriptionsProps extends HTMLAttributes<HTMLDListElement> {
   children?: ReactNode
@@ -29,9 +38,10 @@ export interface DescriptionsProps extends HTMLAttributes<HTMLDListElement> {
    */
   layout?: 'inline' | 'stacked'
   /**
-   * Columns to split the pairs across ON DESKTOP ONLY. A phone is always one
-   * column: two columns of key/value at 390px is unreadable, and the pairs
-   * would be narrower than their own values.
+   * Columns to split the pairs across, as a MAXIMUM. The card takes as many of
+   * them as its own width can give `MIN_COLUMN_W` each, so `columns={3}` is
+   * three in a wide card, two in a medium one and one on a phone — where two
+   * columns of key/value would be narrower than their own values.
    * @default 1
    */
   columns?: number
@@ -55,15 +65,33 @@ export function Descriptions({
   style,
   ...rest
 }: DescriptionsProps) {
+  const groupRef = useRef<HTMLDivElement>(null)
   const isDesktop = useIsDesktop()
-  const resolved = isDesktop ? Math.max(1, Math.floor(columns)) : 1
+  const width = useContainerWidth(groupRef)
+  const asked = Math.max(1, Math.floor(columns))
+  /*
+   * How many columns FIT, capped by how many were asked for. Measuring the
+   * card rather than the window is what makes `columns={2}` resolve to one in
+   * a 254px sidebar of a 1400px screen, which a viewport query reports as
+   * desktop and lays out at half the width a pair needs.
+   *
+   * Before the first measurement — the server, and the render before the
+   * layout effect — the viewport is the only thing to go on, and answering
+   * with it keeps the markup identical to what this component emitted before.
+   */
+  const resolved =
+    width === null
+      ? isDesktop
+        ? asked
+        : 1
+      : Math.min(asked, Math.max(1, Math.floor(width / MIN_COLUMN_W)))
 
   // toArray drops nulls and booleans, so a conditionally rendered row cannot
   // silently consume an index and push the whole first-row calculation over.
   const rows = Children.toArray(children)
 
   return (
-    <div className={cx('may-descriptions-group', className)}>
+    <div ref={groupRef} className={cx('may-descriptions-group', className)}>
       {header && <div className="may-descriptions__section-header">{header}</div>}
       <dl
         {...rest}

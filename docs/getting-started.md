@@ -366,6 +366,35 @@ useKeyboardInset(open)          // enable the measurement while your panel is up
 // .my-footer { padding-bottom: var(--may-keyboard-inset); }
 ```
 
+**`useContainerWidth(ref)`** — the element's own content width, kept current as
+it resizes, or `null` before the first measurement and on the server. It is the
+answer to a question `useIsDesktop()` cannot address: a component laid out in
+flow gets its room from its parent, not from the window. Both directions of
+that mistake were live in `Table` until recently — a table filling a 1000px
+window collapsed to a phone list because 1000 is under the 1024px breakpoint,
+and the same table in a 254px sidebar of a 1400px window rendered full width
+and scrolled sideways inside the column. No breakpoint fixes both, because the
+viewport does not know the sidebar is there.
+
+Treat `null` as "fall back to the viewport" — that keeps server-rendered markup
+identical to what a viewport query would have produced, so nothing reflows on
+hydration.
+
+```tsx
+const ref = useRef<HTMLDivElement>(null)
+const width = useContainerWidth(ref)
+const isDesktop = useIsDesktop()
+const wide = width === null ? isDesktop : width >= 640
+return <div ref={ref}>{wide ? <Table … /> : <List … />}</div>
+```
+
+Reach for `useIsDesktop()` instead when the component really is pinned to the
+window — a Sheet sliding up from the bottom of the screen is a viewport
+question and nothing else. `Modal`, `Sheet`, `AlertDialog`, `ActionSheet` and
+`Popup` are all on that side of the line, and `check:contract` holds the list:
+any other component under `components/`, `desktop/` or `mobile/` that branches
+on `useIsDesktop` has to measure its own box too.
+
 `usePressFeedback()`, `useReducedMotion()`, `useIsDesktop()` and `usePlatform()`
 are public for the same reason: the press physics, the motion opt-out and the
 adaptive breakpoint are decisions the system has already made, and a component
