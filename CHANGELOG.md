@@ -8,6 +8,11 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
 
 ### Added
 
+- **`--may-target-min`** (24px), the floor for anything you press. Reach for
+  `--may-control-h` first — 44px is Apple's number and the right one for a
+  standalone control. This is for the parts that are a fraction of a control:
+  a tag's remove button, a table's column sorter.
+
 - **`--may-color-on-warning`, `--may-color-on-success`, `--may-on-bright`** —
   the foreground for a bright fill, named once instead of chosen by hand in
   five component sheets.
@@ -288,13 +293,6 @@ Notable changes to `@adit_firdaus/may-ui`. Format follows
   flex row collapses to the glyph. That one now fills the pill properly, 36 to
   52px. `SplitPane`'s divider stays a hairline on purpose: a pseudo-element
   already extends its hit area 8px each side and it has no neighbour to crowd.
-
-### Added
-
-- **`--may-target-min`** (24px), the floor for anything you press. Reach for
-  `--may-control-h` first — 44px is Apple's number and the right one for a
-  standalone control. This is for the parts that are a fraction of a control:
-  a tag's remove button, a table's column sorter.
 
 - **Text fields have a real focus indicator.** `Input`, `Textarea`, `Combobox`,
   `SearchField` and mobile `SearchBar` drew a 28-30% halo, and `Input`
